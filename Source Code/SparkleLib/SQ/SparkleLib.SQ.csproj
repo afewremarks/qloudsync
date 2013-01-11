@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5389E416-C229-4A98-90F3-C7829DFF77D0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SparkleLib.SQ</RootNamespace>
+    <AssemblyName>SparkleLib.SQ</AssemblyName>
+    <ReleaseVersion />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>..\..\bin</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>..\..\bin</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="AWSSDK">
+      <HintPath>..\..\lib\AWSSDK.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="ConnectionManager.cs" />
+    <Compile Include="LocalFile.cs" />
+    <Compile Include="RemoteFile.cs" />
+    <Compile Include="Folder.cs" />
+    <Compile Include="Credential.cs" />
+    <Compile Include="Constant.cs" />
+    <Compile Include="Change.cs" />
+    <Compile Include="File.cs" />
+    <Compile Include="Synchronizer.cs" />
+    <Compile Include="Authentication.cs" />
+    <Compile Include="OSXFileWatcher.cs" />
+    <Compile Include="RemoteRepo.cs" />
+    <Compile Include="SparkleFetcherQS.cs" />
+    <Compile Include="SparkleRepoQS.cs" />
+    <Compile Include="Repo.cs" />
+    <Compile Include="Sync.cs" />
+    <Compile Include="LocalRepo.cs" />
+    <Compile Include="QloudSyncPlugin.cs" />
+    <Compile Include="UploadSynchronizer.cs" />
+    <Compile Include="DownloadSynchronizer.cs" />
+    <Compile Include="BacklogSynchronizer.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="SparkleLib.SQ.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SparkleLib.csproj">
+      <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
+      <Name>SparkleLib</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
