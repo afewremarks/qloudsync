@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}</ProjectGuid>
+    <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SparkleShare</RootNamespace>
+    <AssemblyName>QloudSync</AssemblyName>
+    <ReleaseVersion>
+    </ReleaseVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="mkdir -p ${TargetDir}/${SolutionName}.app/Contents/Frameworks &amp;&amp; cp -R Growl.framework ${TargetDir}/${SolutionName}.app/Contents/Frameworks &amp;&amp; cp -R git ${TargetDir}/${SolutionName}.app/Contents/Resources &amp;&amp; cp -R SparkleShareInviteOpener.app ${TargetDir}/${SolutionName}.app/Contents/Resources" externalConsole="True" />
+      </CustomCommands>
+    </CustomCommands>
+    <EnableCodeSigning>False</EnableCodeSigning>
+    <CreatePackage>False</CreatePackage>
+    <EnablePackageSigning>False</EnablePackageSigning>
+    <IncludeMonoRuntime>True</IncludeMonoRuntime>
+    <ConsolePause>False</ConsolePause>
+    <CodeSigningKey>Mac Developer</CodeSigningKey>
+    <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
+    <I18n />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <IncludeMonoRuntime>False</IncludeMonoRuntime>
+    <EnablePackageSigning>False</EnablePackageSigning>
+    <EnableCodeSigning>False</EnableCodeSigning>
+    <CreatePackage>False</CreatePackage>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="mkdir -p ${TargetDir}/${SolutionName}.app/Contents/Frameworks &amp;&amp; cp -R Growl.framework ${TargetDir}/${SolutionName}.app/Contents/Frameworks &amp;&amp; cp -R git ${TargetDir}/${SolutionName}.app/Contents/Resources &amp;&amp; cp -R SparkleShareInviteOpener.app ${TargetDir}/${SolutionName}.app/Contents/Resources" externalConsole="True" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoMac" />
+    <Reference Include="System.Net" />
+    <Reference Include="Mono.Posix" />
+    <Reference Include="AWSSDK">
+      <HintPath>..\..\lib\AWSSDK.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppDelegate.cs">
+      <DependentUpon>MainMenu.xib</DependentUpon>
+    </Compile>
+    <Compile Include="MainMenu.xib.designer.cs">
+      <DependentUpon>MainMenu.xib</DependentUpon>
+    </Compile>
+    <Compile Include="..\SparkleControllerBase.cs">
+      <Link>SparkleControllerBase.cs</Link>
+    </Compile>
+    <Compile Include="SparkleStatusIcon.cs" />
+    <Compile Include="SparkleUI.cs" />
+    <Compile Include="..\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="SparkleMacWatcher.cs" />
+    <Compile Include="SparkleEventLog.cs" />
+    <Compile Include="SparkleBadger.cs" />
+    <Compile Include="SparkleBubbles.cs" />
+    <Compile Include="SparkleSetup.cs" />
+    <Compile Include="SparkleSetupWindow.cs" />
+    <Compile Include="..\SparkleBubblesController.cs">
+      <Link>SparkleBubblesController.cs</Link>
+    </Compile>
+    <Compile Include="..\SparkleEventLogController.cs">
+      <Link>SparkleEventLogController.cs</Link>
+    </Compile>
+    <Compile Include="..\SparkleSetupController.cs">
+      <Link>SparkleSetupController.cs</Link>
+    </Compile>
+    <Compile Include="..\SparkleStatusIconController.cs">
+      <Link>SparkleStatusIconController.cs</Link>
+    </Compile>
+    <Compile Include="..\SparkleAboutController.cs">
+      <Link>SparkleAboutController.cs</Link>
+    </Compile>
+    <Compile Include="..\SparkleExtensions.cs">
+      <Link>SparkleExtensions.cs</Link>
+    </Compile>
+    <Compile Include="SparkleController.cs" />
+    <Compile Include="..\SparklePlugin.cs">
+      <Link>SparklePlugin.cs</Link>
+    </Compile>
+    <Compile Include="SparkleAbout.cs" />
+    <Compile Include="..\SparkleInvite.cs">
+      <Link>SparkleInvite.cs</Link>
+    </Compile>
+    <Compile Include="..\SparkleKeys.cs">
+      <Link>SparkleKeys.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="MainMenu.xib" xmlns="" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
+  <ItemGroup>
+    <Content Include="..\Common\HTML\day-entry.html">
+      <Link>HTML\day-entry.html</Link>
+    </Content>
+    <Content Include="..\Common\HTML\event-entry.html">
+      <Link>HTML\event-entry.html</Link>
+    </Content>
+    <Content Include="..\Common\HTML\event-log.html">
+      <Link>HTML\event-log.html</Link>
+    </Content>
+    <Content Include="..\Common\Pixmaps\side-splash.png">
+      <Link>Pixmaps\side-splash.png</Link>
+    </Content>
+    <Content Include="Pixmaps\sparkleshare-folder.icns">
+      <Link>sparkleshare-folder.icns</Link>
+    </Content>
+    <Content Include="Pixmaps\sparkleshare-app.icns">
+      <Link>sparkleshare-app.icns</Link>
+    </Content>
+    <Content Include="..\Linux\Pixmaps\icons\document-added-12.png">
+      <Link>Pixmaps\document-added-12.png</Link>
+    </Content>
+    <Content Include="..\Linux\Pixmaps\icons\document-edited-12.png">
+      <Link>Pixmaps\document-edited-12.png</Link>
+    </Content>
+    <Content Include="..\Linux\Pixmaps\icons\document-deleted-12.png">
+      <Link>Pixmaps\document-deleted-12.png</Link>
+    </Content>
+    <Content Include="..\Linux\Pixmaps\icons\document-moved-12.png">
+      <Link>Pixmaps\document-moved-12.png</Link>
+    </Content>
+    <Content Include="..\Common\Pixmaps\about.png">
+      <Link>Pixmaps\about.png</Link>
+    </Content>
+    <Content Include="..\Common\HTML\jquery.js">
+      <Link>HTML\jquery.js</Link>
+    </Content>
+    <Content Include="Pixmaps\tutorial-slide-1.png">
+      <Link>Pixmaps\tutorial-slide-1.png</Link>
+    </Content>
+    <Content Include="Pixmaps\tutorial-slide-2.png">
+      <Link>Pixmaps\tutorial-slide-2.png</Link>
+    </Content>
+    <Content Include="Pixmaps\tutorial-slide-3.png">
+      <Link>Pixmaps\tutorial-slide-3.png</Link>
+    </Content>
+    <Content Include="..\Common\Pixmaps\tutorial-slide-4.png">
+      <Link>Pixmaps\tutorial-slide-4.png</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\greenqloud.xml">
+      <Link>Plugins\greenqloud.xml</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\greenqloud.png">
+      <Link>Plugins\greenqloud.png</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\bitbucket.xml">
+      <Link>Plugins\bitbucket.xml</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\bitbucket.png">
+      <Link>Plugins\bitbucket.png</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\github.xml">
+      <Link>Plugins\github.xml</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\github.png">
+      <Link>Plugins\github.png</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\gitorious.xml">
+      <Link>Plugins\gitorious.xml</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\gitorious.png">
+      <Link>Plugins\gitorious.png</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\gnome.xml">
+      <Link>Plugins\gnome.xml</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\gnome.png">
+      <Link>Plugins\gnome.png</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\own-server.xml">
+      <Link>Plugins\own-server.xml</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\own-server.png">
+      <Link>Plugins\own-server.png</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\ssnet.xml">
+      <Link>Plugins\ssnet.xml</Link>
+    </Content>
+    <Content Include="..\Common\Plugins\ssnet.png">
+      <Link>Plugins\ssnet.png</Link>
+    </Content>
+    <Content Include="Growl.plist" />
+    <Content Include="Pixmaps\process-syncing-active.png" />
+    <Content Include="Pixmaps\process-syncing-down-active.png" />
+    <Content Include="Pixmaps\process-syncing-down.png" />
+    <Content Include="Pixmaps\process-syncing-error-active.png" />
+    <Content Include="Pixmaps\process-syncing-error.png" />
+    <Content Include="Pixmaps\process-syncing-idle-active.png" />
+    <Content Include="Pixmaps\process-syncing-idle.png" />
+    <Content Include="Pixmaps\process-syncing-up-active.png" />
+    <Content Include="Pixmaps\process-syncing-up.png" />
+    <Content Include="Pixmaps\process-syncing.png" />
+    <Content Include="..\Common\Pixmaps\user-icon-default.png">
+      <Link>Pixmaps\user-icon-default.png</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pixmaps\" />
+    <Folder Include="HTML\" />
+    <Folder Include="Plugins\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SparkleLib\SparkleLib.csproj">
+      <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
+      <Name>SparkleLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SparkleLib\Git\SparkleLib.Git.csproj">
+      <Project>{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}</Project>
+      <Name>SparkleLib.Git</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SparkleLib\SQ\SparkleLib.SQ.csproj">
+      <Project>{5389E416-C229-4A98-90F3-C7829DFF77D0}</Project>
+      <Name>SparkleLib.SQ</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+  </ItemGroup>
+</Project>
