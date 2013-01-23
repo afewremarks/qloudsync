@@ -80,7 +80,7 @@ namespace QloudSync {
             process.Start ();
             process.WaitForExit ();
 
-            SparkleLogger.LogInfo ("Controller", "Added " + NSBundle.MainBundle.BundlePath + " to login items");
+            Logger.LogInfo ("Controller", "Added " + NSBundle.MainBundle.BundlePath + " to login items");
 		}
 
 
@@ -143,12 +143,11 @@ namespace QloudSync {
 		}
 
 
-		public override bool CreateSparkleShareFolder ()
+		public override bool CreateHomeFolder ()
 		{
-            this.watcher = new SparkleMacWatcher (Program.Controller.FoldersPath);
 
-            if (!Directory.Exists (Program.Controller.FoldersPath)) {
-                Directory.CreateDirectory (Program.Controller.FoldersPath);
+            if (!Directory.Exists (Settings.HomePath)) {
+                Directory.CreateDirectory (Settings.HomePath);
                 return true;
 
             } else {

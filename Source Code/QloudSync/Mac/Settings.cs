@@ -128,7 +128,7 @@ namespace QloudSync {
             }
             set
             {
-                ConfigurationManager.AppSettings["NotificationsEnabled"] = value.ToString();
+                AppSettingsUpdate ("NotificationsEnabled", value.ToString());
             }
         }
 
@@ -144,7 +144,7 @@ namespace QloudSync {
             }
             set{
                 username = value;
-                ConfigurationManager.AppSettings ["Username"] = value;
+                AppSettingsUpdate("Username", value);
             }
         }
 
@@ -157,7 +157,7 @@ namespace QloudSync {
             }
             set {
                 publickey = value;
-                ConfigurationManager.AppSettings ["PublicKey"] = value;
+                AppSettingsUpdate("PublicKey", value);
             }
         }
 
@@ -170,9 +170,23 @@ namespace QloudSync {
             }
             set {
                 secretkey = value;
-                ConfigurationManager.AppSettings ["SecretKey"] = value;
+                AppSettingsUpdate("SecretKey", value);
             }
         }
         #endregion
+
+        private static void AppSettingsUpdate (string name, string value)
+        {
+            System.Configuration.Configuration config = ConfigurationManager.OpenExeConfiguration (ConfigurationUserLevel.None);
+
+            if (ConfigurationManager.AppSettings [name] != null) {
+                config.AppSettings.Settings [name].Value = value;     
+            } else {
+                config.AppSettings.Settings.Add (name, value);
+            }
+            config.Save (ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection ("appSettings");
+
+        }
     }
 }

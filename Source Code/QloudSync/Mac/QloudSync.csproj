@@ -66,6 +66,7 @@
       <HintPath>..\..\lib\AWSSDK.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDelegate.cs">
@@ -114,9 +115,7 @@
     <Compile Include="SparkleChangeSet.cs" />
     <Compile Include="SparkleExceptions.cs" />
     <Compile Include="SparkleListenerBase.cs" />
-    <Compile Include="SparkleListenerFactory.cs" />
     <Compile Include="SparkleListenerTcp.cs" />
-    <Compile Include="SparkleLogger.cs" />
     <Compile Include="SparkleRepoBase.cs" />
     <Compile Include="SparkleUser.cs" />
     <Compile Include="SparkleWatcher.cs" />
@@ -132,7 +131,6 @@
     <Compile Include="Folder.cs" />
     <Compile Include="LocalFile.cs" />
     <Compile Include="LocalRepo.cs" />
-    <Compile Include="Logger.cs" />
     <Compile Include="OSXFileWatcher.cs" />
     <Compile Include="QloudSyncPlugin.cs" />
     <Compile Include="RemoteFile.cs" />
@@ -143,7 +141,8 @@
     <Compile Include="Synchronizer.cs" />
     <Compile Include="UploadSynchronizer.cs" />
     <Compile Include="SparkleFetcher.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Logger.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />
@@ -208,5 +207,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
+    <None Include="app.config" />
   </ItemGroup>
 </Project>

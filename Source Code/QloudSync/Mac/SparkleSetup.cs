@@ -122,7 +122,8 @@ namespace QloudSync {
                     Frame           = new RectangleF (325, 75 , Frame.Width, 60),
                     StringValue     = "The password you entered is incorrect.\n",
                     Font            = NSFontManager.SharedFontManager.FontWithFamily (
-                        "Lucida Grande", NSFontTraitMask.Bold, 0, 10)
+                        "Lucida Grande", NSFontTraitMask.Bold, 0, 10),
+                    TextColor = NSColor.Red
                 };
 
 
@@ -150,8 +151,7 @@ namespace QloudSync {
                     try{
                         QloudSync.Net.Authentication aut = new QloudSync.Net.Authentication();
                         aut.Authenticate (FullNameTextField.StringValue, PasswordTextField.StringValue);
-                        QloudSync.QloudSyncPlugin.WriteKeys();
-                        Controller.AddPageCompleted (FullNameTextField.StringValue, PasswordTextField.StringValue);
+                        //Controller.AddPageCompleted (FullNameTextField.StringValue, PasswordTextField.StringValue);
                     }
                     catch (System.Net.WebException)
                     {
