@@ -9,22 +9,33 @@ namespace  QloudSync.Repository
 {
     public class RemoteRepo : Repo
     {
-        private static ConnectionManager connection = new ConnectionManager(DefaultBucketName);
+        private ConnectionManager connection; 
+
+        public RemoteRepo ()
+        {
+            this.connection =  new ConnectionManager (DefaultBucketName);
+        }
+
+        public ConnectionManager Connection {
+            get {
+                return connection;
+            }
+        }
 
 		#region Files
-        public static List<RemoteFile> Files{ 
+        public List<RemoteFile> Files{ 
             get {
-                return AllFiles.Where(sobj => !RemoteRepo.IsTrashFile (sobj) && sobj.Name != Constant.CLOCK_TIME ).ToList();
+                return AllFiles.Where(sobj => !IsTrashFile (sobj) && sobj.Name != Constant.CLOCK_TIME ).ToList();
             } 
         }
 
-        public static List<RemoteFile> AllFiles{ 
+        public List<RemoteFile> AllFiles{ 
             get {
                 return GetRemoteFiles (connection.GetFiles());
             } 
         }
 
-		private static List<RemoteFile> GetRemoteFiles (List<S3Object> files)
+		private List<RemoteFile> GetRemoteFiles (List<S3Object> files)
 		{
 			List <RemoteFile> remoteFiles = new List <RemoteFile> ();
 			
@@ -34,32 +45,32 @@ namespace  QloudSync.Repository
 			return remoteFiles;
 		}
 
-        public static List<RemoteFile> TrashFiles {
+        public List<RemoteFile> TrashFiles {
             get{ return AllFiles.Where(f => IsTrashFile(f)).ToList();} 
         }
 
-		public static List<File> FilesChanged{ set; get;}
+		public List<File> FilesChanged{ set; get;}
 
 		#endregion
 
 		#region Auxiliar
 
-        public static bool HasChanges{ set; get; }
+        public bool HasChanges{ set; get; }
 
-        public static bool ExistsTrashFolder {
+        public  bool ExistsTrashFolder {
             get {
-                return  RemoteRepo.TrashFiles.Where(rm => IsTrashFile(rm)).Any();
+                return  TrashFiles.Where(rm => IsTrashFile(rm)).Any();
             }
         }
 
-        public static TimeSpan DiffClocks 
+        public TimeSpan DiffClocks 
         {
             get{
                 return connection.CalculateDiffClocks();
             }
         }
 
-        public static bool Connected {
+        public bool Connected {
             get {
                 return connection.Reconnect () != null;
             }
@@ -74,7 +85,7 @@ namespace  QloudSync.Repository
 
 		#endregion
 
-        public static bool InitBucket ()
+        public bool InitBucket ()
         {
             if (!connection.ExistsBucket)
                 return connection.CreateBucket();
@@ -82,78 +93,77 @@ namespace  QloudSync.Repository
             else return true; 
         }
 
-        public static bool InitTrashFolder ()
+        public bool InitTrashFolder ()
         {
-            if (!RemoteRepo.ExistsTrashFolder) {
+            if (!ExistsTrashFolder) {
                 return connection.CreateTrashFolder ();
             }
             else return true;
         }
 
-        public static void Download (RemoteFile remoteFile)
+        public void Download (RemoteFile remoteFile)
         {
-            Console.WriteLine (remoteFile.FullLocalName);
             //TODO observar aqui
-            if (!RemoteRepo.IsTrashFile (remoteFile) && !LocalRepo.PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == System.IO.WatcherChangeTypes.Deleted).Any())
+            if (!IsTrashFile (remoteFile) && !LocalRepo.PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == System.IO.WatcherChangeTypes.Deleted).Any())
                 connection.Download (remoteFile);
         }
 
 
-        public static void Upload (File file)
+        public void Upload (File file)
         {
             connection.Upload(file);
         }
 
-        public static void CreateFolder (Folder folder)
+        public void CreateFolder (Folder folder)
         {
             connection.CreateFolder (folder);
         }
 
-        public static void Move (File old, File newO)
+        public void Move (File old, File newO)
         {
             connection.Copy (old, newO);
             connection.CopyToTrash (old);
-            if (RemoteRepo.Files.Where (rf => rf.Name == old.Name).Any())
+            if (Files.Where (rf => rf.Name == old.Name).Any())
                 connection.Delete (old);
         }
         
-        public static void MoveToTrash (File  SQObject){
+        public void MoveToTrash (File  SQObject){
             connection.CopyToTrash ( SQObject);
             UpdateTrashFolder ( SQObject);
             connection.Delete ( SQObject);
         }
 
-        public static bool ExistsInBucket (File file)
+        public bool ExistsInBucket (File file)
         {
             return Files.Where (rf => rf.AbsolutePath == file.AbsolutePath 
                                 || rf.AbsolutePath.Contains (file.AbsolutePath)).Any ();
         }
         
-        public static bool IsTrashFile (RemoteFile file)
+        public bool IsTrashFile (RemoteFile file)
         {
             return file.InTrash;
         }
 
-        public static bool SendToTrash (LocalFile file)
+        public bool SendToTrash (LocalFile file)
         {
             connection.UploadToTrash (file);
             Logger.LogInfo ("Connection","File "+file.Name+" was sent to trash folder.");
             UpdateTrashFolder (file);
 
-            return RemoteRepo.TrashFiles.Where (rf => rf.TrashFullName == file.TrashFullName+"(1)").Any ();
+            return TrashFiles.Where (rf => rf.TrashFullName == file.TrashFullName+"(1)").Any ();
         }
         
-        public static bool SendToTrash (RemoteFile remoteFile)
+        public bool SendToTrash (RemoteFile remoteFile)
         {
             connection.CopyToTrash (remoteFile);
-            bool copySucessfull =  RemoteRepo.TrashFiles.Where (rm => remoteFile.AbsolutePath+"(0)" == rm.AbsolutePath).Any();
+            bool copySucessfull =  TrashFiles.Where (rm => remoteFile.AbsolutePath+"(0)" == rm.AbsolutePath).Any();
             if (copySucessfull)
                 UpdateTrashFolder (remoteFile);
             
             return copySucessfull;
         }
         
-        public static void UpdateTrashFolder (File  SQObject)
+        public void UpdateTrashFolder (File  SQObject)
         {
             if ( SQObject.IsAFolder)
                 return;
@@ -179,18 +189,25 @@ namespace  QloudSync.Repository
             }
         }
 
-		public static void Delete (RemoteFile file)
+		public void Delete (RemoteFile file)
 		{
 			connection.Delete (file);
 		}
         
-        private static List<RemoteFile> GetVersionsOrderByLastModified (File  SQObject)  {
-            return  RemoteRepo.TrashFiles.Where (ft => ft.AbsolutePath.Contains ( SQObject.AbsolutePath)).OrderBy(ft => ft.AsS3Object.LastModified).ToList<RemoteFile>();
+        private List<RemoteFile> GetVersionsOrderByLastModified (File  SQObject)  {
+            return  TrashFiles.Where (ft => ft.AbsolutePath.Contains ( SQObject.AbsolutePath)).OrderBy(ft => ft.AsS3Object.LastModified).ToList<RemoteFile>();
         }
 
-        public static void DeleteAllFilesInBucket(){
+        public void DeleteAllFilesInBucket(){
 			connection.DeleteAllFilesInBucket();
 		}
+
+        public bool Initialized ()
+        {
+            if (InitBucket())
+                return InitTrashFolder();
+            return false;
+        }
     }
 }
 

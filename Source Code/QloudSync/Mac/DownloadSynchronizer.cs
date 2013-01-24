@@ -13,7 +13,7 @@ namespace  QloudSync.Synchrony
     {
         private static DownloadSynchronizer instance;
         private List<QloudSync.Repository.RemoteFile> PendingFiles;
-
+        private RemoteRepo remoteRepo = new RemoteRepo();
 
         public static bool Initialized;
         
@@ -37,7 +37,7 @@ namespace  QloudSync.Synchrony
             Synchronized = false;
             Logger.LogInfo("Synchronizer", "Trying download files from Storage.");
             DateTime initTime = DateTime.Now;
-            RemoteRepo.FilesChanged = new List<QloudSync.Repository.File>();
+            remoteRepo.FilesChanged = new List<QloudSync.Repository.File>();
             SyncSize = 0;
             if (Initialize ()) {
                 PendingFiles = RemoteChanges;
@@ -145,14 +145,14 @@ namespace  QloudSync.Synchrony
                     // baixa arquivo remoto
                     //Changes.Add (connection.Download (remoteFile));
                     AddDownloadFile (remoteFile);
-					RemoteRepo.Download (remoteFile);
+					remoteRepo.Download (remoteFile);
                 }
             }
             else
             {
                 // se nao existe, baixa
 				AddDownloadFile(remoteFile);
-                RemoteRepo.Download (remoteFile);
+                remoteRepo.Download (remoteFile);
                 
                 countOperation++;
             }   

@@ -13,9 +13,13 @@ namespace QloudSync
         }
 
         private static DownloadController instance;
-        private bool finished = false;
-        private double downSize = 0;
-
+        private bool downloadFinished = false;
+        private double downloadSize = 0;
+        private double downloadPercent = 0;
+        private double downloadSpeed = 0;
+        private int secondsRemaining = 0;
+        private int bytesTransferred = 0;
+        private RemoteRepo remoteRepo = new RemoteRepo();
         
         
         protected List<string> warnings = new List<string> ();
@@ -77,24 +81,27 @@ namespace QloudSync
             return instance;
         }
 
+
+
         public bool FirstLoad()
         {
             try
             {
-                Thread downThread = new Thread(DownThreadMethod);
-                double percentage = 0;
+                ClearDownloadIndexes ();
+                Thread downThread = new Thread(FullLoad);
                 downThread.Start ();
-                
-                while (percentage < 100)
+
+                while (downloadPercent < 100)
                 {
-                    if (finished)
+                    if (downloadFinished)
                         break;
                     
-                    double repoSize = LocalRepo.Size;
-                    
-                    if (downSize != 0)
-                        percentage = (repoSize / downSize)*100;
-                    ProgressChanged (percentage);
+                    bytesTransferred += remoteRepo.Connection.TransferSize;
+                    remoteRepo.Connection.TransferSize = 0;
+                    if (downloadSize != 0)
+                        downloadPercent = (bytesTransferred / downloadSize) * 100;
+
+                    ProgressChanged (downloadPercent);
                     Thread.Sleep (1000);
                 }
             }
@@ -106,36 +113,46 @@ namespace QloudSync
             return true;
         }
 
-        void DownThreadMethod ()
+        void FullLoad ()
         {
-            finished = false;
-            if (RemoteRepo.InitBucket ()) {
-                if(RemoteRepo.InitTrashFolder ()){
-                    System.Collections.Generic.List<RemoteFile> remoteFiles = RemoteRepo.Files;
-                    foreach (RemoteFile remoteFile in remoteFiles) {
-                        if (!remoteFile.IsIgnoreFile)
-                            downSize += remoteFile.AsS3Object.Size;
-                    }
+            downloadFinished = false;
+            if (remoteRepo.Initialized ()) {
+                    List<RemoteFile> remoteFiles = remoteRepo.Files;
+                    CalculateDownloadSize(remoteFiles);
                     foreach (RemoteFile remoteFile in remoteFiles) {
                         if(remoteFile.IsAFolder)
                             Directory.CreateDirectory (remoteFile.FullLocalName);
                         else
                         {
                             if (!remoteFile.IsIgnoreFile)
-                                RemoteRepo.Download (remoteFile);
+                                remoteRepo.Download (remoteFile);
                         }
                     }
                     //BacklogSynchronizer.GetInstance().Write();
-                }
             }
-            finished = true;
+            downloadFinished = true;
         }
 
-
-        
         public void Stop ()
         {
-            finished = true;
+            downloadFinished = true;
+        }
+
+        void CalculateDownloadSize (List<RemoteFile> remoteFiles)
+        {
+            foreach (RemoteFile remoteFile in remoteFiles) {
+                if (!remoteFile.IsIgnoreFile)
+                    downloadSize += remoteFile.AsS3Object.Size;
+            }
+        }
+
+        void ClearDownloadIndexes()
+        {
+            downloadPercent = 0;
+            downloadSpeed = 0;
+            downloadSize = 0;
+            secondsRemaining = 0;
+            bytesTransferred = 0;
         }
     }
 }

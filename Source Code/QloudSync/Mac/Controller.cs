@@ -31,8 +31,7 @@ namespace QloudSync {
 	public class Controller{
 
         
-        DownloadController downloadController = DownloadController.GetInstance();
-
+        DownloadController downloadController;
         public double ProgressPercentage = 0.0;
         public string ProgressSpeed      = "";
         
@@ -51,10 +50,7 @@ namespace QloudSync {
         
         public event FolderFetchingHandler FolderFetching = delegate { };
         public delegate void FolderFetchingHandler (double percentage);
-        
-        public event Action FolderListChanged = delegate { };
-        
-        
+
         public event Action OnIdle = delegate { };
         public event Action OnSyncing = delegate { };
         public event Action OnError = delegate { };
@@ -62,7 +58,7 @@ namespace QloudSync {
 
         public Controller () : base ()
         {
-            using (var a = new NSAutoreleasePool ())
+            /*using (var a = new NSAutoreleasePool ())
             {
                 string content_path = Directory.GetParent (System.AppDomain.CurrentDomain.BaseDirectory).ToString ();
     
@@ -72,7 +68,7 @@ namespace QloudSync {
                 // Needed for Growl
                 Dlfcn.dlopen (growl_path, 0);
                 NSApplication.Init ();
-            }
+            }*/
 
 
         }
@@ -80,9 +76,10 @@ namespace QloudSync {
 
         public void Initialize ()
         {
-            if(CreateConfigFolder())
-                if (CreateHomeFolder ())
-                    AddToBookmarks ();
+            CreateConfigFolder();
+
+            if (CreateHomeFolder ())
+                AddToBookmarks ();
         }
 
 
@@ -166,8 +163,7 @@ namespace QloudSync {
             } else if (repo.HasUnsyncedChanges) {
                 has_unsynced_repos = true;
             }
-            
-            
+
             if (has_unsynced_repos)
                 OnError ();
             else
@@ -178,12 +174,8 @@ namespace QloudSync {
 
         public void StartFetcher ()
         {
-            string tmp_path = RuntimeSettings.TmpPath;
+            downloadController = DownloadController.GetInstance();
 
-            if (!Directory.Exists (tmp_path)) {
-                Directory.CreateDirectory (tmp_path);
-                File.SetAttributes (tmp_path, File.GetAttributes (tmp_path) | FileAttributes.Hidden);
-            }
             downloadController.Finished += () => FinishFetcher();
             downloadController.Failed += delegate {
                 FolderFetchError (downloadController.Errors);

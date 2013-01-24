@@ -135,6 +135,7 @@ namespace QloudSync {
                     try{
                         Net.S3.ConnectionManager.Authenticate (FullNameTextField.StringValue, PasswordTextField.StringValue);
                         Credential.Username = FullNameTextField.StringValue;
+
                         Controller.AddPageCompleted (FullNameTextField.StringValue, PasswordTextField.StringValue);
                     }
                     catch (System.Net.WebException)

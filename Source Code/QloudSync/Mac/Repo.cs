@@ -6,7 +6,7 @@ using QloudSync.Synchrony;
 	public class Repo
 	{
 
-		protected Repo ()
+		public Repo ()
 		{
 
 		}

@@ -75,24 +75,18 @@
       <Link>SparkleSetupController.cs</Link>
     </Compile>
     <Compile Include="SparkleRepoBase.cs" />
-    <Compile Include="BacklogSynchronizer.cs" />
     <Compile Include="Change.cs" />
     <Compile Include="ConnectionManager.cs" />
     <Compile Include="Constant.cs" />
     <Compile Include="Credential.cs" />
-    <Compile Include="DownloadSynchronizer.cs" />
     <Compile Include="File.cs" />
     <Compile Include="Folder.cs" />
     <Compile Include="LocalFile.cs" />
     <Compile Include="LocalRepo.cs" />
-    <Compile Include="OSXFileWatcher.cs" />
     <Compile Include="RemoteFile.cs" />
     <Compile Include="RemoteRepo.cs" />
     <Compile Include="Repo.cs" />
-    <Compile Include="SparkleRepoQS.cs" />
     <Compile Include="Sync.cs" />
-    <Compile Include="Synchronizer.cs" />
-    <Compile Include="UploadSynchronizer.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="DownloadController.cs" />

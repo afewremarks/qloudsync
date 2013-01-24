@@ -28,6 +28,10 @@ using System.Text;
             this.bucketName = bucketName;
 		}
 
+        public int TransferSize {
+            set; get;
+        }
+
 		#region Connection
 
         private AmazonS3Client connection;       
@@ -120,22 +124,36 @@ using System.Text;
 		public void Download (QloudSync.Repository.File  file)
         {
             try {
-                string sourcekey = file.AbsolutePath;//file.AbsolutePath.Substring (1, file.AbsolutePath.Length-1);
+                string sourcekey = file.AbsolutePath;
                 Logger.LogInfo ("Connection", "Download the file " + sourcekey + ".");
 			
                 GetObjectRequest objectRequest = new GetObjectRequest (){
-                BucketName = bucketName,
-				Key = sourcekey
-			};
+                    BucketName = bucketName,
+    				Key = sourcekey
+			    };
+               
+                using (GetObjectResponse response = Connect ().GetObject(objectRequest)) {
+                    using (Stream responseStream = response.ResponseStream) {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            var data = new byte[16*1024];
+                            int bytesRead;
+                            do
+                            {
+                                bytesRead = responseStream.Read(data, 0, data.Length);
+                                memoryStream.Write(data, 0, bytesRead);
+                                TransferSize += bytesRead;
 
-                using (GetObjectResponse response = Connect ().GetObject (objectRequest)) {
-                    response.WriteResponseStreamToFile (file.FullLocalName);
+                            } while (bytesRead > 0);
+                            memoryStream.WriteTo (new FileStream (file.FullLocalName,FileMode.Create, FileAccess.ReadWrite));
+                            memoryStream.Flush();
+                        }
+                    } 
                 }
 
             } catch (Exception e) {
                 Logger.LogInfo ("Error", e);
-            }
-			
+            }			
 		}	
 
 		public void Upload (QloudSync.Repository.File  file)
