@@ -4,8 +4,6 @@ using System.Linq;
 using Amazon.S3.Model;
 using QloudSync.Net.S3;
 using QloudSync.Util;
-using QloudSync.Security;
-
 
 namespace  QloudSync.Repository
 {
@@ -70,7 +68,7 @@ namespace  QloudSync.Repository
         public static string DefaultBucketName {
             get 
             {
-                return Credential.User + Constant.DEFAULT;
+                return string.Concat(Credential.Username, GlobalSettings.SuffixNameBucket);
             }
         }
 
@@ -94,7 +92,7 @@ namespace  QloudSync.Repository
 
         public static void Download (RemoteFile remoteFile)
         {
-
+            Console.WriteLine (remoteFile.FullLocalName);
             //TODO observar aqui
             if (!RemoteRepo.IsTrashFile (remoteFile) && !LocalRepo.PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == System.IO.WatcherChangeTypes.Deleted).Any())
                 connection.Download (remoteFile);

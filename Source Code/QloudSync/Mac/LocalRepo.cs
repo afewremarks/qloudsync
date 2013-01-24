@@ -16,11 +16,7 @@ using QloudSync.Util;
         private LocalRepo ()
         {
         }
-
-        public static string LocalFolder {
-            set;
-            get;
-        }
+       
 
         public static List<File> Files {
 			set {
@@ -36,7 +32,7 @@ using QloudSync.Util;
 		public static List<File> GetFiles ()
 		{
 			try {
-				System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo (LocalFolder);
+                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo (RuntimeSettings.HomePath);
 				List<File> list = LocalFile.Get (dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ());
 				list.AddRange (Folder.Get (dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()));
 
@@ -47,15 +43,41 @@ using QloudSync.Util;
 			}
 		}
 
-        public static List<Folder> WatchedFolders{ set; get;}
+        private static List<Folder> watched = new List<Folder>();
+        public static List<Folder> WatchedFolders { 
+            set {
+                watched = value;
+            }
+            get {
+                return watched;
+            }
+        }
 
-        public static List<Change> PendingChanges{ set; get; }
+        private static List<Change> pending = new List<Change>();
+        public static List<Change> PendingChanges {
+            set 
+            {
+                pending = value;
+            }
+            get
+            {
+                return pending;
+            } 
+        }
 
-        public static List<Sync> Syncs{ set; get; }
+        private static List<Sync> sync_list = new List<Sync>();
+        public static List<Sync> Syncs {
+            set {
+                sync_list = value;
+            }
+            get {
+                return sync_list;
+            }
+        }
 
         public static List<Folder> EmptyFolders {
             get {
-                List<DirectoryInfo> emptyDirectories = new DirectoryInfo (LocalFolder)
+                List<DirectoryInfo> emptyDirectories = new DirectoryInfo (RuntimeSettings.HomePath)
                 .GetDirectories ("*", SearchOption.AllDirectories)
                     .Where (d => !Directory.EnumerateFileSystemEntries (d.FullName).Any ()).ToList ();
                 List<Folder> emptyFolders = new List<Folder> ();
@@ -67,7 +89,7 @@ using QloudSync.Util;
 
         public static double Size {
 			get {
-				return GetFolderSize (LocalFolder);
+                return GetFolderSize (RuntimeSettings.HomePath);
 			}
         }
 

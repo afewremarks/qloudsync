@@ -28,10 +28,10 @@ namespace QloudSync {
 
     public class SparkleUI : AppDelegate {
 
-        public SparkleStatusIcon StatusIcon;
+        public IconController StatusIcon;
 
         public SparkleSetup Setup;
-        public SparkleAbout About;
+        public AboutWindow About;
 		
 		public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
 			"Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
@@ -50,8 +50,8 @@ namespace QloudSync {
                 SetFolderIcon ();
     
                 Setup      = new SparkleSetup ();
-                About      = new SparkleAbout ();
-                StatusIcon = new SparkleStatusIcon ();
+                About      = new AboutWindow ();
+                //StatusIcon = new IconController ();
 
                 Program.Controller.UIHasLoaded ();
             }
@@ -63,7 +63,7 @@ namespace QloudSync {
             using (var a = new NSAutoreleasePool ())
             {
                 NSImage folder_icon = NSImage.ImageNamed ("sparkleshare-folder.icns");
-                NSWorkspace.SharedWorkspace.SetIconforFile (folder_icon, Settings.HomePath, 0);
+                NSWorkspace.SharedWorkspace.SetIconforFile (folder_icon, RuntimeSettings.HomePath, 0);
             }
         }
 

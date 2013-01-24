@@ -27,7 +27,7 @@ using QloudSync.Util;
 
 
 
-           absolutePath = absolutePath.Replace (LocalRepo.LocalFolder, "");
+           absolutePath = absolutePath.Replace (RuntimeSettings.HomePath, "");
             
             if (absolutePath.Contains (Constant.DELIMITER)) {
                 
@@ -64,7 +64,7 @@ using QloudSync.Util;
         
         public string FullLocalName {
             get {
-                    return Path.Combine(LocalRepo.LocalFolder,AbsolutePath);
+                    return Path.Combine(RuntimeSettings.HomePath,AbsolutePath);
             }
         }
         

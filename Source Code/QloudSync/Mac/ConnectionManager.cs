@@ -13,9 +13,9 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using QloudSync.Security;
 using QloudSync.Util;
 using QloudSync.Repository;
+using System.Text;
 
 
  namespace QloudSync.Net.S3
@@ -31,7 +31,25 @@ using QloudSync.Repository;
 		#region Connection
 
         private AmazonS3Client connection;       
-        
+
+        public static void Authenticate (string username, string password)
+        {
+            Uri uri = new Uri(GlobalSettings.AuthenticationURL);
+            
+            WebRequest myReq = WebRequest.Create (uri);
+            string usernamePassword = username + ":" + password;
+            CredentialCache mycache = new CredentialCache ();
+            mycache.Add (uri, "Basic", new NetworkCredential (username, password));
+            myReq.Credentials = mycache;
+            myReq.Headers.Add ("Authorization", "Basic " + Convert.ToBase64String (new ASCIIEncoding ().GetBytes (usernamePassword)));
+            WebResponse wr = myReq.GetResponse ();
+            Stream receiveStream = wr.GetResponseStream ();
+            StreamReader reader = new StreamReader (receiveStream, Encoding.UTF8);
+            string receiveContent = reader.ReadToEnd ();
+            Credential.SecretKey = receiveContent.Substring(Constant.KEY_SECRET_START_INDEX, Constant.KEYS_LENGTH);
+            Credential.PublicKey = receiveContent.Substring(Constant.KEY_PUBLIC_START_INDEX, Constant.KEYS_LENGTH);
+            
+        }   
         
         private AmazonS3Client Connect ()
         {
@@ -53,10 +71,10 @@ using QloudSync.Repository;
 		public AmazonS3Client Reconnect ()
 		{
 			if (Credential.PublicKey == null || Credential.SecretKey == null) {
-				if (Credential.User == null || Credential.Password == null){
+				if (Credential.Username == null || Credential.Password == null){
 					return null;
 				}
-				new Authentication().Authenticate (Credential.User, Credential.Password);
+				Authenticate (Credential.Username, Credential.Password);
 			}			
 			return Connect();
 		}
@@ -64,7 +82,7 @@ using QloudSync.Repository;
         private static AmazonS3Config CreateConfig()
         {
             AmazonS3Config conf = new AmazonS3Config();
-            conf.ServiceURL = Credential.URLConnection;
+            conf.ServiceURL =  new Uri(GlobalSettings.StorageURL).Host;
             return conf;
         }
 
@@ -73,8 +91,8 @@ using QloudSync.Repository;
 
 		public bool ExistsBucket {
 			get {
-				return Reconnect ().ListBuckets () .Buckets.Where (b => b.BucketName == bucketName).Any ();
-			}
+                    return Reconnect().ListBuckets () .Buckets.Where (b => b.BucketName == bucketName).Any ();
+       			}
 		}
 
         public bool CreateBucket ()

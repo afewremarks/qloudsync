@@ -36,11 +36,11 @@ namespace QloudSync {
             lock (debug_lock) {
                 // Don't let the log get bigger than 1000 lines
                 if (log_size >= 1000) {
-                    File.WriteAllText (Settings.LogFilePath, line + Environment.NewLine);
+                    File.WriteAllText (RuntimeSettings.LogFilePath, line + Environment.NewLine);
                     log_size = 0;
 
                 } else {
-                    File.AppendAllText (Settings.LogFilePath, line + Environment.NewLine);
+                    File.AppendAllText (RuntimeSettings.LogFilePath, line + Environment.NewLine);
                     log_size++;
                 }
             }

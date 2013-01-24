@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using QloudSync.Repository;
 using System.IO;
+using System.Collections.Generic;
 
 namespace QloudSync
 {
@@ -14,6 +15,44 @@ namespace QloudSync
         private static DownloadController instance;
         private bool finished = false;
         private double downSize = 0;
+
+        
+        
+        protected List<string> warnings = new List<string> ();
+        protected List<string> errors   = new List<string> ();
+
+
+        public string [] Warnings {
+            get {
+                return this.warnings.ToArray ();
+            }
+        }
+        
+        public string [] Errors {
+            get {
+                return this.errors.ToArray ();
+            }
+        }
+
+        protected string [] ExcludeRules = new string [] {
+            "*.autosave", // Various autosaving apps
+            "*~", // gedit and emacs
+            ".~lock.*", // LibreOffice
+            "*.part", "*.crdownload", // Firefox and Chromium temporary download files
+            ".*.sw[a-z]", "*.un~", "*.swp", "*.swo", // vi(m)
+            ".directory", // KDE
+            ".DS_Store", "Icon\r\r", "._*", ".Spotlight-V100", ".Trashes", // Mac OS X
+            "*(Autosaved).graffle", // Omnigraffle
+            "Thumbs.db", "Desktop.ini", // Windows
+            "~*.tmp", "~*.TMP", "*~*.tmp", "*~*.TMP", // MS Office
+            "~*.ppt", "~*.PPT", "~*.pptx", "~*.PPTX",
+            "~*.xls", "~*.XLS", "~*.xlsx", "~*.XLSX",
+            "~*.doc", "~*.DOC", "~*.docx", "~*.DOCX",
+            "*/CVS/*", ".cvsignore", "*/.cvsignore", // CVS
+            "/.svn/*", "*/.svn/*", // Subversion
+            "/.hg/*", "*/.hg/*", "*/.hgignore", // Mercurial
+            "/.bzr/*", "*/.bzr/*", "*/.bzrignore" // Bazaar
+        };
 
         #region Events
 
@@ -38,7 +77,7 @@ namespace QloudSync
             return instance;
         }
 
-        public void FirstLoad()
+        public bool FirstLoad()
         {
             try
             {
@@ -62,7 +101,9 @@ namespace QloudSync
             catch (Exception e)
             {
                 Logger.LogInfo("First Load", e);
+                return false;
             }
+            return true;
         }
 
         void DownThreadMethod ()
@@ -91,7 +132,11 @@ namespace QloudSync
         }
 
 
-
+        
+        public void Stop ()
+        {
+            finished = true;
+        }
     }
 }
 

@@ -65,10 +65,6 @@
     <Compile Include="MainMenu.xib.designer.cs">
       <DependentUpon>MainMenu.xib</DependentUpon>
     </Compile>
-    <Compile Include="..\SparkleControllerBase.cs">
-      <Link>SparkleControllerBase.cs</Link>
-    </Compile>
-    <Compile Include="SparkleStatusIcon.cs" />
     <Compile Include="SparkleUI.cs" />
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>
@@ -78,16 +74,7 @@
     <Compile Include="..\SparkleSetupController.cs">
       <Link>SparkleSetupController.cs</Link>
     </Compile>
-    <Compile Include="..\SparkleStatusIconController.cs">
-      <Link>SparkleStatusIconController.cs</Link>
-    </Compile>
-    <Compile Include="..\SparkleAboutController.cs">
-      <Link>SparkleAboutController.cs</Link>
-    </Compile>
-    <Compile Include="SparkleController.cs" />
-    <Compile Include="SparkleAbout.cs" />
     <Compile Include="SparkleRepoBase.cs" />
-    <Compile Include="Authentication.cs" />
     <Compile Include="BacklogSynchronizer.cs" />
     <Compile Include="Change.cs" />
     <Compile Include="ConnectionManager.cs" />
@@ -106,10 +93,15 @@
     <Compile Include="Sync.cs" />
     <Compile Include="Synchronizer.cs" />
     <Compile Include="UploadSynchronizer.cs" />
-    <Compile Include="SparkleFetcher.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="DownloadController.cs" />
+    <Compile Include="Controller.cs" />
+    <Compile Include="AboutWindow.cs" />
+    <Compile Include="IconController.cs" />
+    <Compile Include="RuntimeSettings.cs" />
+    <Compile Include="Prefferences.cs" />
+    <Compile Include="GlobalSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />

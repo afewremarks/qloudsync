@@ -26,26 +26,24 @@ using MonoMac.WebKit;
 
 namespace QloudSync {
 
-    public class SparkleAbout : NSWindow {
-
-        public SparkleAboutController Controller = new SparkleAboutController ();
+    public class AboutWindow : NSWindow {
 
         private NSImage about_image;
         private NSImageView about_image_view;
-        private NSTextField version_text_field;
         private NSTextField updates_text_field;
         private NSTextField credits_text_field;
-        private NSButton hidden_close_button;
-        private SparkleLink website_link;
-        private SparkleLink credits_link;
-        private SparkleLink report_problem_link;
-        private SparkleLink debug_log_link;
 
 
-        public SparkleAbout (IntPtr handle) : base (handle) { }
+        public event Action ShowWindowEvent = delegate { };
+        public event Action HideWindowEvent = delegate { };
+        public AboutWindow (IntPtr handle) : base (handle) { }
 
-        public SparkleAbout () : base ()
+        public AboutWindow () : base ()
         {
+            Program.Controller.ShowAboutWindowEvent += delegate {
+                ShowWindowEvent ();
+            };
+
             using (var a = new NSAutoreleasePool ())
             {
                 SetFrame (new RectangleF (0, 0, 640, 281), true);
@@ -59,46 +57,10 @@ namespace QloudSync {
                 HasShadow   = true;
                 BackingType = NSBackingStore.Buffered;
 
-                this.website_link       = new SparkleLink ("Website", Controller.WebsiteLinkAddress);
-                this.website_link.Frame = new RectangleF (new PointF (295, 25), this.website_link.Frame.Size);
-
-                this.credits_link = new SparkleLink ("Credits", Controller.CreditsLinkAddress);
-                this.credits_link.Frame = new RectangleF (
-                    new PointF (this.website_link.Frame.X + this.website_link.Frame.Width + 10, 25),
-                    this.credits_link.Frame.Size);
-
-                this.report_problem_link = new SparkleLink ("Report a problem", Controller.ReportProblemLinkAddress);
-                this.report_problem_link.Frame = new RectangleF (
-                    new PointF (this.credits_link.Frame.X + this.credits_link.Frame.Width + 10, 25),
-                    this.report_problem_link.Frame.Size);
-
-                this.debug_log_link = new SparkleLink ("Debug log", Controller.DebugLogLinkAddress);
-                this.debug_log_link.Frame = new RectangleF (
-                    new PointF (this.report_problem_link.Frame.X + this.report_problem_link.Frame.Width + 10, 25),
-                    this.debug_log_link.Frame.Size);
-
-                this.hidden_close_button = new NSButton () {
-                    Frame                     = new RectangleF (0, 0, 0, 0),
-                    KeyEquivalentModifierMask = NSEventModifierMask.CommandKeyMask,
-                    KeyEquivalent             = "w"
-                };
-
-                this.hidden_close_button.Activated += delegate {
-                    Controller.WindowClosed ();
-                };
-
-
-                ContentView.AddSubview (this.hidden_close_button);
-
                 CreateAbout ();
-
-                ContentView.AddSubview (this.website_link);
-                ContentView.AddSubview (this.credits_link);
-                ContentView.AddSubview (this.report_problem_link);
-                ContentView.AddSubview (this.debug_log_link);
             }
 
-            Controller.HideWindowEvent += delegate {
+            HideWindowEvent += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
@@ -107,41 +69,11 @@ namespace QloudSync {
                 }
             };
 
-            Controller.ShowWindowEvent += delegate {
+            ShowWindowEvent += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
                         OrderFrontRegardless ();
-                    });
-                }
-            };
-
-            Controller.NewVersionEvent += delegate (string new_version) {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    InvokeOnMainThread (delegate {
-                        this.updates_text_field.StringValue = "A newer version (" + new_version + ") is available!";
-                        this.updates_text_field.TextColor   = NSColor.FromCalibratedRgba (0.45f, 0.62f, 0.81f, 1.0f);
-                    });
-                }
-            };
-
-            Controller.VersionUpToDateEvent += delegate {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    InvokeOnMainThread (delegate {
-                        this.updates_text_field.StringValue = "You are running the latest version.";
-                        this.updates_text_field.TextColor   = NSColor.FromCalibratedRgba (0.45f, 0.62f, 0.81f, 1.0f);
-                    });
-                }
-            };
-
-            Controller.CheckingForNewVersionEvent += delegate {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    InvokeOnMainThread (delegate {
-                        this.updates_text_field.StringValue = "Checking for updates...";
-                        this.updates_text_field.TextColor   = NSColor.FromCalibratedRgba (0.45f, 0.62f, 0.81f, 1.0f);
                     });
                 }
             };
@@ -193,12 +125,15 @@ namespace QloudSync {
                 };
 
                 ContentView.AddSubview (this.about_image_view);
-                ContentView.AddSubview (this.version_text_field);
                 ContentView.AddSubview (this.updates_text_field);
                 ContentView.AddSubview (this.credits_text_field);
             }
         }
 
+        public void WindowClosed ()
+        {
+            HideWindowEvent ();
+        }
 
         public override void OrderFrontRegardless ()
         {
@@ -228,9 +163,11 @@ namespace QloudSync {
         
         public override bool WindowShouldClose (NSObject sender)
         {
-            (sender as SparkleAbout).Controller.WindowClosed ();
+            (sender as AboutWindow).WindowClosed ();
             return false;
         }
+
+
     }
 
 

@@ -1,19 +1,3 @@
-//   SparkleShare, a collaboration and sharing tool.
-//   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
-//
-//   This program is free software: you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation, either version 3 of the License, or
-//   (at your option) any later version.
-//
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//   GNU General Public License for more details.
-//
-//   You should have received a copy of the GNU General Public License
-//   along with this program. If not, see <http://www.gnu.org/licenses/>.
-
 
 using System;
 using System.Collections.Generic;
@@ -129,7 +113,7 @@ namespace QloudSync {
 
                         ShowWindowEvent ();
 
-                    } else if (!Settings.FirstRun && TutorialPageNumber == 0) {
+                    } else if (!RuntimeSettings.FirstRun && TutorialPageNumber == 0) {
                         WindowIsOpen = true;
                         ChangePageEvent (PageType.Add, null);
                         ShowWindowEvent ();
@@ -237,37 +221,24 @@ namespace QloudSync {
 
         public void AddPageCompleted (string username, string password)
         {
-
-            Settings.Username = username;
-            QloudSync.Security.Credential.Password = password;
-
-            password =  QloudSync.Security.Credential.User + "-default.SQ";
-
-            SyncingFolder = Path.GetFileNameWithoutExtension (password);
-            SyncingFolder = SyncingFolder.Replace ("-crypto", "");
             ProgressBarPercentage = 1.0;
-            
             ChangePageEvent (PageType.Syncing, null);
-            
- 
-            password = password.Trim ();
-            password = password.TrimEnd ("/".ToCharArray ());
 
             Program.Controller.FolderFetched    += AddPageFetchedDelegate;
             Program.Controller.FolderFetchError += AddPageFetchErrorDelegate;
             Program.Controller.FolderFetching   += SyncingPageFetchingDelegate;
-            
-            /*new Thread (() => {
-                Program.Controller.StartFetcher (address, remote_path, this.fetch_prior_history);
-                
-            }).Start ();*/
+
+
+            new Thread (() => {
+                Program.Controller.StartFetcher ();
+            }).Start ();
 
         }
 
         // The following private methods are
         // delegates used by the previous method
 
-        private void AddPageFetchedDelegate (string remote_url, string [] warnings)
+        private void AddPageFetchedDelegate (string [] warnings)
         {
             ChangePageEvent (PageType.Finished, warnings);
 
@@ -276,7 +247,7 @@ namespace QloudSync {
             Program.Controller.FolderFetching   -= SyncingPageFetchingDelegate;
         }
 
-        private void AddPageFetchErrorDelegate (string remote_url, string [] errors)
+        private void AddPageFetchErrorDelegate (string [] errors)
         {
             ChangePageEvent (PageType.Error, errors);
 

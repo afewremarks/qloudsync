@@ -22,12 +22,19 @@ using System.IO;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
+using System.Threading;
 
 namespace QloudSync {
 
-    public class SparkleStatusIcon : NSObject {
+    public enum IconState {
+        Idle,
+        SyncingUp,
+        SyncingDown,
+        Syncing,
+        Error
+    }
 
-        public SparkleStatusIconController Controller = new SparkleStatusIconController ();
+    public class IconController : NSObject {
 
         private NSMenu menu;
         private NSMenu submenu;
@@ -35,9 +42,6 @@ namespace QloudSync {
         private NSStatusItem status_item;
         private NSMenuItem state_item;
         private NSMenuItem folder_item;
-
-        //private NSMenuItem [] folder_menu_items;
-        //private NSMenuItem [] submenu_items;
 
         private NSMenuItem more_item;
         private NSMenuItem add_item;
@@ -64,9 +68,64 @@ namespace QloudSync {
 
         private EventHandler [] folder_tasks;
         private EventHandler [] overflow_tasks;
-
+        public event UpdateIconEventHandler UpdateIconEvent = delegate { };
+        public delegate void UpdateIconEventHandler (IconState state);
         
-        public SparkleStatusIcon () : base ()
+        public event UpdateMenuEventHandler UpdateMenuEvent = delegate { };
+        public delegate void UpdateMenuEventHandler (IconState state);
+        
+        public event UpdateStatusItemEventHandler UpdateStatusItemEvent = delegate { };
+        public delegate void UpdateStatusItemEventHandler (string state_text);
+        
+        public event UpdateQuitItemEventHandler UpdateQuitItemEvent = delegate { };
+        public delegate void UpdateQuitItemEventHandler (bool quit_item_enabled);
+        
+        public event UpdateRecentEventsItemEventHandler UpdateRecentEventsItemEvent = delegate { };
+        public delegate void UpdateRecentEventsItemEventHandler (bool recent_events_item_enabled);
+        
+        public IconState CurrentState = IconState.Idle;
+        public string StateText = "Welcome to QloudSync!";
+        
+        public readonly int MenuOverflowThreshold   = 9;
+        public readonly int MinSubmenuOverflowCount = 3;
+        
+        public string [] Folders;
+        public string [] FolderErrors;
+        
+        public string [] OverflowFolders;
+        public string [] OverflowFolderErrors;
+        
+        
+        public string FolderSize {
+            get {
+                double size = 0;
+                
+                if (size == 0)
+                    return "";
+                else
+                    return "— " + Program.Controller.FormatSize (size);
+            }
+        }
+        
+        public int ProgressPercentage {
+            get {
+                return (int) Program.Controller.ProgressPercentage;
+            }
+        }
+        
+        public string ProgressSpeed {
+            get {
+                return Program.Controller.ProgressSpeed;
+            }
+        }
+        
+        public bool QuitItemEnabled {
+            get {
+                return (CurrentState == IconState.Idle || CurrentState == IconState.Error);
+            }
+        }
+        
+        public IconController () : base ()
         {
             using (var a = new NSAutoreleasePool ())
             {
@@ -97,9 +156,62 @@ namespace QloudSync {
 
                 CreateMenu ();
             }
-			
 
-            Controller.UpdateIconEvent += delegate (IconState state) {
+            Program.Controller.OnIdle += delegate {
+
+                if (CurrentState != IconState.Error) {
+                    CurrentState = IconState.Idle;
+                    
+                    if (System.IO.Directory.GetDirectories(RuntimeSettings.HomePath).Length == 0 && System.IO.Directory.GetFiles (RuntimeSettings.HomePath).Length < 2)
+                        StateText = "Welcome to QloudSync!";
+                    else
+                        StateText = "Files up to date " + FolderSize;
+                }
+                
+                UpdateQuitItemEvent (QuitItemEnabled);
+                UpdateStatusItemEvent (StateText);
+                UpdateIconEvent (CurrentState);
+                UpdateMenuEvent (CurrentState);
+            };
+            
+            Program.Controller.OnSyncing += delegate {
+                int repos_syncing_up   = 0;
+                int repos_syncing_down = 0;
+                
+                if (repos_syncing_up > 0 &&
+                    repos_syncing_down > 0) {
+                    
+                    CurrentState = IconState.Syncing;
+                    StateText    = "Syncing changes…";
+                    
+                } else if (repos_syncing_down == 0) {
+                    CurrentState = IconState.SyncingUp;
+                    StateText    = "Sending changes…";
+                    
+                } else {
+                    CurrentState = IconState.SyncingDown;
+                    StateText    = "Receiving changes…";
+                }
+                
+                if (ProgressPercentage > 0)
+                    StateText += " " + ProgressPercentage + "%  " + ProgressSpeed;
+                
+                UpdateIconEvent (CurrentState);
+                UpdateStatusItemEvent (StateText);
+                UpdateQuitItemEvent (QuitItemEnabled);
+            };
+            
+            Program.Controller.OnError += delegate {
+                CurrentState = IconState.Error;
+                StateText    = "Failed to send some changes";
+
+                UpdateQuitItemEvent (QuitItemEnabled);
+                UpdateStatusItemEvent (StateText);
+                UpdateIconEvent (CurrentState);
+                UpdateMenuEvent (CurrentState);
+            };			
+
+            UpdateIconEvent += delegate (IconState state) {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
@@ -137,7 +249,7 @@ namespace QloudSync {
                 }
             };
 
-            Controller.UpdateStatusItemEvent += delegate (string state_text) {
+            UpdateStatusItemEvent += delegate (string state_text) {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
@@ -146,14 +258,14 @@ namespace QloudSync {
                 }
             };
 
-            Controller.UpdateMenuEvent += delegate {
+            UpdateMenuEvent += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (() => CreateMenu ());
                 }
             };
 
-            Controller.UpdateQuitItemEvent += delegate (bool quit_item_enabled) {
+            UpdateQuitItemEvent += delegate (bool quit_item_enabled) {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
@@ -162,7 +274,7 @@ namespace QloudSync {
                 }
             };
 
-            Controller.UpdateRecentEventsItemEvent += delegate (bool events_item_enabled) {
+            UpdateRecentEventsItemEvent += delegate (bool events_item_enabled) {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
@@ -181,16 +293,16 @@ namespace QloudSync {
                 this.menu.AutoEnablesItems = false;
 
                 this.state_item = new NSMenuItem () {
-                    Title   = Controller.StateText,
+                    Title   = StateText,
                     Enabled = false
                 };
 
                 this.folder_item = new NSMenuItem () {
-                    Title = Settings.ApplicationName
+                    Title = GlobalSettings.ApplicationName
                 };
 
                 this.folder_item.Activated += delegate {
-                    Controller.SparkleShareClicked ();
+                    SparkleShareClicked ();
                 };
 
                 this.folder_item.Image      = this.sparkleshare_image;
@@ -203,7 +315,7 @@ namespace QloudSync {
                 };
 
                 this.add_item.Activated += delegate {
-                    Controller.AddHostedProjectClicked ();
+                    AddHostedProjectClicked ();
                 };
 
                 this.recent_events_item = new NSMenuItem () {
@@ -216,7 +328,7 @@ namespace QloudSync {
                     Enabled = false// (Controller.Folders.Length > 0)
                 };
 
-                if (Settings.NotificationsEnabled)
+                if (Prefferences.NotificationsEnabled)
                     this.notify_item.Title = "Turn Notifications Off";
                 else
                     this.notify_item.Title = "Turn Notifications On";
@@ -225,7 +337,7 @@ namespace QloudSync {
                     Program.Controller.ToggleNotifications ();
 
                     InvokeOnMainThread (delegate {
-                        if (Settings.NotificationsEnabled)
+                        if (Prefferences.NotificationsEnabled)
                             this.notify_item.Title = "Turn Notifications Off";
                         else
                             this.notify_item.Title = "Turn Notifications On";
@@ -233,21 +345,21 @@ namespace QloudSync {
                 };
 
                 this.about_item = new NSMenuItem () {
-                    Title   = string.Format("About {0}", Settings.ApplicationName),
+                    Title   = string.Format("About {0}", GlobalSettings.ApplicationName),
                     Enabled = true
                 };
 
                 this.about_item.Activated += delegate {
-                    Controller.AboutClicked ();
+                    AboutClicked ();
                 };
 
                 this.quit_item = new NSMenuItem () {
                     Title   = "Quit",
-                    Enabled = Controller.QuitItemEnabled
+                    Enabled = QuitItemEnabled
                 };
 
                 this.quit_item.Activated += delegate {
-                    Controller.QuitClicked ();
+                    QuitClicked ();
                 };
 
 
@@ -269,6 +381,37 @@ namespace QloudSync {
                 this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
                 this.status_item.Menu = this.menu;
             }
+        }
+
+        
+        public void SparkleShareClicked ()
+        {
+            Program.Controller.OpenSparkleShareFolder ();
+        }
+        
+        
+        
+        public void AddHostedProjectClicked ()
+        {
+            new Thread (() => Program.Controller.ShowSetupWindow (PageType.Add)).Start ();
+        }
+        
+        
+        public void RecentEventsClicked ()
+        {
+            new Thread (() => Program.Controller.ShowEventLogWindow ()).Start ();
+        }
+        
+        
+        public void AboutClicked ()
+        {
+            Program.Controller.ShowAboutWindow ();
+        }
+        
+        
+        public void QuitClicked ()
+        {
+            Program.Controller.Quit ();
         }
     }
     

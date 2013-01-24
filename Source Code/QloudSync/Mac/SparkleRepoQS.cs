@@ -12,8 +12,6 @@ using QloudSync.IO;
 using QloudSync.Synchrony;
 using QloudSync.Repository;
 using QloudSync.Util;
-using QloudSync.Security;
-
 
 namespace QloudSync
 {
@@ -41,7 +39,7 @@ namespace QloudSync
             MoveToQloudSyncFolder();
             Initialize();
             EnableHasChanges = false;
-            fileWatcher = new OSXFileWatcher(LocalRepo.LocalFolder);
+            fileWatcher = new OSXFileWatcher(RuntimeSettings.HomePath);
             BacklogSynchronizer.GetInstance().Synchronize();
 
             EnableHasChanges = true;
@@ -50,8 +48,7 @@ namespace QloudSync
         new void Initialize(){
             DownloadSynchronizer.GetInstance().Synchronized = true;
             UploadSynchronizer.GetInstance().Synchronized = true;
-            Credential.URLConnection = base.RemoteUrl.Host;
-        }
+          }
 
         void MoveToQloudSyncFolder ()
         {
@@ -74,8 +71,6 @@ namespace QloudSync
                 if(oldFolder.Name!="QloudSync")
                 oldFolder.Delete ();
             }
-
-            LocalRepo.LocalFolder = QloudsyncFolder;
             DirectoryInfo temp = new DirectoryInfo (Path.Combine (QloudsyncFolder, ".tmp"));
             if (temp.Exists) {
                 temp.Delete ();
