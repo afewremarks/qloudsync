@@ -327,7 +327,6 @@ namespace QloudSync {
                 };
 
                 FinishButton.Activated += delegate {
-                    QloudSync.QloudSyncPlugin.InitRepo = true;
                     Controller.FinishPageCompleted ();
                 };
 
@@ -460,111 +459,6 @@ namespace QloudSync {
                         break;
                     }
                 }
-            }
-        }
-    }
-
-
-    [Register("SparkleDataSource")]
-    public class SparkleDataSource : NSTableViewDataSource {
-
-        public List<object> Items ;
-        public NSAttributedString [] Cells;
-        public NSAttributedString [] SelectedCells;
-
-
-        public SparkleDataSource (List<SparklePlugin> plugins)
-        {
-            Items         = new List <object> ();
-            Cells         = new NSAttributedString [plugins.Count];
-            SelectedCells = new NSAttributedString [plugins.Count];
-
-            int i = 0;
-            foreach (SparklePlugin plugin in plugins) {
-                Items.Add (plugin);
-
-                NSTextFieldCell cell = new NSTextFieldCell ();
-
-                NSData name_data = NSData.FromString ("<font face='Lucida Grande'><b>" + plugin.Name + "</b></font>");
-
-                NSDictionary name_dictionary       = new NSDictionary();
-                NSAttributedString name_attributes = new NSAttributedString (
-                    name_data, new NSUrl ("file://"), out name_dictionary);
-
-                NSData description_data = NSData.FromString (
-                    "<small><font style='line-height: 150%' color='#aaa' face='Lucida Grande'>" + plugin.Description + "</font></small>");
-
-                NSDictionary description_dictionary       = new NSDictionary();
-                NSAttributedString description_attributes = new NSAttributedString (
-                    description_data, new NSUrl ("file://"), out description_dictionary);
-
-                NSMutableAttributedString mutable_attributes = new NSMutableAttributedString (name_attributes);
-                mutable_attributes.Append (new NSAttributedString ("\n"));
-                mutable_attributes.Append (description_attributes);
-
-                cell.AttributedStringValue = mutable_attributes;
-                Cells [i] = (NSAttributedString) cell.ObjectValue;
-
-                NSTextFieldCell selected_cell = new NSTextFieldCell ();
-
-                NSData selected_name_data = NSData.FromString (
-                    "<font color='white' face='Lucida Grande'><b>" + plugin.Name + "</b></font>");
-
-                NSDictionary selected_name_dictionary = new NSDictionary ();
-                NSAttributedString selected_name_attributes = new NSAttributedString (
-                    selected_name_data, new NSUrl ("file://"), out selected_name_dictionary);
-
-                NSData selected_description_data = NSData.FromString (
-                    "<small><font style='line-height: 150%' color='#9bbaeb' face='Lucida Grande'>" +
-                    plugin.Description + "</font></small>");
-
-                NSDictionary selected_description_dictionary       = new NSDictionary ();
-                NSAttributedString selected_description_attributes = new NSAttributedString (
-                    selected_description_data, new NSUrl ("file://"), out selected_description_dictionary);
-
-                NSMutableAttributedString selected_mutable_attributes =
-                    new NSMutableAttributedString (selected_name_attributes);
-
-                selected_mutable_attributes.Append (new NSAttributedString ("\n"));
-                selected_mutable_attributes.Append (selected_description_attributes);
-
-                selected_cell.AttributedStringValue = selected_mutable_attributes;
-                SelectedCells [i] = (NSAttributedString) selected_cell.ObjectValue;
-
-                i++;
-            }
-        }
-
-
-        [Export("numberOfRowsInTableView:")]
-        public int numberOfRowsInTableView (NSTableView table_view)
-        {
-            if (Items == null)
-                return 0;
-            else
-                return Items.Count;
-        }
-
-
-        [Export("tableView:objectValueForTableColumn:row:")]
-        public NSObject objectValueForTableColumn (NSTableView table_view,
-            NSTableColumn table_column, int row_index)
-        {
-            if (table_column.HeaderToolTip.Equals ("Description")) {
-                if (table_view.SelectedRow == row_index &&
-                    Program.UI.Setup.IsKeyWindow &&
-                    Program.UI.Setup.FirstResponder == table_view) {
-
-                    return SelectedCells [row_index];
-
-                } else {
-                    return Cells [row_index];
-                }
-
-            } else {
-                return new NSImage ((Items [row_index] as SparklePlugin).ImagePath) {
-                    Size = new SizeF (24, 24)
-                };
             }
         }
     }

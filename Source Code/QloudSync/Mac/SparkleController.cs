@@ -30,17 +30,6 @@ namespace QloudSync {
 
 	public class SparkleController : SparkleControllerBase {
 
-        public override string PluginsPath {
-            get {
-                return Path.Combine (NSBundle.MainBundle.ResourcePath, "Plugins");
-            }
-        }
-
-        // We have to use our own custom made folder watcher, as
-        // System.IO.FileSystemWatcher fails watching subfolders on Mac
-        private SparkleMacWatcher watcher;
-
-        
         public SparkleController () : base ()
         {
             using (var a = new NSAutoreleasePool ())
@@ -65,7 +54,7 @@ namespace QloudSync {
         }
 
 
-		public override void CreateStartupItem ()
+		public void CreateStartupItem ()
 		{
             // There aren't any bindings in MonoMac to support this yet, so
             // we call out to an applescript to do the job
@@ -84,10 +73,6 @@ namespace QloudSync {
 		}
 
 
-        public override void InstallProtocolHandler ()
-        {
-             // We ship SparkleShareInviteHandler.app in the bundle
-        }
 
 
 		// Adds the SparkleShare folder to the user's

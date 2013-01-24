@@ -31,7 +31,6 @@ namespace QloudSync {
         public SparkleStatusIcon StatusIcon;
 
         public SparkleSetup Setup;
-        public SparkleBubbles Bubbles;
         public SparkleAbout About;
 		
 		public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
@@ -45,8 +44,6 @@ namespace QloudSync {
         {
             using (var a = new NSAutoreleasePool ())
             {
-                GrowlApplicationBridge.WeakDelegate = this;
-                GrowlApplicationBridge.Delegate     = new SparkleGrowlDelegate ();
 
                 NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("sparkleshare-app.icns");
 
@@ -54,7 +51,6 @@ namespace QloudSync {
     
                 Setup      = new SparkleSetup ();
                 About      = new SparkleAbout ();
-                Bubbles    = new SparkleBubbles ();
                 StatusIcon = new SparkleStatusIcon ();
 
                 Program.Controller.UIHasLoaded ();

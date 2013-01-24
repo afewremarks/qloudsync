@@ -219,34 +219,6 @@ namespace QloudSync
         }
 
 
-        protected List<SparkleChangeSet> GetChangesSetsInternal (string path, int count)
-        {
-          //  SparkleUser user = new SparkleUser(local_config.User.Name, local_config.User.Email);
-            List<SparkleChangeSet> sparkleChangeSets = new List<SparkleChangeSet> ();
-            SparkleChangeSet schange = new SparkleChangeSet(){
-                FirstTimestamp = DateTime.Now,
-                Timestamp = DateTime.Now,
-                Revision = "Fetch",
-                Folder = new SparkleFolder("folder"),
-                RemoteUrl = new Uri("http://s.greenqloud.com"),
-          //      User = user
-            };
-            schange.Changes.Add(new SparkleChange(){
-                Path        = "remote",
-                MovedToPath = "Local",
-                Timestamp   = DateTime.Now,
-                Type        = SparkleChangeType.Moved
-            });
-            sparkleChangeSets.Add(schange);
-            
-            base.ChangeSets = sparkleChangeSets;
-            return sparkleChangeSets;
-            
-        }
-        
- 
-        
-        
         public override List<string> ExcludePaths 
         {
             get {
@@ -274,15 +246,6 @@ namespace QloudSync
                 return this.enableHasChanges;
             }
         }
-
-        public override List<SparkleChangeSet> GetChangeSets ()
-        {
-            return null;
-        }
-
-        public override List<SparkleChangeSet> GetChangeSets (string path)
-        {
-            return GetChangesSetsInternal (path, 1);
-        }
+       
     }
 }

@@ -78,7 +78,7 @@ namespace QloudSync {
             get {
                 if (homePath == null)
                 {
-                    if (SparkleBackend.Platform == PlatformID.Win32NT)
+                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                         homePath = Path.Combine(Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), ApplicationName);
                     else
                         homePath = Path.Combine(Environment.GetFolderPath (Environment.SpecialFolder.Personal), ApplicationName);

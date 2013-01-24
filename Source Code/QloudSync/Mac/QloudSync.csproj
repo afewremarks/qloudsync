@@ -20,11 +20,6 @@
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CustomCommands>
-      <CustomCommands>
-        <Command type="AfterBuild" command="mkdir -p ${TargetDir}/${SolutionName}.app/Contents/Frameworks &amp;&amp; cp -R Growl.framework ${TargetDir}/${SolutionName}.app/Contents/Frameworks" externalConsole="True" />
-      </CustomCommands>
-    </CustomCommands>
     <EnableCodeSigning>False</EnableCodeSigning>
     <CreatePackage>False</CreatePackage>
     <EnablePackageSigning>False</EnablePackageSigning>
@@ -44,11 +39,6 @@
     <EnablePackageSigning>False</EnablePackageSigning>
     <EnableCodeSigning>False</EnableCodeSigning>
     <CreatePackage>False</CreatePackage>
-    <CustomCommands>
-      <CustomCommands>
-        <Command type="AfterBuild" command="mkdir -p ${TargetDir}/${SolutionName}.app/Contents/Frameworks &amp;&amp; cp -R Growl.framework ${TargetDir}/${SolutionName}.app/Contents/Frameworks" externalConsole="True" />
-      </CustomCommands>
-    </CustomCommands>
     <Externalconsole>True</Externalconsole>
     <DefineConstants>DEBUG</DefineConstants>
     <DebugSymbols>True</DebugSymbols>
@@ -83,14 +73,8 @@
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
-    <Compile Include="SparkleMacWatcher.cs" />
-    <Compile Include="SparkleBadger.cs" />
-    <Compile Include="SparkleBubbles.cs" />
     <Compile Include="SparkleSetup.cs" />
     <Compile Include="SparkleSetupWindow.cs" />
-    <Compile Include="..\SparkleBubblesController.cs">
-      <Link>SparkleBubblesController.cs</Link>
-    </Compile>
     <Compile Include="..\SparkleSetupController.cs">
       <Link>SparkleSetupController.cs</Link>
     </Compile>
@@ -100,26 +84,9 @@
     <Compile Include="..\SparkleAboutController.cs">
       <Link>SparkleAboutController.cs</Link>
     </Compile>
-    <Compile Include="..\SparkleExtensions.cs">
-      <Link>SparkleExtensions.cs</Link>
-    </Compile>
     <Compile Include="SparkleController.cs" />
-    <Compile Include="..\SparklePlugin.cs">
-      <Link>SparklePlugin.cs</Link>
-    </Compile>
     <Compile Include="SparkleAbout.cs" />
-    <Compile Include="..\SparkleKeys.cs">
-      <Link>SparkleKeys.cs</Link>
-    </Compile>
-    <Compile Include="SparkleBackend.cs" />
-    <Compile Include="SparkleChangeSet.cs" />
-    <Compile Include="SparkleExceptions.cs" />
-    <Compile Include="SparkleListenerBase.cs" />
-    <Compile Include="SparkleListenerTcp.cs" />
     <Compile Include="SparkleRepoBase.cs" />
-    <Compile Include="SparkleUser.cs" />
-    <Compile Include="SparkleWatcher.cs" />
-    <Compile Include="SparkleWrappers.cs" />
     <Compile Include="Authentication.cs" />
     <Compile Include="BacklogSynchronizer.cs" />
     <Compile Include="Change.cs" />
@@ -132,7 +99,6 @@
     <Compile Include="LocalFile.cs" />
     <Compile Include="LocalRepo.cs" />
     <Compile Include="OSXFileWatcher.cs" />
-    <Compile Include="QloudSyncPlugin.cs" />
     <Compile Include="RemoteFile.cs" />
     <Compile Include="RemoteRepo.cs" />
     <Compile Include="Repo.cs" />
@@ -143,6 +109,7 @@
     <Compile Include="SparkleFetcher.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="DownloadController.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />

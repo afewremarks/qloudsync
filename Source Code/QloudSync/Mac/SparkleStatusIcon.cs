@@ -270,16 +270,6 @@ namespace QloudSync {
                 this.status_item.Menu = this.menu;
             }
         }
-
-
-        // A method reference that makes sure that opening the
-        // event log for each repository works correctly
-        private EventHandler OpenFolderDelegate (string name)
-        {
-            return delegate {
-                Controller.SubfolderClicked (name);
-            };
-        }
     }
     
     

@@ -31,18 +31,6 @@ namespace QloudSync {
 
     public abstract class SparkleControllerBase {
 
-        public SparkleRepoBase [] Repositories {
-            get {
-                lock (this.repo_lock)
-                    return this.repositories.GetRange (0, this.repositories.Count).ToArray ();
-            }
-        }
-
-        public bool RepositoriesLoaded { get; private set;}
-
-        private List<SparkleRepoBase> repositories = new List<SparkleRepoBase> ();
-        public string FoldersPath { get; private set; }
-
         public double ProgressPercentage = 0.0;
         public string ProgressSpeed      = "";
 
@@ -71,76 +59,17 @@ namespace QloudSync {
 
 
 
-        public event NotificationRaisedEventHandler NotificationRaised = delegate { };
-        public delegate void NotificationRaisedEventHandler (SparkleChangeSet change_set);
-
-        public event AlertNotificationRaisedEventHandler AlertNotificationRaised = delegate { };
-        public delegate void AlertNotificationRaisedEventHandler (string title, string message);
-
-
-        public bool FirstRun {
-            get {
-                return this.config.User.Email.Equals ("Unknown");
-            }
-        }
-
-        public List<string> Folders {
-            get {
-                List<string> folders = this.config.Folders;
-                return folders;
-            }
-        }
-
-        public string ConfigPath {
-            get {
-                return this.config.LogFilePath;
-            }
-        }
-
-        public SparkleUser CurrentUser {
-            get {
-                return this.config.User;
-            }
-
-            set {
-                this.config.User = value;
-            }
-        }
-
-        public bool NotificationsEnabled {
-            get {
-                string notifications_enabled = this.config.GetConfigOption ("notifications");
-
-                if (string.IsNullOrEmpty (notifications_enabled)) {
-                    this.config.SetConfigOption ("notifications", bool.TrueString);
-                    return true;
-
-                } else {
-                    return notifications_enabled.Equals (bool.TrueString);
-                }
-            }
-        }
-
-
         public abstract string EventLogHTML { get; }
         public abstract string DayEntryHTML { get; }
         public abstract string EventEntryHTML { get; }
 
-        // Path where the plugins are kept
-        public abstract string PluginsPath { get; }
-
-        // Enables SparkleShare to start automatically at login
-        public abstract void CreateStartupItem ();
-
-        // Installs the sparkleshare:// protocol handler
-        public abstract void InstallProtocolHandler ();
 
         // Adds the SparkleShare folder to the user's
         // list of bookmarked places
         public abstract void AddToBookmarks ();
 
         // Creates the SparkleShare folder in the user's home folder
-        public abstract bool CreateSparkleShareFolder ();
+        public abstract bool CreateHomeFolder ();
 
         // Opens the SparkleShare folder or an (optional) subfolder
         public abstract void OpenFolder (string path);
@@ -151,95 +80,40 @@ namespace QloudSync {
         // Opens a file with the appropriate application
         public abstract void OpenWebsite (string url);
 
-
-        private Config config;
-        private SparkleFetcher fetcher;
-        private FileSystemWatcher watcher;
-        private Object repo_lock        = new Object ();
-        private Object check_repos_lock = new Object ();
-
-
         public SparkleControllerBase ()
         {
-            string app_data_path = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
-            string config_path   = Path.Combine (app_data_path, "qloudsync");
-            
-            this.config                 = new Config (config_path, "config.xml");
-
-            Config.DefaultConfig = this.config;
-            FoldersPath                 = this.config.FoldersPath;
         }
 
 
         public virtual void Initialize ()
         {
-           
-            SparklePlugin.PluginsPath = PluginsPath;
-            InstallProtocolHandler ();
-
-            // Create the SparkleShare folder and add it to the bookmarks
-            if (CreateSparkleShareFolder ())
+                       // Create the SparkleShare folder and add it to the bookmarks
+            if (CreateHomeFolder ())
                 AddToBookmarks ();
-            Console.WriteLine (this.config.FullPath);
-
-            if (FirstRun) {
-                this.config.SetConfigOption ("notifications", bool.TrueString);
-            }
         }
 
 
         public void UIHasLoaded ()
         {
-            if (FirstRun) {
+            if (Settings.FirstRun) {
                 ShowSetupWindow (PageType.Login);
-
-                /*new Thread (() => {
-                    string keys_path     = Path.GetDirectoryName (SparkleConfig.DefaultConfig.FullPath);
-                    string key_file_name = DateTime.Now.ToString ("yyyy-MM-dd HH\\hmm");
-                    
-                    string [] key_pair = SparkleKeys.GenerateKeyPair (keys_path, key_file_name);
-                    SparkleKeys.ImportPrivateKey (key_pair [0]);
-                    
-                    //string link_code_file_path = Path.Combine (Program.Controller.FoldersPath, "Your link code.txt");
-                    
-                    // Create an easily accessible copy of the public
-                    // key in the user's SparkleShare folder
-                   // File.Copy (key_pair [1], link_code_file_path, true);
-                    
-                }).Start ();*/
-
             } else {
-                new Thread (() => {
-                    CheckRepositories ();
-                    RepositoriesLoaded = true;
-                    FolderListChanged ();
-                    UpdateState ();
-
-                }).Start ();
+                AddRepository();
             }
         }
 
+        SparkleRepoBase repo = null;
 
-        private void AddRepository (string folder_path)
+        private void AddRepository ()
         {
 
-            SparkleRepoBase repo = null;
-            string folder_name   = Path.GetFileName (folder_path);
-            string backend       = this.config.GetBackendForFolder (folder_name);
-            backend = "SQ";
-            if (repositories.Where (r => r.Name == "QloudSync").Any())
-                return;
+            string backend       ="SQ";
             try {
-
-                Type t = Type.GetType ("SparkleLib." + backend + ".SparkleRepo, SparkleLib." + backend); 
-                repo = (SparkleRepoBase) Activator.CreateInstance ( t,
-                                                                   new object [] { folder_path, this.config }
-
-                    );
+              
             } catch (Exception e ){
                 Console.WriteLine (e.InnerException);
-                     SparkleLogger.LogInfo ("Controller",
-                    "Failed to load '" + backend + "' backend for '" + folder_name + "': " + e.Message);
+                     Logger.LogInfo ("Controller",
+                    "Failed to load '" + backend + "' backend for: " + e.Message);
 
                 return;
             }
@@ -264,50 +138,7 @@ namespace QloudSync {
                 UpdateState ();
             };
          
-            repo.NewChangeSet += delegate (SparkleChangeSet change_set) {
-                if (NotificationsEnabled)
-                    NotificationRaised (change_set);
-            };
-
-            repo.ConflictResolved += delegate {
-                if (NotificationsEnabled)
-                    AlertNotificationRaised ("Conflict detected",
-                        "Don't worry, SparkleShare made a copy of each conflicting file.");
-            };
-          
-            this.repositories.Add (repo);
-
             repo.Initialize ();
-        }
-
-
-        private void RemoveRepository (string folder_path)
-        {
-            for (int i = 0; i < this.repositories.Count; i++) {
-                SparkleRepoBase repo = this.repositories [i];
-
-                if (repo.LocalPath.Equals (folder_path)) {
-                    repo.Dispose ();
-                    this.repositories.Remove (repo);
-                    repo = null;
-
-                    return;
-                }
-            }
-        }
-
-
-        private void CheckRepositories ()
-        {
-            lock (this.check_repos_lock) {
-                string path = this.config.FoldersPath;
-                if (config.User.Name == "empty")
-                    AddRepository (path);
-
-
-                FolderListChanged ();
-
-            }
         }
 
 
@@ -315,16 +146,14 @@ namespace QloudSync {
         private void UpdateState ()
         {
             bool has_unsynced_repos = false;
+            if (repo.Status == SyncStatus.SyncDown || repo.Status == SyncStatus.SyncUp || repo.IsBuffering) {
+                OnSyncing ();
+                return;
 
-            foreach (SparkleRepoBase repo in Repositories) {
-                if (repo.Status == SyncStatus.SyncDown || repo.Status == SyncStatus.SyncUp || repo.IsBuffering) {
-                    OnSyncing ();
-                    return;
-
-                } else if (repo.HasUnsyncedChanges) {
-                    has_unsynced_repos = true;
-                }
+            } else if (repo.HasUnsyncedChanges) {
+                has_unsynced_repos = true;
             }
+
 
             if (has_unsynced_repos)
                OnError ();
@@ -332,62 +161,21 @@ namespace QloudSync {
                 OnIdle ();
         }
 
-
-        private void ClearFolderAttributes (string path)
-        {
-            if (!Directory.Exists (path))
-                return;
-
-            string [] folders = Directory.GetDirectories (path);
-
-            foreach (string folder in folders)
-                ClearFolderAttributes (folder);
-
-            string [] files = Directory.GetFiles(path);
-
-            foreach (string file in files)
-                if (!IsSymlink (file))
-                    File.SetAttributes (file, FileAttributes.Normal);
-        }
-
-
-        private bool IsSymlink (string file)
-        {
-            FileAttributes attributes = File.GetAttributes (file);
-            return ((attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint);
-        }
-
-
-        public void OnFolderActivity (object o, FileSystemEventArgs args)
-        {
-            if (args != null && args.FullPath.EndsWith (".xml") &&
-                args.ChangeType == WatcherChangeTypes.Created) {
-                return;
-
-            } else {
-                if (Directory.Exists (args.FullPath) && args.ChangeType == WatcherChangeTypes.Created)
-                    return;
-                
-                CheckRepositories ();
-            }
-        }
-
+        SparkleFetcher fetcher;
         public void StartFetcher (string address, string remote_path, bool fetch_prior_history)
         {
-            string tmp_path = this.config.TmpPath;
-
+            string tmp_path = Settings.TmpPath;
 			if (!Directory.Exists (tmp_path)) {
                 Directory.CreateDirectory (tmp_path);
                 File.SetAttributes (tmp_path, File.GetAttributes (tmp_path) | FileAttributes.Hidden);
             }
-            this.fetcher = new SparkleFetcher (address, remote_path);
-
+            DownloadController downloadController = DownloadController.GetInstance();
             this.fetcher.Failed += delegate {
                 FolderFetchError (this.fetcher.RemoteUrl.ToString (), this.fetcher.Errors);
                 StopFetcher ();
             };
             
-            this.fetcher.ProgressChanged += delegate (double percentage) {
+            downloadController.ProgressChanged += delegate (double percentage) {
                 FolderFetching (percentage);
             };
 
@@ -402,10 +190,10 @@ namespace QloudSync {
             if (Directory.Exists (this.fetcher.TargetFolder)) {
                 try {
                     Directory.Delete (this.fetcher.TargetFolder, true);
-                    SparkleLogger.LogInfo ("Controller", "Deleted " + this.fetcher.TargetFolder);
+                    Logger.LogInfo ("Controller", "Deleted " + this.fetcher.TargetFolder);
 
                 } catch (Exception e) {
-                    SparkleLogger.LogInfo ("Controller",
+                    Logger.LogInfo ("Controller",
                         "Failed to delete '" + this.fetcher.TargetFolder + "': " + e.Message);
                 }
             }
@@ -413,59 +201,26 @@ namespace QloudSync {
             this.fetcher.Dispose ();
             this.fetcher = null;
 
-            this.watcher.EnableRaisingEvents = true;
         }
 
         public void FinishFetcher ()
         {
-            this.watcher.EnableRaisingEvents = false;
 
             this.fetcher.Complete ();
-            string canonical_name = Path.GetFileNameWithoutExtension (this.fetcher.RemoteUrl.AbsolutePath);
-            canonical_name = canonical_name.Replace ("-crypto", "");
-
-            bool target_folder_exists = Directory.Exists (
-                Path.Combine (this.config.FoldersPath, canonical_name));
-
-            // Add a numbered suffix to the name if a folder with the same name
-            // already exists. Example: "Folder (2)"
-            int suffix = 1;
-            while (target_folder_exists) {
-                suffix++;
-                target_folder_exists = Directory.Exists (
-                    Path.Combine (this.config.FoldersPath, canonical_name + " (" + suffix + ")"));
-            }
-
-            string target_folder_name = canonical_name;
-
-            if (suffix > 1)
-                target_folder_name += " (" + suffix + ")";
-
-            string target_folder_path = Path.Combine (this.config.FoldersPath, target_folder_name);
-
             try {
-                ClearFolderAttributes (this.fetcher.TargetFolder);
-                Directory.Move (this.fetcher.TargetFolder, target_folder_path);
+                Directory.Move (this.fetcher.TargetFolder, Settings.HomePath);
 
             } catch (Exception e) {
-                SparkleLogger.LogInfo ("Controller", "Error moving directory: " + e.Message);
-                this.watcher.EnableRaisingEvents = true;
+                Logger.LogInfo ("Controller", "Error moving directory: " + e.Message);
                 return;
             }
 
-            this.config.AddFolder (target_folder_name, this.fetcher.Identifier,
-                this.fetcher.RemoteUrl.ToString ());
-
             FolderFetched (this.fetcher.RemoteUrl.ToString (), this.fetcher.Warnings.ToArray ());
-            //while (!QloudSync.QloudSyncPlugin.InitRepo) {
-            //}
-            AddRepository (target_folder_path);
+            AddRepository ();
             FolderListChanged ();
 
             this.fetcher.Dispose ();
             this.fetcher = null;
-
-            this.watcher.EnableRaisingEvents = true;
         }
 
         public void ShowSetupWindow (PageType page_type)
@@ -488,19 +243,14 @@ namespace QloudSync {
 
         public void OpenSparkleShareFolder ()
         {
-            OpenFolder (this.config.FoldersPath);
+            OpenFolder (Settings.HomePath);
         }
 
-
-        public void OpenSparkleShareFolder (string name)
-        {
-            OpenFolder (new SparkleFolder (name).FullPath);
-        }
+       
 
 
         public void ToggleNotifications () {
-            bool notifications_enabled = this.config.GetConfigOption ("notifications").Equals (bool.TrueString);
-            this.config.SetConfigOption ("notifications", (!notifications_enabled).ToString ());
+            Settings.NotificationsEnabled = !Settings.NotificationsEnabled;
         }
 
 
@@ -523,9 +273,6 @@ namespace QloudSync {
 
         public virtual void Quit ()
         {
-            foreach (SparkleRepoBase repo in Repositories)
-                repo.Dispose ();
-
             Environment.Exit (0);
         }
     }

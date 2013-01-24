@@ -22,7 +22,6 @@ using System.Threading;
 
 namespace QloudSync {
 
-    // This is SparkleShare!
     public class Program {
 
         public static SparkleController Controller;
@@ -38,8 +37,8 @@ namespace QloudSync {
         {
 
             if (args.Length != 0 && !args [0].Equals ("start") &&
-                SparkleBackend.Platform != PlatformID.MacOSX &&
-                SparkleBackend.Platform != PlatformID.Win32NT) {
+                Environment.OSVersion.Platform != PlatformID.MacOSX &&
+                Environment.OSVersion.Platform != PlatformID.Win32NT) {
 
                 Console.WriteLine ("QloudSync is already running.");
                 Environment.Exit (-1);
@@ -62,8 +61,8 @@ namespace QloudSync {
                 UI.Run ();
 
             } catch (Exception e){
-                QloudSync.Util.Logger.LogInfo ("Init", e);
-                 Environment.Exit (-1);
+                Logger.LogInfo ("Init", e);
+                Environment.Exit (-1);
             }
          
             #if !__MonoCS__

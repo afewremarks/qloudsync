@@ -129,7 +129,7 @@ namespace QloudSync {
 
                         ShowWindowEvent ();
 
-                    } else if (!Program.Controller.FirstRun && TutorialPageNumber == 0) {
+                    } else if (!Settings.FirstRun && TutorialPageNumber == 0) {
                         WindowIsOpen = true;
                         ChangePageEvent (PageType.Add, null);
                         ShowWindowEvent ();
@@ -172,24 +172,7 @@ namespace QloudSync {
         
         public void SetupPageCompleted (string full_name, string email)
         {
-            Program.Controller.CurrentUser = new SparkleUser (full_name, email);
 
-            /*new Thread (() => {
-                string link_code_file_path = Path.Combine (Program.Controller.FoldersPath, "Your link code.txt");
-
-                if (File.Exists (link_code_file_path)) {
-                    string name = Program.Controller.CurrentUser.Name.Split (" ".ToCharArray ()) [0];
-
-                    if (name.EndsWith ("s"))
-                        name += "'";
-                    else
-                        name += "'s";
-
-                    string new_file_path = Path.Combine (Program.Controller.FoldersPath, name + " link code.txt");
-                    File.Move (link_code_file_path, new_file_path);
-                }
-
-            }).Start ();*/
 
            // TutorialPageNumber = 1;
             //ChangePageEvent (PageType.Tutorial, null);
@@ -246,30 +229,29 @@ namespace QloudSync {
             this.saved_remote_path = remote_path;
 
             bool fields_valid = (!string.IsNullOrEmpty (address) &&
-                !string.IsNullOrEmpty (remote_path) && !remote_path.Contains ("\"") && Program.Controller.Folders.Count == 0);
+                !string.IsNullOrEmpty (remote_path) && !remote_path.Contains ("\""));
 
             UpdateAddProjectButtonEvent (fields_valid);
         }
 
 
-        public void AddPageCompleted (string address, string remote_path)
+        public void AddPageCompleted (string username, string password)
         {
 
-            Program.Controller.CurrentUser = new SparkleUser ("empty", "empty");
-            QloudSync.Security.Credential.User = address;
-            QloudSync.Security.Credential.Password = remote_path;
-            address = "https://s.greenqloud.com";
-            remote_path =  QloudSync.Security.Credential.User + "-default.SQ";
+            Settings.Username = username;
+            QloudSync.Security.Credential.Password = password;
 
-            SyncingFolder = Path.GetFileNameWithoutExtension (remote_path);
+            password =  QloudSync.Security.Credential.User + "-default.SQ";
+
+            SyncingFolder = Path.GetFileNameWithoutExtension (password);
             SyncingFolder = SyncingFolder.Replace ("-crypto", "");
             ProgressBarPercentage = 1.0;
             
             ChangePageEvent (PageType.Syncing, null);
             
-            address = Uri.EscapeUriString (address.Trim ());
-            remote_path = remote_path.Trim ();
-            remote_path = remote_path.TrimEnd ("/".ToCharArray ());
+ 
+            password = password.Trim ();
+            password = password.TrimEnd ("/".ToCharArray ());
 
             Program.Controller.FolderFetched    += AddPageFetchedDelegate;
             Program.Controller.FolderFetchError += AddPageFetchErrorDelegate;
@@ -332,7 +314,7 @@ namespace QloudSync {
         }
         public void OpenFolderClicked ()
         {
-            Program.Controller.OpenSparkleShareFolder (Path.GetFileName (""));
+            Program.Controller.OpenSparkleShareFolder();
             FinishPageCompleted ();
         }
 
