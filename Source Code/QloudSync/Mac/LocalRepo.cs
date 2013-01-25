@@ -43,38 +43,6 @@ using QloudSync.Util;
 			}
 		}
 
-        private static List<Folder> watched = new List<Folder>();
-        public static List<Folder> WatchedFolders { 
-            set {
-                watched = value;
-            }
-            get {
-                return watched;
-            }
-        }
-
-        private static List<Change> pending = new List<Change>();
-        public static List<Change> PendingChanges {
-            set 
-            {
-                pending = value;
-            }
-            get
-            {
-                return pending;
-            } 
-        }
-
-        private static List<Sync> sync_list = new List<Sync>();
-        public static List<Sync> Syncs {
-            set {
-                sync_list = value;
-            }
-            get {
-                return sync_list;
-            }
-        }
-
         public static List<Folder> EmptyFolders {
             get {
                 List<DirectoryInfo> emptyDirectories = new DirectoryInfo (RuntimeSettings.HomePath)
@@ -86,31 +54,7 @@ using QloudSync.Util;
                 return emptyFolders;
             }
         }
-
-        public static double Size {
-			get {
-                return GetFolderSize (RuntimeSettings.HomePath);
-			}
-        }
-
-		private static double GetFolderSize (string folderName)
-		{
-			double size = 0;
-
-			if(!new DirectoryInfo(folderName).Exists)
-				return 0;
-			foreach (string fileName in Directory.GetFiles (folderName, "*.*")) 
-				if (!new LocalFile(fileName).IsIgnoreFile && System.IO.File.Exists(fileName))
-					size += new FileInfo (fileName).Length;
-			if(!new DirectoryInfo(folderName).Exists)
-				return 0;
-			foreach (string dirName in Directory.GetDirectories (folderName, "*.*")) 
-				size += GetFolderSize (dirName);
-
-			
-			return size;
-		}
-
+       
         public static string ResolveDecodingProblem (string path)
         {
             bool haveProblem = false;

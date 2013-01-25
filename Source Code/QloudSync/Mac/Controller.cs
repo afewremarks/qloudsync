@@ -32,6 +32,8 @@ namespace QloudSync {
 
         
         DownloadController downloadController;
+        UploadController uploadController;
+        BacklogController backlogController;
         public double ProgressPercentage = 0.0;
         public string ProgressSpeed      = "";
         
@@ -58,7 +60,7 @@ namespace QloudSync {
 
         public Controller () : base ()
         {
-            /*using (var a = new NSAutoreleasePool ())
+            using (var a = new NSAutoreleasePool ())
             {
                 string content_path = Directory.GetParent (System.AppDomain.CurrentDomain.BaseDirectory).ToString ();
     
@@ -68,9 +70,7 @@ namespace QloudSync {
                 // Needed for Growl
                 Dlfcn.dlopen (growl_path, 0);
                 NSApplication.Init ();
-            }*/
-
-
+            }
         }
 
 
@@ -82,53 +82,24 @@ namespace QloudSync {
                 AddToBookmarks ();
         }
 
-
-		public void CreateStartupItem ()
-		{
-            // There aren't any bindings in MonoMac to support this yet, so
-            // we call out to an applescript to do the job
-            Process process = new Process ();
-            process.StartInfo.FileName               = "osascript";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute        = false;
-
-            process.StartInfo.Arguments = "-e 'tell application \"System Events\" to " +
-                "make login item at end with properties {path:\"" + NSBundle.MainBundle.BundlePath + "\", hidden:false}'";
-
-            process.Start ();
-            process.WaitForExit ();
-
-            Logger.LogInfo ("Controller", "Added " + NSBundle.MainBundle.BundlePath + " to login items");
-		}
-
-
-        
         public void UIHasLoaded ()
         {
             if (RuntimeSettings.FirstRun) {
                 ShowSetupWindow (PageType.Login);
             } else {
-                AddRepository();
+                InitializeSynchronizers();
             }
         }
-        
-        SparkleRepoBase repo = null;
-        
-        private void AddRepository ()
+
+        private void InitializeSynchronizers ()
         {
-            
-            string backend       ="SQ";
-            try {
-                
-            } catch (Exception e ){
-                Console.WriteLine (e.InnerException);
-                Logger.LogInfo ("Controller",
-                                "Failed to load '" + backend + "' backend for: " + e.Message);
-                
-                return;
-            }
-            
-            repo.ChangesDetected += delegate {
+
+            downloadController = DownloadController.GetInstance();
+            uploadController = UploadController.GetInstance();
+            backlogController = BacklogController.GetInstance();
+
+
+            /*repo.ChangesDetected += delegate {
                 UpdateState ();
             };
             
@@ -148,14 +119,14 @@ namespace QloudSync {
                 UpdateState ();
             };
             
-            repo.Initialize ();
+            repo.Initialize ();*/
         }
         
         
         // Fires events for the current syncing state
         private void UpdateState ()
         {
-            bool has_unsynced_repos = false;
+            /*bool has_unsynced_repos = false;
             if (repo.Status == SyncStatus.SyncDown || repo.Status == SyncStatus.SyncUp || repo.IsBuffering) {
                 OnSyncing ();
                 return;
@@ -167,7 +138,7 @@ namespace QloudSync {
             if (has_unsynced_repos)
                 OnError ();
             else
-                OnIdle ();
+                OnIdle ();*/
         }
         
 
@@ -200,7 +171,7 @@ namespace QloudSync {
         {  
             Logger.LogInfo ("Controller", "First load sucessfully");
             FolderFetched (downloadController.Warnings);
-            //AddRepository ();
+            InitializeSynchronizers ();
         }
         
         public void ShowSetupWindow (PageType page_type)

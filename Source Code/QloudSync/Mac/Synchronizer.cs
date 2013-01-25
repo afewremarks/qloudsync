@@ -20,16 +20,56 @@ namespace  QloudSync.Synchrony
 {
     public abstract class Synchronizer
     {
+
+        private List<QloudSync.Repository.File> filesinlastsync;
+
         protected List <QloudSync.Repository.File> localFiles;
         protected List <RemoteFile> remoteFiles;
         protected List <Folder> localEmptyFolders;
+        protected RemoteRepo remoteRepo;
         
         protected int countOperation = 0;
  
         
         protected Synchronizer ()
         {
+            remoteRepo = new RemoteRepo();
         }
+
+
+        #region Properties
+        public bool Done {
+            set; get;
+        }
+        
+        public double Size {
+            set; get;
+        }
+        
+
+        public int BytesTransferred {
+
+            get{
+                return remoteRepo.Connection.TransferSize;
+            }
+        }
+        
+        public List<QloudSync.Repository.File> FilesInLastSync {
+            set {
+                this.filesinlastsync = value;
+            }get {
+                return filesinlastsync;
+            }
+        }
+
+        
+        public SyncStatus Status
+        {
+            get; set;
+        }
+        
+        #endregion
+
         
         public bool Synchronized {
              set; get;
@@ -39,28 +79,14 @@ namespace  QloudSync.Synchrony
             protected set; get;
         }
         
-        public abstract bool Synchronize();
-        
-        public List<RemoteFile> RemoteChanges {
-            get {
-                TimeSpan diffClocks = RemoteRepo.DiffClocks;
-				DateTime referencialClock = Repo.LastSyncTime.Subtract (diffClocks);
-                return RemoteRepo.Files.Where (rf => Convert.ToDateTime (rf.AsS3Object.LastModified).Subtract (referencialClock).TotalSeconds > 0).ToList<RemoteFile>();
-            }
-        }
-        
-        public bool HasRemoteChanges {
-            get {
-                return RemoteChanges.Count != 0;
-            }
-        }
-        
+        public abstract void Synchronize();
+                  
         protected bool Initialize ()
         {
 
             //ServicePointManager.ServerCertificateValidationCallback = connection.GetValidationCallBack;
 
-            if ( RemoteRepo.InitBucket () && RemoteRepo.InitTrashFolder ()) {
+            if ( remoteRepo.InitBucket () && remoteRepo.InitTrashFolder ()) {
 
                 //pegar os posteriores a ultima sincronizaçao
                 /*DirectoryInfo dir = new DirectoryInfo (LocalRepo.LocalFolder);
@@ -68,7 +94,7 @@ namespace  QloudSync.Synchrony
                 localFiles.AddRange ( Folder.Get (dir.GetDirectories ("*", SearchOption.AllDirectories).ToList ()));
 				//LocalRepo.Files = OSXFileWatcher.*/
 				localFiles = LocalRepo.Files;
-                remoteFiles = RemoteRepo.Files;
+                remoteFiles = remoteRepo.Files;
                 
                 localEmptyFolders = LocalRepo.EmptyFolders;
                 countOperation = 0;
@@ -104,7 +130,7 @@ namespace  QloudSync.Synchrony
 
 		protected bool ExistsVersion (QloudSync.Repository.File file)
 		{
-			return RemoteRepo.TrashFiles.Where (tf => tf.AbsolutePath == file.AbsolutePath+"(1)").Any ();
+			return remoteRepo.TrashFiles.Where (tf => tf.AbsolutePath == file.AbsolutePath+"(1)").Any ();
 		}
 
 

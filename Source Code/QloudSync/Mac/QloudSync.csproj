@@ -74,7 +74,6 @@
     <Compile Include="..\SparkleSetupController.cs">
       <Link>SparkleSetupController.cs</Link>
     </Compile>
-    <Compile Include="SparkleRepoBase.cs" />
     <Compile Include="Change.cs" />
     <Compile Include="ConnectionManager.cs" />
     <Compile Include="Constant.cs" />
@@ -96,6 +95,13 @@
     <Compile Include="RuntimeSettings.cs" />
     <Compile Include="Prefferences.cs" />
     <Compile Include="GlobalSettings.cs" />
+    <Compile Include="UploadController.cs" />
+    <Compile Include="SynchronizerController.cs" />
+    <Compile Include="BacklogController.cs" />
+    <Compile Include="OSXFileWatcher.cs" />
+    <Compile Include="DownloadSynchronizer.cs" />
+    <Compile Include="Synchronizer.cs" />
+    <Compile Include="UploadSynchronizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />

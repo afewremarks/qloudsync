@@ -15,6 +15,7 @@ namespace  QloudSync.IO
         List<System.IO.FileSystemWatcher> watchers = new List<System.IO.FileSystemWatcher>();
         List <string> triggers = new List<string>();
         List<string> eventshandled = new List<string>(); 
+        List<File> updatedFilesInDownloadController;
         public DateTime LastTimeChanges {
             get;
             set;
@@ -24,10 +25,6 @@ namespace  QloudSync.IO
         
         public OSXFileWatcher (string repo_address)
         {
-            LocalRepo.PendingChanges = new List<Change> ();
-            RemoteRepo.FilesChanged = new List<File> ();
-            
-            
             new System.Threading.Thread(ListenEvents).Start();
             CreateWatcher (repo_address);
         }
@@ -52,7 +49,7 @@ namespace  QloudSync.IO
                     }
                 }
                 try{
-                    foreach(Change c in LocalRepo.PendingChanges){
+                    foreach(Change c in UploadSynchronizer.GetInstance().PendingChanges){
                         if (eventshandled.Where(eh => eh == c.File.FullLocalName && (c.Event == System.IO.WatcherChangeTypes.Created || c.Event == System.IO.WatcherChangeTypes.Renamed)).Any())
                             eventshandled.Remove(c.File.FullLocalName);
                     }
@@ -93,12 +90,7 @@ namespace  QloudSync.IO
             {   
                 return;
             }
-            if (BacklogSynchronizer.GetInstance ().ChangesMade.Count > 0) {
-                if (BacklogSynchronizer.GetInstance ().ChangesMade.Where (f => f.FullLocalName == e.FullPath).Any ()) {    
-                    BacklogSynchronizer.GetInstance ().ChangesMade.RemoveAll (f => f.FullLocalName == e.FullPath);
-                    return;
-                }
-            }
+
             switch (e.ChangeType) {
             case System.IO.WatcherChangeTypes.Created:
                 triggers.Add (e.FullPath);
@@ -108,7 +100,7 @@ namespace  QloudSync.IO
                 HandleDelete();
                 break;
             case System.IO.WatcherChangeTypes.Changed:
-                LocalRepo.PendingChanges.Add 
+                UploadSynchronizer.GetInstance().PendingChanges.Add 
                     (new Change(new LocalFile(e.FullPath), e.ChangeType));
                 break;
             }
@@ -117,11 +109,12 @@ namespace  QloudSync.IO
         bool HandleCreates (string path)
         { 
             if (path == null) {
-                //Console.WriteLine ("Debug - HandleCreate received a null value");
                 return false;
             }
-            if (RemoteRepo.FilesChanged.Count > 0) {
-                if (RemoteRepo.FilesChanged.Where (df => df.FullLocalName == path).Any ())
+            //TODO lock
+            updatedFilesInDownloadController = DownloadSynchronizer.GetInstance().FilesInLastSync; 
+            if (updatedFilesInDownloadController.Count > 0) {
+                if (updatedFilesInDownloadController.Where (df => df.FullLocalName == path).Any ())
                     return true;
             }
             
@@ -163,45 +156,45 @@ namespace  QloudSync.IO
         {
             if (oldVersion == null)
                 return false;
-            List<Change> oldcreates = LocalRepo.PendingChanges.Where (c=> c.File.FullLocalName == oldVersion.FullLocalName && c.Event == System.IO.WatcherChangeTypes.Created).ToList<Change>();
-            List<Change> oldrenames = LocalRepo.PendingChanges.Where (c=> c.File.FullLocalName == oldVersion.FullLocalName && c.Event == System.IO.WatcherChangeTypes.Renamed).ToList<Change>();
+            List<Change> oldcreates = UploadSynchronizer.GetInstance().PendingChanges.Where (c=> c.File.FullLocalName == oldVersion.FullLocalName && c.Event == System.IO.WatcherChangeTypes.Created).ToList<Change>();
+            List<Change> oldrenames = UploadSynchronizer.GetInstance().PendingChanges.Where (c=> c.File.FullLocalName == oldVersion.FullLocalName && c.Event == System.IO.WatcherChangeTypes.Renamed).ToList<Change>();
             if(oldrenames.Count > 0){
                 //apagar o rename antigo
                 Change renameChange = oldrenames [0];
                 Console.WriteLine (DateTime.Now.ToUniversalTime () + " - Replace rename - " + renameChange.File.FullLocalName +" to "+newVersion.FullLocalName);
                 
                 // apagar o delete que inicou o rename atual
-                Change deletedChange = LocalRepo.PendingChanges.Where (c=> c.File.AbsolutePath == oldVersion.AbsolutePath && c.Event == System.IO.WatcherChangeTypes.Deleted).First();
-                LocalRepo.PendingChanges.Remove (deletedChange);
+                Change deletedChange = UploadSynchronizer.GetInstance().PendingChanges.Where (c=> c.File.AbsolutePath == oldVersion.AbsolutePath && c.Event == System.IO.WatcherChangeTypes.Deleted).First();
+                UploadSynchronizer.GetInstance().PendingChanges.Remove (deletedChange);
                 LocalRepo.Files.Remove (oldVersion);
                 
                 oldVersion = renameChange.File.OldVersion;
-                LocalRepo.PendingChanges.Remove (renameChange);
+                UploadSynchronizer.GetInstance().PendingChanges.Remove (renameChange);
                 LocalRepo.Files.Remove (renameChange.File);
                 //create o novo rename
                 
                 newVersion.OldVersion = oldVersion;
-                LocalRepo.PendingChanges.Add (new Change (newVersion, System.IO.WatcherChangeTypes.Renamed));
+                UploadSynchronizer.GetInstance().PendingChanges.Add (new Change (newVersion, System.IO.WatcherChangeTypes.Renamed));
                 LocalRepo.Files.Add (newVersion);
             }
             else
                 if (oldcreates.Count>0)
             {
                 Console.WriteLine (DateTime.Now.ToUniversalTime () + " - Creating new version - " + oldVersion.FullLocalName +" to "+newVersion.FullLocalName);
-                Change deletedChange = LocalRepo.PendingChanges.Where (c=> c.File.AbsolutePath == oldVersion.AbsolutePath && c.Event == System.IO.WatcherChangeTypes.Deleted).First();
-                LocalRepo.PendingChanges.Remove (deletedChange);
+                Change deletedChange = UploadSynchronizer.GetInstance().PendingChanges.Where (c=> c.File.AbsolutePath == oldVersion.AbsolutePath && c.Event == System.IO.WatcherChangeTypes.Deleted).First();
+                UploadSynchronizer.GetInstance().PendingChanges.Remove (deletedChange);
                 LocalRepo.Files.Remove (oldVersion);
                 
                 Change createOldChange = oldcreates[0];
                 LocalRepo.Files.Remove (createOldChange.File);
-                LocalRepo.PendingChanges.Remove (createOldChange);
+                UploadSynchronizer.GetInstance().PendingChanges.Remove (createOldChange);
                 
                 if (oldVersion.TimeOfLastChange.Subtract(Repo.LastSyncTime).TotalSeconds >0){
                     newVersion.OldVersion = createOldChange.File;
-                    LocalRepo.PendingChanges.Add (new Change(newVersion, System.IO.WatcherChangeTypes.Renamed));
+                    UploadSynchronizer.GetInstance().PendingChanges.Add (new Change(newVersion, System.IO.WatcherChangeTypes.Renamed));
                 }
                 else{
-                    LocalRepo.PendingChanges.Add (new Change(newVersion, System.IO.WatcherChangeTypes.Created));
+                    UploadSynchronizer.GetInstance().PendingChanges.Add (new Change(newVersion, System.IO.WatcherChangeTypes.Created));
                 }
                 LocalRepo.Files.Add (newVersion);
                 
@@ -210,9 +203,9 @@ namespace  QloudSync.IO
             else
             {
                 newVersion.OldVersion = oldVersion;
-                Change deletedChange = LocalRepo.PendingChanges.Where (c=> c.File.AbsolutePath == oldVersion.AbsolutePath && c.Event == System.IO.WatcherChangeTypes.Deleted).First();
-                LocalRepo.PendingChanges.Remove ( deletedChange);
-                LocalRepo.PendingChanges.Add (new Change (newVersion, System.IO.WatcherChangeTypes.Renamed));
+                Change deletedChange = UploadSynchronizer.GetInstance().PendingChanges.Where (c=> c.File.AbsolutePath == oldVersion.AbsolutePath && c.Event == System.IO.WatcherChangeTypes.Deleted).First();
+                UploadSynchronizer.GetInstance().PendingChanges.Remove ( deletedChange);
+                UploadSynchronizer.GetInstance().PendingChanges.Add (new Change (newVersion, System.IO.WatcherChangeTypes.Renamed));
                 LocalRepo.Files.Remove (oldVersion);
                 LocalRepo.Files.Add (newVersion);
             }
@@ -224,17 +217,17 @@ namespace  QloudSync.IO
             try {
                 foreach (QloudSync.Repository.File lf in LocalRepo.Files) {
                     
-                    if (RemoteRepo.FilesChanged.Where (f => f.AbsolutePath == lf.AbsolutePath).Any ())
+                    if (updatedFilesInDownloadController.Where (f => f.AbsolutePath == lf.AbsolutePath).Any ())
                         continue;
                     
                     if (!lf.ExistsInLocalRepo && !lf.Deleted) {
                         //se tiver algum pendingchange antes do delete,apaga
-                        List<Change> deprecatedChanges = LocalRepo.PendingChanges.Where (c => c.File.AbsolutePath == lf.AbsolutePath && c.Event != System.IO.WatcherChangeTypes.Deleted).ToList<Change> ();
+                        List<Change> deprecatedChanges = UploadSynchronizer.GetInstance().PendingChanges.Where (c => c.File.AbsolutePath == lf.AbsolutePath && c.Event != System.IO.WatcherChangeTypes.Deleted).ToList<Change> ();
                         foreach (Change ch in deprecatedChanges)
-                            LocalRepo.PendingChanges.Remove (ch);
+                            UploadSynchronizer.GetInstance().PendingChanges.Remove (ch);
                         lf.Deleted = true;
                         lf.TimeOfLastChange = DateTime.Now;
-                        LocalRepo.PendingChanges.Add 
+                        UploadSynchronizer.GetInstance().PendingChanges.Add 
                             (new Change (lf, System.IO.WatcherChangeTypes.Deleted));
                     }
                 }
@@ -255,7 +248,7 @@ namespace  QloudSync.IO
             CreateWatcher (folder_path);
             LocalFile folder = new LocalFile (folder_path);
             if (System.IO.Directory.GetFiles (folder_path).Count () == 0 && System.IO.Directory.GetDirectories (folder_path).Count () == 0)
-                LocalRepo.PendingChanges.Add 
+                UploadSynchronizer.GetInstance().PendingChanges.Add 
                     (new Change (folder, System.IO.WatcherChangeTypes.Created));
             else {
                 foreach (string fileName in System.IO.Directory.GetFiles(folder_path)) {
@@ -279,7 +272,7 @@ namespace  QloudSync.IO
             if (!createDeprecated) {
                 Console.WriteLine (DateTime.Now.ToUniversalTime ()+" - Create File: "+file.FullLocalName);
                 file.TimeOfLastChange = DateTime.Now;
-                LocalRepo.PendingChanges.Add 
+                UploadSynchronizer.GetInstance().PendingChanges.Add 
                     (new Change (file, System.IO.WatcherChangeTypes.Created));
             } 
             
@@ -300,7 +293,7 @@ namespace  QloudSync.IO
                     w.Dispose();
                     watchers.Remove (w);
                     w = null;
-                    LocalRepo.PendingChanges.Add(new Change(new Folder(w.Path), System.IO.WatcherChangeTypes.Deleted));
+                    UploadSynchronizer.GetInstance().PendingChanges.Add(new Change(new Folder(w.Path), System.IO.WatcherChangeTypes.Deleted));
                 }
                 else c++;
             }

@@ -14,6 +14,15 @@ namespace  QloudSync.Synchrony
 	{
 		private static UploadSynchronizer instance;
 
+        private List<Change> pendingChanges;
+        public List<Change> PendingChanges {
+            set {
+                this.pendingChanges = value;
+            }
+            get {
+                return pendingChanges;
+            }
+        }
 
 		public static UploadSynchronizer GetInstance ()
 		{
@@ -23,7 +32,7 @@ namespace  QloudSync.Synchrony
 			return instance;
 		}
 		
-		public override bool Synchronize ()
+		public override void Synchronize ()
 		{
             Synchronized = false;
 			Logger.LogInfo ("Synchronizer", "Trying upload files to Storage.");
@@ -34,7 +43,7 @@ namespace  QloudSync.Synchrony
 			}
 			Repo.LastSyncTime = initTime;
             Synchronized = true;
-            return true;
+
 		}
 
 		private void SyncFiles ()
@@ -42,15 +51,15 @@ namespace  QloudSync.Synchrony
 
                 int attempt = 0;
                 int index = 0;
-                Console.WriteLine (DateTime.Now.ToUniversalTime () + " - Pending Changes (" + LocalRepo.PendingChanges.Count + ") ");
+                Console.WriteLine (DateTime.Now.ToUniversalTime () + " - Pending Changes (" + PendingChanges.Count + ") ");
 
-                while (LocalRepo.PendingChanges.Count != 0) {
+                while (PendingChanges.Count != 0) {
                    
-                    if (index >= LocalRepo.PendingChanges.Count)
+                    if (index >= PendingChanges.Count)
                         break;
                     
                     
-                    Change change = LocalRepo.PendingChanges [index];
+                    Change change = PendingChanges [index];
                     if(change != null)
                     {
                         bool operationSuccessfully = false;
@@ -74,7 +83,7 @@ namespace  QloudSync.Synchrony
                         }
 
                         if (operationSuccessfully) {
-                            LocalRepo.PendingChanges.Remove (change);
+                            PendingChanges.Remove (change);
                             attempt = 0;
                             index = 0;
                         } else {
@@ -96,7 +105,7 @@ namespace  QloudSync.Synchrony
 		bool HasChangeMustRecent (Change change)
         {
             try {
-                foreach (Change otherchange in LocalRepo.PendingChanges) {
+                foreach (Change otherchange in PendingChanges) {
                     if (otherchange.Event == WatcherChangeTypes.Renamed && otherchange.File.OldVersion != null) {
                         if (otherchange.File.OldVersion.FullLocalName == change.File.FullLocalName) {
                             otherchange.Event = change.Event;
@@ -115,9 +124,9 @@ namespace  QloudSync.Synchrony
             
 			try {
 				if (file.IsAFolder)
-					RemoteRepo.CreateFolder (new Folder (file.FullLocalName));
+					remoteRepo.CreateFolder (new Folder (file.FullLocalName));
 				else
-                    RemoteRepo.Upload (file);
+                    remoteRepo.Upload (file);
 				return true;
 			} catch (Exception e) {
 				Console.WriteLine (e.Message);
@@ -137,9 +146,9 @@ namespace  QloudSync.Synchrony
 					// indica que a versao mais atual eh a local
 					remoteFile.RecentVersion = file;
 					// envia para o trash a versao desatualizada
-                    RemoteRepo.MoveToTrash (remoteFile);
+                    remoteRepo.MoveToTrash (remoteFile);
 					// faz o upload da versao recente
-                    RemoteRepo.Upload (file);
+                    remoteRepo.Upload (file);
 				}
 				return true;
 			} catch {
@@ -160,12 +169,12 @@ namespace  QloudSync.Synchrony
                         if(file.IsIgnoreFile)
                             continue;
                         if (r.AbsolutePath != file.AbsolutePath)
-                            RemoteRepo.MoveToTrash (r);
+                            remoteRepo.MoveToTrash (r);
 
                     }
                 }
 
-                RemoteRepo.MoveToTrash (file);
+               remoteRepo.MoveToTrash (file);
 			} catch {
 				return false;
 			}
@@ -193,7 +202,7 @@ namespace  QloudSync.Synchrony
 		private void SynchronizeUploadRenameFile (LocalFile localFile)
 		{
 			// renomeia o arquivo remoto
-            RemoteRepo.Move (localFile.OldVersion, localFile);
+            remoteRepo.Move (localFile.OldVersion, localFile);
 		}
 		
 		private void SynchronizeUploadRenameFolder (Folder folder)
@@ -202,14 +211,14 @@ namespace  QloudSync.Synchrony
 			// nao precisa fazer upload, pois vai mover apenas remotamente (os arquivos atuais ja estao la)
 			FileInfo[] filesInFolder = new DirectoryInfo(folder.FullLocalName).GetFiles();
 			if (filesInFolder.Length == 0)
-                RemoteRepo.Move (folder.OldVersion, folder);
+                remoteRepo.Move (folder.OldVersion, folder);
 			else {
 				foreach (FileInfo file in filesInFolder)
 				{
 					LocalFile newFile = new LocalFile (file.FullName);
 					LocalFile oldFile = new LocalFile 
 						(file.FullName.Replace (folder.FullLocalName, folder.OldVersion.FullLocalName));
-                    RemoteRepo.Move (oldFile, newFile);
+                    remoteRepo.Move (oldFile, newFile);
 				}
 			}
 		}

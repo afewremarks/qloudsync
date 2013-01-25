@@ -16,6 +16,8 @@ namespace QloudSync {
         public static void Main (string [] args)
         {
             try {
+
+              
                Controller = new Controller ();
 
                 Controller.Initialize ();
@@ -23,7 +25,6 @@ namespace QloudSync {
                 UI = new SparkleUI ();
 
                 UI.Run ();
-         
             } catch (Exception e){
                 Logger.LogInfo ("Init", e);
                 Environment.Exit (-1);

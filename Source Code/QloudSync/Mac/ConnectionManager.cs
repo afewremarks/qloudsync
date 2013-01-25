@@ -156,15 +156,6 @@ using System.Text;
             }			
 		}	
 
-		public void Upload (QloudSync.Repository.File  file)
-		{	
-			Logger.LogInfo ("Connection","Uploading the file "+ file.FullLocalName+" to bucket.");
-			if (!System.IO.File.Exists(file.FullLocalName))
-				return;
-
-            GenericUpload ( file.RelativePathInBucket,  file.Name,  file.FullLocalName);
-		}
-
 		public bool CreateFolder (QloudSync.Repository.Folder folder)
 		{
 			return CreateFolder (folder.Name, folder.RelativePathInBucket);
@@ -194,57 +185,9 @@ using System.Text;
 				return false;
 			}
 		}
-
-		public void UploadToTrash (QloudSync.Repository.File  file)
-		{
-			Logger.LogInfo ("Connection","Uploading the file "+ file.Name+" to bucket.");
-			if (!System.IO.File.Exists(file.FullLocalName))
-				return;
-
-			string key;
-			if ( file.IsAFolder) {
-				key =  file.Name;
-			} else {
-				key =  file.Name + "(0)";
-			}
-			Logger.LogInfo ("Connection","Uploading the file "+key+" to trash.");
-			GenericUpload ( file.TrashRelativePath, key,  file.FullLocalName);	
-		}
-
-		public void Copy (QloudSync.Repository.File source, QloudSync.Repository.File destination)
-		{
-			//string sourcekey = source.AbsolutePath.Substring (1,source.AbsolutePath.Length-1);
-			GenericCopy (bucketName, source.AbsolutePath, destination.RelativePathInBucket, destination.Name);			
-		}
-
-		public void CopyInTrash (QloudSync.Repository.File source, QloudSync.Repository.File destination)
-		{
-			GenericCopy (bucketName, source.TrashAbsolutePath, destination.TrashRelativePath, destination.Name);
-		}
+     
 		
-		public void CopyToTrash (QloudSync.Repository.File source)
-		{
-			string destinationName;
-			if (source.IsAFolder)
-				destinationName = source.Name;
-			else
-				destinationName = source.Name+"(0)";
-
-			GenericCopy (bucketName, source.AbsolutePath, source.TrashRelativePath, destinationName);
-		}
-
-		public void Delete (QloudSync.Repository.File  file)
-		{
-            Logger.LogInfo ("Connection", "Deleting " + file.AbsolutePath + " from bucket.");
-			GenericDelete (file.AbsolutePath);
-		}
-
-		public void DeleteInTrash (QloudSync.Repository.File file)
-		{
-			GenericDelete (file.TrashAbsolutePath);
-		}
-
-		private void GenericDelete (string key)
+		public void GenericDelete (string key)
 		{
 			try {
 				if (key == "")
@@ -286,15 +229,16 @@ using System.Text;
 				S3Object remotefile = files.S3Objects.Where (o => o.Key == clockFile.Name).FirstOrDefault();
 				string sRemoteclock = remotefile.LastModified;
 				
-				Delete(clockFile);
-				
+                GenericDelete (clockFile.AbsolutePath);
+
 				DateTime remoteClock = Convert.ToDateTime (sRemoteclock);
 				
 				return localClock.Subtract(remoteClock);
 				
 			} catch(Exception e) {
-				return new TimeSpan(0);
-				Logger.LogInfo ("Connection","Fail to determinate a remote clock: "+e.Message +" \n");
+                Logger.LogInfo ("Connection","Fail to determinate a remote clock: "+e.Message +" \n");
+
+                return new TimeSpan (0);
 			}
 		}
 
@@ -306,7 +250,7 @@ using System.Text;
 		}
 
 
-        private void GenericCopy (string sourceBucket, string sourceKey, string destinationBucket, string destinationKey)
+        public void GenericCopy (string sourceBucket, string sourceKey, string destinationBucket, string destinationKey)
         {
             try{
                 CopyObjectRequest request = new CopyObjectRequest (){
@@ -321,7 +265,7 @@ using System.Text;
             } 
         }
 
-        private void GenericUpload (string bucketName, string key, string filepath)
+        public void GenericUpload (string bucketName, string key, string filepath)
 		{
 			try {
 				PutObjectRequest putObject = new PutObjectRequest ()
@@ -329,7 +273,7 @@ using System.Text;
                     BucketName = bucketName,
                     FilePath = filepath,
                     Key = key, 
-                    Timeout = 3600000
+                    Timeout = GlobalSettings.UploadTimeout
                 };
 				using (S3Response response = Connect ().PutObject (putObject)) {
 					response.Dispose ();

@@ -103,15 +103,18 @@ namespace  QloudSync.Repository
 
         public void Download (RemoteFile remoteFile)
         {
-            //TODO observar aqui
-            if (!IsTrashFile (remoteFile) && !LocalRepo.PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == System.IO.WatcherChangeTypes.Deleted).Any())
+            //TODO mover isso para a chamada do metodo
+            //if (!IsTrashFile (remoteFile) && !LocalRepo.PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == System.IO.WatcherChangeTypes.Deleted).Any())
                 connection.Download (remoteFile);
         }
 
 
         public void Upload (File file)
         {
-            connection.Upload(file);
+            if (!System.IO.File.Exists(file.FullLocalName))
+                return;
+            
+            connection.GenericUpload ( file.RelativePathInBucket,  file.Name,  file.FullLocalName);
         }
 
         public void CreateFolder (Folder folder)
@@ -119,18 +122,32 @@ namespace  QloudSync.Repository
             connection.CreateFolder (folder);
         }
 
-        public void Move (File old, File newO)
+        public void Move (File source, File destination)
         {
-            connection.Copy (old, newO);
-            connection.CopyToTrash (old);
-            if (Files.Where (rf => rf.Name == old.Name).Any())
-                connection.Delete (old);
+            connection.GenericCopy (DefaultBucketName, source.AbsolutePath, destination.RelativePathInBucket, destination.Name);
+
+            string destinationName;
+            if (source.IsAFolder)
+                destinationName = source.Name;
+            else
+                destinationName = source.Name+"(0)";
+            
+            connection.GenericCopy (DefaultBucketName, source.AbsolutePath, source.TrashRelativePath, destinationName);
+            if (Files.Where (rf => rf.Name == source.Name).Any())
+                connection.GenericDelete (source.AbsolutePath);
         }
         
-        public void MoveToTrash (File  SQObject){
-            connection.CopyToTrash ( SQObject);
-            UpdateTrashFolder ( SQObject);
-            connection.Delete ( SQObject);
+        public void MoveToTrash (File  file){
+            string destinationName;
+            if (file.IsAFolder)
+                destinationName = file.Name;
+            else
+                destinationName = file.Name+"(0)";
+            
+            connection.GenericCopy (DefaultBucketName, file.AbsolutePath, file.TrashRelativePath, destinationName);
+
+            UpdateTrashFolder ( file);
+            connection.GenericDelete (file.AbsolutePath);
         }
 
         public bool ExistsInBucket (File file)
@@ -146,56 +163,71 @@ namespace  QloudSync.Repository
 
         public bool SendToTrash (LocalFile file)
         {
-            connection.UploadToTrash (file);
+            if (!System.IO.File.Exists(file.FullLocalName))
+                return false;
+            
+            string key;
+            if ( file.IsAFolder) {
+                key =  file.Name;
+            } else {
+                key =  file.Name + "(0)";
+            }
+            Logger.LogInfo ("Connection","Uploading the file "+key+" to trash.");
+            connection.GenericUpload ( file.TrashRelativePath, key,  file.FullLocalName);
             Logger.LogInfo ("Connection","File "+file.Name+" was sent to trash folder.");
             UpdateTrashFolder (file);
 
             return TrashFiles.Where (rf => rf.TrashFullName == file.TrashFullName+"(1)").Any ();
         }
         
-        public bool SendToTrash (RemoteFile remoteFile)
+        public bool SendToTrash (RemoteFile file)
         {
-            connection.CopyToTrash (remoteFile);
-            bool copySucessfull =  TrashFiles.Where (rm => remoteFile.AbsolutePath+"(0)" == rm.AbsolutePath).Any();
+            string destinationName;
+            if (file.IsAFolder)
+                destinationName = file.Name;
+            else
+                destinationName = file.Name+"(0)";
+            
+            connection.GenericCopy (DefaultBucketName, file.AbsolutePath, file.TrashRelativePath, destinationName);
+
+            bool copySucessfull =  TrashFiles.Where (rm => file.AbsolutePath+"(0)" == rm.AbsolutePath).Any();
             if (copySucessfull)
-                UpdateTrashFolder (remoteFile);
+                UpdateTrashFolder (file);
             
             return copySucessfull;
         }
         
-        public void UpdateTrashFolder (File  SQObject)
+        public void UpdateTrashFolder (File  file)
         {
-            if ( SQObject.IsAFolder)
+            if ( file.IsAFolder)
                 return;
-            List<RemoteFile> versions = GetVersionsOrderByLastModified ( SQObject);
+            List<RemoteFile> versions = GetVersionsOrderByLastModified ( file);
            
             foreach (RemoteFile version in versions) {
-                //if (version.IsAFolder)
-                //  continue;
-                //Console.WriteLine ("Incrementa versao");
                 string newName = "";
                 string oldName = version.FullLocalName;
                 int sizeOldName = oldName.Length;
                 int v = int.Parse(oldName[sizeOldName-2].ToString())+1;
                 newName = oldName.Substring (0, sizeOldName - 3) +"("+v+")";
-                
-                connection.CopyInTrash (version, new RemoteFile(newName));
-                connection.DeleteInTrash (version);
+                RemoteFile newVersion = new RemoteFile(newName);
+                connection.GenericCopy (DefaultBucketName, version.TrashAbsolutePath, newVersion.TrashRelativePath, newVersion.Name);
+
+                connection.GenericDelete (version.TrashAbsolutePath);
             }
-            versions = GetVersionsOrderByLastModified ( SQObject);
+            versions = GetVersionsOrderByLastModified ( file);
             while (versions.Count > 3) {
-                connection.DeleteInTrash (versions.First());
-                versions = GetVersionsOrderByLastModified( SQObject);                
+                connection.GenericDelete (versions.First().TrashAbsolutePath);
+                versions = GetVersionsOrderByLastModified( file);                
             }
         }
 
 		public void Delete (RemoteFile file)
 		{
-			connection.Delete (file);
+			connection.GenericDelete (file.AbsolutePath);
 		}
         
-        private List<RemoteFile> GetVersionsOrderByLastModified (File  SQObject)  {
-            return  TrashFiles.Where (ft => ft.AbsolutePath.Contains ( SQObject.AbsolutePath)).OrderBy(ft => ft.AsS3Object.LastModified).ToList<RemoteFile>();
+        private List<RemoteFile> GetVersionsOrderByLastModified (File  file)  {
+            return  TrashFiles.Where (ft => ft.AbsolutePath.Contains ( file.AbsolutePath)).OrderBy(ft => ft.AsS3Object.LastModified).ToList<RemoteFile>();
         }
 
         public void DeleteAllFilesInBucket(){

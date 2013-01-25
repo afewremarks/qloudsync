@@ -13,8 +13,7 @@ namespace  QloudSync.Synchrony
     {
         private static DownloadSynchronizer instance;
         private List<QloudSync.Repository.RemoteFile> PendingFiles;
-        private RemoteRepo remoteRepo = new RemoteRepo();
-
+ 
         public static bool Initialized;
         
         
@@ -31,9 +30,32 @@ namespace  QloudSync.Synchrony
             
             return instance;
         }
-        
-        public override bool Synchronize ()
+
+        public void FullLoad ()
         {
+            Done = false;
+            
+            remoteRepo.Connection.TransferSize = 0;
+            if (remoteRepo.Initialized ()) {
+                List<RemoteFile> remoteFiles = remoteRepo.Files;
+                CalculateDownloadSize(remoteFiles);
+                foreach (RemoteFile remoteFile in remoteFiles) {
+                    if(remoteFile.IsAFolder)
+                        Directory.CreateDirectory (remoteFile.FullLocalName);
+                    else
+                    {
+                        if (!remoteFile.IsIgnoreFile)
+                            remoteRepo.Download (remoteFile);
+                    }
+                }
+            }
+            Done = true;
+        }
+
+        public override void Synchronize ()
+        {
+            
+            remoteRepo.Connection.TransferSize = 0;
             Synchronized = false;
             Logger.LogInfo("Synchronizer", "Trying download files from Storage.");
             DateTime initTime = DateTime.Now;
@@ -41,81 +63,47 @@ namespace  QloudSync.Synchrony
             SyncSize = 0;
             if (Initialize ()) {
                 PendingFiles = RemoteChanges;
-                foreach (RemoteFile remoteFile in PendingFiles)
-                {
-                    if (!remoteFile.IsIgnoreFile)
-                        SyncSize += remoteFile.AsS3Object.Size;
-                }
-
-
                 SyncRemoteUpdates ();
                 SyncClear ();
                 ShowDoneMessage ("Download");
                 Synchronized = true;
             }
             Repo.LastSyncTime = initTime;
-            return true;
+        }
+
+        void CalculateDownloadSize (List<RemoteFile> remoteFiles)
+        {
+            foreach (RemoteFile remoteFile in remoteFiles) {
+                if (!remoteFile.IsIgnoreFile)
+                    Size += remoteFile.AsS3Object.Size;
+            }
+        }
+
+        public List<RemoteFile> RemoteChanges {
+            get {
+                TimeSpan diffClocks = remoteRepo.DiffClocks;
+                DateTime referencialClock = Repo.LastSyncTime.Subtract (diffClocks);
+                return remoteRepo.Files.Where (rf => Convert.ToDateTime (rf.AsS3Object.LastModified).Subtract (referencialClock).TotalSeconds > 0).ToList<RemoteFile>();
+            }
         }
         
-        
-      /*  public bool DownloadRemoteFiles ()
-        {
-            Synchronized = false;
-            Logger.LogInfo("Synchronizer", "Trying download files from Storage.");
-            DateTime initTime = DateTime.Now;
-            SyncSize = 0;
-            if (Initialize ()) 
-            {
-                foreach (RemoteFile remoteFile in remoteFiles)
-                {
-                    if (!remoteFile.IsIgnoreFile)
-                        SyncSize += remoteFile.AsS3Object.Size;
-                }
-                Initialized = true;
-
-                foreach (RemoteFile remoteFile in remoteFiles)
-                {
-                    if (remoteFile.InTrash || remoteFile.IsIgnoreFile)
-                        continue;
-
-                    if(!remoteFile.IsAFolder)
-                    {
-                        LocalFile localFile = new LocalFile (remoteFile.FullLocalName);
-                        
-                        if (localFile.IsFileLocked)
-                            continue;
-
-                        Logger.LogInfo ("Synchronizer","Synchronizing: "+remoteFile.Name);
-                        
-                        if (!localFile.ExistsInLocalRepo)
-                        {
-                            // se nao existe, baixa
-                            RemoteRepo.Download (remoteFile);
-
-                            countOperation++;
-                        }   
-                        
-                    }
-                    else 
-                        SyncFolder (new Folder (remoteFile.FullLocalName));
-                }
-                ShowDoneMessage ("Download");
+        public bool HasRemoteChanges {
+            get {
+                return RemoteChanges.Count != 0;
             }
-            LastSyncTime = initTime;
-            Synchronized = true;
-            return true;
-        }*/
-        
+        }
+
+
         private void SyncRemoteUpdates ()
         {
             foreach (RemoteFile remoteFile in PendingFiles)
             {
-                if (!LocalRepo.PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == WatcherChangeTypes.Deleted).Any()){
+             //   if (!UploadSynchronizer.GetInstance().PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == WatcherChangeTypes.Deleted).Any()){
                     if(!remoteFile.IsAFolder)
                         SyncFile (remoteFile);
                     else 
                         SyncFolder (new Folder (remoteFile.FullLocalName));
-                }
+               // }
             }
         }
         
@@ -173,7 +161,7 @@ namespace  QloudSync.Synchrony
 	            {
 					if(localFile.Deleted)
 						continue;
-	                if (LocalRepo.PendingChanges.Where(c => c.File.AbsolutePath == localFile.AbsolutePath).Any())
+                    if (UploadSynchronizer.GetInstance().PendingChanges.Where(c => c.File.AbsolutePath == localFile.AbsolutePath).Any())
 	                    continue;
 
 
@@ -225,13 +213,13 @@ namespace  QloudSync.Synchrony
 		void ExcludeFolder (DirectoryInfo folder)
 		{
 			foreach (FileInfo f in folder.GetFiles()){
-				RemoteRepo.FilesChanged.Add(new RemoteFile(f.FullName));
+				remoteRepo.FilesChanged.Add(new RemoteFile(f.FullName));
 				f.Delete();
 			}
 			foreach (DirectoryInfo id in folder.GetDirectories()){
 				ExcludeFolder (id);
 			}
-			RemoteRepo.FilesChanged.Add (new LocalFile(folder.FullName));
+			remoteRepo.FilesChanged.Add (new LocalFile(folder.FullName));
 			folder.Delete ();
 		}
         
@@ -239,9 +227,9 @@ namespace  QloudSync.Synchrony
         {
             Logger.LogInfo ("Synchronizer", "Versioning: " + localFile.Name);
             
-            if (RemoteRepo.SendToTrash (localFile)) 
+            if (remoteRepo.SendToTrash (localFile)) 
             {
-				RemoteRepo.FilesChanged.Add (localFile);
+				remoteRepo.FilesChanged.Add (localFile);
                 new FileInfo(localFile.FullLocalName).Delete ();    
                 Logger.LogInfo("Synchronizer","Local file "+localFile.Name+" was deleted.");
             }
@@ -250,7 +238,7 @@ namespace  QloudSync.Synchrony
         void AddDownloadFile (RemoteFile remoteFile)
         {
             remoteFile.TimeOfLastChange = DateTime.Now;
-            RemoteRepo.FilesChanged.Add (remoteFile);
+            remoteRepo.FilesChanged.Add (remoteFile);
         }
     }
 }

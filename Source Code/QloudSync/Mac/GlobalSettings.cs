@@ -39,6 +39,30 @@ namespace QloudSync
             }
         }
 
+        public static int UploadTimeout {
+            get {
+                try{
+                return int.Parse(ConfigurationManager.AppSettings ["UploadTimeout"]);
+                }
+                catch{
+                    Logger.LogInfo ("GlobalSettings", "Invalid UploadTimeout value");
+                    return 3600000;
+                }
+            }
+        }
+
+        
+        public static int IntervalBetweenChecksRemoteRepository {
+            get {
+                try{
+                    return int.Parse(ConfigurationManager.AppSettings ["IntervalBetweenChecksRemoteRepository"]);
+                }
+                catch{
+                    Logger.LogInfo ("GlobalSettings", "Invalid IntervalBetweenChecksRemoteRepository value");
+                    return 30000;
+                }
+            }
+        }
     }
 }
 

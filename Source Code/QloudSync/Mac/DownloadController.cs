@@ -3,25 +3,17 @@ using System.Threading;
 using QloudSync.Repository;
 using System.IO;
 using System.Collections.Generic;
+using QloudSync.Synchrony;
 
 namespace QloudSync
 {
-    public class DownloadController
+    public class DownloadController : SynchronizerController
     {
-        private DownloadController ()
-        {
-        }
-
+       
         private static DownloadController instance;
-        private bool downloadFinished = false;
-        private double downloadSize = 0;
-        private double downloadPercent = 0;
-        private double downloadSpeed = 0;
-        private int secondsRemaining = 0;
-        private int bytesTransferred = 0;
-        private RemoteRepo remoteRepo = new RemoteRepo();
-        
-        
+        private System.Timers.Timer remote_timer         = new System.Timers.Timer () { Interval = GlobalSettings.IntervalBetweenChecksRemoteRepository };
+        DownloadSynchronizer synchronizer = DownloadSynchronizer.GetInstance();
+
         protected List<string> warnings = new List<string> ();
         protected List<string> errors   = new List<string> ();
 
@@ -81,79 +73,55 @@ namespace QloudSync
             return instance;
         }
 
+        public void FirstLoad()
+        {
+            ThreadController(new Thread(DownloadSynchronizer.GetInstance().FullLoad));
+        }
 
-
-        public bool FirstLoad()
+        
+        public override void Synchronize ()
+        {
+            if(!remote_timer.Enabled)
+                remote_timer.Start();
+            ThreadController(new Thread(DownloadSynchronizer.GetInstance().Synchronize));
+        }
+       
+        public void ThreadController (Thread downThread)
         {
             try
             {
                 ClearDownloadIndexes ();
-                Thread downThread = new Thread(FullLoad);
                 downThread.Start ();
-
-                while (downloadPercent < 100)
+               
+                while (Percent < 100)
                 {
-                    if (downloadFinished)
+                    if (synchronizer.Done)
                         break;
-                    
-                    bytesTransferred += remoteRepo.Connection.TransferSize;
-                    remoteRepo.Connection.TransferSize = 0;
-                    if (downloadSize != 0)
-                        downloadPercent = (bytesTransferred / downloadSize) * 100;
 
-                    ProgressChanged (downloadPercent);
+                    if (synchronizer.Size != 0)
+                        Percent = (synchronizer.BytesTransferred / synchronizer.Size) * 100;
+                    
+                    ProgressChanged (Percent);
+                    Console.WriteLine ("Debug "+Percent);
                     Thread.Sleep (1000);
                 }
             }
             catch (Exception e)
             {
-                Logger.LogInfo("First Load", e);
-                return false;
+                Logger.LogInfo("DownloadController", e);
             }
-            return true;
         }
 
-        void FullLoad ()
-        {
-            downloadFinished = false;
-            if (remoteRepo.Initialized ()) {
-                    List<RemoteFile> remoteFiles = remoteRepo.Files;
-                    CalculateDownloadSize(remoteFiles);
-                    foreach (RemoteFile remoteFile in remoteFiles) {
-                        if(remoteFile.IsAFolder)
-                            Directory.CreateDirectory (remoteFile.FullLocalName);
-                        else
-                        {
-                            if (!remoteFile.IsIgnoreFile)
-                                remoteRepo.Download (remoteFile);
-                        }
-                    }
-                    //BacklogSynchronizer.GetInstance().Write();
-            }
-            downloadFinished = true;
-        }
 
+
+     
         public void Stop ()
         {
-            downloadFinished = true;
+            DownloadSynchronizer.GetInstance().Done = true;
+            remote_timer.Stop();
         }
 
-        void CalculateDownloadSize (List<RemoteFile> remoteFiles)
-        {
-            foreach (RemoteFile remoteFile in remoteFiles) {
-                if (!remoteFile.IsIgnoreFile)
-                    downloadSize += remoteFile.AsS3Object.Size;
-            }
-        }
 
-        void ClearDownloadIndexes()
-        {
-            downloadPercent = 0;
-            downloadSpeed = 0;
-            downloadSize = 0;
-            secondsRemaining = 0;
-            bytesTransferred = 0;
-        }
     }
 }
 
