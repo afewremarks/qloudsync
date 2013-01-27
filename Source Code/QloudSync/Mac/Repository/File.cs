@@ -128,6 +128,10 @@ using QloudSync.Util;
             set;
             get;
         }
+
+        public int Id{
+            set; get;
+        }
         
         public static File Get (File  SQObject, List<File>  SQObjectList)
         {

@@ -51,7 +51,7 @@ namespace QloudSync {
     
                 Setup      = new SparkleSetup ();
                 About      = new AboutWindow ();
-                //StatusIcon = new IconController ();
+                StatusIcon = new IconController ();
 
                 Program.Controller.UIHasLoaded ();
             }

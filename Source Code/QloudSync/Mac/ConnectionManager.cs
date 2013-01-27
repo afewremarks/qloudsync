@@ -18,7 +18,7 @@ using QloudSync.Repository;
 using System.Text;
 
 
- namespace QloudSync.Net.S3
+namespace QloudSync.Net.S3
 {
 	public class ConnectionManager
 	{
@@ -55,7 +55,7 @@ using System.Text;
             
         }   
         
-        private AmazonS3Client Connect ()
+        public AmazonS3Client Connect ()
         {
             if(connection != null)
                 return connection;
@@ -95,6 +95,7 @@ using System.Text;
 
 		public bool ExistsBucket {
 			get {
+                Console.WriteLine(bucketName);
                     return Reconnect().ListBuckets () .Buckets.Where (b => b.BucketName == bucketName).Any ();
        			}
 		}
@@ -102,7 +103,7 @@ using System.Text;
         public bool CreateBucket ()
         {   
             try {
-                Logger.LogInfo ("Connection","Creating a bucket "+bucketName);
+                //Logger.LogInfo ("Connection","Creating a bucket "+bucketName);
                 PutBucketRequest request = new PutBucketRequest ();
                 request.BucketName = bucketName;
                 Connect ().PutBucket (request);
@@ -151,7 +152,13 @@ using System.Text;
                     } 
                 }
 
-            } catch (Exception e) {
+            }catch (AmazonS3Exception) {
+                if(InitializeBucket())
+                    Download (file);
+                else
+                    Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
+            }
+            catch (Exception e) {
                 Logger.LogInfo ("Error", e);
             }			
 		}	
@@ -169,7 +176,7 @@ using System.Text;
 		private bool CreateFolder (string name, string relativePath)
 		{
 			try {
-				Logger.LogInfo ("Connection","Creating folder "+name+".");
+	
 				PutObjectRequest putObject = new PutObjectRequest (){
 					BucketName = relativePath,
 					Key = name,
@@ -180,7 +187,16 @@ using System.Text;
 					response.Dispose ();
 					return true;
 				}
-			} catch(Exception e) {
+                Logger.LogInfo ("Connection","Creating folder "+name+".");
+            }catch (AmazonS3Exception) {
+                if(InitializeBucket())
+                  return  CreateFolder (name, relativePath);
+                else{
+                    Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
+                    return false;
+                }
+            }
+            catch(Exception e) {
 				Logger.LogInfo ("Connection","Fail to upload "+e.Message);
 				return false;
 			}
@@ -195,13 +211,22 @@ using System.Text;
 
 
 				DeleteObjectRequest request = new DeleteObjectRequest (){
-				BucketName = bucketName,
-				Key = key
-			};
-				using (DeleteObjectResponse response = Connect ().DeleteObject (request)) {
-					response.Dispose ();
+				    BucketName = bucketName,
+				    Key = key
+			    };
+                AmazonS3Client connection = Connect();
+
+                using (DeleteObjectResponse response = connection.DeleteObject (request)) {
+                    response.Dispose ();
 				}
-			} catch (Exception e){
+                Logger.LogInfo ("Connection", string.Format("{0} was deleted in bucket.", key));
+
+            } catch (AmazonS3Exception) {
+                if(InitializeBucket())
+                    GenericDelete (key);
+                else
+                    Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
+            }catch (Exception e){
 				Logger.LogInfo ("Connection", e);
 			}
 		}
@@ -260,31 +285,60 @@ using System.Text;
                     SourceKey = sourceKey
                 };
                 Connect ().CopyObject (request);
-            } catch{
-                //Logger.LogInfo ("Connection", "Problems sending file to trash folder");
+            } 
+            catch (AmazonS3Exception) {
+                if(InitializeBucket())
+                    GenericCopy (sourceBucket, sourceKey, destinationBucket, destinationKey);
+                else
+                    Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
+            }
+            catch (System.InvalidOperationException){
+            }
+            catch (Exception e){
+                Logger.LogInfo ("Connection", e);
             } 
         }
 
         public void GenericUpload (string bucketName, string key, string filepath)
-		{
-			try {
-				PutObjectRequest putObject = new PutObjectRequest ()
+        {
+            try {
+                PutObjectRequest putObject = new PutObjectRequest ()
                 {
                     BucketName = bucketName,
                     FilePath = filepath,
                     Key = key, 
                     Timeout = GlobalSettings.UploadTimeout
                 };
-				using (S3Response response = Connect ().PutObject (putObject)) {
-					response.Dispose ();
-				}
-			} catch (ObjectDisposedException) {
-				Logger.LogInfo ("Connection","An exception occurred, the file will be resend.");
-				GenericUpload (bucketName, key, filepath);
-			}
+                using (S3Response response = Connect ().PutObject (putObject)) {
+                    response.Dispose ();
+                }
+                Logger.LogInfo ("Connection", string.Format("{0} was uploaded.", filepath));
+            } catch (ObjectDisposedException) {
+                Logger.LogInfo ("Connection", "An exception occurred, the file will be resend.");
+                GenericUpload (bucketName, key, filepath);
+            } catch (AmazonS3Exception) {
+
+                if(InitializeBucket())
+                    GenericUpload (bucketName, key, filepath);
+                else
+                    Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
+            }
 			catch(Exception e) {
                 Logger.LogInfo ("Connection",e);
             }
+        }
+
+        protected bool InitializeBucket ()
+        {
+            if (!ExistsBucket) {
+                if (CreateBucket ())
+                   return CreateTrashFolder ();
+            } else {
+                if (!GetFiles().Where(s3o => s3o.Key.Contains(GlobalSettings.Trash)).Any())
+                    return CreateTrashFolder ();
+                return true;
+            }
+            return false;
         }
 
 		#endregion
@@ -299,6 +353,7 @@ using System.Text;
 				using (DeleteObjectResponse response = Connect ().DeleteObject (request)) {
 					response.Dispose ();
 				}
+                connection = null;
 			}
 		}
 	}

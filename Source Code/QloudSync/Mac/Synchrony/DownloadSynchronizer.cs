@@ -20,6 +20,7 @@ namespace  QloudSync.Synchrony
         private DownloadSynchronizer ()
         { 
             Initialized = false;
+            LastSyncTime = DateTime.Now;
         }
         
         public static DownloadSynchronizer GetInstance()
@@ -36,7 +37,7 @@ namespace  QloudSync.Synchrony
             Done = false;
             
             remoteRepo.Connection.TransferSize = 0;
-            if (remoteRepo.Initialized ()) {
+
                 List<RemoteFile> remoteFiles = remoteRepo.Files;
                 CalculateDownloadSize(remoteFiles);
                 foreach (RemoteFile remoteFile in remoteFiles) {
@@ -46,29 +47,27 @@ namespace  QloudSync.Synchrony
                     {
                         if (!remoteFile.IsIgnoreFile)
                             remoteRepo.Download (remoteFile);
+
                     }
+
+                    BacklogSynchronizer.GetInstance().AddFile(remoteFile);
                 }
-            }
             Done = true;
         }
 
-        public override void Synchronize ()
-        {
-            
+        public void Synchronize ()
+        {            
             remoteRepo.Connection.TransferSize = 0;
-            Synchronized = false;
             Logger.LogInfo("Synchronizer", "Trying download files from Storage.");
             DateTime initTime = DateTime.Now;
             remoteRepo.FilesChanged = new List<QloudSync.Repository.File>();
             SyncSize = 0;
-            if (Initialize ()) {
-                PendingFiles = RemoteChanges;
-                SyncRemoteUpdates ();
-                SyncClear ();
-                ShowDoneMessage ("Download");
-                Synchronized = true;
-            }
-            Repo.LastSyncTime = initTime;
+            Initialize();
+            PendingFiles = RemoteChanges;
+            SyncRemoteUpdates ();
+            SyncClear ();
+            ShowDoneMessage ("Download");
+            LastSyncTime = initTime;
         }
 
         void CalculateDownloadSize (List<RemoteFile> remoteFiles)
@@ -82,7 +81,7 @@ namespace  QloudSync.Synchrony
         public List<RemoteFile> RemoteChanges {
             get {
                 TimeSpan diffClocks = remoteRepo.DiffClocks;
-                DateTime referencialClock = Repo.LastSyncTime.Subtract (diffClocks);
+                DateTime referencialClock = LastSyncTime.Subtract (diffClocks);
                 return remoteRepo.Files.Where (rf => Convert.ToDateTime (rf.AsS3Object.LastModified).Subtract (referencialClock).TotalSeconds > 0).ToList<RemoteFile>();
             }
         }
@@ -98,7 +97,7 @@ namespace  QloudSync.Synchrony
         {
             foreach (RemoteFile remoteFile in PendingFiles)
             {
-             //   if (!UploadSynchronizer.GetInstance().PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == WatcherChangeTypes.Deleted).Any()){
+             //   if (!UploadController.GetInstance().PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == WatcherChangeTypes.Deleted).Any()){
                     if(!remoteFile.IsAFolder)
                         SyncFile (remoteFile);
                     else 
@@ -123,6 +122,7 @@ namespace  QloudSync.Synchrony
             
             if (localFile.ExistsInLocalRepo)
             {
+                //update
                 if ( !FilesIsSync (localFile, remoteFile))
                 {
                     Console.WriteLine ("Not sync "+localFile.MD5Hash+" "+remoteFile.MD5Hash);
@@ -134,22 +134,25 @@ namespace  QloudSync.Synchrony
                     //Changes.Add (connection.Download (remoteFile));
                     AddDownloadFile (remoteFile);
 					remoteRepo.Download (remoteFile);
+                    BacklogSynchronizer.GetInstance().EditFileByName (remoteFile);
                 }
             }
             else
             {
-                // se nao existe, baixa
+                //create
 				AddDownloadFile(remoteFile);
                 remoteRepo.Download (remoteFile);
-                
+                BacklogSynchronizer.GetInstance().AddFile(remoteFile);
                 countOperation++;
             }   
         }
         
         private void SyncFolder (Folder folder)
         {           
-            if (!new DirectoryInfo (folder.FullLocalName).Exists )
-                folder.Create();
+            if (!new DirectoryInfo (folder.FullLocalName).Exists) {
+                folder.Create ();
+                BacklogSynchronizer.GetInstance().AddFile (folder);
+            }
             //countOperation++;
         }
         
@@ -161,7 +164,7 @@ namespace  QloudSync.Synchrony
 	            {
 					if(localFile.Deleted)
 						continue;
-                    if (UploadSynchronizer.GetInstance().PendingChanges.Where(c => c.File.AbsolutePath == localFile.AbsolutePath).Any())
+                    if (UploadController.GetInstance().PendingChanges.Where(c => c.File.AbsolutePath == localFile.AbsolutePath).Any())
 	                    continue;
 
 
@@ -195,6 +198,7 @@ namespace  QloudSync.Synchrony
                     if (f.Exists)
                         f.Delete();
                 }
+                BacklogSynchronizer.GetInstance().RemoveFileByHash (localFile);
             }
 
         }
@@ -207,6 +211,8 @@ namespace  QloudSync.Synchrony
 
 			if (!ExistsInBucket (folder) && d.Exists) {
 				ExcludeFolder (d);
+                
+                BacklogSynchronizer.GetInstance().RemoveFileByHash (folder);
 			}
         }
 

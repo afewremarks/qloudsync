@@ -7,7 +7,7 @@ using QloudSync.Util;
 
 namespace  QloudSync.Repository
 {
-    public class RemoteRepo : Repo
+    public class RemoteRepo
     {
         private ConnectionManager connection; 
 
@@ -35,12 +35,12 @@ namespace  QloudSync.Repository
             } 
         }
 
-		private List<RemoteFile> GetRemoteFiles (List<S3Object> files)
+		protected List<RemoteFile> GetRemoteFiles (List<S3Object> files)
 		{
 			List <RemoteFile> remoteFiles = new List <RemoteFile> ();
 			
 			foreach (S3Object file in files) {
-				remoteFiles.Add (new RemoteFile (file));
+                remoteFiles.Add (new RemoteFile (file));
 			}
 			return remoteFiles;
 		}
@@ -112,7 +112,10 @@ namespace  QloudSync.Repository
         public void Upload (File file)
         {
             if (!System.IO.File.Exists(file.FullLocalName))
+            {
+                Logger.LogInfo ("Upload", string.Format("Could not upload {0} because it does not exist in local repository.",file.AbsolutePath));
                 return;
+            }
             
             connection.GenericUpload ( file.RelativePathInBucket,  file.Name,  file.FullLocalName);
         }
@@ -122,10 +125,13 @@ namespace  QloudSync.Repository
             connection.CreateFolder (folder);
         }
 
-        public void Move (File source, File destination)
+        public void Copy (File source, File destination)
         {
             connection.GenericCopy (DefaultBucketName, source.AbsolutePath, destination.RelativePathInBucket, destination.Name);
+        }
 
+        public void Move (File source, File destination)
+        {
             string destinationName;
             if (source.IsAFolder)
                 destinationName = source.Name;
@@ -146,7 +152,7 @@ namespace  QloudSync.Repository
             
             connection.GenericCopy (DefaultBucketName, file.AbsolutePath, file.TrashRelativePath, destinationName);
 
-            UpdateTrashFolder ( file);
+            UpdateTrashFolder (file);
             connection.GenericDelete (file.AbsolutePath);
         }
 
@@ -177,7 +183,7 @@ namespace  QloudSync.Repository
             Logger.LogInfo ("Connection","File "+file.Name+" was sent to trash folder.");
             UpdateTrashFolder (file);
 
-            return TrashFiles.Where (rf => rf.TrashFullName == file.TrashFullName+"(1)").Any ();
+            return true;
         }
         
         public bool SendToTrash (RemoteFile file)
@@ -189,7 +195,6 @@ namespace  QloudSync.Repository
                 destinationName = file.Name+"(0)";
             
             connection.GenericCopy (DefaultBucketName, file.AbsolutePath, file.TrashRelativePath, destinationName);
-
             bool copySucessfull =  TrashFiles.Where (rm => file.AbsolutePath+"(0)" == rm.AbsolutePath).Any();
             if (copySucessfull)
                 UpdateTrashFolder (file);
@@ -201,24 +206,26 @@ namespace  QloudSync.Repository
         {
             if ( file.IsAFolder)
                 return;
-            List<RemoteFile> versions = GetVersionsOrderByLastModified ( file);
-           
+
+            List<RemoteFile> versions = GetVersionsOrderByLastModified (file);
+
+            while (versions.Count > 3) {
+                connection.GenericDelete (versions.First().TrashAbsolutePath);
+            }
+
             foreach (RemoteFile version in versions) {
                 string newName = "";
                 string oldName = version.FullLocalName;
                 int sizeOldName = oldName.Length;
                 int v = int.Parse(oldName[sizeOldName-2].ToString())+1;
-                newName = oldName.Substring (0, sizeOldName - 3) +"("+v+")";
-                RemoteFile newVersion = new RemoteFile(newName);
-                connection.GenericCopy (DefaultBucketName, version.TrashAbsolutePath, newVersion.TrashRelativePath, newVersion.Name);
+                newName = string.Format("{0}({1})", oldName.Substring (0, sizeOldName - 3), v);
 
+                RemoteFile newVersion = new RemoteFile(newName);
+
+                connection.GenericCopy (DefaultBucketName, version.TrashAbsolutePath, newVersion.TrashRelativePath, newVersion.Name);
                 connection.GenericDelete (version.TrashAbsolutePath);
             }
-            versions = GetVersionsOrderByLastModified ( file);
-            while (versions.Count > 3) {
-                connection.GenericDelete (versions.First().TrashAbsolutePath);
-                versions = GetVersionsOrderByLastModified( file);                
-            }
+
         }
 
 		public void Delete (RemoteFile file)
@@ -232,14 +239,7 @@ namespace  QloudSync.Repository
 
         public void DeleteAllFilesInBucket(){
 			connection.DeleteAllFilesInBucket();
-		}
-
-        public bool Initialized ()
-        {
-            if (InitBucket())
-                return InitTrashFolder();
-            return false;
-        }
+		}       
     }
 }
 
