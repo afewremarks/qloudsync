@@ -64,10 +64,13 @@ using System.Xml;
                         //else cria o local
                         if(!System.IO.Directory.Exists(remoteFile.AbsolutePath))
                         {
-                            if (existsInBacklog)
+                            if (existsInBacklog){
                                 remoteRepo.Delete (remoteFile);
-                            else
+                                RemoveFileByAbsolutePath (remoteFile);
+                            }
+                            else{
                                 System.IO.Directory.CreateDirectory (remoteFile.AbsolutePath);
+                            }
                             continue;
                         }
                     }
@@ -81,6 +84,7 @@ using System.Xml;
                         if (!System.IO.File.Exists (localFile.FullLocalName)) 
                         {
                             remoteRepo.MoveToTrash (remoteFile);
+                            RemoveFileByAbsolutePath (remoteFile);
                         }
                         //verify updates when offline
                         else 
@@ -114,6 +118,7 @@ using System.Xml;
                         if(remoteFile.IsAFolder)
                         {
                             System.IO.Directory.CreateDirectory (remoteFile.FullLocalName);
+
                         }else{
                             //remote file was create when offline
                             ChangesMade.Add (remoteFile);
@@ -122,6 +127,7 @@ using System.Xml;
                             if(localFile != null)
                                 alreadyAnalyzed.Add (localFile);
                         }
+                        AddFile(remoteFile);
                     }
                 }
                 //not exists remote file
@@ -142,6 +148,7 @@ using System.Xml;
                     {
                         if (localFile.IsAFolder){
                             System.IO.Directory.Delete (localFile.FullLocalName);
+                            RemoveFileByAbsolutePath (localFile);
                             continue;            
                         }
 
@@ -151,6 +158,7 @@ using System.Xml;
                         {
                             ChangesMade.Add (lf);
                             System.IO.File.Delete(localFile.FullLocalName); 
+                            RemoveFileByAbsolutePath (localFile);
                         }
                     }
                     // local file was created when offline
@@ -160,6 +168,7 @@ using System.Xml;
                             continue;            
                         }
                         remoteRepo.Upload (localFile);
+                        AddFile(localFile);
                     }
                     alreadyAnalyzed.Add (localFile);
                 }
@@ -215,7 +224,10 @@ using System.Xml;
             node_name.InnerText       = file.Name;
             node_relativePath.InnerText = file.RelativePath;
             node_modificationDate.InnerText        = file.TimeOfLastChange.ToString();
-            node_hash.InnerText    = file.MD5Hash.ToString();
+            if(file.IsAFolder)
+                node_hash.InnerText = "";
+            else
+                node_hash.InnerText    = file.MD5Hash.ToString();
             
             XmlNode node_file = CreateNode (XmlNodeType.Element, "file", null);
             

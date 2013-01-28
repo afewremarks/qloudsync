@@ -13,6 +13,7 @@ namespace QloudSync
     public class TestBacklog
     {
         RemoteRepo remoteRepo = new RemoteRepo();
+        Test util = new Test();
         [Test ()]
         public void TestBacklogFileCreate ()
         {
@@ -34,7 +35,7 @@ namespace QloudSync
         [Test ()]
         public void TestSynchronizeDeleteLocalFileOffline(){
 
-            ClearRepositories();
+            util.ClearRepositories(remoteRepo);
 
             string path = Path.Combine(RuntimeSettings.HomePath, "Testfile.txt");
             //criar um arquivo
@@ -55,7 +56,7 @@ namespace QloudSync
 
         [Test ()]
         public void TestSynchronizeCreateLocalFileOffline(){
-            ClearRepositories();
+            util.ClearRepositories(remoteRepo);
 
             
             string path = Path.Combine(RuntimeSettings.HomePath, "Testfile.txt");
@@ -80,7 +81,7 @@ namespace QloudSync
         [Test ()]
         public void TestSynchronizeChangeLocalFileOffline(){
 
-            ClearRepositories();
+            util.ClearRepositories(remoteRepo);
 
             string path = Path.Combine(RuntimeSettings.HomePath, "Testfile.txt");
             //criar um arquivo
@@ -102,7 +103,7 @@ namespace QloudSync
 
         [Test ()]
         public void TestSynchronizeCreateRemoteFileOffline(){
-            ClearRepositories();
+            util.ClearRepositories(remoteRepo);
 
 
             string path = Path.Combine(RuntimeSettings.HomePath, "Testfile.txt");
@@ -124,7 +125,7 @@ namespace QloudSync
 
         [Test()]
         public void TestSynchronizeDeleteRemoteFileOffline(){
-            ClearRepositories();
+            util.ClearRepositories(remoteRepo);
                         
             string path = Path.Combine(RuntimeSettings.HomePath, "Testfile.txt");
             //criar um arquivo
@@ -142,7 +143,7 @@ namespace QloudSync
         [Test()]
         public void TestSynchronizeCreateLocalFolderOffline ()
         {
-            ClearRepositories();
+            util.ClearRepositories(remoteRepo);
             string path = Path.Combine(RuntimeSettings.HomePath, "TestFolder/");
             System.IO.Directory.CreateDirectory (path);
             BacklogSynchronizer.GetInstance().Synchronize();
@@ -152,7 +153,7 @@ namespace QloudSync
         [Test()]
         public void TestSynchronizeCreateRemoteFolderOffline ()
         {
-            ClearRepositories();
+            util.ClearRepositories(remoteRepo);
             string path = Path.Combine(RuntimeSettings.HomePath, "TestFolder/");
             Folder f = new Folder (path);
             remoteRepo.CreateFolder(f);
@@ -163,7 +164,7 @@ namespace QloudSync
         [Test()]
         public void TestSynchronizeDeleteLocalFolderOffline ()
         {
-            ClearRepositories();
+            util.ClearRepositories(remoteRepo);
             string path = Path.Combine(RuntimeSettings.HomePath, "TestFolder/");
             Folder f = new Folder (path);
             remoteRepo.CreateFolder(f);
@@ -175,7 +176,7 @@ namespace QloudSync
         [Test()]
         public void TestSynchronizeDeleteRemoteFolderOffline ()
         {
-            ClearRepositories();
+            util.ClearRepositories(remoteRepo);
             string path = Path.Combine(RuntimeSettings.HomePath, "TestFolder/");
             Folder f = new Folder (path);
             Directory.CreateDirectory (path);
@@ -224,26 +225,6 @@ namespace QloudSync
          
         }
 
-        void ClearRepositories ()
-        {
-            
-            remoteRepo.DeleteAllFilesInBucket();
-            ClearFolder (RuntimeSettings.HomePath);
-            BacklogSynchronizer.GetInstance().Create();
-            BacklogSynchronizer.GetInstance().RemoveAllFiles();
-        }
-
-        void ClearFolder(string path){
-            if (Directory.Exists (path)) {
-                foreach (string file in Directory.GetFiles(path))
-                         System.IO.File.Delete(file);
-                foreach (string folder in Directory.GetDirectories(path))
-                {
-                    ClearFolder(folder);
-                    Directory.Delete (folder);
-                }
-            }
-        }
 
     }
 }

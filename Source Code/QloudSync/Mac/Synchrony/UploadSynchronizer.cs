@@ -39,7 +39,7 @@ namespace  QloudSync.Synchrony
                     //delete copys that is not in local repo and not is a trash file
                     foreach (RemoteFile remote in copys){
                         if (!System.IO.File.Exists(remote.FullLocalName) && !remote.InTrash)
-                            remoteRepo.Delete (remote);
+                            remoteRepo.MoveToTrash (remote);
                     }
                     //if there was a rename or move, the hash remains the same 
                     BacklogSynchronizer.GetInstance().EditFileByHash (file);
