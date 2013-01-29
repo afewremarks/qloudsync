@@ -54,6 +54,23 @@ namespace QloudSync
         [Test()]
         public void TestMoveFile ()
         {
+            this.ClearRepositories ();
+            base.w.CreateWatcher (RuntimeSettings.HomePath);
+
+            string path = Path.Combine (RuntimeSettings.HomePath, "file.txt");
+            string newpath = Path.Combine (RuntimeSettings.HomePath, "move/file.txt");
+            Directory.CreateDirectory (Path.Combine(RuntimeSettings.HomePath,"move"));
+            System.IO.File.WriteAllText (path, "simple test file");
+            LocalFile old = new LocalFile (path);
+            System.IO.File.Move (path, newpath);
+            LocalFile file = new LocalFile (newpath);
+            DateTime reff = DateTime.Now;
+            while (DateTime.Now.Subtract(reff).TotalSeconds<30);
+            while (UploadController.GetInstance().Status == SyncStatus.Sync);
+
+            Assert.True (remoteRepo.Files.Where (rf=> rf.MD5Hash == file.MD5Hash && rf.AbsolutePath == file.AbsolutePath).Any());
+            Assert.False (remoteRepo.Files.Where (rf=> rf.MD5Hash == old.MD5Hash && rf.AbsolutePath == old.AbsolutePath).Any());
+
         }
 
         [Test()]
