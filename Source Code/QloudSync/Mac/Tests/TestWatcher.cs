@@ -75,6 +75,28 @@ namespace QloudSync
 
         [Test()]
         public void TestMoveEmptyFolder(){
+            this.ClearRepositories ();
+            base.w.CreateWatcher (RuntimeSettings.HomePath);
+            
+            string old = Path.Combine(RuntimeSettings.HomePath,"origin");
+            string newpath = Path.Combine (RuntimeSettings.HomePath, "move");
+            string path = "folder/";
+            Directory.CreateDirectory (old);
+            Directory.CreateDirectory(newpath);
+            string newfullpath = Path.Combine(newpath, path);
+            string oldfullpath = Path.Combine(old, path);
+            Directory.CreateDirectory (oldfullpath);
+            Console.WriteLine (oldfullpath);
+
+            Console.WriteLine (newfullpath);
+            System.IO.Directory.Move (oldfullpath, newfullpath);
+
+            DateTime reff = DateTime.Now;
+            while (DateTime.Now.Subtract(reff).TotalSeconds<30);
+            while (UploadController.GetInstance().Status == SyncStatus.Sync);
+            
+            Assert.True (remoteRepo.Files.Where (rf=> rf.AbsolutePath == new LocalFile(newfullpath).AbsolutePath).Any());
+            Assert.False (remoteRepo.Files.Where (rf=> rf.AbsolutePath == new LocalFile(oldfullpath).AbsolutePath).Any());
         }
 
         [Test()]
