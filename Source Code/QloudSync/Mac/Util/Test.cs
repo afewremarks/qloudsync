@@ -7,17 +7,25 @@ namespace QloudSync
 {
     public class Test
     {
+        public QloudSync.IO.OSXFileWatcher w = new QloudSync.IO.OSXFileWatcher(RuntimeSettings.HomePath);
+        protected RemoteRepo remoteRepo = new RemoteRepo();
         public Test ()
         {
         }
 
-        public void ClearRepositories (RemoteRepo remoteRepo)
+        public void ClearRepositories ()
         {
-            
+            w.Dispose();
             remoteRepo.DeleteAllFilesInBucket();
             ClearFolder (RuntimeSettings.HomePath);
             BacklogSynchronizer.GetInstance().Create();
             BacklogSynchronizer.GetInstance().RemoveAllFiles();
+
+        }
+
+        public void ClearLocalRepository ()
+        {
+            ClearFolder (RuntimeSettings.HomePath);
         }
         
         void ClearFolder(string path){

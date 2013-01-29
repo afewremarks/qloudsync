@@ -12,7 +12,7 @@ namespace  QloudSync.IO
     public class OSXFileWatcher
     {
         
-        List<System.IO.FileSystemWatcher> watchers = new List<System.IO.FileSystemWatcher>();
+        public List<System.IO.FileSystemWatcher> watchers = new List<System.IO.FileSystemWatcher>();
         List <string> triggers = new List<string>();
         List<string> eventshandled = new List<string>(); 
         List<File> updatedFilesInDownloadController = new List<File>();
@@ -25,8 +25,9 @@ namespace  QloudSync.IO
         
         public OSXFileWatcher (string repo_address)
         {
-            new System.Threading.Thread(ListenEvents).Start();
             CreateWatcher (repo_address);
+            new System.Threading.Thread(ListenEvents).Start();
+
         }
         
         public void ListenEvents ()
@@ -60,23 +61,24 @@ namespace  QloudSync.IO
             }
         }
         
-        void CreateWatcher (string folder_path)
+        public void CreateWatcher (string folder_path)
         {
-            if ( folder_path.Contains (".app/") || folder_path.EndsWith(".app"))
+            if (folder_path.Contains (".app/") || folder_path.EndsWith (".app"))
                 return;
-            Console.WriteLine (DateTime.Now.ToUniversalTime ()+" - Creating a watcher to "+folder_path+"\n");
+            Console.WriteLine (DateTime.Now.ToUniversalTime () + " - Creating a watcher to " + folder_path + "\n");
             System.IO.DirectoryInfo d = new System.IO.DirectoryInfo (folder_path);
             
-            System.IO.FileSystemWatcher f = new System.IO.FileSystemWatcher(d.FullName, "*.*");
+            System.IO.FileSystemWatcher f = new System.IO.FileSystemWatcher (d.FullName, "*.*");
             f.NotifyFilter = System.IO.NotifyFilters.DirectoryName | System.IO.NotifyFilters.FileName | System.IO.NotifyFilters.LastWrite;
             f.Changed += HandleChanges; 
             f.Deleted += HandleChanges;
             f.Created += HandleChanges;
             f.EnableRaisingEvents = true;
             
-            foreach (System.IO.DirectoryInfo dir in d.GetDirectories())
+            foreach (System.IO.DirectoryInfo dir in d.GetDirectories()) {
+                Console.WriteLine ("w");
                 CreateWatcher (dir.FullName);
-            
+            }
             watchers.Add (f);
         }
         
@@ -90,10 +92,12 @@ namespace  QloudSync.IO
             {   
                 return;
             }
+            Console.WriteLine(string.Format("{0}{1}", e.ChangeType, e.FullPath));
 
             switch (e.ChangeType) {
             case System.IO.WatcherChangeTypes.Created:
                 triggers.Add (e.FullPath);
+
                 LastTimeCatch = DateTime.Now;
                 break;
             case System.IO.WatcherChangeTypes.Deleted:
@@ -108,6 +112,7 @@ namespace  QloudSync.IO
         
         bool HandleCreates (string path)
         { 
+            Console.WriteLine ("HandelCreate");
             if (path == null) {
                 return false;
             }
@@ -160,6 +165,7 @@ namespace  QloudSync.IO
         
         void CreateFolder (string folder_path)
         {
+            Console.WriteLine ("folder");
             if (folder_path.Contains (".app/") || folder_path.EndsWith (".app"))
                 return;
             CreateWatcher (folder_path);
@@ -183,6 +189,7 @@ namespace  QloudSync.IO
         
         void CreateFile (LocalFile file)
         {
+            Console.WriteLine ("Create "+file.Name);
             UploadController.GetInstance().PendingChanges.Add 
                 (new Change (file, System.IO.WatcherChangeTypes.Created));
             LocalRepo.Files.Add (file);
@@ -217,6 +224,16 @@ namespace  QloudSync.IO
                 return DateTime.Now.Subtract (LastTimeChanges).TotalSeconds > 1 && !Catching;
             }
         }
+
+        public void Dispose ()
+        {
+                while (watchers.Count!=0) {
+                    System.IO.FileSystemWatcher w = watchers [0];
+                    w.Dispose ();
+                    watchers.Remove (w);
+                    w = null;
+                }
+                   }
     }
 }
 
