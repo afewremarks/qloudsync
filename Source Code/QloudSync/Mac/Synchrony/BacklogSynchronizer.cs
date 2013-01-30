@@ -205,40 +205,43 @@ using System.Xml;
         
         public void AddFile (File file)
         {
-                 
-            XmlNode node_root = SelectSingleNode ("files");
+            if (!EditFileByName(file))
             
-            
-            XmlNode node_id = CreateElement (id);
-            XmlNode node_name = CreateElement (name);
-            XmlNode node_relativePath = CreateElement (relativePath);
-            XmlNode node_modificationDate = CreateElement (modificationDate);
-            XmlNode node_hash = CreateElement (hash);
+            {
+                     
+                XmlNode node_root = SelectSingleNode ("files");
+                
+                
+                XmlNode node_id = CreateElement (id);
+                XmlNode node_name = CreateElement (name);
+                XmlNode node_relativePath = CreateElement (relativePath);
+                XmlNode node_modificationDate = CreateElement (modificationDate);
+                XmlNode node_hash = CreateElement (hash);
 
-           
-            try {
-                node_id.InnerText = (int.Parse (node_root.LastChild [id].InnerText) + 1).ToString();
-            } catch {
-                node_id.InnerText = "1";
+               
+                try {
+                    node_id.InnerText = (int.Parse (node_root.LastChild [id].InnerText) + 1).ToString();
+                } catch {
+                    node_id.InnerText = "1";
+                }
+                node_name.InnerText       = file.Name;
+                node_relativePath.InnerText = file.RelativePath;
+                node_modificationDate.InnerText        = file.TimeOfLastChange.ToString();
+                if(file.IsAFolder)
+                    node_hash.InnerText = "";
+                else
+                    node_hash.InnerText    = file.MD5Hash.ToString();
+                
+                XmlNode node_file = CreateNode (XmlNodeType.Element, "file", null);
+                
+                node_file.AppendChild (node_id);
+                node_file.AppendChild (node_name);
+                node_file.AppendChild (node_relativePath);
+                node_file.AppendChild (node_modificationDate);
+                node_file.AppendChild (node_hash);
+                
+                node_root.AppendChild (node_file);
             }
-            node_name.InnerText       = file.Name;
-            node_relativePath.InnerText = file.RelativePath;
-            node_modificationDate.InnerText        = file.TimeOfLastChange.ToString();
-            if(file.IsAFolder)
-                node_hash.InnerText = "";
-            else
-                node_hash.InnerText    = file.MD5Hash.ToString();
-            
-            XmlNode node_file = CreateNode (XmlNodeType.Element, "file", null);
-            
-            node_file.AppendChild (node_id);
-            node_file.AppendChild (node_name);
-            node_file.AppendChild (node_relativePath);
-            node_file.AppendChild (node_modificationDate);
-            node_file.AppendChild (node_hash);
-            
-            node_root.AppendChild (node_file);
-            
             Save ();
         }
 
@@ -300,15 +303,15 @@ using System.Xml;
             }
         }
 
-        public void EditFileByName(File file)
+        public bool EditFileByName(File file)
         {
             foreach (XmlNode node_file in SelectNodes ("/files/file")) {
                 if (node_file [name].InnerText == file.Name.ToString() && node_file[relativePath].InnerText == file.RelativePath){
                     UpdateFile (file, node_file);
-                    continue;
+                    return true;
                 }
             }
-            
+            return false;
         }
 
         protected void UpdateFile(File file, XmlNode node_file)
@@ -320,7 +323,10 @@ using System.Xml;
             XmlNode node_modificationDate = node_file.SelectSingleNode (modificationDate);
             node_modificationDate.InnerText = file.TimeOfLastChange.ToString();
             XmlNode node_hash = node_file.SelectSingleNode (hash);
-            node_hash.InnerText = file.MD5Hash.ToString();
+            if(file.IsAFolder)
+                node_hash.InnerText = "";
+            else
+                node_hash.InnerText = file.MD5Hash.ToString();
             
             Save ();
         }

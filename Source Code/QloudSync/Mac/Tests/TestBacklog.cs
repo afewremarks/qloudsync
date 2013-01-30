@@ -35,7 +35,7 @@ namespace QloudSync
         [Test ()]
         public void TestSynchronizeDeleteLocalFileOffline(){
 
-            util.ClearRepositories(remoteRepo);
+            util.ClearRepositories();
 
             string path = Path.Combine(RuntimeSettings.HomePath, "Testfile.txt");
             //criar um arquivo
@@ -56,7 +56,7 @@ namespace QloudSync
 
         [Test ()]
         public void TestSynchronizeCreateLocalFileOffline(){
-            util.ClearRepositories(remoteRepo);
+            util.ClearRepositories();
 
             
             string path = Path.Combine(RuntimeSettings.HomePath, "Testfile.txt");
@@ -81,7 +81,7 @@ namespace QloudSync
         [Test ()]
         public void TestSynchronizeChangeLocalFileOffline(){
 
-            util.ClearRepositories(remoteRepo);
+            util.ClearRepositories();
 
             string path = Path.Combine(RuntimeSettings.HomePath, "Testfile.txt");
             //criar um arquivo
@@ -103,7 +103,7 @@ namespace QloudSync
 
         [Test ()]
         public void TestSynchronizeCreateRemoteFileOffline(){
-            util.ClearRepositories(remoteRepo);
+            util.ClearRepositories();
 
 
             string path = Path.Combine(RuntimeSettings.HomePath, "Testfile.txt");
@@ -125,7 +125,7 @@ namespace QloudSync
 
         [Test()]
         public void TestSynchronizeDeleteRemoteFileOffline(){
-            util.ClearRepositories(remoteRepo);
+            util.ClearRepositories();
                         
             string path = Path.Combine(RuntimeSettings.HomePath, "Testfile.txt");
             //criar um arquivo
@@ -143,7 +143,7 @@ namespace QloudSync
         [Test()]
         public void TestSynchronizeCreateLocalFolderOffline ()
         {
-            util.ClearRepositories(remoteRepo);
+            util.ClearRepositories();
             string path = Path.Combine(RuntimeSettings.HomePath, "TestFolder/");
             System.IO.Directory.CreateDirectory (path);
             BacklogSynchronizer.GetInstance().Synchronize();
@@ -153,7 +153,7 @@ namespace QloudSync
         [Test()]
         public void TestSynchronizeCreateRemoteFolderOffline ()
         {
-            util.ClearRepositories(remoteRepo);
+            util.ClearRepositories();
             string path = Path.Combine(RuntimeSettings.HomePath, "TestFolder/");
             Folder f = new Folder (path);
             remoteRepo.CreateFolder(f);
@@ -164,7 +164,7 @@ namespace QloudSync
         [Test()]
         public void TestSynchronizeDeleteLocalFolderOffline ()
         {
-            util.ClearRepositories(remoteRepo);
+            util.ClearRepositories();
             string path = Path.Combine(RuntimeSettings.HomePath, "TestFolder/");
             Folder f = new Folder (path);
             remoteRepo.CreateFolder(f);
@@ -176,7 +176,7 @@ namespace QloudSync
         [Test()]
         public void TestSynchronizeDeleteRemoteFolderOffline ()
         {
-            util.ClearRepositories(remoteRepo);
+            util.ClearRepositories();
             string path = Path.Combine(RuntimeSettings.HomePath, "TestFolder/");
             Folder f = new Folder (path);
             Directory.CreateDirectory (path);

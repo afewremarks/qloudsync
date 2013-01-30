@@ -82,7 +82,7 @@ namespace QloudSync
         }
 
         public void Init(){
-            new Test().ClearRepositories(remoteRepo);
+            new Test().ClearRepositories();
             System.IO.File.WriteAllText(filepath, "this a test file");
             Directory.CreateDirectory (folderpath);
         }

@@ -63,6 +63,7 @@ namespace  QloudSync.IO
         
         public void CreateWatcher (string folder_path)
         {
+
             if (folder_path.Contains (".app/") || folder_path.EndsWith (".app"))
                 return;
             Console.WriteLine (DateTime.Now.ToUniversalTime () + " - Creating a watcher to " + folder_path + "\n");
@@ -75,10 +76,9 @@ namespace  QloudSync.IO
             f.Created += HandleChanges;
             f.EnableRaisingEvents = true;
             
-            foreach (System.IO.DirectoryInfo dir in d.GetDirectories()) {
-                Console.WriteLine ("w");
+            foreach (System.IO.DirectoryInfo dir in d.GetDirectories())
                 CreateWatcher (dir.FullName);
-            }
+
             watchers.Add (f);
         }
         
@@ -92,7 +92,7 @@ namespace  QloudSync.IO
             {   
                 return;
             }
-            Console.WriteLine(string.Format("{0}{1}", e.ChangeType, e.FullPath));
+            Logger.LogInfo("Watcher",string.Format("{0}{1}", e.ChangeType, e.FullPath));
 
             switch (e.ChangeType) {
             case System.IO.WatcherChangeTypes.Created:
@@ -112,7 +112,7 @@ namespace  QloudSync.IO
         
         bool HandleCreates (string path)
         { 
-            Console.WriteLine ("HandelCreate");
+
             if (path == null) {
                 return false;
             }
@@ -165,7 +165,7 @@ namespace  QloudSync.IO
         
         void CreateFolder (string folder_path)
         {
-            Console.WriteLine ("folder");
+            Logger.LogInfo ("Watcher", string.Format("Creating folder {0}", folder_path));
             if (folder_path.Contains (".app/") || folder_path.EndsWith (".app"))
                 return;
             CreateWatcher (folder_path);
@@ -189,7 +189,7 @@ namespace  QloudSync.IO
         
         void CreateFile (LocalFile file)
         {
-            Console.WriteLine ("Create "+file.Name);
+            Logger.LogInfo ("Watcher", string.Format("Create {0}",file.FullLocalName));
             UploadController.GetInstance().PendingChanges.Add 
                 (new Change (file, System.IO.WatcherChangeTypes.Created));
             LocalRepo.Files.Add (file);

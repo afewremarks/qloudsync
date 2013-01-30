@@ -99,9 +99,85 @@ namespace QloudSync
             Assert.False (remoteRepo.Files.Where (rf=> rf.AbsolutePath == new LocalFile(oldfullpath).AbsolutePath).Any());
         }
 
+
         [Test()]
         public void TestMoveFullFolder(){
+            this.ClearRepositories ();
+            
+            base.w.CreateWatcher (RuntimeSettings.HomePath);
+            
+            string old = Path.Combine(RuntimeSettings.HomePath,"origin");
+            string newpath = Path.Combine (RuntimeSettings.HomePath, "move");
+            string path = Path.Combine (old, "folder");
+            string npath = Path.Combine(newpath, "folder");
+            Directory.CreateDirectory (old);
+            Directory.CreateDirectory (newpath);
+            Directory.CreateDirectory (path);
+            for (int i = 1 ; i <11; i++)
+                System.IO.File.WriteAllText (Path.Combine(path, string.Format("teste{0}.txt", i)), string.Format("{0}{1}",i,"simple test file"));
+            
+
+            System.IO.Directory.Move (path, npath);
+            
+            DateTime reff = DateTime.Now;
+            while (DateTime.Now.Subtract(reff).TotalSeconds<60);
+            while (UploadController.GetInstance().Status == SyncStatus.Sync);
+            Assert.True (remoteRepo.Files.Count (rf=> rf.AbsolutePath.Contains (new LocalFile(path).AbsolutePath))==0);
+            Assert.True (remoteRepo.Files.Count (rf=> rf.AbsolutePath.Contains(new LocalFile(npath).AbsolutePath))==10);
+            
         }
+
+        [Test()]
+        public void TestRenameFolder(){
+            this.ClearRepositories ();
+            
+            base.w.CreateWatcher (RuntimeSettings.HomePath);
+            
+            string old = Path.Combine(RuntimeSettings.HomePath,"origin");
+            string newpath = Path.Combine (RuntimeSettings.HomePath, "move");
+            
+            Directory.CreateDirectory (old);
+            
+            for (int i = 1 ; i <11; i++)
+                System.IO.File.WriteAllText (Path.Combine(old, string.Format("teste{0}.txt", i)), string.Format("{0}{1}",i,"simple test file"));
+            
+            
+            System.IO.Directory.Move (old, newpath);
+            
+            DateTime reff = DateTime.Now;
+            while (DateTime.Now.Subtract(reff).TotalSeconds<60);
+            while (UploadController.GetInstance().Status == SyncStatus.Sync);
+            Assert.True (remoteRepo.Files.Count (rf=> rf.AbsolutePath.Contains (new LocalFile(old).AbsolutePath))==0);
+            Assert.True (remoteRepo.Files.Count (rf=> rf.AbsolutePath.Contains(new LocalFile(newpath).AbsolutePath))==10);
+            
+        }
+        
+        [Test()]
+        public void TestRenameFile(){
+            this.ClearRepositories ();
+            
+            base.w.CreateWatcher (RuntimeSettings.HomePath);
+            
+            string old = Path.Combine(RuntimeSettings.HomePath,"origin");
+            string newpath = Path.Combine (RuntimeSettings.HomePath, "move");
+            
+            Directory.CreateDirectory (old);            
+            Directory.CreateDirectory (newpath);
+
+            System.IO.File.WriteAllText (Path.Combine(old, "teste.txt"), "simple test file");
+            LocalFile newfile = new LocalFile(Path.Combine(newpath, "teste.txt"));
+            LocalFile oldfile = new LocalFile (Path.Combine(old, "teste.txt"));
+            System.IO.File.Move (oldfile.FullLocalName, newfile.FullLocalName);
+            
+            DateTime reff = DateTime.Now;
+            while (DateTime.Now.Subtract(reff).TotalSeconds<30);
+            while (UploadController.GetInstance().Status == SyncStatus.Sync);
+            Assert.True (remoteRepo.Files.Where (rf=> rf.AbsolutePath== newfile.AbsolutePath).Any());
+            Assert.False (remoteRepo.Files.Where (rf=> rf.AbsolutePath==oldfile.AbsolutePath).Any());
+            
+        }
+        
+
     }
 }
 

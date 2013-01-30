@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using QloudSync.Repository;
@@ -19,14 +20,10 @@ namespace QloudSync
             PendingChanges = new ChangesCapturedByWatcher<Change>();
             PendingChanges.OnAdd += HandleOnAdd;
         }
-
+        int controller = 0;
         void HandleOnAdd (object sender, EventArgs e)
         {
-            if (Status == SyncStatus.Idle) {
-                Status = SyncStatus.Sync;
-                new Thread (Synchronize).Start ();
-                Status = SyncStatus.Idle;
-            }
+            new Thread (Synchronize).Start ();
 
         }
 
@@ -40,11 +37,13 @@ namespace QloudSync
 
         public override void Synchronize ()
         {
-            
+            ++controller;
+            if (Status == SyncStatus.Idle && controller == 1) {
+                Status = SyncStatus.Sync;
+            Logger.LogInfo ("UploadController","Sync"); 
             int attempt = 0;
             int index = 0;
-            Console.WriteLine (DateTime.Now.ToUniversalTime () + " - Pending Changes (" + PendingChanges.Count + ") ");
-            
+            Logger.LogInfo ("UploadController",string.Format("Pending Changes ({0})", PendingChanges.Count));
             while (PendingChanges.Count != 0) {
                 
                 if (index >= PendingChanges.Count)
@@ -75,6 +74,7 @@ namespace QloudSync
                     }
                     
                     if (operationSuccessfully) {
+                        Console.WriteLine (string.Format("Removing change {0} to {1} - update completed", change.Event, change.File.FullLocalName));
                         PendingChanges.Remove (change);
                         attempt = 0;
                         index = 0;
@@ -87,6 +87,9 @@ namespace QloudSync
                             attempt ++;
                     }
                 }
+            }
+                Status = SyncStatus.Idle;
+                controller = 0;
             }
             
         }
