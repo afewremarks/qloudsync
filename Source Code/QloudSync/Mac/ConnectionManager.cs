@@ -57,19 +57,24 @@ namespace QloudSync.Net.S3
         
         public AmazonS3Client Connect ()
         {
-            if(connection != null)
+            if (connection != null)
                 return connection;
             
-            try{    
-                AmazonS3Config config = CreateConfig();
-                connection = (AmazonS3Client) Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
+            try {    
+                AmazonS3Config config = CreateConfig ();
+                connection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
                 return connection;
-            }
-            catch (System.Net.WebException)
-            {
-                Logger.LogInfo("Connection", "Failed to communicate with the remote server");
+            } catch (System.Net.WebException) {
+                Logger.LogInfo ("Connection", "Failed to communicate with the remote server");
+            } catch (Exception e){
+                Logger.LogInfo ("Connection", e);
             }
             return null;
+        }
+
+        public void Reset ()
+        {
+            connection = null;
         }
 
 		public AmazonS3Client Reconnect ()

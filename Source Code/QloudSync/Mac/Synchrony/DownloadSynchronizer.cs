@@ -57,10 +57,11 @@ namespace  QloudSync.Synchrony
 
         public void Synchronize ()
         {            
+            Done = false;
             remoteRepo.Connection.TransferSize = 0;
             Logger.LogInfo("Synchronizer", "Trying download files from Storage.");
             DateTime initTime = DateTime.Now;
-            remoteRepo.FilesChanged = new List<QloudSync.Repository.File>();
+            FilesInLastSync = new List<QloudSync.Repository.File>();
             SyncSize = 0;
             Initialize();
             PendingFiles = RemoteChanges;
@@ -68,6 +69,7 @@ namespace  QloudSync.Synchrony
             SyncClear ();
             ShowDoneMessage ("Download");
             LastSyncTime = initTime;
+            Done = true;
         }
 
         void CalculateDownloadSize (List<RemoteFile> remoteFiles)
@@ -97,12 +99,12 @@ namespace  QloudSync.Synchrony
         {
             foreach (RemoteFile remoteFile in PendingFiles)
             {
-             //   if (!UploadController.GetInstance().PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == WatcherChangeTypes.Deleted).Any()){
+               if (!UploadController.GetInstance().PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == WatcherChangeTypes.Deleted).Any()){
                     if(!remoteFile.IsAFolder)
                         SyncFile (remoteFile);
                     else 
                         SyncFolder (new Folder (remoteFile.FullLocalName));
-               // }
+                }
             }
         }
         
@@ -244,7 +246,7 @@ namespace  QloudSync.Synchrony
         void AddDownloadFile (RemoteFile remoteFile)
         {
             remoteFile.TimeOfLastChange = DateTime.Now;
-            remoteRepo.FilesChanged.Add (remoteFile);
+            FilesInLastSync.Add (remoteFile);
         }
     }
 }

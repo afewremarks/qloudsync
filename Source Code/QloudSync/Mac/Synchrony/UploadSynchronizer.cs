@@ -29,6 +29,10 @@ namespace  QloudSync.Synchrony
         public bool CreateFile (QloudSync.Repository.File file)
         {
             try{
+                if (DownloadSynchronizer.GetInstance().FilesInLastSync.Where(lf => lf.MD5Hash==file.MD5Hash && lf.AbsolutePath == file.AbsolutePath).Any()){
+                    Logger.LogInfo ("UploadSynchronizer", string.Format("File {0} already updated", file.FullLocalName));
+                    return true;
+                }
                 //Rename and moves
                 //file already exists in remote?
                 if (remoteRepo.AllFiles.Where (rf => rf.MD5Hash == file.MD5Hash).Any()) {
@@ -63,6 +67,10 @@ namespace  QloudSync.Synchrony
         public bool UpdateFile (QloudSync.Repository.File file)
         {
             try {
+                if (DownloadSynchronizer.GetInstance().FilesInLastSync.Where(lf => lf.MD5Hash==file.MD5Hash && lf.AbsolutePath == file.AbsolutePath).Any()){
+                    Logger.LogInfo ("UploadSynchronizer", string.Format("File {0} already updated", file.FullLocalName));
+                    return true;
+                }
                 RemoteFile remoteFile = new RemoteFile (file.AbsolutePath);
                 remoteRepo.MoveToTrash (remoteFile);
                 remoteRepo.Upload (file);

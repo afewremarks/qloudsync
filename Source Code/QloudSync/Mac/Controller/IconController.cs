@@ -173,22 +173,19 @@ namespace QloudSync {
                 UpdateIconEvent (CurrentState);
                 UpdateMenuEvent (CurrentState);
             };
-            
+
             Program.Controller.OnSyncing += delegate {
-                int repos_syncing_up   = 0;
-                int repos_syncing_down = 0;
-                
-                if (repos_syncing_up > 0 &&
-                    repos_syncing_down > 0) {
-                    
+                bool syncDown = DownloadController.GetInstance().Status == SyncStatus.Sync;                
+                bool syncUp = UploadController.GetInstance().Status == SyncStatus.Sync;
+                if(syncDown && syncUp){
                     CurrentState = IconState.Syncing;
                     StateText    = "Syncing changes…";
                     
-                } else if (repos_syncing_down == 0) {
+                } else if (syncUp) {
                     CurrentState = IconState.SyncingUp;
                     StateText    = "Sending changes…";
                     
-                } else {
+                } else if (syncDown){
                     CurrentState = IconState.SyncingDown;
                     StateText    = "Receiving changes…";
                 }

@@ -13,10 +13,14 @@ namespace QloudSync
     {
         public ChangesCapturedByWatcher<Change> PendingChanges;
 
+        public IO.OSXFileWatcher Watcher {
+            get;
+            set;
+        }
 
 
         protected UploadController(){
-            new IO.OSXFileWatcher(RuntimeSettings.HomePath);
+            Watcher = new IO.OSXFileWatcher(RuntimeSettings.HomePath);
             PendingChanges = new ChangesCapturedByWatcher<Change>();
             PendingChanges.OnAdd += HandleOnAdd;
         }
@@ -24,7 +28,6 @@ namespace QloudSync
         void HandleOnAdd (object sender, EventArgs e)
         {
             new Thread (Synchronize).Start ();
-
         }
 
         private static UploadController instance;
@@ -40,7 +43,6 @@ namespace QloudSync
             ++controller;
             if (Status == SyncStatus.Idle && controller == 1) {
                 Status = SyncStatus.Sync;
-            Logger.LogInfo ("UploadController","Sync"); 
             int attempt = 0;
             int index = 0;
             Logger.LogInfo ("UploadController",string.Format("Pending Changes ({0})", PendingChanges.Count));

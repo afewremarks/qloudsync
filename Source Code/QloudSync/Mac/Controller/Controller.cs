@@ -88,10 +88,13 @@ namespace QloudSync {
            // StatusIcon = new IconController ();
             QloudSync.Synchrony.BacklogSynchronizer.GetInstance ().Synchronize ();
 
+
             downloadController = DownloadController.GetInstance();
             //downloadController.Synchronize ();
             uploadController = UploadController.GetInstance();
 
+            downloadController.SyncStatusChanged += HandleSyncStatusChanged;
+            uploadController.SyncStatusChanged += HandleSyncStatusChanged;
 
             /*repo.ChangesDetected += delegate {
                 UpdateState ();
@@ -115,24 +118,25 @@ namespace QloudSync {
             
             repo.Initialize ();*/
         }
+
+        void HandleSyncStatusChanged (SyncStatus status)
+        {
+            if (status == SyncStatus.Idle)
+            {
+                ProgressPercentage = 0.0;
+                ProgressSpeed = "";
+            }
+            UpdateState ();
+        }
         
         
         // Fires events for the current syncing state
         private void UpdateState ()
         {
-            /*bool has_unsynced_repos = false;
-            if (repo.Status == SyncStatus.SyncDown || repo.Status == SyncStatus.SyncUp || repo.IsBuffering) {
+            if (downloadController.Status == SyncStatus.Sync || uploadController.Status == SyncStatus.Sync)// repo.IsBuffering
                 OnSyncing ();
-                return;
-                
-            } else if (repo.HasUnsyncedChanges) {
-                has_unsynced_repos = true;
-            }
-
-            if (has_unsynced_repos)
-                OnError ();
-            else
-                OnIdle ();*/
+             else
+                OnIdle ();
         }
         
 

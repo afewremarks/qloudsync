@@ -63,9 +63,7 @@ namespace QloudSync
         public event FinishedEventHandler Finished = delegate { };
         public delegate void FinishedEventHandler ();
 
-
-
-        #endregion
+       #endregion
 
         protected DownloadController ()
         {
@@ -91,15 +89,12 @@ namespace QloudSync
             remote_timer.Start();
         }
 
+        int controller = 0;
+
         //Disparado pelo Timer
         void SynchronizeOnTime (object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (Status == SyncStatus.Idle)
-            {
-                Status = SyncStatus.Sync;
-                Synchronize ();
-                Status = SyncStatus.Idle;
-            }
+            Synchronize ();
         }
 
         public override void Synchronize ()
@@ -111,26 +106,34 @@ namespace QloudSync
        
         public void ThreadController (Thread downThread)
         {
-            try
+            ++controller;
+            if (Status == SyncStatus.Idle && controller == 1)
             {
-                ClearDownloadIndexes ();
-                downThread.Start ();
-               
-                while (Percent < 100)
+                Status = SyncStatus.Sync;
+                try
                 {
-                    if (synchronizer.Done)
-                        break;
+                    ClearDownloadIndexes ();
+                    downThread.Start ();
+                   
+                    while (Percent < 100)
+                    {
+                       if (synchronizer.Done)
+                            break;
 
-                    if (synchronizer.Size != 0)
-                        Percent = (synchronizer.BytesTransferred / synchronizer.Size) * 100;
-                    
-                    ProgressChanged (Percent);
-                    Thread.Sleep (1000);
+                        if (synchronizer.Size != 0)
+                            Percent = (synchronizer.BytesTransferred / synchronizer.Size) * 100;
+                        
+                        ProgressChanged (Percent);
+                        Thread.Sleep (1000);
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                Logger.LogInfo("DownloadController", e);
+                catch (Exception e)
+                {
+                    Logger.LogInfo("DownloadController", e);
+                }
+
+                Status = SyncStatus.Idle;
+                controller = 0;
             }
         }
 

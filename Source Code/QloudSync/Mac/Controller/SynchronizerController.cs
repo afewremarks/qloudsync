@@ -14,9 +14,18 @@ namespace QloudSync
     public abstract class SynchronizerController
     {
 
-        public SyncStatus Status
-        {
-            get; set;
+
+        public delegate void SyncStatusChangedHandler (SyncStatus status);
+        public event SyncStatusChangedHandler SyncStatusChanged = delegate {};
+        private SyncStatus status;
+        public SyncStatus Status {
+            get {
+                return status;
+            }
+            set {
+                status = value;
+                SyncStatusChanged(status);
+            }
         }
 
         protected SynchronizerController ()

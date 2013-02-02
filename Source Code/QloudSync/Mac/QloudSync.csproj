@@ -108,9 +108,10 @@
     <Compile Include="Tests\TestBacklog.cs" />
     <Compile Include="Tests\TestRemoteRepo.cs" />
     <Compile Include="Tests\TestConnectionManager.cs" />
-    <Compile Include="Tests\TestWatcher.cs" />
     <Compile Include="Tests\TestUploadSynchronizer.cs" />
     <Compile Include="Util\Test.cs" />
+    <Compile Include="Synchrony\DeltaFile.cs" />
+    <Compile Include="Repository\TestWatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />

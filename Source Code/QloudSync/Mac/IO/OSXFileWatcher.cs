@@ -64,7 +64,7 @@ namespace  QloudSync.IO
         public void CreateWatcher (string folder_path)
         {
 
-            if (folder_path.Contains (".app/") || folder_path.EndsWith (".app"))
+            if (folder_path.Contains (".app/") || folder_path.EndsWith (".app") || folder_path.Contains (".lpdf") || folder_path.EndsWith(".lpdf"))
                 return;
             Console.WriteLine (DateTime.Now.ToUniversalTime () + " - Creating a watcher to " + folder_path + "\n");
             System.IO.DirectoryInfo d = new System.IO.DirectoryInfo (folder_path);
@@ -166,7 +166,7 @@ namespace  QloudSync.IO
         void CreateFolder (string folder_path)
         {
             Logger.LogInfo ("Watcher", string.Format("Creating folder {0}", folder_path));
-            if (folder_path.Contains (".app/") || folder_path.EndsWith (".app"))
+            if (folder_path.Contains (".app/") || folder_path.EndsWith (".app") || folder_path.Contains (".lpdf/") || folder_path.EndsWith (".lpdf"))
                 return;
             CreateWatcher (folder_path);
             LocalFile folder = new LocalFile (folder_path);
