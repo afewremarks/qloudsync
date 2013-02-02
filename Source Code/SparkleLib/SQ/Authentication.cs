@@ -1,5 +1,4 @@
 
-
 using  SQ.Security;
 
 using System;
@@ -40,6 +39,7 @@ namespace SQ.Net
 
 		private void RecoverKeys(string receiveContent)
 		{
+			//FIXME The base authentication response is JSON format. Doing a substring using an index will brake. Fix by using a JSON parser. 
 			Credential.SecretKey = receiveContent.Substring(Constant.KEY_SECRET_START_INDEX, Constant.KEYS_LENGTH);
 			Credential.PublicKey = receiveContent.Substring(Constant.KEY_PUBLIC_START_INDEX, Constant.KEYS_LENGTH);
 		}
