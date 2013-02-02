@@ -1,7 +1,6 @@
 
 
 
-
 using Amazon.S3;
 using Amazon.S3.Model;
 
@@ -50,6 +49,8 @@ namespace QloudSync.Net.S3
             Stream receiveStream = wr.GetResponseStream ();
             StreamReader reader = new StreamReader (receiveStream, Encoding.UTF8);
             string receiveContent = reader.ReadToEnd ();
+            //FIXME The base authentication response is JSON format. Doing a substring using an index will brake. Fix by using a JSON parser. 
+           
             Credential.SecretKey = receiveContent.Substring(Constant.KEY_SECRET_START_INDEX, Constant.KEYS_LENGTH);
             Credential.PublicKey = receiveContent.Substring(Constant.KEY_PUBLIC_START_INDEX, Constant.KEYS_LENGTH);
             
