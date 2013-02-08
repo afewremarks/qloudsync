@@ -11,19 +11,19 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 
-using QloudSync.Repository;
-using QloudSync.Util;
+using GreenQloud.Repository;
+using GreenQloud.Util;
 
 
 
-namespace  QloudSync.Synchrony
+namespace GreenQloud.Synchrony
 {
     public abstract class Synchronizer
     {
 
-        private List<QloudSync.Repository.File> filesinlastsync = new List<QloudSync.Repository.File>();
+        private List<GreenQloud.Repository.Change> changesInLastSync = new List<GreenQloud.Repository.Change>();
 
-        protected List <QloudSync.Repository.File> localFiles;
+        protected List <GreenQloud.Repository.File> localFiles;
         protected List <RemoteFile> remoteFiles;
         protected List <Folder> localEmptyFolders;
         protected RemoteRepo remoteRepo;
@@ -59,11 +59,11 @@ namespace  QloudSync.Synchrony
             }
         }
         
-        public List<QloudSync.Repository.File> FilesInLastSync {
+        public List<GreenQloud.Repository.Change> ChangesInLastSync {
             set {
-                this.filesinlastsync = value;
+                this.changesInLastSync = value;
             }get {
-                return filesinlastsync;
+                return changesInLastSync;
             }
         }
 
@@ -99,12 +99,12 @@ namespace  QloudSync.Synchrony
                 Logger.LogInfo(action, string.Format("Successful: {0} files.\n",countOperation));
         }   
         
-        protected bool ExistsInBucket (QloudSync.Repository.File  file){
+        protected bool ExistsInBucket (GreenQloud.Repository.File  file){
              return remoteFiles.Where (rf => rf.AbsolutePath ==  file.AbsolutePath
                                       || rf.FullLocalName.Contains ( file.FullLocalName)).Any ();
         }
 
-		protected bool ExistsVersion (QloudSync.Repository.File file)
+        protected bool ExistsVersion (GreenQloud.Repository.File file)
 		{
 			return remoteRepo.TrashFiles.Where (tf => tf.AbsolutePath == file.AbsolutePath+"(1)").Any ();
 		}

@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
-using QloudSync.Repository;
+using GreenQloud.Repository;
 using System.IO;
 using System.Collections.Generic;
-using QloudSync.Synchrony;
+using GreenQloud.Synchrony;
 
-namespace QloudSync
+namespace GreenQloud
 {
     //Controla as threads responsaveis pelas sincronizacoes de download
     public class DownloadController : SynchronizerController

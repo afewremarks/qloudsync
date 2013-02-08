@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using QloudSync.Util;
+using GreenQloud.Util;
 
 
- namespace QloudSync.Repository
+ namespace GreenQloud.Repository
 {
     public abstract class File
     {
@@ -178,6 +178,11 @@ using QloudSync.Util;
         private string CorrectsDelimiter (string path)
         {
             return path.Replace (Constant.DELIMITER_INVERSE, Constant.DELIMITER);
+        }
+
+        public Folder ToFolder ()
+        {
+            return new Folder(AbsolutePath);
         }
     }
 }

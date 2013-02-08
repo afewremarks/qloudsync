@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 
- namespace QloudSync.Repository
+ namespace GreenQloud.Repository
 {
 	public class Folder : File
 	{

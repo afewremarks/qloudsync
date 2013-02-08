@@ -1,8 +1,8 @@
 using System;
-using QloudSync.Repository;
+using GreenQloud.Repository;
 using System.Collections.Generic;
 
-namespace QloudSync
+namespace GreenQloud
 {
 
     public enum SyncStatus {

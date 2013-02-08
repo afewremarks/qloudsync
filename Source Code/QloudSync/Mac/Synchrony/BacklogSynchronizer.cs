@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using QloudSync.Repository;
+using GreenQloud.Repository;
 using System.Linq;
 using System.Xml;
 
- namespace QloudSync.Synchrony
+ namespace GreenQloud.Synchrony
 {
     public class BacklogSynchronizer : XmlDocument
     {

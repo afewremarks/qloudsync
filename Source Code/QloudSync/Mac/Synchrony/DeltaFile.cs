@@ -1,7 +1,7 @@
 using System;
 using System.Xml;
 
-namespace QloudSync
+namespace GreenQloud
 {
     public class DeltaFile : XmlDocument
     {

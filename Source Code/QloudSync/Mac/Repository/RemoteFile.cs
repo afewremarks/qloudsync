@@ -3,11 +3,11 @@ using Amazon.S3.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QloudSync.Util;
+using GreenQloud.Util;
 
 
 
-namespace  QloudSync.Repository
+namespace GreenQloud.Repository
 {
 	public class RemoteFile : File
 	{

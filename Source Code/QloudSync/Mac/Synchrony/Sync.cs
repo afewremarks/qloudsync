@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using QloudSync.Repository;
+using GreenQloud.Repository;
 
 
-namespace  QloudSync.Synchrony
+namespace GreenQloud.Synchrony
 {
     public class Sync
     {

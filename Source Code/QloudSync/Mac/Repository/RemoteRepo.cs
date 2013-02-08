@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Amazon.S3.Model;
-using QloudSync.Net.S3;
-using QloudSync.Util;
+using GreenQloud.Net.S3;
+using GreenQloud.Util;
 
-namespace  QloudSync.Repository
+namespace GreenQloud.Repository
 {
     public class RemoteRepo
     {
@@ -49,7 +49,6 @@ namespace  QloudSync.Repository
             get{ return AllFiles.Where(f => IsTrashFile(f)).ToList();} 
         }
 
-		public List<File> FilesChanged{ set; get;}
 
 		#endregion
 

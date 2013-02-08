@@ -1,6 +1,6 @@
 using System;
 
- namespace QloudSync.Repository
+ namespace GreenQloud.Repository
 {
 	
 	public class Change

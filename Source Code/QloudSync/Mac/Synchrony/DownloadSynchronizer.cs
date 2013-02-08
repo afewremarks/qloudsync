@@ -3,16 +3,16 @@ using System.Linq;
 
 using System.IO;
 using System.Collections.Generic;
-using QloudSync.Repository;
-using QloudSync.Util;
+using GreenQloud.Repository;
+using GreenQloud.Util;
 
 
-namespace  QloudSync.Synchrony
+namespace GreenQloud.Synchrony
 {
     public class DownloadSynchronizer :  Synchrony.Synchronizer
     {
         private static DownloadSynchronizer instance;
-        private List<QloudSync.Repository.RemoteFile> PendingFiles;
+        private List<GreenQloud.Repository.RemoteFile> PendingFiles;
  
         public static bool Initialized;
         
@@ -61,7 +61,7 @@ namespace  QloudSync.Synchrony
             remoteRepo.Connection.TransferSize = 0;
             Logger.LogInfo("Synchronizer", "Trying download files from Storage.");
             DateTime initTime = DateTime.Now;
-            FilesInLastSync = new List<QloudSync.Repository.File>();
+            ChangesInLastSync = new List<GreenQloud.Repository.Change>();
             SyncSize = 0;
             Initialize();
             PendingFiles = RemoteChanges;
@@ -99,12 +99,10 @@ namespace  QloudSync.Synchrony
         {
             foreach (RemoteFile remoteFile in PendingFiles)
             {
-               if (!UploadController.GetInstance().PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == WatcherChangeTypes.Deleted).Any()){
-                    if(!remoteFile.IsAFolder)
-                        SyncFile (remoteFile);
-                    else 
-                        SyncFolder (new Folder (remoteFile.FullLocalName));
-                }
+               if(!remoteFile.IsAFolder)
+                    SyncFile (remoteFile);
+                else 
+                    SyncFolder (remoteFile.ToFolder());
             }
         }
         
@@ -114,8 +112,7 @@ namespace  QloudSync.Synchrony
             LocalFile localFile = new LocalFile (remoteFile.FullLocalName);
             
             if (localFile.IsFileLocked)
-                return;
-            
+                return;            
             
             if (remoteFile.InTrash || remoteFile.IsIgnoreFile)
                 return;
@@ -125,50 +122,52 @@ namespace  QloudSync.Synchrony
             if (localFile.ExistsInLocalRepo)
             {
                 //update
-                if ( !FilesIsSync (localFile, remoteFile))
+                if (!FilesIsSync (localFile, remoteFile))
                 {
-                    Console.WriteLine ("Not sync "+localFile.MD5Hash+" "+remoteFile.MD5Hash);
                     // nao estando sincronizado
                     // faz upload do arquivo local para o trash com referencia ao arquivo remoto
                     //localFile.RecentVersion = remoteFile;
                     MoveToTrashFolder (localFile);
                     // baixa arquivo remoto
-                    //Changes.Add (connection.Download (remoteFile));
-                    AddDownloadFile (remoteFile);
+                    remoteFile.TimeOfLastChange = DateTime.Now;
 					remoteRepo.Download (remoteFile);
+                    ChangesInLastSync.Add (new Change(remoteFile, WatcherChangeTypes.Changed));
                     BacklogSynchronizer.GetInstance().EditFileByName (remoteFile);
                 }
             }
             else
             {
+                if (UploadController.GetInstance().PendingChanges.Any (f=> f.AbsolutePath==remoteFile.AbsolutePath) 
+                    || UploadSynchronizer.GetInstance().ChangesInLastSync.Any(c=> c.Event == WatcherChangeTypes.Deleted && c.File.AbsolutePath==remoteFile.AbsolutePath))
+                    return;
                 //create
-				AddDownloadFile(remoteFile);
+                remoteFile.TimeOfLastChange = DateTime.Now;
                 remoteRepo.Download (remoteFile);
+                ChangesInLastSync.Add (new Change(remoteFile, WatcherChangeTypes.Created));
                 BacklogSynchronizer.GetInstance().AddFile(remoteFile);
-                countOperation++;
             }   
         }
         
         private void SyncFolder (Folder folder)
         {           
-            if (!new DirectoryInfo (folder.FullLocalName).Exists) {
-                folder.Create ();
+            if (!Directory.Exists(folder.FullLocalName)) {
+                folder.Create ();                
+                ChangesInLastSync.Add (new Change(folder, WatcherChangeTypes.Created));
                 BacklogSynchronizer.GetInstance().AddFile (folder);
-            }
-            //countOperation++;
+            }           
         }
         
         
         private void SyncClear ()
         {
 			try{
-	            foreach (QloudSync.Repository.File localFile in localFiles)
+	            foreach (GreenQloud.Repository.File localFile in localFiles)
 	            {
 					if(localFile.Deleted)
 						continue;
-                    if (UploadController.GetInstance().PendingChanges.Where(c => c.File.AbsolutePath == localFile.AbsolutePath).Any())
-	                    continue;
-
+                  
+                    if (UploadController.GetInstance().PendingChanges.Any(f=> f.AbsolutePath==localFile.AbsolutePath))
+                        continue;
 
 	                if (localFile is Folder)
 	                    SyncRemoveFolder ((Folder) localFile);
@@ -183,12 +182,9 @@ namespace  QloudSync.Synchrony
         }
         
         private void SyncRemoveFile (LocalFile localFile)
-        {
-            
+        {            
             if (localFile.IsIgnoreFile)
                 return;
-	        //se arquivo local nao existe no repositorio remoto
-
             if (!ExistsInBucket (localFile))
             {
 				if (!ExistsVersion (localFile)){
@@ -196,9 +192,10 @@ namespace  QloudSync.Synchrony
 				}
                 else
                 {
-                    FileInfo f = new FileInfo(localFile.FullLocalName);
-                    if (f.Exists)
-                        f.Delete();
+                    if(System.IO.File.Exists (localFile.FullLocalName)){                    
+                        System.IO.File.Delete(localFile.FullLocalName);                    
+                        ChangesInLastSync.Add (new Change(localFile, WatcherChangeTypes.Deleted));
+                    }
                 }
                 BacklogSynchronizer.GetInstance().RemoveFileByHash (localFile);
             }
@@ -207,8 +204,7 @@ namespace  QloudSync.Synchrony
         
         private void SyncRemoveFolder (Folder folder)
 		{
-
-			//TODO fazer uma rotina de exclusao de pastas
+            //TODO fazer uma rotina de exclusao de pastas
 			DirectoryInfo d = new DirectoryInfo (folder.FullLocalName);
 
 			if (!ExistsInBucket (folder) && d.Exists) {
@@ -221,14 +217,14 @@ namespace  QloudSync.Synchrony
 		void ExcludeFolder (DirectoryInfo folder)
 		{
 			foreach (FileInfo f in folder.GetFiles()){
-				remoteRepo.FilesChanged.Add(new RemoteFile(f.FullName));
-				f.Delete();
+                f.Delete();
+                ChangesInLastSync.Add (new Change (new LocalFile(f.FullName), WatcherChangeTypes.Deleted));
 			}
 			foreach (DirectoryInfo id in folder.GetDirectories()){
 				ExcludeFolder (id);
 			}
-			remoteRepo.FilesChanged.Add (new LocalFile(folder.FullName));
 			folder.Delete ();
+            ChangesInLastSync.Add (new Change (new LocalFile(folder.FullName), WatcherChangeTypes.Deleted));
 		}
         
         private void MoveToTrashFolder (LocalFile localFile)
@@ -237,16 +233,11 @@ namespace  QloudSync.Synchrony
             
             if (remoteRepo.SendToTrash (localFile)) 
             {
-				remoteRepo.FilesChanged.Add (localFile);
-                new FileInfo(localFile.FullLocalName).Delete ();    
+                ChangesInLastSync.Add(new Change(localFile, WatcherChangeTypes.Deleted));
+				System.IO.File.Delete(localFile.FullLocalName);    
                 Logger.LogInfo("Synchronizer","Local file "+localFile.Name+" was deleted.");
             }
         }
 
-        void AddDownloadFile (RemoteFile remoteFile)
-        {
-            remoteFile.TimeOfLastChange = DateTime.Now;
-            FilesInLastSync.Add (remoteFile);
-        }
-    }
+   }
 }

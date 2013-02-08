@@ -24,7 +24,7 @@ using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 using System.Threading;
 
-namespace QloudSync {
+namespace GreenQloud {
 
     public enum IconState {
         Idle,

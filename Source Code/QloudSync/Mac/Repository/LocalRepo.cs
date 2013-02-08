@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 using System.IO;
 using System.Linq;
-using QloudSync.Synchrony;
-using QloudSync.Util;
+using GreenQloud.Synchrony;
+using GreenQloud.Util;
 
 
- namespace QloudSync.Repository
+ namespace GreenQloud.Repository
 {
     public class LocalRepo
     {

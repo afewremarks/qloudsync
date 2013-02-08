@@ -3,11 +3,11 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using QloudSync.Synchrony;
-using QloudSync.Repository;
-using QloudSync.Util;
+using GreenQloud.Synchrony;
+using GreenQloud.Repository;
+using GreenQloud.Util;
 
-namespace  QloudSync.Synchrony
+namespace GreenQloud.Synchrony
 {
     public class UploadSynchronizer : Synchronizer
     {
@@ -26,16 +26,30 @@ namespace  QloudSync.Synchrony
             return instance;
         }
 
-        public bool CreateFile (QloudSync.Repository.File file)
+        public bool Synchronize (GreenQloud.Repository.File file)
         {
-            try{
-                if (DownloadSynchronizer.GetInstance().FilesInLastSync.Where(lf => lf.MD5Hash==file.MD5Hash && lf.AbsolutePath == file.AbsolutePath).Any()){
-                    Logger.LogInfo ("UploadSynchronizer", string.Format("File {0} already updated", file.FullLocalName));
+            try{        
+                if(file.IsIgnoreFile)
                     return true;
+                if(file.IsAFolder)
+                    SynchronizeFolder(file);
+                else{
+                    SynchronizeFile(file);
                 }
+            } catch (Exception e) {
+                Logger.LogInfo ("UploadSynchronizer", e);
+                return false;
+            }
+            return true;
+        }
+
+        void SynchronizeFile (GreenQloud.Repository.File file)
+        {
+            if (System.IO.File.Exists(file.FullLocalName))
+            {
                 //Rename and moves
                 //file already exists in remote?
-                if (remoteRepo.AllFiles.Where (rf => rf.MD5Hash == file.MD5Hash).Any()) {
+                if (remoteRepo.AllFiles.Any (rf => rf.MD5Hash == file.MD5Hash)) {
                     //get all remote copys of file
                     List<RemoteFile> copys = remoteRepo.AllFiles.Where(rf => rf.MD5Hash == file.MD5Hash).ToList<RemoteFile>();
                     //create a new copy
@@ -47,64 +61,74 @@ namespace  QloudSync.Synchrony
                     }
                     //if there was a rename or move, the hash remains the same 
                     BacklogSynchronizer.GetInstance().EditFileByHash (file);
+                    ChangesInLastSync.Add (new Change(file, WatcherChangeTypes.Renamed));
                 }
-                //Create
+
                 else{
-                    if (file.IsAFolder)
-                        remoteRepo.CreateFolder (new Folder (file.FullLocalName));
-                    else
-                        remoteRepo.Upload (file) ;
-
-                    BacklogSynchronizer.GetInstance().AddFile(file);
+                    //Update
+                    if (remoteRepo.Files.Where (rf=> rf.AbsolutePath == file.AbsolutePath).Any()){
+                        RemoteFile remoteFile = new RemoteFile (file.AbsolutePath);
+                        remoteRepo.MoveToTrash (remoteFile);
+                        remoteRepo.Upload (file);
+                        //hash changes then must be by name
+                        BacklogSynchronizer.GetInstance().EditFileByName(file);
+                        ChangesInLastSync.Add (new Change(file, WatcherChangeTypes.Changed));
+                    }
+                    //Create
+                    else{
+                        if (DownloadSynchronizer.GetInstance().ChangesInLastSync.Any(c=> c.File.AbsolutePath==file.AbsolutePath && c.Event == WatcherChangeTypes.Created))
+                            return;
+                        remoteRepo.Upload (file) ; 
+                        ChangesInLastSync.Add (new Change(file, WatcherChangeTypes.Created));
+                        BacklogSynchronizer.GetInstance().AddFile(file);
+                    }
                 }
-            } catch (Exception e) {
-                Logger.LogInfo ("UploadSynchronizer", e);
-                return false;
+            //Delete
+            }else{
+                if (DownloadSynchronizer.GetInstance().ChangesInLastSync.Any(c=> c.File.AbsolutePath==file.AbsolutePath && c.Event == WatcherChangeTypes.Deleted))
+                    return;
+                DeleteFile (file);
             }
-            return true;
-        }
-        
-        public bool UpdateFile (QloudSync.Repository.File file)
-        {
-            try {
-                if (DownloadSynchronizer.GetInstance().FilesInLastSync.Where(lf => lf.MD5Hash==file.MD5Hash && lf.AbsolutePath == file.AbsolutePath).Any()){
-                    Logger.LogInfo ("UploadSynchronizer", string.Format("File {0} already updated", file.FullLocalName));
-                    return true;
-                }
-                RemoteFile remoteFile = new RemoteFile (file.AbsolutePath);
-                remoteRepo.MoveToTrash (remoteFile);
-                remoteRepo.Upload (file);
-                //hash changes then must be by name
-                BacklogSynchronizer.GetInstance().EditFileByName(file);
-                return true;
-            } catch {
-                return false;
-            }       
         }
 
-        public bool DeleteFile (QloudSync.Repository.File file)
+        void SynchronizeFolder (GreenQloud.Repository.File file)
+        {
+            if (Directory.Exists(file.FullLocalName)){
+                if (!remoteRepo.Files.Where (remo => remo.AbsolutePath.Contains (file.AbsolutePath)).Any())
+                    remoteRepo.CreateFolder (file.ToFolder());
+            }
+            else{
+                DeleteFolder (file.ToFolder());
+            }
+        }
+
+        public bool DeleteFolder (Folder folder)
         {
 
             try {
-                string absolutePath = string.Format("{0}{1}", file.AbsolutePath, Path.PathSeparator);
-                List<RemoteFile> filesInFolder = remoteRepo.Files.Where (remo => remo.AbsolutePath.Contains (absolutePath)).ToList<RemoteFile> ();
+                List<RemoteFile> filesInFolder = remoteRepo.Files.Where (remo => remo.AbsolutePath.Contains (folder.AbsolutePath)).ToList<RemoteFile> ();
 
                 if (filesInFolder.Count >= 1) {
-                    file = new Folder (absolutePath);
                     foreach (RemoteFile r in filesInFolder) {
-                        if (file.IsIgnoreFile)
+                        if (folder.IsIgnoreFile)
                             continue;
-                        if (r.AbsolutePath != file.AbsolutePath)
-                            remoteRepo.MoveToTrash (r);
+                        if (r.AbsolutePath != folder.AbsolutePath)
+                            DeleteFile(r);
 
                     }
                 }
-                remoteRepo.MoveToTrash (file);
-                BacklogSynchronizer.GetInstance().RemoveFileByAbsolutePath(file);
+                remoteRepo.MoveToTrash (folder);
+                BacklogSynchronizer.GetInstance().RemoveFileByAbsolutePath(folder);
             } catch {
                 return false;
             }
             return true;
+        }
+
+        void DeleteFile(GreenQloud.Repository.File file){
+            remoteRepo.MoveToTrash (file);
+            ChangesInLastSync.Add (new Change(file, WatcherChangeTypes.Deleted));
+            BacklogSynchronizer.GetInstance().RemoveFileByAbsolutePath(file);
         }
 
     }

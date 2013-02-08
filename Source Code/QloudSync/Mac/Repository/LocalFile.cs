@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Linq;
 using System.Collections.Generic;
 
- namespace QloudSync.Repository
+ namespace GreenQloud.Repository
 {
 	public class LocalFile : File
 	{
