@@ -22,7 +22,7 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 
-namespace QloudSync
+namespace GreenQloud
 {
 	public partial class AppDelegate : NSApplicationDelegate
 	{

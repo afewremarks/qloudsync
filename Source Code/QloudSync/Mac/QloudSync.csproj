@@ -29,6 +29,7 @@
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     <I18n />
     <UseSGen>False</UseSGen>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -46,6 +47,7 @@
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     <I18n />
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -102,16 +104,15 @@
     <Compile Include="UI\SparkleSetupWindow.cs" />
     <Compile Include="UI\SparkleSetup.cs" />
     <Compile Include="Repository\Folder.cs" />
-    <Compile Include="IO\OSXFileWatcher.cs" />
     <Compile Include="Repository\Change.cs" />
     <Compile Include="Synchrony\BacklogSynchronizer.cs" />
     <Compile Include="Tests\TestBacklog.cs" />
-    <Compile Include="Tests\TestRemoteRepo.cs" />
     <Compile Include="Tests\TestConnectionManager.cs" />
-    <Compile Include="Tests\TestUploadSynchronizer.cs" />
     <Compile Include="Util\Test.cs" />
     <Compile Include="Synchrony\DeltaFile.cs" />
-    <Compile Include="Repository\TestWatcher.cs" />
+    <Compile Include="Tests\TestWatcher.cs" />
+    <Compile Include="IO\OSXFileSystemWatcher.cs" />
+    <Compile Include="Tests\TestUploadSynchronizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />

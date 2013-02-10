@@ -11,7 +11,7 @@ using MonoMac.WebKit;
 
 using Mono.Unix;
 
-namespace QloudSync {
+namespace GreenQloud {
 
     public class SparkleSetup : SparkleSetupWindow {
 

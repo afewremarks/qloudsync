@@ -24,7 +24,7 @@ using MonoMac.Foundation;
 using MonoMac.ObjCRuntime;
 using MonoMac.WebKit;
 
-namespace QloudSync {
+namespace GreenQloud {
 
     public class AboutWindow : NSWindow {
 

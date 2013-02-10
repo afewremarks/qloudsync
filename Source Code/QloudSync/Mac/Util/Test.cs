@@ -1,13 +1,12 @@
 using System;
-using QloudSync.Synchrony;
+using GreenQloud.Synchrony;
 using System.IO;
-using QloudSync.Repository;
+using GreenQloud.Repository;
 
-namespace QloudSync
+namespace GreenQloud
 {
     public class Test
     {
-        public QloudSync.IO.OSXFileWatcher w = new QloudSync.IO.OSXFileWatcher(RuntimeSettings.HomePath);
         protected RemoteRepo remoteRepo = new RemoteRepo();
         public Test ()
         {
@@ -15,7 +14,6 @@ namespace QloudSync
 
         public void ClearRepositories ()
         {
-            w.Dispose();
             remoteRepo.DeleteAllFilesInBucket();
             ClearFolder (RuntimeSettings.HomePath);
             BacklogSynchronizer.GetInstance().Create();

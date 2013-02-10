@@ -1,7 +1,7 @@
 using System;
 using System.Configuration;
 
-namespace QloudSync
+namespace GreenQloud
 {
     public class Prefferences : Settings
     {

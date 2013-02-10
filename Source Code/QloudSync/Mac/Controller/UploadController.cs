@@ -15,6 +15,7 @@ namespace GreenQloud
         int controller = 0;
 
         protected UploadController(){
+           
             OSXFileSystemWatcher watcher = new OSXFileSystemWatcher();
             
             watcher.Changed += delegate(string path) {
@@ -65,11 +66,13 @@ namespace GreenQloud
             
             public new void Add(GreenQloud.Repository.File item) {
                 if (null != OnAdd) {
-                    OnAdd(this, null);
+                    OnAdd(this, null);                
                 }
+                if(item.FullLocalName==RuntimeSettings.HomePath)
+                    return;
                 if (!this.Any(f=>f.FullLocalName==item.FullLocalName))
                     base.Add(item);
-            }
+                            }
         }       
     }
 }

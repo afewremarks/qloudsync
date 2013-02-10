@@ -46,7 +46,9 @@ namespace GreenQloud.Repository
 		}
 
         public List<RemoteFile> TrashFiles {
-            get{ return AllFiles.Where(f => IsTrashFile(f)).ToList();} 
+            get{
+                return AllFiles.Where(f => IsTrashFile(f)).ToList();
+            } 
         }
 
 
@@ -58,7 +60,7 @@ namespace GreenQloud.Repository
 
         public  bool ExistsTrashFolder {
             get {
-                return  TrashFiles.Where(rm => IsTrashFile(rm)).Any();
+                return  TrashFiles.Any(rm => IsTrashFile(rm));
             }
         }
 
@@ -126,7 +128,10 @@ namespace GreenQloud.Repository
 
         public void Copy (File source, File destination)
         {
-            connection.GenericCopy (DefaultBucketName, source.AbsolutePath, destination.RelativePathInBucket, destination.Name);
+            if (source.InTrash)
+                connection.GenericCopy (DefaultBucketName, source.TrashAbsolutePath, destination.RelativePathInBucket, destination.Name);
+            else
+                connection.GenericCopy (DefaultBucketName, source.AbsolutePath, destination.RelativePathInBucket, destination.Name);
         }
 
         public void Move (File source, File destination)
@@ -138,27 +143,32 @@ namespace GreenQloud.Repository
                 destinationName = source.Name+"(0)";
             
             connection.GenericCopy (DefaultBucketName, source.AbsolutePath, source.TrashRelativePath, destinationName);
-            if (Files.Where (rf => rf.Name == source.Name).Any())
+            if (Files.Any (rf => rf.Name == source.Name))
                 connection.GenericDelete (source.AbsolutePath);
         }
         
-        public void MoveToTrash (File  file){
+        public void MoveToTrash (File  file)
+        {
+
             string destinationName;
             if (file.IsAFolder)
                 destinationName = file.Name;
             else
-                destinationName = file.Name+"(0)";
-            
-            connection.GenericCopy (DefaultBucketName, file.AbsolutePath, file.TrashRelativePath, destinationName);
-
+                destinationName = file.Name + "(1)";
+           
             UpdateTrashFolder (file);
+            connection.GenericCopy (DefaultBucketName, file.AbsolutePath, file.TrashRelativePath, destinationName);           
             connection.GenericDelete (file.AbsolutePath);
+        }
+
+        public bool FolderExistsInBucket (Folder folder)
+        {
+            return Files.Where (rf => rf.AbsolutePath.Contains (folder.AbsolutePath)).Any ();
         }
 
         public bool ExistsInBucket (File file)
         {
-            return Files.Where (rf => rf.AbsolutePath == file.AbsolutePath 
-                                || rf.AbsolutePath.Contains (file.AbsolutePath)).Any ();
+            return Files.Where (rf => rf.AbsolutePath == file.AbsolutePath).Any ();
         }
         
         public bool IsTrashFile (RemoteFile file)
@@ -194,7 +204,7 @@ namespace GreenQloud.Repository
                 destinationName = file.Name+"(0)";
             
             connection.GenericCopy (DefaultBucketName, file.AbsolutePath, file.TrashRelativePath, destinationName);
-            bool copySucessfull =  TrashFiles.Where (rm => file.AbsolutePath+"(0)" == rm.AbsolutePath).Any();
+            bool copySucessfull =  TrashFiles.Any (rm => file.AbsolutePath+"(0)" == rm.AbsolutePath);
             if (copySucessfull)
                 UpdateTrashFolder (file);
             
@@ -203,24 +213,26 @@ namespace GreenQloud.Repository
         
         public void UpdateTrashFolder (File  file)
         {
-            if ( file.IsAFolder)
+            if (file.IsAFolder)
                 return;
+            List<RemoteFile> versions = TrashFiles.Where (tf => tf.AbsolutePath.Contains (file.AbsolutePath)).OrderByDescending(t => t.AbsolutePath).ToList<RemoteFile> ();
 
-            List<RemoteFile> versions = GetVersionsOrderByLastModified (file);
-
-            while (versions.Count > 3) {
-                connection.GenericDelete (versions.First().TrashAbsolutePath);
+            int overload = versions.Count-2;
+            for (int i=0; i<overload; i++) {
+                RemoteFile v = versions[i];
+                connection.GenericDelete(v.TrashAbsolutePath);
+                versions.Remove(v);
             }
 
             foreach (RemoteFile version in versions) {
-                string newName = "";
-                string oldName = version.FullLocalName;
-                int sizeOldName = oldName.Length;
-                int v = int.Parse(oldName[sizeOldName-2].ToString())+1;
-                newName = string.Format("{0}({1})", oldName.Substring (0, sizeOldName - 3), v);
-
-                RemoteFile newVersion = new RemoteFile(newName);
-
+                if(version.AbsolutePath == string.Empty)
+                    continue;
+                int lastOpenParenthesis = version.AbsolutePath.LastIndexOf ("(")+1;
+                int lastCloseParenthesis = version.AbsolutePath.LastIndexOf (")");
+                int versionNumber = int.Parse (version.AbsolutePath.Substring (lastOpenParenthesis, lastCloseParenthesis - lastOpenParenthesis));
+                versionNumber++;
+                string newName = string.Format ("{0}{1})", version.AbsolutePath.Substring (0, lastOpenParenthesis), versionNumber);
+                RemoteFile newVersion = new RemoteFile (newName);
                 connection.GenericCopy (DefaultBucketName, version.TrashAbsolutePath, newVersion.TrashRelativePath, newVersion.Name);
                 connection.GenericDelete (version.TrashAbsolutePath);
             }
@@ -233,7 +245,7 @@ namespace GreenQloud.Repository
 		}
         
         private List<RemoteFile> GetVersionsOrderByLastModified (File  file)  {
-            return  TrashFiles.Where (ft => ft.AbsolutePath.Contains ( file.AbsolutePath)).OrderBy(ft => ft.AsS3Object.LastModified).ToList<RemoteFile>();
+            return  TrashFiles.Where (ft => ft.AbsolutePath.Contains (file.AbsolutePath)).OrderBy(ft => ft.AsS3Object.LastModified).ToList<RemoteFile>();
         }
 
         public void DeleteAllFilesInBucket(){

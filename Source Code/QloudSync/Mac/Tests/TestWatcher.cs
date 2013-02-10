@@ -1,10 +1,10 @@
 using System;
 using NUnit.Framework;
 using System.IO;
-using QloudSync.Repository;
+using GreenQloud.Repository;
 using System.Linq;
 
-namespace QloudSync
+namespace GreenQloud
 {
     [TestFixture()]
     public class TestWatcher : Test
@@ -15,17 +15,17 @@ namespace QloudSync
         public void TestCreateFile ()
         {
             this.ClearRepositories();
-            base.w.CreateWatcher (RuntimeSettings.HomePath);
+            //base.w.CreateWatcher (RuntimeSettings.HomePath);
             string path = Path.Combine (RuntimeSettings.HomePath, "file.txt");
             System.IO.File.WriteAllText(path, "Simple file test");
-            QloudSync.Repository.LocalFile file = new QloudSync.Repository.LocalFile (path);
+            GreenQloud.Repository.LocalFile file = new GreenQloud.Repository.LocalFile (path);
 
             DateTime reff = DateTime.Now;
             while (DateTime.Now.Subtract(reff).TotalSeconds<4);
             while (UploadController.GetInstance().Status == SyncStatus.Sync);
 
             Assert.True (remoteRepo.Files.Count == 1);
-            Assert.True (this.remoteRepo.Files.Where (rf => rf.MD5Hash == file.MD5Hash && rf.AbsolutePath == file.AbsolutePath).Any());
+            Assert.True (this.remoteRepo.Files.Any (rf => rf.MD5Hash == file.MD5Hash && rf.AbsolutePath == file.AbsolutePath));
 
         }
 
@@ -33,7 +33,7 @@ namespace QloudSync
         public void TestCreateFolder()
         {
             this.ClearRepositories();
-            base.w.CreateWatcher (RuntimeSettings.HomePath);
+          //  base.w.CreateWatcher (RuntimeSettings.HomePath);
 
             Directory.CreateDirectory (Path.Combine (RuntimeSettings.HomePath, "folder"));
             Folder folder = new Folder(Path.Combine (RuntimeSettings.HomePath, "folder"));
@@ -41,9 +41,9 @@ namespace QloudSync
             while (DateTime.Now.Subtract(reff).TotalSeconds<4);
             while (UploadController.GetInstance().Status == SyncStatus.Sync);
 
-            Assert.True (w.watchers.Count == 2);
+           // Assert.True (w.watchers.Count == 2);
             Assert.True (remoteRepo.Files.Count==1);
-            Assert.True (remoteRepo.Files.Where (rf =>rf.AbsolutePath == string.Format("{0}/",folder.AbsolutePath)).Any());
+            Assert.True (remoteRepo.Files.Any (rf =>rf.AbsolutePath == string.Format("{0}/",folder.AbsolutePath)));
         }
 
         [Test()]
@@ -55,7 +55,7 @@ namespace QloudSync
         public void TestMoveFile ()
         {
             this.ClearRepositories ();
-            base.w.CreateWatcher (RuntimeSettings.HomePath);
+          //  base.w.CreateWatcher (RuntimeSettings.HomePath);
 
             string path = Path.Combine (RuntimeSettings.HomePath, "file.txt");
             string newpath = Path.Combine (RuntimeSettings.HomePath, "move/file.txt");
@@ -68,15 +68,15 @@ namespace QloudSync
             while (DateTime.Now.Subtract(reff).TotalSeconds<30);
             while (UploadController.GetInstance().Status == SyncStatus.Sync);
 
-            Assert.True (remoteRepo.Files.Where (rf=> rf.MD5Hash == file.MD5Hash && rf.AbsolutePath == file.AbsolutePath).Any());
-            Assert.False (remoteRepo.Files.Where (rf=> rf.MD5Hash == old.MD5Hash && rf.AbsolutePath == old.AbsolutePath).Any());
+            Assert.True (remoteRepo.Files.Any (rf=> rf.MD5Hash == file.MD5Hash && rf.AbsolutePath == file.AbsolutePath));
+            Assert.False (remoteRepo.Files.Any (rf=> rf.MD5Hash == old.MD5Hash && rf.AbsolutePath == old.AbsolutePath));
 
         }
 
         [Test()]
         public void TestMoveEmptyFolder(){
             this.ClearRepositories ();
-            base.w.CreateWatcher (RuntimeSettings.HomePath);
+        //    base.w.CreateWatcher (RuntimeSettings.HomePath);
             
             string old = Path.Combine(RuntimeSettings.HomePath,"origin");
             string newpath = Path.Combine (RuntimeSettings.HomePath, "move");
@@ -95,8 +95,8 @@ namespace QloudSync
             while (DateTime.Now.Subtract(reff).TotalSeconds<30);
             while (UploadController.GetInstance().Status == SyncStatus.Sync);
             
-            Assert.True (remoteRepo.Files.Where (rf=> rf.AbsolutePath == new LocalFile(newfullpath).AbsolutePath).Any());
-            Assert.False (remoteRepo.Files.Where (rf=> rf.AbsolutePath == new LocalFile(oldfullpath).AbsolutePath).Any());
+            Assert.True (remoteRepo.Files.Any (rf=> rf.AbsolutePath == new LocalFile(newfullpath).AbsolutePath));
+            Assert.False (remoteRepo.Files.Any (rf=> rf.AbsolutePath == new LocalFile(oldfullpath).AbsolutePath));
         }
 
 
@@ -104,7 +104,7 @@ namespace QloudSync
         public void TestMoveFullFolder(){
             this.ClearRepositories ();
             
-            base.w.CreateWatcher (RuntimeSettings.HomePath);
+          //  base.w.CreateWatcher (RuntimeSettings.HomePath);
             
             string old = Path.Combine(RuntimeSettings.HomePath,"origin");
             string newpath = Path.Combine (RuntimeSettings.HomePath, "move");
@@ -131,7 +131,7 @@ namespace QloudSync
         public void TestRenameFolder(){
             this.ClearRepositories ();
             
-            base.w.CreateWatcher (RuntimeSettings.HomePath);
+          //  base.w.CreateWatcher (RuntimeSettings.HomePath);
             
             string old = Path.Combine(RuntimeSettings.HomePath,"origin");
             string newpath = Path.Combine (RuntimeSettings.HomePath, "move");
@@ -156,7 +156,7 @@ namespace QloudSync
         public void TestRenameFile(){
             this.ClearRepositories ();
             
-            base.w.CreateWatcher (RuntimeSettings.HomePath);
+        //    base.w.CreateWatcher (RuntimeSettings.HomePath);
             
             string old = Path.Combine(RuntimeSettings.HomePath,"origin");
             string newpath = Path.Combine (RuntimeSettings.HomePath, "move");
@@ -172,8 +172,8 @@ namespace QloudSync
             DateTime reff = DateTime.Now;
             while (DateTime.Now.Subtract(reff).TotalSeconds<30);
             while (UploadController.GetInstance().Status == SyncStatus.Sync);
-            Assert.True (remoteRepo.Files.Where (rf=> rf.AbsolutePath== newfile.AbsolutePath).Any());
-            Assert.False (remoteRepo.Files.Where (rf=> rf.AbsolutePath==oldfile.AbsolutePath).Any());
+            Assert.True (remoteRepo.Files.Any (rf=> rf.AbsolutePath== newfile.AbsolutePath));
+            Assert.False (remoteRepo.Files.Any (rf=> rf.AbsolutePath==oldfile.AbsolutePath));
             
         }
         

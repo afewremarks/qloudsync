@@ -1,13 +1,13 @@
 using System;
 using NUnit.Framework;
-using QloudSync.Synchrony;
+using GreenQloud.Synchrony;
 using System.IO;
 using System.Xml;
-using QloudSync.Repository;
+using GreenQloud.Repository;
 using System.Threading;
 using System.Linq;
 
-namespace QloudSync
+namespace GreenQloud
 {
     [TestFixture()]
     public class TestBacklog
@@ -98,7 +98,7 @@ namespace QloudSync
             //sincronizar
             BacklogSynchronizer.GetInstance().Synchronize();
             //tem que existir o hash no servidor
-            Assert.True(remoteRepo.Files.Where(rf=> rf.MD5Hash == file2.MD5Hash).Any());
+            Assert.True(remoteRepo.Files.Any(rf=> rf.MD5Hash == file2.MD5Hash));
         }
 
         [Test ()]
@@ -147,7 +147,7 @@ namespace QloudSync
             string path = Path.Combine(RuntimeSettings.HomePath, "TestFolder/");
             System.IO.Directory.CreateDirectory (path);
             BacklogSynchronizer.GetInstance().Synchronize();
-            Assert.True (remoteRepo.Files.Where (rf => rf.AbsolutePath == new Folder(path).AbsolutePath).Any());
+            Assert.True (remoteRepo.Files.Any (rf => rf.AbsolutePath == new Folder(path).AbsolutePath));
         }
 
         [Test()]
@@ -170,7 +170,7 @@ namespace QloudSync
             remoteRepo.CreateFolder(f);
             BacklogSynchronizer.GetInstance().AddFile(f);
             BacklogSynchronizer.GetInstance().Synchronize();
-            Assert.False (remoteRepo.Files.Where (rf => rf.AbsolutePath == new Folder(path).AbsolutePath).Any());
+            Assert.False (remoteRepo.Files.Any (rf => rf.AbsolutePath == new Folder(path).AbsolutePath));
         }
 
         [Test()]

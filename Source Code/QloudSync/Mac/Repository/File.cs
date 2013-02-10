@@ -171,7 +171,7 @@ using GreenQloud.Util;
 				if(IsAFolder){
 					return false;
 				}
-                return Constant.EXCLUDE_FILES.Where (s => s == Name) .Any() || Name == Constant.CLOCK_TIME || FullLocalName.Contains(".app/") || Name.EndsWith(".app");
+                return Constant.EXCLUDE_FILES.Any (s => s == Name) || Name == Constant.CLOCK_TIME || FullLocalName.Contains(".app/") || Name.EndsWith(".app");
             }
         }
 
@@ -182,7 +182,7 @@ using GreenQloud.Util;
 
         public Folder ToFolder ()
         {
-            return new Folder(AbsolutePath);
+            return new Folder(string.Format("{0}/",AbsolutePath));
         }
     }
 }

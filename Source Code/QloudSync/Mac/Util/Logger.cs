@@ -18,7 +18,7 @@
 using System;
 using System.IO;
 
-namespace QloudSync {
+namespace GreenQloud {
     
     public static class Logger {
 
@@ -47,7 +47,7 @@ namespace QloudSync {
         }
 
         public static void LogInfo (string type, Exception e ){
-            string message = e.GetType()+"\n"+e.Message+"\n"+e.StackTrace+"\n"+e.GetBaseException();
+            string message = e.GetType()+"\n"+e.Message+"\n"+e.StackTrace+"\n"+e.GetBaseException()+"\n"+e.InnerException.Message;
             LogInfo (type, message);
         }
     }

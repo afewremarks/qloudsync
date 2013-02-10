@@ -24,7 +24,7 @@ using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 using MonoMac.Growl;
 
-namespace QloudSync {
+namespace GreenQloud {
 
     public class SparkleUI : AppDelegate {
 

@@ -1,6 +1,7 @@
 
 
 
+
 using Amazon.S3;
 using Amazon.S3.Model;
 
@@ -12,12 +13,12 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using QloudSync.Util;
-using QloudSync.Repository;
+using GreenQloud.Util;
+using GreenQloud.Repository;
 using System.Text;
 
 
-namespace QloudSync.Net.S3
+namespace GreenQloud.Net.S3
 {
 	public class ConnectionManager
 	{
@@ -49,8 +50,7 @@ namespace QloudSync.Net.S3
             Stream receiveStream = wr.GetResponseStream ();
             StreamReader reader = new StreamReader (receiveStream, Encoding.UTF8);
             string receiveContent = reader.ReadToEnd ();
-            //FIXME The base authentication response is JSON format. Doing a substring using an index will brake. Fix by using a JSON parser. 
-           
+//FIXME The base authentication response is JSON format. Doing a substring using an index will brake. Fix by using a JSON parser. 
             Credential.SecretKey = receiveContent.Substring(Constant.KEY_SECRET_START_INDEX, Constant.KEYS_LENGTH);
             Credential.PublicKey = receiveContent.Substring(Constant.KEY_PUBLIC_START_INDEX, Constant.KEYS_LENGTH);
             
@@ -99,17 +99,16 @@ namespace QloudSync.Net.S3
 		#endregion
 
 
-		public bool ExistsBucket {
+		public bool ExistsBucket 
+        {
 			get {
-                Console.WriteLine(bucketName);
-                    return Reconnect().ListBuckets () .Buckets.Where (b => b.BucketName == bucketName).Any ();
+                    return Reconnect().ListBuckets () .Buckets.Any (b => b.BucketName == bucketName);
        			}
 		}
 
         public bool CreateBucket ()
         {   
             try {
-                //Logger.LogInfo ("Connection","Creating a bucket "+bucketName);
                 PutBucketRequest request = new PutBucketRequest ();
                 request.BucketName = bucketName;
                 Connect ().PutBucket (request);
@@ -128,7 +127,7 @@ namespace QloudSync.Net.S3
                 ).S3Objects;
         }
 
-		public void Download (QloudSync.Repository.File  file)
+		public void Download (GreenQloud.Repository.File  file)
         {
             try {
                 string sourcekey = file.AbsolutePath;
@@ -169,7 +168,7 @@ namespace QloudSync.Net.S3
             }			
 		}	
 
-		public bool CreateFolder (QloudSync.Repository.Folder folder)
+		public bool CreateFolder (GreenQloud.Repository.Folder folder)
 		{
 			return CreateFolder (folder.Name, folder.RelativePathInBucket);
 		}
@@ -242,7 +241,7 @@ namespace QloudSync.Net.S3
 		public TimeSpan CalculateDiffClocks ()
 		{
 			try {
-				QloudSync.Repository.File clockFile = new RemoteFile (Constant.CLOCK_TIME);
+                GreenQloud.Repository.File clockFile = new RemoteFile (Constant.CLOCK_TIME);
 				PutObjectRequest putObject = new PutObjectRequest ()
 				{
 					BucketName = bucketName,
@@ -278,31 +277,26 @@ namespace QloudSync.Net.S3
 		                                   System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors errors)
 		{
 			return true;
+
 		}
 
 
         public void GenericCopy (string sourceBucket, string sourceKey, string destinationBucket, string destinationKey)
         {
-            try{
+            try {
                 CopyObjectRequest request = new CopyObjectRequest (){
                     DestinationBucket = destinationBucket,
                     DestinationKey = destinationKey,
                     SourceBucket = sourceBucket,
                     SourceKey = sourceKey
                 };
+
                 Connect ().CopyObject (request);
             } 
-            catch (AmazonS3Exception) {
-                if(InitializeBucket())
-                    GenericCopy (sourceBucket, sourceKey, destinationBucket, destinationKey);
-                else
-                    Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
+            //TODO Understand why System.InvalidOperationException is catched, and the file is copied
+            catch{
+                               
             }
-            catch (System.InvalidOperationException){
-            }
-            catch (Exception e){
-                Logger.LogInfo ("Connection", e);
-            } 
         }
 
         public void GenericUpload (string bucketName, string key, string filepath)
@@ -340,7 +334,7 @@ namespace QloudSync.Net.S3
                 if (CreateBucket ())
                    return CreateTrashFolder ();
             } else {
-                if (!GetFiles().Where(s3o => s3o.Key.Contains(GlobalSettings.Trash)).Any())
+                if (!GetFiles().Any(s3o => s3o.Key.Contains(GlobalSettings.Trash)))
                     return CreateTrashFolder ();
                 return true;
             }

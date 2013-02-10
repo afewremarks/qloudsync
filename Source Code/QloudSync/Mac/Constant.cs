@@ -1,6 +1,6 @@
 using System;
 
- namespace QloudSync.Util
+ namespace GreenQloud.Util
 {
 	public static class Constant
 	{

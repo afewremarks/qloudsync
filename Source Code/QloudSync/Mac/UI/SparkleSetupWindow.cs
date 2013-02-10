@@ -9,7 +9,7 @@ using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 using MonoMac.WebKit;
 
-namespace QloudSync {
+namespace GreenQloud {
 
     public class SparkleSetupWindow : NSWindow {
 

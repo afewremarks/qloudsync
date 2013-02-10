@@ -54,7 +54,7 @@ namespace GreenQloud
                     ids [i] = eventIdsPointer [i];
                 }
             }
-            var handler = Changed;
+            ChangedEventHandler handler = Changed;
             for (int i = 0; i < numEvents; i++) {
                 string pcatched = paths[i];
                 if(!pcatched.EndsWith (".DS_Store"))

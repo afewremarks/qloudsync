@@ -20,7 +20,7 @@ using System.Configuration;
 using System.IO;
 
 
-namespace QloudSync {
+namespace GreenQloud {
 
     public class Settings{
 

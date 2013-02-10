@@ -106,7 +106,7 @@ namespace GreenQloud.Synchrony
 
         protected bool ExistsVersion (GreenQloud.Repository.File file)
 		{
-			return remoteRepo.TrashFiles.Where (tf => tf.AbsolutePath == file.AbsolutePath+"(1)").Any ();
+			return remoteRepo.TrashFiles.Any (tf => tf.AbsolutePath == file.AbsolutePath+"(1)");
 		}
 
 

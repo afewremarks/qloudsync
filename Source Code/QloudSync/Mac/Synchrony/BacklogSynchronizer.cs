@@ -134,7 +134,7 @@ using System.Xml;
                 foreach(File localFile in filesInLocalRepo)
                 {
 
-                    if (alreadyAnalyzed.Where (lf => LocalRepo.ResolveDecodingProblem (lf.AbsolutePath) == LocalRepo.ResolveDecodingProblem(localFile.AbsolutePath)).Any())
+                    if (alreadyAnalyzed.Any (lf => LocalRepo.ResolveDecodingProblem (lf.AbsolutePath) == LocalRepo.ResolveDecodingProblem(localFile.AbsolutePath)))
                         continue;
 
                     if(!System.IO.File.Exists (localFile.FullLocalName) && !localFile.IsAFolder)
