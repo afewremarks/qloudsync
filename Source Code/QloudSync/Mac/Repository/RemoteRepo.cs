@@ -215,7 +215,7 @@ namespace GreenQloud.Repository
         {
             if (file.IsAFolder)
                 return;
-            List<RemoteFile> versions = TrashFiles.Where (tf => tf.AbsolutePath.Contains (file.AbsolutePath)).OrderByDescending(t => t.AbsolutePath).ToList<RemoteFile> ();
+            List<RemoteFile> versions = TrashFiles.Where (tf => tf.AbsolutePath.Substring(0, tf.AbsolutePath.Length-3)== file.AbsolutePath).OrderByDescending(t => t.AbsolutePath).ToList<RemoteFile> ();
 
             int overload = versions.Count-2;
             for (int i=0; i<overload; i++) {

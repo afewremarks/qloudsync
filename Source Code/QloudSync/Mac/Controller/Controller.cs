@@ -39,6 +39,7 @@ namespace GreenQloud {
         public event Action OnSyncing = delegate { };
         public event Action OnError = delegate { };
 
+        bool FirstRun = RuntimeSettings.FirstRun;
 
         public Controller () : base ()
         {
@@ -48,9 +49,6 @@ namespace GreenQloud {
 
         public void Initialize ()
         {
-
-
-
             CreateConfigFolder();
 
             if (CreateHomeFolder ())
@@ -59,7 +57,7 @@ namespace GreenQloud {
 
         public void UIHasLoaded ()
         {
-            if (RuntimeSettings.FirstRun) {
+            if (FirstRun) {
                 ShowSetupWindow (PageType.Login);
                 foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
                     File.Delete (f);
@@ -72,13 +70,18 @@ namespace GreenQloud {
         private void InitializeSynchronizers ()
         {
            // StatusIcon = new IconController ();
+            if(!FirstRun)
             GreenQloud.Synchrony.BacklogSynchronizer.GetInstance ().Synchronize ();
 
 
             downloadController = DownloadController.GetInstance();
             //downloadController.Synchronize ();
+            try{
             uploadController = UploadController.GetInstance();
-
+            }
+            catch(Exception e){
+                Logger.LogInfo("InitializeSyncs",e);
+            }
             downloadController.SyncStatusChanged += HandleSyncStatusChanged;
             uploadController.SyncStatusChanged += HandleSyncStatusChanged;
 

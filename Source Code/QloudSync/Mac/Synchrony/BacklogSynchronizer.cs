@@ -55,7 +55,8 @@ using System.Xml;
                 foreach (RemoteFile remoteFile in filesInRemoteRepo) {
                     if(remoteFile.IsIgnoreFile)
                         continue;
-                    
+                    if(DownloadSynchronizer.GetInstance().ChangesInLastSync.Any(c=>c.File.AbsolutePath==remoteFile.AbsolutePath))
+                        continue;
                     File backlogFile = Get (remoteFile.AbsolutePath);
                     bool existsInBacklog = backlogFile != null;
 
@@ -65,10 +66,12 @@ using System.Xml;
                         if(!System.IO.Directory.Exists(remoteFile.AbsolutePath))
                         {
                             if (existsInBacklog){
+                 
                                 remoteRepo.Delete (remoteFile);
                                 RemoveFileByAbsolutePath (remoteFile);
                             }
                             else{
+                 
                                 System.IO.Directory.CreateDirectory (remoteFile.AbsolutePath);
                             }
                             continue;
@@ -83,6 +86,7 @@ using System.Xml;
                         //localfile was deleted when offline
                         if (!System.IO.File.Exists (localFile.FullLocalName)) 
                         {
+                 
                             remoteRepo.MoveToTrash (remoteFile);
                             RemoveFileByAbsolutePath (remoteFile);
                         }
@@ -99,11 +103,13 @@ using System.Xml;
                                 DateTime referencialClock = localLastTime.Subtract (diffClocks);
                                 //local version is more recent
                                 if (referencialClock.Subtract (Convert.ToDateTime (remoteFile.AsS3Object.LastModified)).TotalSeconds > -1) {
+                 
                                     remoteRepo.MoveToTrash (remoteFile);
                                     remoteRepo.Upload (localFile);
                                 }
                                 //remote version is more recent
                                 else {
+                 
                                     remoteRepo.SendToTrash (localFile);
                                     ChangesMade.Add (remoteFile);
                                     remoteRepo.Download (remoteFile);
@@ -117,9 +123,11 @@ using System.Xml;
                     {
                         if(remoteFile.IsAFolder)
                         {
+                 
                             System.IO.Directory.CreateDirectory (remoteFile.FullLocalName);
 
                         }else{
+                 
                             //remote file was create when offline
                             ChangesMade.Add (remoteFile);
                             remoteRepo.Download (remoteFile);
@@ -147,6 +155,7 @@ using System.Xml;
                     if(existsInBacklog)
                     {
                         if (localFile.IsAFolder){
+                 
                             System.IO.Directory.Delete (localFile.FullLocalName);
                             RemoveFileByAbsolutePath (localFile);
                             continue;            
@@ -156,6 +165,7 @@ using System.Xml;
 
                         if (remoteRepo.SendToTrash (lf)) 
                         {
+                 
                             ChangesMade.Add (lf);
                             System.IO.File.Delete(localFile.FullLocalName); 
                             RemoveFileByAbsolutePath (localFile);
@@ -164,6 +174,7 @@ using System.Xml;
                     // local file was created when offline
                     else{
                         if (localFile.IsAFolder){
+                 
                             remoteRepo.CreateFolder(new Folder(localFile.AbsolutePath));
                             continue;            
                         }

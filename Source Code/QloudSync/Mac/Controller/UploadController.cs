@@ -11,18 +11,22 @@ namespace GreenQloud
     public class UploadController : SynchronizerController
     {
         public ChangesCapturedByWatcher<GreenQloud.Repository.File> PendingChanges;
-  
+        OSXFileSystemWatcher watcher = new OSXFileSystemWatcher ();
         int controller = 0;
 
-        protected UploadController(){
-           
-            OSXFileSystemWatcher watcher = new OSXFileSystemWatcher();
+        protected UploadController ()
+        {
+            try {
+
             
-            watcher.Changed += delegate(string path) {
-                PendingChanges.Add (new LocalFile(path));
-            };
-            PendingChanges = new ChangesCapturedByWatcher<GreenQloud.Repository.File>();
-            PendingChanges.OnAdd += HandleOnAdd;
+                watcher.Changed += delegate(string path) {
+                    PendingChanges.Add (new LocalFile (path));
+                };
+                PendingChanges = new ChangesCapturedByWatcher<GreenQloud.Repository.File> ();
+                PendingChanges.OnAdd += HandleOnAdd;
+            } catch (Exception e) {
+                Logger.LogInfo("uploadcontroller", e);
+            }
         }
 
         void HandleOnAdd (object sender, EventArgs e)
@@ -42,7 +46,6 @@ namespace GreenQloud
             ++controller;
             if (Status == SyncStatus.Idle && controller == 1) {
                 int index = 0;
-                Logger.LogInfo ("UploadController",string.Format("Pending Changes ({0})", PendingChanges.Count));
                 while (PendingChanges.Count != 0) {
                     
                     if (index >= PendingChanges.Count)
@@ -70,9 +73,9 @@ namespace GreenQloud
                 }
                 if(item.FullLocalName==RuntimeSettings.HomePath)
                     return;
-                if (!this.Any(f=>f.FullLocalName==item.FullLocalName))
+                if (!this.Any(f=>f.FullLocalName==item.FullLocalName || item.FullLocalName.Contains(f.FullLocalName+".")))
                     base.Add(item);
-                            }
+            }
         }       
     }
 }
