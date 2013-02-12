@@ -16,22 +16,18 @@ namespace GreenQloud
 
         protected UploadController ()
         {
-            try {
-
-            
+            try {            
                 watcher.Changed += delegate(string path) {
-                    PendingChanges.Add (new LocalFile (path));
+                    LocalFile changedFile = new LocalFile (path);
+                    PendingChanges.Add (changedFile);
+                    if (PendingChanges.Contains(changedFile))
+                        new Thread (Synchronize).Start ();
                 };
                 PendingChanges = new ChangesCapturedByWatcher<GreenQloud.Repository.File> ();
-                PendingChanges.OnAdd += HandleOnAdd;
-            } catch (Exception e) {
-                Logger.LogInfo("uploadcontroller", e);
-            }
-        }
 
-        void HandleOnAdd (object sender, EventArgs e)
-        {
-            new Thread (Synchronize).Start ();
+            } catch (Exception e) {
+                Logger.LogInfo("UploadController", e);
+            }
         }
 
         private static UploadController instance;
@@ -45,12 +41,14 @@ namespace GreenQloud
         {
             ++controller;
             if (Status == SyncStatus.Idle && controller == 1) {
+                Status = SyncStatus.Sync;
                 int index = 0;
                 while (PendingChanges.Count != 0) {
                     
                     if (index >= PendingChanges.Count)
                         break;
                     GreenQloud.Repository.File pendingFile = PendingChanges[index];
+
                     if (UploadSynchronizer.GetInstance().Synchronize(pendingFile))
                     {   
                         PendingChanges.Remove (pendingFile); 
@@ -60,6 +58,7 @@ namespace GreenQloud
                         index++;
                 }
                 controller = 0;
+                Status = SyncStatus.Idle;
             }            
         }
 
@@ -67,14 +66,16 @@ namespace GreenQloud
         {
             public event EventHandler OnAdd;
             
-            public new void Add(GreenQloud.Repository.File item) {
+            public new void Add (GreenQloud.Repository.File item)
+            {
                 if (null != OnAdd) {
-                    OnAdd(this, null);                
+                    OnAdd (this, null);                
                 }
-                if(item.FullLocalName==RuntimeSettings.HomePath)
+                if (item.FullLocalName == RuntimeSettings.HomePath)
                     return;
-                if (!this.Any(f=>f.FullLocalName==item.FullLocalName || item.FullLocalName.Contains(f.FullLocalName+".")))
-                    base.Add(item);
+                if (!this.Any (f => f.FullLocalName == item.FullLocalName || item.FullLocalName.Contains (f.FullLocalName + "."))) {
+                    base.Add (item);
+                }
             }
         }       
     }
