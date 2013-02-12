@@ -155,7 +155,7 @@ namespace GreenQloud.Repository
                 destinationName = file.Name;
             else
                 destinationName = file.Name + "(1)";
-           
+  
             UpdateTrashFolder (file);
             connection.GenericCopy (DefaultBucketName, file.AbsolutePath, file.TrashRelativePath, destinationName);           
             connection.GenericDelete (file.AbsolutePath);
@@ -215,7 +215,7 @@ namespace GreenQloud.Repository
         {
             if (file.IsAFolder)
                 return;
-            List<RemoteFile> versions = TrashFiles.Where (tf => tf.AbsolutePath.Substring(0, tf.AbsolutePath.Length-3)== file.AbsolutePath).OrderByDescending(t => t.AbsolutePath).ToList<RemoteFile> ();
+            List<RemoteFile> versions = TrashFiles.Where (tf => tf.AbsolutePath != string.Empty && tf.AbsolutePath.Substring(0, tf.AbsolutePath.Length-3)== file.TrashAbsolutePath).OrderByDescending(t => t.AbsolutePath).ToList<RemoteFile> ();
 
             int overload = versions.Count-2;
             for (int i=0; i<overload; i++) {
