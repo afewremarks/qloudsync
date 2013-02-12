@@ -36,7 +36,7 @@ namespace GreenQloud.Synchrony
                 if (System.IO.File.Exists (file.FullLocalName)) {
                     if (remoteRepo.Files.Any (rf => rf.MD5Hash == file.MD5Hash && rf.AbsolutePath == file.AbsolutePath))
                         return true;
-                    
+
                     //Rename and moves
                     //file already exists in remote?                
                     //get all remote copys of file
@@ -76,8 +76,11 @@ namespace GreenQloud.Synchrony
                     }
                     //Create folder
                 } else if (Directory.Exists (file.FullLocalName)) {
-                    if (!remoteRepo.Files.Any (remo => remo.AbsolutePath.Contains (file.AbsolutePath)))
+                    if (!remoteRepo.Files.Any (remo => remo.AbsolutePath.Contains (file.AbsolutePath))){
                         remoteRepo.CreateFolder (file.ToFolder());
+                        foreach (string f in Directory.GetFiles(file.FullLocalName))
+                            Synchronize(new LocalFile(f));
+                    }
                 }//Deletes
                 else{
                     if (DownloadSynchronizer.GetInstance().ChangesInLastSync.Any(c=> c.File.AbsolutePath==file.AbsolutePath && c.Event == WatcherChangeTypes.Deleted))
@@ -95,6 +98,7 @@ namespace GreenQloud.Synchrony
                 Logger.LogInfo ("UploadSynchronizer", e);
                 return false;
             }
+          
             return true;
         }
 
