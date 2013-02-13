@@ -78,8 +78,12 @@ namespace GreenQloud.Synchrony
                 } else if (Directory.Exists (file.FullLocalName)) {
                     if (!remoteRepo.Files.Any (remo => remo.AbsolutePath.Contains (file.AbsolutePath))){
                         remoteRepo.CreateFolder (file.ToFolder());
-                        foreach (string f in Directory.GetFiles(file.FullLocalName))
-                            Synchronize(new LocalFile(f));
+                        if(Directory.Exists(file.FullLocalName)){
+                            string [] files = Directory.GetFiles(file.FullLocalName);
+                            foreach (string f in files)
+                                Synchronize(new LocalFile(f));
+                        }
+
                     }
                 }//Deletes
                 else{

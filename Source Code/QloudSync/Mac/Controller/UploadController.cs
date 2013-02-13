@@ -73,7 +73,9 @@ namespace GreenQloud
                 }
                 if (item.FullLocalName == RuntimeSettings.HomePath)
                     return;
-                if (!this.Any (f => f.FullLocalName == item.FullLocalName || item.FullLocalName.Contains (f.FullLocalName + "."))) {
+                if (Directory.Exists (item.FullLocalName))
+                    base.Add (item.ToFolder());
+                else if (!this.Any (f => f.FullLocalName == item.FullLocalName || item.FullLocalName.Contains (f.FullLocalName + "."))) {
                     base.Add (item);
                 }
             }

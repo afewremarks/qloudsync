@@ -71,17 +71,14 @@ namespace GreenQloud {
         {
            // StatusIcon = new IconController ();
             if(!FirstRun)
-            GreenQloud.Synchrony.BacklogSynchronizer.GetInstance ().Synchronize ();
-
+              GreenQloud.Synchrony.BacklogSynchronizer.GetInstance ().Synchronize ();
 
             downloadController = DownloadController.GetInstance();
-            //downloadController.Synchronize ();
-            try{
+            if(!FirstRun)
+                downloadController.Synchronize();
+
             uploadController = UploadController.GetInstance();
-            }
-            catch(Exception e){
-                Logger.LogInfo("InitializeSyncs",e);
-            }
+
             downloadController.SyncStatusChanged += HandleSyncStatusChanged;
             uploadController.SyncStatusChanged += HandleSyncStatusChanged;
 
