@@ -48,7 +48,7 @@ using System.IO;
 
         class XmlCredential: XmlDocument
 	    {
-            string credential_path = Path.Combine(RuntimeSettings.ConfigPath, "Credentials.xml");
+            string credential_path = Path.Combine(RuntimeSettings.ConfigPath, "credentials.xml");
 
             private void Create (){
                 if(!System.IO.File.Exists (credential_path))
@@ -59,12 +59,7 @@ using System.IO;
             
             private void Save ()
             {
-                
-                if (!System.IO.File.Exists (credential_path))
-                    Create ();
-                
-                Save (credential_path);
-                
+                Save (credential_path);                
             }
 
             private void SetCredentialInfo (string credential_info, string value)
@@ -88,7 +83,7 @@ using System.IO;
                 Create ();
                 XmlNode node = SelectSingleNode(string.Format("/credential/{0}", credential_info));
                 if (node == null)
-                    return "";
+                    return string.Empty;
                 else
                     return node.InnerText;
             }

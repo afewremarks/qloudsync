@@ -13,7 +13,7 @@ namespace GreenQloud
 
         public static bool FirstRun {
             get {
-                return ConfigurationManager.AppSettings ["Username"] == null;
+                return Credential.Username == string.Empty;
             }
         }
         
@@ -40,6 +40,9 @@ namespace GreenQloud
             get {
                 if (configPath == null)
                     configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), GlobalSettings.ApplicationName);
+
+                if (!Directory.Exists(configPath))
+                    Directory.CreateDirectory (configPath);
                 return configPath;
             }
         }
@@ -54,8 +57,9 @@ namespace GreenQloud
         private static string logfilepath = null;
         public static string LogFilePath {
             get {
-                if (logfilepath == null)
+                if (logfilepath == null){
                     logfilepath = Path.Combine (ConfigPath, ConfigurationManager.AppSettings ["LogFile"]);
+                }
                 return logfilepath;
             }
         }
