@@ -29,9 +29,10 @@ namespace GreenQloud.Synchrony
         public bool Synchronize (GreenQloud.Repository.File file)
         {
             try{        
-                Logger.LogInfo ("UploadSync",file.FullLocalName);
                 if(file.IsIgnoreFile)
                     return true;
+
+                Logger.LogInfo ("UploadSync",file.FullLocalName);
 
                 if (System.IO.File.Exists (file.FullLocalName)) {
                     if (remoteRepo.Files.Any (rf => rf.MD5Hash == file.MD5Hash && rf.AbsolutePath == file.AbsolutePath))
@@ -56,6 +57,11 @@ namespace GreenQloud.Synchrony
                         ChangesInLastSync.Add (new Change (file, WatcherChangeTypes.Renamed));
                     } else {
                         //Update
+
+                        if (DownloadSynchronizer.GetInstance ().ChangesInLastSync.Any (c => c.File.AbsolutePath == file.AbsolutePath && c.Event == WatcherChangeTypes.Created))
+                            return true;
+
+                    
                         if (remoteRepo.Files.Any (rf => rf.AbsolutePath == file.AbsolutePath && rf.MD5Hash != file.MD5Hash)) {
                             RemoteFile remoteFile = new RemoteFile (file.AbsolutePath);
                             remoteRepo.MoveToTrash (remoteFile);
@@ -66,9 +72,9 @@ namespace GreenQloud.Synchrony
                         }
                         //Create
                         else if (!remoteRepo.Files.Any (rf => rf.AbsolutePath == file.AbsolutePath)) {
-                            
                             if (DownloadSynchronizer.GetInstance ().ChangesInLastSync.Any (c => c.File.AbsolutePath == file.AbsolutePath && c.Event == WatcherChangeTypes.Created))
                                 return true;
+
                             remoteRepo.Upload (file); 
                             ChangesInLastSync.Add (new Change (file, WatcherChangeTypes.Created));
                             BacklogSynchronizer.GetInstance ().AddFile (file);
@@ -89,7 +95,7 @@ namespace GreenQloud.Synchrony
                 else{
                     if (DownloadSynchronizer.GetInstance().ChangesInLastSync.Any(c=> c.File.AbsolutePath==file.AbsolutePath && c.Event == WatcherChangeTypes.Deleted))
                         return true;
-                    
+
                     if (remoteRepo.FolderExistsInBucket (file.ToFolder())){
                         DeleteFolder(file.ToFolder());
                     }
@@ -102,7 +108,7 @@ namespace GreenQloud.Synchrony
                 Logger.LogInfo ("UploadSynchronizer", e);
                 return false;
             }
-          
+
             return true;
         }
 
