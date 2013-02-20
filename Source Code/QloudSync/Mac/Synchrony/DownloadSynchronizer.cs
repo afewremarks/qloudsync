@@ -86,6 +86,7 @@ namespace GreenQloud.Synchrony
 
         protected void SynchronizeDeletes ()
         {
+            Logger.LogInfo ("Synchronizing Local", "Updating deleted changes");
             foreach (LocalFile localFile in deleted) {
                 string tempPath = Path.Combine (RuntimeSettings.ConfigPath, "Temp", localFile.AbsolutePath);
                 System.IO.File.Move (localFile.FullLocalName, tempPath);
@@ -97,6 +98,11 @@ namespace GreenQloud.Synchrony
                     SyncRemoveFolder (localFile.ToFolder());
                 else{
                     if (!ExistsVersion (localFile)){
+                        List<RemoteFile> copys = remoteRepo.AllFiles.Where (rf => rf.MD5Hash == localFile.MD5Hash && rf.AbsolutePath != localFile.AbsolutePath).ToList<RemoteFile> ();
+                        if (copys.Count != 0) {
+                            //create a new copy
+                            remoteRepo.Copy (copys [0], localFile);
+                        }else
                         MoveToTrashFolder (localFile);
                     }
                     //else copia
@@ -112,6 +118,7 @@ namespace GreenQloud.Synchrony
 
         protected void SynchronizeCreates ()
         {
+            Logger.LogInfo ("Synchronizing Local", "Updating creating changes");
             foreach (LocalFile localFile in created) {
                 if (localFile.IsAFolder)
                 {
@@ -139,6 +146,7 @@ namespace GreenQloud.Synchrony
 
         protected void SynchronizeUpdates ()
         {
+            Logger.LogInfo ("Synchronizing Local", "Updating changes");
             foreach (LocalFile localFile in updated) {
                 MoveToTrashFolder (localFile);
                 // baixa arquivo remoto
