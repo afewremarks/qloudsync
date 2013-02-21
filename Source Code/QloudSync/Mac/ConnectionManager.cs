@@ -1,7 +1,3 @@
-
-
-
-
 using Amazon.S3;
 using Amazon.S3.Model;
 
@@ -57,12 +53,13 @@ namespace GreenQloud.Net.S3
         
         public AmazonS3Client Connect ()
         {
-            if (connection != null)
+            if (connection != null) {
                 return connection;
-            
+            }
             try {    
                 AmazonS3Config config = CreateConfig ();
                 connection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
+                Logger.LogInfo("Connection", "Start a new Connection.");
                 return connection;
             } catch (System.Net.WebException) {
                 Logger.LogInfo ("Connection", "Failed to communicate with the remote server");
@@ -150,7 +147,7 @@ namespace GreenQloud.Net.S3
                                 TransferSize += bytesRead;
 
                             } while (bytesRead > 0);
-                            CreateParentFolders (file.FullLocalName);
+                            IOHelper.CreateParentFolders (file.FullLocalName);
                             memoryStream.WriteTo (new FileStream (file.FullLocalName,FileMode.Create, FileAccess.ReadWrite));
                             memoryStream.Flush();
                         }
@@ -182,6 +179,7 @@ namespace GreenQloud.Net.S3
 		{
 			try {
 	
+                Logger.LogInfo ("Connection","Creating folder "+name+".");
 				PutObjectRequest putObject = new PutObjectRequest (){
 					BucketName = relativePath,
 					Key = name,
@@ -192,7 +190,6 @@ namespace GreenQloud.Net.S3
 					response.Dispose ();
 					return true;
 				}
-                Logger.LogInfo ("Connection","Creating folder "+name+".");
             }catch (AmazonS3Exception) {
                 if(InitializeBucket())
                   return  CreateFolder (name, relativePath);
@@ -356,18 +353,5 @@ namespace GreenQloud.Net.S3
                 connection = null;
 			}
 		}
-
-        public void CreateParentFolders (string path)
-        {
-            int lastIndex = path.LastIndexOf("/");
-            path = path.Substring(0, lastIndex);
-            
-            if (!Directory.Exists(path))
-            {
-                CreateParentFolders (path);
-                Directory.CreateDirectory(path);
-            }
-
-        }
 	}
 }

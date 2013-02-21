@@ -20,6 +20,7 @@ using System.Collections.Generic;
             Deleted = false;
 		}
 
+
 		public override string MD5Hash {
             get ; set;
 			
@@ -84,9 +85,9 @@ using System.Collections.Generic;
 			}
 		}
 
-		public static List <File> Get (List <FileInfo> fileInfos)
+		public static List <LocalFile> Get (List <FileInfo> fileInfos)
 		{
-			List <File> localFiles = new List <File> ();
+			List <LocalFile> localFiles = new List <LocalFile> ();
 			foreach (FileInfo fileInfo in fileInfos) {
 				LocalFile localFile = new LocalFile (fileInfo.FullName, fileInfo.LastWriteTime);
 				if(!localFile.IsIgnoreFile)
@@ -95,4 +96,5 @@ using System.Collections.Generic;
 			return localFiles;
 		}
 	}
-}
+}
+

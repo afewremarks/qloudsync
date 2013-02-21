@@ -1,7 +1,11 @@
 using System;
 using System.Threading;
+using System.IO;
+using GreenQloud.Repository;
+using System.Linq;
+using GreenQloud.Net.S3;
 
-namespace QloudSync {
+namespace GreenQloud {
 
     public class Program {
 
@@ -16,16 +20,14 @@ namespace QloudSync {
         public static void Main (string [] args)
         {
             try {
-
-              
-               Controller = new Controller ();
-
+               
+                Controller = new Controller ();
                 Controller.Initialize ();
                
                 UI = new SparkleUI ();
-
-                UI.Run ();
+                UI.Run ();              
             } catch (Exception e){
+                Console.WriteLine (e.StackTrace);
                 Logger.LogInfo ("Init", e);
                 Environment.Exit (-1);
             }

@@ -109,7 +109,7 @@ namespace GreenQloud
             ++controller;
             if (Status == SyncStatus.Idle && controller == 1)
             {
-                Status = SyncStatus.Sync;
+
                 try
                 {
                     ClearDownloadIndexes ();
@@ -121,8 +121,11 @@ namespace GreenQloud
                             break;
 
                         if (synchronizer.Size != 0)
+                        {    
+                            if(Status != SyncStatus.Sync)
+                                Status = SyncStatus.Sync;
                             Percent = (synchronizer.BytesTransferred / synchronizer.Size) * 100;
-                        
+                        }
                         ProgressChanged (Percent);
                         Thread.Sleep (1000);
                     }

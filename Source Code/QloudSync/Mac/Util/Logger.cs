@@ -35,6 +35,7 @@ namespace GreenQloud {
 #endif
             lock (debug_lock) {
                 // Don't let the log get bigger than 1000 lines
+
                 if (log_size >= 1000) {
                     File.WriteAllText (RuntimeSettings.LogFilePath, line + Environment.NewLine);
                     log_size = 0;

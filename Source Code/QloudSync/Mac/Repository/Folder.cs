@@ -44,9 +44,9 @@ using System.Linq;
 		#endregion
 
 		
-		public static List <File> Get (List<DirectoryInfo> dirInfos)
+		public static List <Folder> Get (List<DirectoryInfo> dirInfos)
 		{
-			List <File> localFiles = new List<File>();
+			List <Folder> localFiles = new List<Folder>();
 			foreach (DirectoryInfo fileInfo in dirInfos)
 				localFiles.Add (new Folder (fileInfo.FullName));
 			return localFiles;

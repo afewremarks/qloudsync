@@ -47,7 +47,7 @@ using System.Xml;
             try {
                 Logger.LogInfo("Synchronizer", "Sync starting from backlog");
 
-                List<File> filesInLocalRepo = LocalRepo.GetFiles();
+                List<LocalFile> filesInLocalRepo = LocalRepo.GetFiles();
                 List<RemoteFile> filesInRemoteRepo = remoteRepo.Files;
                 TimeSpan diffClocks = remoteRepo.DiffClocks;
                 List<File> alreadyAnalyzed = new List<File>();
@@ -241,9 +241,11 @@ using System.Xml;
                 node_modificationDate.InnerText        = file.TimeOfLastChange.ToString();
                 if(file.IsAFolder)
                     node_hash.InnerText = "";
+                else if (file.MD5Hash == null)
+                    node_hash.InnerText = "";
                 else
                     node_hash.InnerText    = file.MD5Hash.ToString();
-                
+
                 XmlNode node_file = CreateNode (XmlNodeType.Element, "file", null);
                 
                 node_file.AppendChild (node_id);
@@ -337,9 +339,10 @@ using System.Xml;
             XmlNode node_hash = node_file.SelectSingleNode (hash);
             if(file.IsAFolder)
                 node_hash.InnerText = "";
+            else if (file.MD5Hash == null)
+                node_hash.InnerText = "";
             else
-                node_hash.InnerText = file.MD5Hash.ToString();
-            
+                node_hash.InnerText    = file.MD5Hash.ToString();
             Save ();
         }
 

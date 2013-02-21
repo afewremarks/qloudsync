@@ -55,6 +55,11 @@ namespace GreenQloud.Repository
 
 			return remoteFiles;
 		}*/
+
+        public LocalFile ToLocalFile ()
+        {
+            return new LocalFile(this.AbsolutePath);
+        }
 	}
 }
 

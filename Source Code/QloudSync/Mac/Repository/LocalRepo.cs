@@ -11,14 +11,14 @@ using GreenQloud.Util;
 {
     public class LocalRepo
     {
-		private static List<File> files = null;
+		private static List<LocalFile> files = null;
 
         private LocalRepo ()
         {
         }
        
 
-        public static List<File> Files {
+        public static List<LocalFile> Files {
 			set {
 				files = value;
 			}
@@ -29,19 +29,43 @@ using GreenQloud.Util;
 			}
 		}
 
-		public static List<File> GetFiles ()
+        private static List<Folder> folders;
+        public static List<Folder> Folders{
+            set {
+                folders = value;
+            }
+            get {
+                if(folders==null)
+                    folders = GetFolders();
+                return folders;
+            }
+        }
+
+		public static List<LocalFile> GetFiles ()
 		{
 			try {
                 System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo (RuntimeSettings.HomePath);
-				List<File> list = LocalFile.Get (dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ());
-				list.AddRange (Folder.Get (dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()));
-
+				List<LocalFile> list = LocalFile.Get (dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ());
+			
 				return list;
 			} catch (System.ArgumentNullException) {
 				Logger.LogInfo("Error", "Set a LocalFolder variable");
 				return null;
 			}
 		}
+
+        public static List<Folder> GetFolders ()
+        {
+            try {
+                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo (RuntimeSettings.HomePath);
+                List<Folder> list = Folder.Get (dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ());
+                
+                return list;
+            } catch (System.ArgumentNullException) {
+                Logger.LogInfo("Error", "Set a LocalFolder variable");
+                return null;
+            }
+        }
 
         public static List<Folder> EmptyFolders {
             get {

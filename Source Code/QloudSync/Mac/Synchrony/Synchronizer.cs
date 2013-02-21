@@ -23,7 +23,6 @@ namespace GreenQloud.Synchrony
 
         private List<GreenQloud.Repository.Change> changesInLastSync = new List<GreenQloud.Repository.Change>();
 
-        protected List <GreenQloud.Repository.File> localFiles;
         protected List <RemoteFile> remoteFiles;
         protected List <Folder> localEmptyFolders;
         protected RemoteRepo remoteRepo;
@@ -53,7 +52,6 @@ namespace GreenQloud.Synchrony
         
 
         public int BytesTransferred {
-
             get{
                 return remoteRepo.Connection.TransferSize;
             }
@@ -80,15 +78,11 @@ namespace GreenQloud.Synchrony
         }
                   
         protected void Initialize ()
-        {
-       
-        	localFiles = LocalRepo.Files;
-            remoteFiles = remoteRepo.Files;
+        {       
+        	remoteFiles = remoteRepo.Files;
             
             localEmptyFolders = LocalRepo.EmptyFolders;
             countOperation = 0;
-
-
         }   
         
         protected void ShowDoneMessage (string action)

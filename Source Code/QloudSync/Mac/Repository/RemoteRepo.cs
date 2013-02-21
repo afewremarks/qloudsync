@@ -102,11 +102,9 @@ namespace GreenQloud.Repository
             else return true;
         }
 
-        public void Download (RemoteFile remoteFile)
+        public void Download (File remoteFile)
         {
-            //TODO mover isso para a chamada do metodo
-            //if (!IsTrashFile (remoteFile) && !LocalRepo.PendingChanges.Where (c => c.File.FullLocalName == remoteFile.FullLocalName && c.Event == System.IO.WatcherChangeTypes.Deleted).Any())
-                connection.Download (remoteFile);
+            connection.Download (remoteFile);
         }
 
 
@@ -134,6 +132,11 @@ namespace GreenQloud.Repository
                 connection.GenericCopy (DefaultBucketName, source.AbsolutePath, destination.RelativePathInBucket, destination.Name);
         }
 
+        public void CopyToTrashFolder (File source, File destination)
+        {
+            connection.GenericCopy (DefaultBucketName, source.AbsolutePath, destination.TrashRelativePath, destination.Name);
+        }
+
         public void Move (File source, File destination)
         {
             string destinationName;
@@ -151,24 +154,25 @@ namespace GreenQloud.Repository
         {
 
             string destinationName;
-            if (file.IsAFolder)
+            if (FolderExistsInBucket(file.ToFolder()))
                 destinationName = file.Name;
             else
                 destinationName = file.Name + "(1)";
   
             UpdateTrashFolder (file);
+
             connection.GenericCopy (DefaultBucketName, file.AbsolutePath, file.TrashRelativePath, destinationName);           
             connection.GenericDelete (file.AbsolutePath);
         }
 
         public bool FolderExistsInBucket (Folder folder)
         {
-            return Files.Where (rf => rf.AbsolutePath.Contains (folder.AbsolutePath)).Any ();
+           return Files.Any (rf => rf.AbsolutePath==folder.AbsolutePath || rf.AbsolutePath.Contains(folder.AbsolutePath));
         }
 
         public bool ExistsInBucket (File file)
         {
-            return Files.Where (rf => rf.AbsolutePath == file.AbsolutePath).Any ();
+            return Files.Any (rf => rf.AbsolutePath == file.AbsolutePath);
         }
         
         public bool IsTrashFile (RemoteFile file)
@@ -180,7 +184,6 @@ namespace GreenQloud.Repository
         {
             if (!System.IO.File.Exists(file.FullLocalName))
                 return false;
-            
             string key;
             if ( file.IsAFolder) {
                 key =  file.Name;
@@ -215,7 +218,7 @@ namespace GreenQloud.Repository
         {
             if (file.IsAFolder)
                 return;
-            List<RemoteFile> versions = TrashFiles.Where (tf => tf.AbsolutePath != string.Empty && tf.AbsolutePath.Substring(0, tf.AbsolutePath.Length-3)== file.TrashAbsolutePath).OrderByDescending(t => t.AbsolutePath).ToList<RemoteFile> ();
+            List<RemoteFile> versions = TrashFiles.Where (tf => tf.AbsolutePath != string.Empty && tf.AbsolutePath.Substring(0, tf.AbsolutePath.Length-3)== file.AbsolutePath).OrderByDescending(t => t.AbsolutePath).ToList<RemoteFile> ();
 
             int overload = versions.Count-2;
             for (int i=0; i<overload; i++) {

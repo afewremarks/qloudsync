@@ -7,7 +7,7 @@ using System.Threading;
 
  
 
-namespace QloudSync {
+namespace GreenQloud {
 
     public enum PageType {
         None,
@@ -247,7 +247,7 @@ namespace QloudSync {
 
 
             new Thread (() => {
-                Program.Controller.StartFetcher ();
+                Program.Controller.SyncStart ();
             }).Start ();
 
         }
@@ -283,7 +283,7 @@ namespace QloudSync {
 
         public void SyncingCancelled ()
         {
-            Program.Controller.StopFetcher ();
+            Program.Controller.SyncStop ();
 
             ChangePageEvent (PageType.Login, null);
         }

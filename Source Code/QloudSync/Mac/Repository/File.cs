@@ -61,13 +61,18 @@ using GreenQloud.Util;
         public string Name { get; private set;}
         
         public string RelativePath{ get; private set; }
-        
+        private string fullLocalName;
         public string FullLocalName {
+            set{
+                fullLocalName = value;
+            }
             get {
-                    return Path.Combine(RuntimeSettings.HomePath,AbsolutePath);
+                if(fullLocalName== null)
+                    fullLocalName = Path.Combine(RuntimeSettings.HomePath,AbsolutePath);
+                return fullLocalName;
             }
         }
-        
+
         public string FullRemoteName {
             get {
                 
@@ -182,7 +187,10 @@ using GreenQloud.Util;
 
         public Folder ToFolder ()
         {
-            return new Folder(string.Format("{0}/",AbsolutePath));
+           if(AbsolutePath.EndsWith("/"))
+                return new Folder(AbsolutePath);
+            else
+                return new Folder(string.Format("{0}/",AbsolutePath));
         }
     }
 }
