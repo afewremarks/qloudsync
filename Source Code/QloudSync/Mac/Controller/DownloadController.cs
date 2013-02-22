@@ -58,7 +58,7 @@ namespace GreenQloud
 
 
         public event ProgressChangedEventHandler ProgressChanged = delegate { };
-        public delegate void ProgressChangedEventHandler (double percentage);
+        public delegate void ProgressChangedEventHandler (double percentage, double time);
 
         public event FinishedEventHandler Finished = delegate { };
         public delegate void FinishedEventHandler ();
@@ -114,19 +114,36 @@ namespace GreenQloud
                 {
                     ClearDownloadIndexes ();
                     downThread.Start ();
-                   
+                    double lastSize = 0;
+                    DateTime lastTime = DateTime.Now;
+                    TimeRemaining = 0;
+
                     while (Percent < 100)
                     {
                        if (synchronizer.Done)
                             break;
-
-                        if (synchronizer.Size != 0)
+                        DateTime time = DateTime.Now;
+                        double size = synchronizer.Size;
+                        double transferred = synchronizer.BytesTransferred;
+                        if (size != 0)
                         {    
                             if(Status != SyncStatus.Sync)
                                 Status = SyncStatus.Sync;
-                            Percent = (synchronizer.BytesTransferred / synchronizer.Size) * 100;
+                            Percent = (transferred / size) * 100;
+                            double diffSeconds = time.Subtract(lastTime).TotalMilliseconds;
+                            if(diffSeconds!=0){
+                                double diffSize = transferred - lastSize;
+                                double sizeRemaining = size - transferred;
+                                double dTimeRemaninig = (sizeRemaining/diffSize)/(diffSeconds/1000);
+                                dTimeRemaninig = Math.Round(dTimeRemaninig, 0);
+                                if (TimeRemaining == 0 || (TimeRemaining>dTimeRemaninig && dTimeRemaninig>0)){
+                                        TimeRemaining = dTimeRemaninig;
+                                }
+                            }
                         }
-                        ProgressChanged (Percent);
+                        lastSize = transferred;
+                        lastTime = time;
+                        ProgressChanged (Percent, TimeRemaining);
                         Thread.Sleep (1000);
                     }
                 }

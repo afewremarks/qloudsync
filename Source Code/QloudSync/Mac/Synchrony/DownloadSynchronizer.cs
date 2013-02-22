@@ -72,7 +72,6 @@ namespace GreenQloud.Synchrony
                     deletedFiles.Add (localFile);
             }
 
-
             foreach (GreenQloud.Repository.Folder folder in LocalRepo.Folders) {
                 if (UploadController.GetInstance ().PendingChanges.Any (f => f.AbsolutePath == folder.AbsolutePath))
                     continue;
@@ -84,7 +83,8 @@ namespace GreenQloud.Synchrony
             foreach (RemoteFile remoteFile in remoteFiles) {
                 LocalFile localFile = new LocalFile (remoteFile.FullLocalName);
                 if (remoteFile.ExistsInLocalRepo){
-                    if (!FilesIsSync (localFile, remoteFile))
+                    localFile.SetMD5Hash();
+                    if (!FilesIsSync (localFile, remoteFile))                    
                        updatedFiles.Add (remoteFile);
                 }
                 else  createdFiles.Add(remoteFile);
@@ -93,8 +93,8 @@ namespace GreenQloud.Synchrony
 
         protected void SynchronizeDeletes ()
         {
-            Logger.LogInfo ("Synchronizing Local", "Updating deleted changes");
             foreach (GreenQloud.Repository.LocalFile localFile in deletedFiles) {
+                Logger.LogInfo ("Synchronizing Local", string.Format("Updating deleted changes | {0}", localFile.FullLocalName));
 
                 string tempPath = Path.Combine (RuntimeSettings.ConfigPath, "Temp", localFile.RelativePath);
                 if (!Directory.Exists (tempPath))
@@ -144,10 +144,10 @@ namespace GreenQloud.Synchrony
 
         protected void SynchronizeCreates ()
         {
-            Logger.LogInfo ("Synchronizing Local", "Updating creating changes");
             foreach (RemoteFile remoteFile in createdFiles) {
                 if (remoteFile.IsAFolder)
                 {
+                    Logger.LogInfo ("Synchronizing Local", string.Format("Updating creating changes | {0}", remoteFile.FullLocalName));
                     Folder folder = remoteFile.ToFolder();
                     if (!Directory.Exists(folder.FullLocalName)) {
                         folder.Create ();                
@@ -172,8 +172,9 @@ namespace GreenQloud.Synchrony
 
         protected void SynchronizeUpdates ()
         {
-            Logger.LogInfo ("Synchronizing Local", "Updating changes");
             foreach (RemoteFile remoteFile in updatedFiles) {
+                
+                Logger.LogInfo ("Synchronizing Local", string.Format("Updating changes | {0}", remoteFile.FullLocalName));
                 MoveToTrashFolder (remoteFile.ToLocalFile());
                 // baixa arquivo remoto
                 remoteFile.TimeOfLastChange = DateTime.Now;
@@ -193,14 +194,10 @@ namespace GreenQloud.Synchrony
             SyncSize = 0;
             Initialize();
             PendingFiles = RemoteChanges;
-            /*SyncRemoteUpdates ();
-            SyncClear ();*/
-            //new
             DescoveryRemoteChanges();
             SynchronizeDeletes();
             SynchronizeCreates();
             SynchronizeUpdates();
-            //end new
             ShowDoneMessage ("Download");
             LastSyncTime = initTime;
             Done = true;

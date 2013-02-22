@@ -170,6 +170,16 @@ namespace GreenQloud {
 
                 ProgressIndicator.StartAnimation (this);
 
+                NSTextField TimeRemaining = new NSTextField () {
+                    Alignment       = NSTextAlignment.Left,
+                    BackgroundColor = NSColor.WindowBackground,
+                    Bordered        = false,
+                    Editable        = false,
+                    Frame           = new RectangleF (190, Frame.Height - 230, 640 - 150 - 80, 20),
+                    StringValue     = "",
+                    Font            = SparkleUI.Font
+                };
+
                 CancelButton = new NSButton () {
                     Title = "Cancel"
                 };
@@ -179,10 +189,29 @@ namespace GreenQloud {
                     Enabled = false
                 };
 
-
                 Controller.UpdateProgressBarEvent += delegate (double percentage) {
                     InvokeOnMainThread (() => {
                         ProgressIndicator.DoubleValue = percentage;
+                    });
+                };
+
+                Controller.UpdateTimeRemaningEvent += delegate (double time){
+                    InvokeOnMainThread (() => {
+                        try{
+                            TimeSpan t = TimeSpan.FromSeconds(time);
+                            string stime = "";
+                            if (t.Hours >0)
+                                stime = string.Format("{0} hours and {1} minutes",t.Hours, t.Minutes);
+                            else if (t.Minutes>0)
+                                stime = string.Format("{0} minutes and {1} seconds",t.Minutes, t.Seconds);
+                            else if(t.Seconds>0)
+                                stime = string.Format("{0} seconds", t.Seconds); 
+                            else
+                                stime = "estimating";
+                                TimeRemaining.StringValue = string.Format("Time remaining: {0}", stime);}
+                        catch{
+
+                        }
                     });
                 };
 
@@ -192,9 +221,8 @@ namespace GreenQloud {
 
                 };
 
-
                 ContentView.AddSubview (ProgressIndicator);
-
+                ContentView.AddSubview (TimeRemaining);
                 Buttons.Add (FinishButton);
                 Buttons.Add (CancelButton);
             }

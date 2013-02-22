@@ -33,7 +33,7 @@ namespace GreenQloud {
         public delegate void FolderFetchErrorHandler (string [] errors);
         
         public event FolderFetchingHandler FolderFetching = delegate { };
-        public delegate void FolderFetchingHandler (double percentage);
+        public delegate void FolderFetchingHandler (double percentage, double time);
 
         public event Action OnIdle = delegate { };
         public event Action OnSyncing = delegate { };
@@ -137,8 +137,8 @@ namespace GreenQloud {
                 SyncStop();
             };
             
-            downloadController.ProgressChanged += delegate (double percentage) {
-                FolderFetching (percentage);
+            downloadController.ProgressChanged += delegate (double percentage, double time) {
+                FolderFetching (percentage, time);
             };
 
             downloadController.FirstLoad();

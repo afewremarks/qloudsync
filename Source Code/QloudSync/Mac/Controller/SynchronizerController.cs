@@ -42,7 +42,7 @@ namespace GreenQloud
             set; get;
         }
         
-        protected int TimeRemaining {
+        protected double TimeRemaining {
             set; get;
         }
 
