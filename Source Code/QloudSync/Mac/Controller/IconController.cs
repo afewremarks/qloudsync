@@ -46,6 +46,7 @@ namespace GreenQloud {
         private NSMenuItem more_item;
         private NSMenuItem add_item;
         private NSMenuItem about_item;
+        private NSMenuItem openweb_item;
         private NSMenuItem notify_item;
         private NSMenuItem recent_events_item;
         private NSMenuItem quit_item;
@@ -346,6 +347,17 @@ namespace GreenQloud {
                     Enabled = true
                 };
 
+                this.openweb_item = new NSMenuItem() {
+                    Title = "Open in StorageQloud",
+                    Enabled = true
+                };
+
+               this.openweb_item.Activated += delegate {                    
+                    byte[] encbuff = System.Text.Encoding.UTF8.GetBytes(Credential.SecretKey);
+                    string hash = System.Web.HttpServerUtility.UrlTokenEncode(encbuff);
+                    Program.Controller.OpenWebsite (string.Format("http://my.greenqloud.com/api/client?username={0}&hash={1}&returnUrl=/StorageQloud", Credential.Username, hash));
+               };
+
                 this.about_item.Activated += delegate {
                     AboutClicked ();
                 };
@@ -371,6 +383,7 @@ namespace GreenQloud {
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.notify_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
+                this.menu.AddItem (this.openweb_item);
 				this.menu.AddItem (this.about_item);
 			    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.quit_item);
