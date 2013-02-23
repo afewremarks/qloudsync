@@ -109,7 +109,7 @@ namespace GreenQloud
             ++controller;
             if (Status == SyncStatus.Idle && controller == 1)
             {
-
+                Status = SyncStatus.Sync;
                 try
                 {
                     ClearDownloadIndexes ();
@@ -126,9 +126,7 @@ namespace GreenQloud
                         double size = synchronizer.Size;
                         double transferred = synchronizer.BytesTransferred;
                         if (size != 0)
-                        {    
-                            if(Status != SyncStatus.Sync)
-                                Status = SyncStatus.Sync;
+                        {   
                             Percent = (transferred / size) * 100;
                             double diffSeconds = time.Subtract(lastTime).TotalMilliseconds;
                             if(diffSeconds!=0){
@@ -136,9 +134,9 @@ namespace GreenQloud
                                 double sizeRemaining = size - transferred;
                                 double dTimeRemaninig = (sizeRemaining/diffSize)/(diffSeconds/1000);
                                 dTimeRemaninig = Math.Round(dTimeRemaninig, 0);
-                                if (TimeRemaining == 0 || (TimeRemaining>dTimeRemaninig && dTimeRemaninig>0)){
+                                //if (TimeRemaining == 0 || (TimeRemaining>dTimeRemaninig && dTimeRemaninig>0)){
                                         TimeRemaining = dTimeRemaninig;
-                                }
+                                //}
                             }
                         }
                         lastSize = transferred;
@@ -162,8 +160,6 @@ namespace GreenQloud
             DownloadSynchronizer.GetInstance().Done = true;
             remote_timer.Stop();
         }
-
-
     }
 }
 

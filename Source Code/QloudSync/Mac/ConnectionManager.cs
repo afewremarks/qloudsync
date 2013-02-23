@@ -48,7 +48,7 @@ namespace GreenQloud.Net.S3
             string receiveContent = reader.ReadToEnd ();
             Credential.SecretKey = receiveContent.Substring(Constant.KEY_SECRET_START_INDEX, Constant.KEYS_LENGTH);
             Credential.PublicKey = receiveContent.Substring(Constant.KEY_PUBLIC_START_INDEX, Constant.KEYS_LENGTH);
-            
+            Logger.LogInfo ("Authetication", "Keys loaded");
         }   
         
         public AmazonS3Client Connect ()
@@ -124,7 +124,11 @@ namespace GreenQloud.Net.S3
         }
 
 		public void Download (GreenQloud.Repository.File  file)
-        {
+        {            
+            GetObjectResponse response = null;
+            Stream responseStream = null;
+            MemoryStream memoryStream = null;
+            FileStream fileStream = null;
             try {
                 string sourcekey = file.AbsolutePath;
                 Logger.LogInfo ("Connection", "Download the file " + sourcekey + ".");
@@ -133,36 +137,38 @@ namespace GreenQloud.Net.S3
                     BucketName = bucketName,
     				Key = sourcekey
 			    };
-               
-                using (GetObjectResponse response = Connect ().GetObject(objectRequest)) {
-                    using (Stream responseStream = response.ResponseStream) {
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            var data = new byte[16*1024];
+                using (response = Connect ().GetObject(objectRequest)) {
+                    using (responseStream = response.ResponseStream) {
+                        using (memoryStream = new MemoryStream()) {
+                            var data = new byte[16 * 1024];
                             int bytesRead;
-                            do
-                            {
-                                bytesRead = responseStream.Read(data, 0, data.Length);
-                                memoryStream.Write(data, 0, bytesRead);
+                            do {
+                                bytesRead = responseStream.Read (data, 0, data.Length);
+                                memoryStream.Write (data, 0, bytesRead);
                                 TransferSize += bytesRead;
 
                             } while (bytesRead > 0);
                             IOHelper.CreateParentFolders (file.FullLocalName);
-                            memoryStream.WriteTo (new FileStream (file.FullLocalName,FileMode.Create, FileAccess.ReadWrite));
-                            memoryStream.Flush();
+                            fileStream = new FileStream (file.FullLocalName, FileMode.Create, FileAccess.ReadWrite);
+                            memoryStream.WriteTo (fileStream);
+                            memoryStream.Flush ();
                         }
                     } 
                 }
 
-            }catch (AmazonS3Exception) {
-                if(InitializeBucket())
+            } catch (AmazonS3Exception) {
+                if (InitializeBucket ())
                     Download (file);
                 else
                     Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Logger.LogInfo ("Error", e);
-            }			
+            } finally {
+                if (fileStream != null) fileStream.Dispose();
+                if (memoryStream!=null) memoryStream.Dispose();
+                if (responseStream != null) responseStream.Dispose();
+                if (response!=null) response.Dispose();
+            }
 		}	
 
 		public bool CreateFolder (GreenQloud.Repository.Folder folder)
