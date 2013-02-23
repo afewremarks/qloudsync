@@ -51,7 +51,7 @@ namespace GreenQloud.Synchrony
         }
         
 
-        public int BytesTransferred {
+        public long BytesTransferred {
             get{
                 return remoteRepo.Connection.TransferSize;
             }

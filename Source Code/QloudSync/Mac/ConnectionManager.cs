@@ -24,7 +24,7 @@ namespace GreenQloud.Net.S3
             this.bucketName = bucketName;
 		}
 
-        public int TransferSize {
+        public long TransferSize {
             set; get;
         }
 
@@ -126,9 +126,6 @@ namespace GreenQloud.Net.S3
 		public void Download (GreenQloud.Repository.File  file)
         {            
             GetObjectResponse response = null;
-            Stream responseStream = null;
-            MemoryStream memoryStream = null;
-            FileStream fileStream = null;
             try {
                 string sourcekey = file.AbsolutePath;
                 Logger.LogInfo ("Connection", "Download the file " + sourcekey + ".");
@@ -137,36 +134,20 @@ namespace GreenQloud.Net.S3
                     BucketName = bucketName,
     				Key = sourcekey
 			    };
-                using (response = Connect ().GetObject(objectRequest)) {
-                    using (responseStream = response.ResponseStream) {
-                        using (memoryStream = new MemoryStream()) {
-                            var data = new byte[16 * 1024];
-                            int bytesRead;
-                            do {
-                                bytesRead = responseStream.Read (data, 0, data.Length);
-                                memoryStream.Write (data, 0, bytesRead);
-                                TransferSize += bytesRead;
-
-                            } while (bytesRead > 0);
-                            IOHelper.CreateParentFolders (file.FullLocalName);
-                            fileStream = new FileStream (file.FullLocalName, FileMode.Create, FileAccess.ReadWrite);
-                            memoryStream.WriteTo (fileStream);
-                            memoryStream.Flush ();
-                        }
-                    } 
+                long lastTransferredBytes = 0;
+                using (response = Connect().GetObject(objectRequest))
+                {
+                    response.WriteObjectProgressEvent += (object sender, WriteObjectProgressArgs e) => {
+                        TransferSize += e.TransferredBytes-lastTransferredBytes;
+                        lastTransferredBytes = e.TransferredBytes;
+                    };
+                    
+                    response.WriteResponseStreamToFile(file.FullLocalName);
+                    
                 }
-
-            } catch (AmazonS3Exception) {
-                if (InitializeBucket ())
-                    Download (file);
-                else
-                    Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
             } catch (Exception e) {
-                Logger.LogInfo ("Error", e);
+                Logger.LogInfo ("Error", e.Message);
             } finally {
-                if (fileStream != null) fileStream.Dispose();
-                if (memoryStream!=null) memoryStream.Dispose();
-                if (responseStream != null) responseStream.Dispose();
                 if (response!=null) response.Dispose();
             }
 		}	

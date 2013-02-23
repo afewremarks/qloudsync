@@ -29,8 +29,7 @@ namespace GreenQloud.Synchrony
         public static DownloadSynchronizer GetInstance()
         {
             if (instance == null)
-                instance = new DownloadSynchronizer();
-            
+                instance = new DownloadSynchronizer();            
             
             return instance;
         }
@@ -47,12 +46,15 @@ namespace GreenQloud.Synchrony
                     Directory.CreateDirectory (remoteFile.FullLocalName);
                 else
                 {
-                    if (!remoteFile.IsIgnoreFile)
+                    if (!remoteFile.IsIgnoreFile){
+//                        Console.WriteLine (remoteFile.AbsolutePath+" "+remoteFile.AsS3Object.Size);
+                        //if(remoteFile.AsS3Object.Size<1000000)
                         remoteRepo.Download (remoteFile);
+                    }
                 }
                 BacklogSynchronizer.GetInstance().AddFile(remoteFile);
             }
-
+            LastSyncTime = DateTime.Now;
             Done = true;
         }
 
@@ -80,12 +82,14 @@ namespace GreenQloud.Synchrony
                     deletedFolders.Add (folder);
             }
 
+           // List<RemoteFile> recentFiles = remoteFiles.Where(rf=>rf.TimeOfLastChange.Subtract(LastSyncTime).TotalSeconds>0).ToList<RemoteFile>();
             foreach (RemoteFile remoteFile in remoteFiles) {
                 LocalFile localFile = new LocalFile (remoteFile.FullLocalName);
                 if (remoteFile.ExistsInLocalRepo){
                     localFile.SetMD5Hash();
-                    if (!FilesIsSync (localFile, remoteFile))                    
-                       updatedFiles.Add (remoteFile);
+                    if (!FilesIsSync (localFile, remoteFile) && localFile.MD5Hash!=string.Empty) {                   
+                        updatedFiles.Add (remoteFile);
+                    }
                 }
                 else  createdFiles.Add(remoteFile);
             }
