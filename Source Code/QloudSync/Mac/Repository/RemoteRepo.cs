@@ -25,7 +25,7 @@ namespace GreenQloud.Repository
 		#region Files
         public List<RemoteFile> Files{ 
             get {
-                return AllFiles.Where(sobj => !IsTrashFile (sobj) && sobj.Name != Constant.CLOCK_TIME ).ToList();
+                return AllFiles.Where(sobj => !IsTrashFile (sobj) && sobj.Name != Constant.CLOCK_TIME && !sobj.Name.EndsWith(System.IO.Path.PathSeparator.ToString())).ToList();
             } 
         }
 
