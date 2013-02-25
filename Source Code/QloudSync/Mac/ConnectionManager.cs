@@ -221,33 +221,38 @@ namespace GreenQloud.Net.S3
 		}
 
 		#region Auxiliar
-
+        DateTime lastDiffClock = new DateTime();
+        TimeSpan diff = new TimeSpan();
 		public TimeSpan CalculateDiffClocks ()
 		{
 			try {
-                GreenQloud.Repository.File clockFile = new RemoteFile (Constant.CLOCK_TIME);
-				PutObjectRequest putObject = new PutObjectRequest ()
-				{
-					BucketName = bucketName,
-					Key = clockFile.Name,
-					ContentBody = string.Empty
-				};
-				
-				DateTime localClock;
-				using (S3Response response = Connect ().PutObject (putObject)){
-					localClock = DateTime.Now;
-					response.Dispose ();
-				}
-				
-				ListObjectsResponse files = Connect ().ListObjects (new ListObjectsRequest ().WithBucketName (bucketName));
-				S3Object remotefile = files.S3Objects.Where (o => o.Key == clockFile.Name).FirstOrDefault();
-				string sRemoteclock = remotefile.LastModified;
-				
-                GenericDelete (clockFile.AbsolutePath);
+                if (DateTime.Now.Subtract(lastDiffClock).TotalMinutes>30){
 
-				DateTime remoteClock = Convert.ToDateTime (sRemoteclock);
-				
-				return localClock.Subtract(remoteClock);
+                    GreenQloud.Repository.File clockFile = new RemoteFile (Constant.CLOCK_TIME);
+    				PutObjectRequest putObject = new PutObjectRequest ()
+    				{
+    					BucketName = bucketName,
+    					Key = clockFile.Name,
+    					ContentBody = string.Empty
+    				};
+    				
+    				DateTime localClock;
+    				using (S3Response response = Connect ().PutObject (putObject)){
+    					localClock = DateTime.Now;
+    					response.Dispose ();
+    				}
+    				
+    				ListObjectsResponse files = Connect ().ListObjects (new ListObjectsRequest ().WithBucketName (bucketName));
+    				S3Object remotefile = files.S3Objects.Where (o => o.Key == clockFile.Name).FirstOrDefault();
+    				string sRemoteclock = remotefile.LastModified;
+    				
+                    GenericDelete (clockFile.AbsolutePath);
+
+    				DateTime remoteClock = Convert.ToDateTime (sRemoteclock);
+                    diff = localClock.Subtract(remoteClock);
+                    lastDiffClock = localClock;
+                }
+                return diff;
 				
 			} catch(Exception e) {
                 Logger.LogInfo ("Connection","Fail to determinate a remote clock: "+e.Message +" \n");
