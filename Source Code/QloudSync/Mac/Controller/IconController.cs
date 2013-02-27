@@ -318,7 +318,7 @@ namespace GreenQloud {
 
                 this.recent_events_item = new NSMenuItem () {
                     Title   = "Recent Changes…",
-                    Enabled = false //Controller.RecentEventsItemEnabled
+                    Enabled = true //Controller.RecentEventsItemEnabled
                 };
                
 
@@ -353,9 +353,8 @@ namespace GreenQloud {
                 };
 
                this.openweb_item.Activated += delegate {                    
-                    byte[] encbuff = System.Text.Encoding.UTF8.GetBytes(Credential.SecretKey);
-                    string hash = System.Web.HttpServerUtility.UrlTokenEncode(encbuff);
-                    Program.Controller.OpenWebsite (string.Format("http://my.greenqloud.com/api/client?username={0}&hash={1}&returnUrl=/StorageQloud", Credential.Username, hash));
+                    string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
+                    Program.Controller.OpenWebsite (string.Format("https://my.greenqloud.com/qloudsync?username={0}&hash={1}&returnUrl=/StorageQloud", Credential.Username, hash));
                };
 
                 this.about_item.Activated += delegate {
