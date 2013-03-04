@@ -85,7 +85,7 @@ namespace GreenQloud {
         public delegate void UpdateRecentEventsItemEventHandler (bool recent_events_item_enabled);
         
         public IconState CurrentState = IconState.Idle;
-        public string StateText = "Welcome to QloudSync!";
+        public string StateText = string.Format("Welcome to {0}!", GlobalSettings.ApplicationName);
         
         public readonly int MenuOverflowThreshold   = 9;
         public readonly int MinSubmenuOverflowCount = 3;
@@ -164,7 +164,7 @@ namespace GreenQloud {
                     CurrentState = IconState.Idle;
                     
                     if (System.IO.Directory.GetDirectories(RuntimeSettings.HomePath).Length == 0 && System.IO.Directory.GetFiles (RuntimeSettings.HomePath).Length < 2)
-                        StateText = "Welcome to QloudSync!";
+                        StateText = string.Format("Welcome to {0}!",GlobalSettings.ApplicationName);
                     else
                         StateText = "Files up to date " + FolderSize;
                 }
@@ -176,8 +176,8 @@ namespace GreenQloud {
             };
 
             Program.Controller.OnSyncing += delegate {
-                bool syncDown = DownloadController.GetInstance().Status == SyncStatus.Sync;                
-                bool syncUp = UploadController.GetInstance().Status == SyncStatus.Sync;
+                bool syncDown = LocalController.GetInstance().Status == SyncStatus.Sync;                
+                bool syncUp = RemoteController.GetInstance().Status == SyncStatus.Sync;
                 if(syncDown && syncUp){
                     CurrentState = IconState.Syncing;
                     StateText    = "Syncing changes…";
@@ -296,7 +296,7 @@ namespace GreenQloud {
                 };
 
                 this.folder_item = new NSMenuItem () {
-                    Title = GlobalSettings.ApplicationName
+                    Title = GlobalSettings.HomeFolderName+" Folder"
                 };
 
                 this.folder_item.Activated += delegate {
@@ -318,7 +318,7 @@ namespace GreenQloud {
 
                 this.recent_events_item = new NSMenuItem () {
                     Title   = "Recent Changes…",
-                    Enabled = true //Controller.RecentEventsItemEnabled
+                    Enabled = false //Controller.RecentEventsItemEnabled
                 };
                
 
@@ -348,7 +348,7 @@ namespace GreenQloud {
                 };
 
                 this.openweb_item = new NSMenuItem() {
-                    Title = "Open in StorageQloud",
+                    Title = "Share/View Online…",
                     Enabled = true
                 };
 
@@ -371,18 +371,27 @@ namespace GreenQloud {
                 };
 
 
+                NSMenuItem co2_savings_item = new NSMenuItem () {
+                    Title = "Yearly CO2 Savings:"
+                };
+
+                NSMenuItem help_item = new NSMenuItem(){
+                    Title = "Help Center"
+                };
+
+                help_item.Activated += delegate {
+                    Program.Controller.OpenWebsite ("http://support.greenqloud.com");
+               };
+
                 this.menu.AddItem (this.state_item);
+                this.menu.AddItem (co2_savings_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.folder_item);
-
-
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.add_item);
+                this.menu.AddItem (this.openweb_item);                
                 this.menu.AddItem (this.recent_events_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.notify_item);
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.openweb_item);
+                this.menu.AddItem (this.add_item);
+                this.menu.AddItem (help_item);
 				this.menu.AddItem (this.about_item);
 			    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.quit_item);

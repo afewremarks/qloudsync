@@ -30,8 +30,10 @@ namespace GreenQloud {
 
         private NSImage about_image;
         private NSImageView about_image_view;
-        private NSTextField updates_text_field;
+        private NSTextField updates_text_field, version_text_field;
         private NSTextField credits_text_field;
+       
+        private SparkleLink website_link, credits_link, report_problem_link, debug_log_link;
 
 
         public event Action ShowWindowEvent = delegate { };
@@ -51,7 +53,7 @@ namespace GreenQloud {
 
                 Delegate    = new SparkleAboutDelegate ();
                 StyleMask   = (NSWindowStyle.Closable | NSWindowStyle.Titled);
-                Title       = "About QloudSync";
+                Title       = "About "+GlobalSettings.ApplicationName;
                 MaxSize     = new SizeF (640, 281);
                 MinSize     = new SizeF (640, 281);
                 HasShadow   = true;
@@ -96,25 +98,38 @@ namespace GreenQloud {
                     Frame = new RectangleF (0, 0, 640, 260)
                 };
 
-
+                this.version_text_field = new NSTextField () {
+                    StringValue     = "Version " + GlobalSettings.RunningVersion,
+                    DrawsBackground = false,
+                    Bordered        = false,
+                    Editable        = false,
+                    Frame           = new RectangleF (295, 140, 318, 22),
+                    TextColor       = NSColor.White,
+                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                        "Lucida Grande", NSFontTraitMask.Unbold, 0, 11)
+                };
                
-                this.updates_text_field = new NSTextField () {
-                    StringValue     = "Checking for updates...",
+                this.updates_text_field = new NSTextField () {                   
                     Frame           = new RectangleF (295, Frame.Height - 232, 318, 98),
                     Bordered        = false,
                     Editable        = false,
                     DrawsBackground = false,
                     Font            = NSFontManager.SharedFontManager.FontWithFamily
                         ("Lucida Grande", NSFontTraitMask.Unbold, 0, 11),
-                    TextColor       = NSColor.FromCalibratedRgba (0.45f, 0.62f, 0.81f, 1.0f) // Tango Sky Blue #1
+                    TextColor       = NSColor.FromCalibratedRgba (0.45f, 1.62f, 1.81f, 1.0f) // Tango Sky Blue #1
                 };
 
+                if(GlobalSettings.RunningVersion == VersionAvailable)
+                    updates_text_field.StringValue = "This is lastest version available..";
+                else
+                    updates_text_field.StringValue = "Lastest version available: "+VersionAvailable;
+
+                NSColor color = NSColor.White;
                 this.credits_text_field = new NSTextField () {
-                    StringValue     = @"Copyright © 2010–" + DateTime.Now.Year + " Hylke Bons and others." +
+                    StringValue     = @"Copyright © 2013 GreenQloud" +
                     "\n" +
                     "\n" +
-                    "SparkleShare is Open Source software. You are free to use, modify, and redistribute it " +
-                    "under the GNU General Public License version 3 or later.",
+                    "QloudSync is Open Source software. You are free to use, modify, and redistribute it under GNU General Public License version 3 or later.",
                     Frame           = new RectangleF (295, Frame.Height - 260, 318, 98),
                     TextColor       = NSColor.White,
                     DrawsBackground = false,
@@ -124,9 +139,53 @@ namespace GreenQloud {
                         "Lucida Grande", NSFontTraitMask.Unbold, 0, 11),
                 };
 
+                this.website_link       = new SparkleLink ("Website", "http://qloudsync.com");
+                this.website_link.Frame = new RectangleF (new PointF (295, 25), this.website_link.Frame.Size);
+                this.website_link.TextColor =  color;
+                
+                this.credits_link       = new SparkleLink ("Credits", "https://github.com/greenqloud/qloudsync/tree/master/legal/Authors.txt");
+                this.credits_link.Frame = new RectangleF (
+                    new PointF (this.website_link.Frame.X + this.website_link.Frame.Width + 10, 25),
+                    this.credits_link.Frame.Size);
+                
+                this.report_problem_link       = new SparkleLink ("Report a problem", "https://github.com/greenqloud/qloudsync/issues");
+                this.report_problem_link.Frame = new RectangleF (
+                    new PointF (this.credits_link.Frame.X + this.credits_link.Frame.Width + 10, 25),
+                    this.report_problem_link.Frame.Size);
+                
+                this.debug_log_link       = new SparkleLink ("Debug log", "file://"+RuntimeSettings.LogFilePath);
+                this.debug_log_link.Frame = new RectangleF (
+                    new PointF (this.report_problem_link.Frame.X + this.report_problem_link.Frame.Width + 10, 25),
+                    this.debug_log_link.Frame.Size);
+
                 ContentView.AddSubview (this.about_image_view);
+                ContentView.AddSubview (this.version_text_field);
                 ContentView.AddSubview (this.updates_text_field);
                 ContentView.AddSubview (this.credits_text_field);
+                ContentView.AddSubview (this.website_link);
+                ContentView.AddSubview (this.credits_link);
+                ContentView.AddSubview (this.report_problem_link);
+                ContentView.AddSubview (this.debug_log_link);
+            }
+        }
+        string versionAvailable = string.Empty;
+
+        public string VersionAvailable {
+            get {
+                if(versionAvailable==string.Empty){
+                    System.Net.WebRequest myReq = System.Net.WebRequest.Create ("https://my.greenqloud.com/qloudsync/version");
+                    myReq.GetResponse();
+                    string receiveContent = string.Empty;
+                    using (System.Net.WebResponse wr = myReq.GetResponse ()){
+                        Stream receiveStream = wr.GetResponseStream ();
+                        StreamReader reader = new StreamReader (receiveStream, System.Text.Encoding.UTF8);
+                        receiveContent = reader.ReadToEnd ();
+                        
+                    }
+                    Newtonsoft.Json.Linq.JObject o = Newtonsoft.Json.Linq.JObject.Parse(receiveContent);
+                    versionAvailable = (string)o["version"];
+                }
+                return versionAvailable;
             }
         }
 
@@ -188,7 +247,7 @@ namespace GreenQloud {
             Selectable      = false;
 
             NSData name_data = NSData.FromString ("<a href='" + this.url +
-                "' style='font-size: 8pt; font-family: \"Lucida Grande\"; color: #739ECF'>" + text + "</a></font>");
+                "' style='font-size: 8pt; font-family: \"Lucida Grande\"; color: white'>" + text + "</a></font>");
 
             NSDictionary name_dictionary       = new NSDictionary();
             NSAttributedString name_attributes = new NSAttributedString (name_data, new NSUrl ("file://"), out name_dictionary);
@@ -212,5 +271,7 @@ namespace GreenQloud {
         {
             AddCursorRect (Bounds, NSCursor.PointingHandCursor);
         }
+
+
     }
 }

@@ -20,12 +20,12 @@ namespace GreenQloud {
         public static void Main (string [] args)
         {
             try {
-               
+                //new ConnectionManager("cmaia-default").DeleteAllFilesInBucket();
                 Controller = new Controller ();
                 Controller.Initialize ();
                
                 UI = new SparkleUI ();
-                UI.Run ();              
+                UI.Run ();  
             } catch (Exception e){
                 Console.WriteLine (e.StackTrace);
                 Logger.LogInfo ("Init", e);

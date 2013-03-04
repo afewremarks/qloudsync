@@ -7,12 +7,24 @@ namespace GreenQloud
     {
         private static string trash = null;
 
+        public static string RunningVersion {
+            get {
+                return ConfigurationManager.AppSettings ["RunningVersion"];
+            }
+        }
+
         public static string ApplicationName {
             get {
                 return ConfigurationManager.AppSettings ["ApplicationName"];
             }
         }
-        
+
+        public static string HomeFolderName {
+            get {
+                return ConfigurationManager.AppSettings ["HomeFolderName"];
+            }
+        }
+
         public static string SuffixNameBucket {
             get{
                 return ConfigurationManager.AppSettings ["SuffixNameBucket"];

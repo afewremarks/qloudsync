@@ -40,6 +40,9 @@ namespace GreenQloud {
         public event UpdateProgressBarEventHandler UpdateProgressBarEvent = delegate { };
         public delegate void UpdateProgressBarEventHandler (double percentage);
 
+        public event UpdateTimeRemaningEventHandler UpdateTimeRemaningEvent = delegate { };
+        public delegate void UpdateTimeRemaningEventHandler (double time);
+
         public event UpdateSetupContinueButtonEventHandler UpdateSetupContinueButtonEvent = delegate { };
         public delegate void UpdateSetupContinueButtonEventHandler (bool button_enabled);
 
@@ -54,6 +57,8 @@ namespace GreenQloud {
 
         public event ChangeAddressFieldEventHandler ChangeAddressFieldEvent = delegate { };
         public delegate void ChangeAddressFieldEventHandler (string text, string example_text, FieldState state);
+
+       
 
         public event ChangePathFieldEventHandler ChangePathFieldEvent = delegate { };
         public delegate void ChangePathFieldEventHandler (string text, string example_text, FieldState state);
@@ -273,13 +278,12 @@ namespace GreenQloud {
             Program.Controller.FolderFetching   -= SyncingPageFetchingDelegate;
         }
 
-        private void SyncingPageFetchingDelegate (double percentage)
+        private void SyncingPageFetchingDelegate (double percentage, double time)
         {
             ProgressBarPercentage = percentage;
             UpdateProgressBarEvent (ProgressBarPercentage);
+            UpdateTimeRemaningEvent (time);
         }
-
-
 
         public void SyncingCancelled ()
         {
@@ -287,7 +291,6 @@ namespace GreenQloud {
 
             ChangePageEvent (PageType.Login, null);
         }
-
 
         public void ErrorPageCompleted ()
         {

@@ -23,8 +23,9 @@ namespace GreenQloud.Synchrony
 
         private List<GreenQloud.Repository.Change> changesInLastSync = new List<GreenQloud.Repository.Change>();
 
-        protected List <RemoteFile> remoteFiles;
-        protected List <Folder> localEmptyFolders;
+        protected List <StorageQloudObject> remoteFiles;
+        protected List <StorageQloudObject> remoteFolders;
+        protected List <StorageQloudObject> localEmptyFolders;
         protected RemoteRepo remoteRepo;
         
         protected int countOperation = 0;
@@ -80,8 +81,8 @@ namespace GreenQloud.Synchrony
         protected void Initialize ()
         {       
         	remoteFiles = remoteRepo.Files;
-            
-            localEmptyFolders = LocalRepo.EmptyFolders;
+            remoteFolders = remoteRepo.Folders;
+
             countOperation = 0;
         }   
         
@@ -92,23 +93,17 @@ namespace GreenQloud.Synchrony
             else
                 Logger.LogInfo(action, string.Format("Successful: {0} files.\n",countOperation));
         }   
-        
-        protected bool ExistsInBucket (GreenQloud.Repository.File  file){
-             return remoteFiles.Where (rf => rf.AbsolutePath ==  file.AbsolutePath
-                                      || rf.FullLocalName.Contains ( file.FullLocalName)).Any ();
+
+        protected bool ExistsInBucket (StorageQloudObject folder)
+        {
+            return remoteFolders.Any (rf=> rf.AbsolutePath==folder.AbsolutePath || rf.AbsolutePath==folder.AbsolutePath+"/");
         }
 
-        protected bool ExistsVersion (GreenQloud.Repository.File file)
+        protected bool ExistsVersion (StorageQloudObject file)
 		{
 			return remoteRepo.TrashFiles.Any (tf => tf.AbsolutePath == file.AbsolutePath+"(1)");
-		}
+		}        
 
-
-        
-
-        public static bool FilesIsSync (LocalFile localFile, RemoteFile remoteFile)
-        {
-            return localFile.MD5Hash == remoteFile.MD5Hash;
-        }
+ 
     }
 }

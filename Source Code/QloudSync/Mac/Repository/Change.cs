@@ -9,13 +9,13 @@ using System;
 		{
 		}
 
-		public Change (File file, System.IO.WatcherChangeTypes changeEvent)
+        public Change (StorageQloudObject file, System.IO.WatcherChangeTypes changeEvent)
 		{
 			File = file;
             Event = changeEvent;
 		}
 
-		public File File{
+        public StorageQloudObject File{
 			set; get;
 		}
 

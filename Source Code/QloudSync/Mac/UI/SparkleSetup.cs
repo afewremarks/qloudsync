@@ -64,7 +64,7 @@ namespace GreenQloud {
         public void ShowPage (PageType type, string [] warnings)
         {
             if (type == PageType.Login) {
-                Header      = "Welcome to QloudSync!";
+                Header      = string.Format("Welcome to {0}!", GlobalSettings.ApplicationName);
 
 
                 FullNameLabel = new NSTextField () {
@@ -300,7 +300,7 @@ namespace GreenQloud {
 
             if (type == PageType.Finished) {
                 Header      = "Your shared project is ready!";
-                Description = "You can find the files in your QloudSync folder.";
+                Description = string.Format("You can find the files in your {0} folder.", GlobalSettings.ApplicationName);
 
 
                 if (warnings.Length > 0) {
@@ -370,7 +370,7 @@ namespace GreenQloud {
 
                     case 1: {
                         Header      = "What's happening next?";
-                        Description = "QloudSync creates a special folder on your computer " +
+                    Description = string.Format("{0} creates a special folder on your computer ", GlobalSettings.ApplicationName) +
                             "that will keep track of your projects.";
 
 
@@ -437,14 +437,14 @@ namespace GreenQloud {
                     }
 
                     case 4: {
-                        Header      = "Adding projects to QloudSync";
+                        Header      = "Adding projects to "+GlobalSettings.ApplicationName;
                         Description = "You can do this through the status icon menu, or by clicking " +
                             "magic buttons on webpages that look like this:";
 
 
                         StartupCheckButton = new NSButton () {
                             Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
-                            Title = "Add QloudSync to startup items",
+                            Title = string.Format("Add {0} to startup items",GlobalSettings.ApplicationName),
                             State = NSCellStateValue.On
                         };
 

@@ -120,7 +120,7 @@ namespace GreenQloud {
 
         public override void OrderFrontRegardless ()
         {
-            NSApplication.SharedApplication.AddWindowsItem (this, "QloudSync Setup", false);
+            NSApplication.SharedApplication.AddWindowsItem (this, GlobalSettings.ApplicationName+" Setup", false);
             NSApplication.SharedApplication.ActivateIgnoringOtherApps (true);
             MakeKeyAndOrderFront (this);
 

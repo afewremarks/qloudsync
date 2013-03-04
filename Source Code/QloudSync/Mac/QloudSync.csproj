@@ -12,6 +12,7 @@
     <AssemblyName>QloudSync</AssemblyName>
     <ReleaseVersion>
     </ReleaseVersion>
+    <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -63,6 +64,10 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Configuration" />
     <Reference Include="nunit.framework" />
+    <Reference Include="System.Web" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDelegate.cs">
@@ -81,8 +86,6 @@
     <Compile Include="ConnectionManager.cs" />
     <Compile Include="Constant.cs" />
     <Compile Include="AboutWindow.cs" />
-    <Compile Include="Controller\DownloadController.cs" />
-    <Compile Include="Controller\UploadController.cs" />
     <Compile Include="Controller\SynchronizerController.cs" />
     <Compile Include="Controller\Controller.cs" />
     <Compile Include="Config\GlobalSettings.cs" />
@@ -91,19 +94,13 @@
     <Compile Include="Config\RuntimeSettings.cs" />
     <Compile Include="Config\Credential.cs" />
     <Compile Include="Synchrony\Synchronizer.cs" />
-    <Compile Include="Synchrony\DownloadSynchronizer.cs" />
-    <Compile Include="Synchrony\UploadSynchronizer.cs" />
     <Compile Include="Repository\LocalRepo.cs" />
     <Compile Include="Repository\RemoteRepo.cs" />
-    <Compile Include="Repository\RemoteFile.cs" />
-    <Compile Include="Repository\LocalFile.cs" />
-    <Compile Include="Repository\File.cs" />
     <Compile Include="Synchrony\Sync.cs" />
     <Compile Include="Controller\IconController.cs" />
     <Compile Include="Util\Logger.cs" />
     <Compile Include="UI\SparkleSetupWindow.cs" />
     <Compile Include="UI\SparkleSetup.cs" />
-    <Compile Include="Repository\Folder.cs" />
     <Compile Include="Repository\Change.cs" />
     <Compile Include="Synchrony\BacklogSynchronizer.cs" />
     <Compile Include="Tests\TestBacklog.cs" />
@@ -113,6 +110,14 @@
     <Compile Include="Tests\TestWatcher.cs" />
     <Compile Include="IO\OSXFileSystemWatcher.cs" />
     <Compile Include="Tests\TestUploadSynchronizer.cs" />
+    <Compile Include="Util\IOHelper.cs" />
+    <Compile Include="Util\Crypto.cs" />
+    <Compile Include="UI\ChangesWindow.cs" />
+    <Compile Include="Repository\StorageQloudObject.cs" />
+    <Compile Include="Synchrony\LocalSynchronizer.cs" />
+    <Compile Include="Synchrony\RemoteSynchronizer.cs" />
+    <Compile Include="Controller\RemoteController.cs" />
+    <Compile Include="Controller\LocalController.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />

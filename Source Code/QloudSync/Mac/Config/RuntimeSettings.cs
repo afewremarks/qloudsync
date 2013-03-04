@@ -16,15 +16,25 @@ namespace GreenQloud
                 return Credential.Username == string.Empty;
             }
         }
+
+        public static string TrashPath { 
+            get {
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                    return Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), GlobalSettings.HomeFolderName);
+                else
+                    return Path.Combine(Environment.GetFolderPath (Environment.SpecialFolder.Personal), ".trash/");
+            }
+        }
+
         
         public static string HomePath{
             get {
                 if (homePath == null)
                 {
                     if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                        homePath = Path.Combine(Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), GlobalSettings.ApplicationName);
+                        homePath = Path.Combine(Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), GlobalSettings.HomeFolderName);
                     else
-                        homePath = Path.Combine(Environment.GetFolderPath (Environment.SpecialFolder.Personal), GlobalSettings.ApplicationName);
+                        homePath = Path.Combine(Environment.GetFolderPath (Environment.SpecialFolder.Personal), GlobalSettings.HomeFolderName);
                 }
                 return homePath;
             }

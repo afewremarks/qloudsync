@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MonoMac.Foundation;
+
 using System.Threading;
 using System.Text;
 
@@ -12,21 +13,23 @@ namespace GreenQloud
     {
         
         private FSEventStreamCallback callback;
-        
+        Thread runLoop;
+        IntPtr stream;
         public OSXFileSystemWatcher()
         {
+
             string watchedFolder = RuntimeSettings.HomePath;   
             this.callback = this.Callback;
 
             IntPtr path = CFStringCreateWithCString (IntPtr.Zero, watchedFolder, 0);
             IntPtr paths = CFArrayCreate (IntPtr.Zero, new IntPtr [1] { path }, 1, IntPtr.Zero);
             
-            IntPtr stream = FSEventStreamCreate (IntPtr.Zero, this.callback, IntPtr.Zero, paths, FSEventStreamEventIdSinceNow, 0, FSEventStreamCreateFlags.WatchRoot | FSEventStreamCreateFlags.FileEvents);
+            stream = FSEventStreamCreate (IntPtr.Zero, this.callback, IntPtr.Zero, paths, FSEventStreamEventIdSinceNow, 0, FSEventStreamCreateFlags.WatchRoot | FSEventStreamCreateFlags.FileEvents);
             
             CFRelease (paths);
             CFRelease (path);
             
-            Thread runLoop = new Thread (delegate() {
+            runLoop = new Thread (delegate() {
                 FSEventStreamScheduleWithRunLoop (stream, CFRunLoopGetCurrent (), kCFRunLoopDefaultMode);
                 FSEventStreamStart (stream);
                 CFRunLoopRun ();
@@ -37,6 +40,15 @@ namespace GreenQloud
         
         public delegate void ChangedEventHandler (string path);
         public event ChangedEventHandler Changed;
+
+        public void Stop ()
+        {
+            Console.WriteLine ("Stop");
+            runLoop.Abort();
+            Console.WriteLine ("Stop");
+            runLoop.Join(1000);
+            Console.WriteLine ("Stop");
+        }
 
         private void Callback (IntPtr streamRef, IntPtr clientCallBackInfo, int numEvents, IntPtr eventPaths, IntPtr eventFlags, IntPtr eventIds)
         {
@@ -58,8 +70,9 @@ namespace GreenQloud
 
             for (int i = 0; i < numEvents; i++) {
                 string pcatched = paths[i];
-                if(!pcatched.EndsWith (".DS_Store"))
+                if(!pcatched.EndsWith (".DS_Store")){
                     handler(pcatched);
+                }
 
             }
         }

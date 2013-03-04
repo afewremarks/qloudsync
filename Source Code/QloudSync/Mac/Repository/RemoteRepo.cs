@@ -23,29 +23,60 @@ namespace GreenQloud.Repository
         }
 
 		#region Files
-        public List<RemoteFile> Files{ 
+        public List<StorageQloudObject> Files{ 
             get {
-                return AllFiles.Where(sobj => !IsTrashFile (sobj) && sobj.Name != Constant.CLOCK_TIME && !sobj.Name.EndsWith(System.IO.Path.PathSeparator.ToString())).ToList();
+                return AllFiles.Where(sobj => !IsTrashFile (sobj) && sobj.Name != Constant.CLOCK_TIME && !sobj.Name.EndsWith("/")).ToList();
             } 
         }
 
-        public List<RemoteFile> AllFiles{ 
+        
+        List<StorageQloudObject> immerseFolderList;
+
+        public List<StorageQloudObject> AllFoldersOutsideTrash {
+            get{
+                List<StorageQloudObject> folders = Folders;
+                immerseFolderList = new List<StorageQloudObject>();
+                foreach (StorageQloudObject folder in folders)
+                    ImmerseFolder(folder.FullLocalName);
+                return immerseFolderList;
+            }
+
+        }
+
+        void ImmerseFolder (string path)
+        {
+            immerseFolderList.Add(new StorageQloudObject(path));
+            int lastIndex = path.LastIndexOf ("/");
+            path = path.Substring (0, lastIndex);
+
+            if(path != RuntimeSettings.HomePath)
+                ImmerseFolder(path);
+
+        }
+
+        public List<StorageQloudObject> Folders{ 
             get {
-                return GetRemoteFiles (connection.GetFiles());
+                return AllFiles.Where(sobj => !IsTrashFile (sobj) && sobj.Name.EndsWith("/")).ToList();
             } 
         }
 
-		protected List<RemoteFile> GetRemoteFiles (List<S3Object> files)
+        public List<StorageQloudObject> AllFiles{ 
+            get {
+                return GetStorageQloudObjects (connection.GetFiles());
+            } 
+        }
+
+		protected List<StorageQloudObject> GetStorageQloudObjects (List<S3Object> files)
 		{
-			List <RemoteFile> remoteFiles = new List <RemoteFile> ();
+			List <StorageQloudObject> remoteFiles = new List <StorageQloudObject> ();
 			
 			foreach (S3Object file in files) {
-                remoteFiles.Add (new RemoteFile (file));
+                remoteFiles.Add (new StorageQloudObject (file));
 			}
 			return remoteFiles;
 		}
 
-        public List<RemoteFile> TrashFiles {
+        public List<StorageQloudObject> TrashFiles {
             get{
                 return AllFiles.Where(f => IsTrashFile(f)).ToList();
             } 
@@ -102,13 +133,13 @@ namespace GreenQloud.Repository
             else return true;
         }
 
-        public void Download (File remoteFile)
+        public void Download (StorageQloudObject remoteFile)
         {
             connection.Download (remoteFile);
         }
 
 
-        public void Upload (File file)
+        public void Upload (StorageQloudObject file)
         {
             if (!System.IO.File.Exists(file.FullLocalName))
             {
@@ -119,25 +150,26 @@ namespace GreenQloud.Repository
             connection.GenericUpload ( file.RelativePathInBucket,  file.Name,  file.FullLocalName);
         }
 
-        public void CreateFolder (Folder folder)
+        public void CreateFolder (StorageQloudObject folder)
         {
             connection.CreateFolder (folder);
         }
 
-        public void Copy (File source, File destination)
+        public void Copy (StorageQloudObject source, StorageQloudObject destination)
         {
             if (source.InTrash)
                 connection.GenericCopy (DefaultBucketName, source.TrashAbsolutePath, destination.RelativePathInBucket, destination.Name);
             else
                 connection.GenericCopy (DefaultBucketName, source.AbsolutePath, destination.RelativePathInBucket, destination.Name);
+            Logger.LogInfo ("Connection", "Copy is done");
         }
 
-        public void CopyToTrashFolder (File source, File destination)
+        public void CopyToTrashFolder (StorageQloudObject source, StorageQloudObject destination)
         {
             connection.GenericCopy (DefaultBucketName, source.AbsolutePath, destination.TrashRelativePath, destination.Name);
         }
 
-        public void Move (File source, File destination)
+        public void Move (StorageQloudObject source, StorageQloudObject destination)
         {
             string destinationName;
             if (source.IsAFolder)
@@ -150,37 +182,45 @@ namespace GreenQloud.Repository
                 connection.GenericDelete (source.AbsolutePath);
         }
         
-        public void MoveToTrash (File  file)
+        public void MoveFileToTrash (StorageQloudObject  file)
         {
+            string destinationName;         
+            destinationName = file.Name + "(1)";
 
-            string destinationName;
-            if (FolderExistsInBucket(file.ToFolder()))
-                destinationName = file.Name;
-            else
-                destinationName = file.Name + "(1)";
-  
             UpdateTrashFolder (file);
 
+
             connection.GenericCopy (DefaultBucketName, file.AbsolutePath, file.TrashRelativePath, destinationName);           
+
+
             connection.GenericDelete (file.AbsolutePath);
         }
 
-        public bool FolderExistsInBucket (Folder folder)
+        public void MoveFolderToTrash (StorageQloudObject folder)
         {
-           return Files.Any (rf => rf.AbsolutePath==folder.AbsolutePath || rf.AbsolutePath.Contains(folder.AbsolutePath));
+
+            connection.GenericCopy (DefaultBucketName, folder.AbsolutePath+"/", folder.TrashRelativePath, folder.Name+"/");           
+            
+            
+            connection.GenericDelete (folder.AbsolutePath+"/");
         }
 
-        public bool ExistsInBucket (File file)
+        public bool FolderExistsInBucket (StorageQloudObject folder)
+        {
+           return Folders.Any (rf => rf.AbsolutePath==folder.AbsolutePath || rf.AbsolutePath.Contains(folder.AbsolutePath));
+        }
+
+        public bool ExistsInBucket (StorageQloudObject file)
         {
             return Files.Any (rf => rf.AbsolutePath == file.AbsolutePath);
         }
         
-        public bool IsTrashFile (RemoteFile file)
+        public bool IsTrashFile (StorageQloudObject file)
         {
             return file.InTrash;
         }
 
-        public bool SendToTrash (LocalFile file)
+        public bool SendLocalVersionToTrash (StorageQloudObject file)
         {
             if (!System.IO.File.Exists(file.FullLocalName))
                 return false;
@@ -198,7 +238,7 @@ namespace GreenQloud.Repository
             return true;
         }
         
-        public bool SendToTrash (RemoteFile file)
+        public bool SendRemoteVersionToTrash (StorageQloudObject file)
         {
             string destinationName;
             if (file.IsAFolder)
@@ -214,20 +254,20 @@ namespace GreenQloud.Repository
             return copySucessfull;
         }
         
-        public void UpdateTrashFolder (File  file)
+        public void UpdateTrashFolder (StorageQloudObject  file)
         {
             if (file.IsAFolder)
                 return;
-            List<RemoteFile> versions = TrashFiles.Where (tf => tf.AbsolutePath != string.Empty && tf.AbsolutePath.Substring(0, tf.AbsolutePath.Length-3)== file.AbsolutePath).OrderByDescending(t => t.AbsolutePath).ToList<RemoteFile> ();
+            List<StorageQloudObject> versions = TrashFiles.Where (tf => tf.AbsolutePath != string.Empty && tf.AbsolutePath.Substring(0, tf.AbsolutePath.Length-3)== file.AbsolutePath).OrderByDescending(t => t.AbsolutePath).ToList<StorageQloudObject> ();
 
             int overload = versions.Count-2;
             for (int i=0; i<overload; i++) {
-                RemoteFile v = versions[i];
+                StorageQloudObject v = versions[i];
                 connection.GenericDelete(v.TrashAbsolutePath);
                 versions.Remove(v);
             }
 
-            foreach (RemoteFile version in versions) {
+            foreach (StorageQloudObject version in versions) {
                 if(version.AbsolutePath == string.Empty)
                     continue;
                 int lastOpenParenthesis = version.AbsolutePath.LastIndexOf ("(")+1;
@@ -235,20 +275,20 @@ namespace GreenQloud.Repository
                 int versionNumber = int.Parse (version.AbsolutePath.Substring (lastOpenParenthesis, lastCloseParenthesis - lastOpenParenthesis));
                 versionNumber++;
                 string newName = string.Format ("{0}{1})", version.AbsolutePath.Substring (0, lastOpenParenthesis), versionNumber);
-                RemoteFile newVersion = new RemoteFile (newName);
+                StorageQloudObject newVersion = new StorageQloudObject (newName);
                 connection.GenericCopy (DefaultBucketName, version.TrashAbsolutePath, newVersion.TrashRelativePath, newVersion.Name);
                 connection.GenericDelete (version.TrashAbsolutePath);
             }
 
         }
 
-		public void Delete (RemoteFile file)
+		public void Delete (StorageQloudObject file)
 		{
 			connection.GenericDelete (file.AbsolutePath);
 		}
         
-        private List<RemoteFile> GetVersionsOrderByLastModified (File  file)  {
-            return  TrashFiles.Where (ft => ft.AbsolutePath.Contains (file.AbsolutePath)).OrderBy(ft => ft.AsS3Object.LastModified).ToList<RemoteFile>();
+        private List<StorageQloudObject> GetVersionsOrderByLastModified (StorageQloudObject  file)  {
+            return  TrashFiles.Where (ft => ft.AbsolutePath.Contains (file.AbsolutePath)).OrderBy(ft => ft.AsS3Object.LastModified).ToList<StorageQloudObject>();
         }
 
         public void DeleteAllFilesInBucket(){

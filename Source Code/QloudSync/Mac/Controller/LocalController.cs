@@ -8,10 +8,10 @@ using GreenQloud.Synchrony;
 namespace GreenQloud
 {
     //Controla as threads responsaveis pelas sincronizacoes de download
-    public class DownloadController : SynchronizerController
+    public class LocalController : SynchronizerController
     {
        
-        private static DownloadController instance;
+        private static LocalController instance;
         private System.Timers.Timer remote_timer         = new System.Timers.Timer () { Interval = GlobalSettings.IntervalBetweenChecksRemoteRepository };
         DownloadSynchronizer synchronizer = DownloadSynchronizer.GetInstance();
 
@@ -65,17 +65,17 @@ namespace GreenQloud
 
        #endregion
 
-        protected DownloadController ()
+        protected LocalController ()
         {
             Status = SyncStatus.Idle;
             remote_timer.Elapsed += SynchronizeOnTime;
             remote_timer.Disposed += (object sender, EventArgs e) => Console.WriteLine("Dispose");
         }
 
-        public static DownloadController GetInstance ()
+        public static LocalController GetInstance ()
         {
             if (instance == null)
-                instance = new DownloadController();
+                instance = new LocalController();
             return instance;
         }
 
@@ -101,6 +101,7 @@ namespace GreenQloud
         {
             if(!remote_timer.Enabled)
                 remote_timer.Start();
+            //if(BacklogSynchronizer.GetInstance().Done)
             ThreadController(new Thread(DownloadSynchronizer.GetInstance().Synchronize));
         }
        
@@ -109,22 +110,25 @@ namespace GreenQloud
             ++controller;
             if (Status == SyncStatus.Idle && controller == 1)
             {
+                ++controller;
                 Status = SyncStatus.Sync;
                 try
                 {
+                    synchronizer.Done = false;
                     ClearDownloadIndexes ();
                     downThread.Start ();
                     double lastSize = 0;
                     DateTime lastTime = DateTime.Now;
                     TimeRemaining = 0;
-
                     while (Percent < 100)
                     {
                        if (synchronizer.Done)
                             break;
+
                         DateTime time = DateTime.Now;
                         double size = synchronizer.Size;
                         double transferred = synchronizer.BytesTransferred;
+                        
                         if (size != 0)
                         {   
                             Percent = (transferred / size) * 100;
@@ -134,16 +138,16 @@ namespace GreenQloud
                                 double sizeRemaining = size - transferred;
                                 double dTimeRemaninig = (sizeRemaining/diffSize)/(diffSeconds/1000);
                                 dTimeRemaninig = Math.Round(dTimeRemaninig, 0);
-                                //if (TimeRemaining == 0 || (TimeRemaining>dTimeRemaninig && dTimeRemaninig>0)){
-                                        TimeRemaining = dTimeRemaninig;
-                                //}
+                                TimeRemaining = dTimeRemaninig;
                             }
                         }
                         lastSize = transferred;
                         lastTime = time;
                         ProgressChanged (Percent, TimeRemaining);
                         Thread.Sleep (1000);
+                
                     }
+
                 }
                 catch (Exception e)
                 {
@@ -152,6 +156,7 @@ namespace GreenQloud
 
                 Status = SyncStatus.Idle;
                 controller = 0;
+
             }
         }
 

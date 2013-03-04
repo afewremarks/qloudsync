@@ -5,80 +5,56 @@ using System.IO;
 using System.Linq;
 using GreenQloud.Synchrony;
 using GreenQloud.Util;
+using MonoMac.AppKit;
 
 
  namespace GreenQloud.Repository
 {
     public class LocalRepo
     {
-		private static List<LocalFile> files = null;
+		private static List<StorageQloudObject> files = null;
 
         private LocalRepo ()
         {
         }
        
 
-        public static List<LocalFile> Files {
+        public static List<StorageQloudObject> Files {
 			set {
 				files = value;
 			}
 			get {
 				if(files==null)
-					files = GetFiles();
+                    files = GetSQObjects(RuntimeSettings.HomePath);
 				return files;
 			}
 		}
 
-        private static List<Folder> folders;
-        public static List<Folder> Folders{
-            set {
-                folders = value;
-            }
-            get {
-                if(folders==null)
-                    folders = GetFolders();
-                return folders;
-            }
-        }
 
-		public static List<LocalFile> GetFiles ()
+		public static List<StorageQloudObject> GetSQObjects (string path)
 		{
 			try {
-                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo (RuntimeSettings.HomePath);
-				List<LocalFile> list = LocalFile.Get (dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ());
-			
+
+                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo (path);
+                List<StorageQloudObject> list = new List<StorageQloudObject>();
+                if(dir.Exists){
+                    foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ()) {
+                        StorageQloudObject localFile = new StorageQloudObject (fileInfo.FullName, fileInfo.LastWriteTime);
+                        if(!localFile.IsIgnoreFile)
+                            list.Add (localFile);
+                    }
+
+                    foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ())
+                        list.Add (new StorageQloudObject (fileInfo.FullName));
+                }
 				return list;
-			} catch (System.ArgumentNullException) {
-				Logger.LogInfo("Error", "Set a LocalFolder variable");
+			} catch (Exception e) {
+                Logger.LogInfo ("Error", "Fail to load local files");
+				Logger.LogInfo("Error", e);
 				return null;
 			}
 		}
 
-        public static List<Folder> GetFolders ()
-        {
-            try {
-                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo (RuntimeSettings.HomePath);
-                List<Folder> list = Folder.Get (dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ());
-                
-                return list;
-            } catch (System.ArgumentNullException) {
-                Logger.LogInfo("Error", "Set a LocalFolder variable");
-                return null;
-            }
-        }
-
-        public static List<Folder> EmptyFolders {
-            get {
-                List<DirectoryInfo> emptyDirectories = new DirectoryInfo (RuntimeSettings.HomePath)
-                .GetDirectories ("*", SearchOption.AllDirectories)
-                    .Where (d => !Directory.EnumerateFileSystemEntries (d.FullName).Any ()).ToList ();
-                List<Folder> emptyFolders = new List<Folder> ();
-                foreach (DirectoryInfo dir in emptyDirectories) 
-                    emptyFolders.Add (new Folder (dir.FullName + Constant.DELIMITER));
-                return emptyFolders;
-            }
-        }
-       
         public static string ResolveDecodingProblem (string path)
         {
             bool haveProblem = false;
@@ -97,6 +73,86 @@ using GreenQloud.Util;
                 path = path.Replace (old,_new);
             }
             return path;
+        }
+
+        public static void Delete(StorageQloudObject sqObj){
+            if(Directory.Exists (sqObj.FullLocalName)){
+                try{
+                    List<StorageQloudObject> sqObjectsInFolder = GetSQObjects(sqObj.FullLocalName);
+                    string path = Path.Combine(RuntimeSettings.TrashPath, sqObj.Name);
+
+                    if(Directory.Exists(path)){
+                        Directory.Move (path, path+" "+DateTime.Now.ToString("dd.mm.ss tt"));
+                    }else{
+                        Directory.Move (sqObj.FullLocalName, path);
+                        RemoveFromLists (sqObj);
+                    }
+
+                    foreach (StorageQloudObject s in sqObjectsInFolder)
+                    {
+                        RemoveFromLists (s);
+                    }
+                }
+                catch {
+                    Logger.LogInfo ("Error", string.Format("Fail to delete folder \"{0}\" in local repo.", sqObj.FullLocalName));
+                }
+            }
+            else if (File.Exists (sqObj.FullLocalName)){
+                try{
+                    string path = Path.Combine(RuntimeSettings.TrashPath, sqObj.Name);
+
+                    if(File.Exists (path)){
+                        string newpath =  path+" "+DateTime.Now.ToString ("dd.mm.ss tt");
+                        File.Move (path, newpath);
+                    }
+
+                    CreatePath (path);
+                    File.Move(sqObj.FullLocalName, path);
+                    RemoveFromLists (sqObj);
+                }
+                catch (Exception e){
+                    Logger.LogInfo ("Error", string.Format("Fail to delete file \"{0}\" in local repo.", sqObj.FullLocalName));
+                    Logger.LogInfo ("Error", e);
+                }
+            }
+        }
+
+        static void RemoveFromLists (StorageQloudObject sqObj)
+        {
+            Files.Remove (sqObj);
+            BacklogSynchronizer.GetInstance().RemoveFileByAbsolutePath (sqObj);
+        }
+
+       
+        public static bool Exists (StorageQloudObject remoteFile)
+        {
+            return System.IO.File.Exists (remoteFile.FullLocalName);
+        }
+
+        public static void CreateFolder (StorageQloudObject folder)
+        {
+            if(!Directory.Exists(folder.FullLocalName)){
+                CreatePath (folder.FullLocalName);
+                Directory.CreateDirectory(folder.FullLocalName);
+                Files.Add(folder);
+                BacklogSynchronizer.GetInstance().AddFile (folder);
+            }
+        }
+
+        static void CreatePath (string path)
+        {
+            string parent = path.Substring (0,path.LastIndexOf("/"));
+
+            if (path.EndsWith ("/")) {
+                parent = parent.Substring (0, parent.LastIndexOf("/"));
+            }
+            if (parent == string.Empty)
+                return;
+
+            CreatePath(parent);
+           
+            if(!Directory.Exists(parent))
+                Directory.CreateDirectory(parent);
         }
     }
 }

@@ -48,3 +48,9 @@ _ReSharper.*
 *.wxs
 *.dotCover
 *.DS_Store
+*.png
+*.tiff
+*.psd
+*.icns
+*.xib
+*.am

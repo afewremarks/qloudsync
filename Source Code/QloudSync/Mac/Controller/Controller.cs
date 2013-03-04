@@ -14,8 +14,8 @@ namespace GreenQloud {
 	public class Controller{
 
         public IconController StatusIcon;
-        DownloadController downloadController;
-        UploadController uploadController;
+        LocalController downloadController;
+        RemoteController uploadController;
         public double ProgressPercentage = 0.0;
         public string ProgressSpeed      = "";
         
@@ -69,19 +69,20 @@ namespace GreenQloud {
 
         private void InitializeSynchronizers ()
         {
-           // StatusIcon = new IconController ();
-            if(!FirstRun)
-              GreenQloud.Synchrony.BacklogSynchronizer.GetInstance ().Synchronize ();
+            // StatusIcon = new IconController ();
+ 
+            downloadController = LocalController.GetInstance ();
 
-            downloadController = DownloadController.GetInstance();
-            if(!FirstRun)
-                downloadController.Synchronize();
+            if (!FirstRun) {
+            //    new Thread (GreenQloud.Synchrony.BacklogSynchronizer.GetInstance ().Synchronize).Start ();
+                downloadController.Synchronize ();
+            }else
+                GreenQloud.Synchrony.BacklogSynchronizer.GetInstance().Done = true;
 
-            uploadController = UploadController.GetInstance();
-
+            uploadController = RemoteController.GetInstance();
+            GreenQloud.Synchrony.BacklogSynchronizer.GetInstance().Done = true;
             downloadController.SyncStatusChanged += HandleSyncStatusChanged;
             uploadController.SyncStatusChanged += HandleSyncStatusChanged;
-
             /*repo.ChangesDetected += delegate {
                 UpdateState ();
             };
@@ -93,16 +94,16 @@ namespace GreenQloud {
                 }
                 
                 UpdateState ();
-            };
+            };*/
             
-            repo.ProgressChanged += delegate (double percentage, string speed) {
+            downloadController.ProgressChanged += delegate (double percentage, double speed) {
                 ProgressPercentage = percentage;
-                ProgressSpeed      = speed;
+                ProgressSpeed      = speed.ToString();
                 
                 UpdateState ();
             };
             
-            repo.Initialize ();*/
+            //repo.Initialize ();*/
         }
 
         void HandleSyncStatusChanged (SyncStatus status)
@@ -119,17 +120,18 @@ namespace GreenQloud {
         // Fires events for the current syncing state
         private void UpdateState ()
         {
-            if (downloadController.Status == SyncStatus.Sync || uploadController.Status == SyncStatus.Sync)// repo.IsBuffering
+           if (downloadController.Status == SyncStatus.Sync || uploadController.Status == SyncStatus.Sync) {// repo.IsBuffering
                 OnSyncing ();
-             else
+            } else {
                 OnIdle ();
+            }
         }
         
 
 
         public void SyncStart ()
         {
-            downloadController = DownloadController.GetInstance();
+            downloadController = LocalController.GetInstance();
 
             downloadController.Finished += () => FinishFetcher();
             downloadController.Failed += delegate {
@@ -205,6 +207,7 @@ namespace GreenQloud {
         
         public virtual void Quit ()
         {
+            Process.GetProcessesByName("QloudSync")[0].Kill();
             Environment.Exit (0);
         }
 
@@ -288,6 +291,7 @@ namespace GreenQloud {
         {
             NSWorkspace.SharedWorkspace.OpenUrl (new NSUrl (url));
         }
+
 
 
    	}

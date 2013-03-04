@@ -34,20 +34,22 @@ namespace GreenQloud.Net.S3
 
         public static void Authenticate (string username, string password)
         {
-            Uri uri = new Uri(GlobalSettings.AuthenticationURL);
-            
+            Uri uri = new Uri (GlobalSettings.AuthenticationURL);
+        
             WebRequest myReq = WebRequest.Create (uri);
             string usernamePassword = username + ":" + password;
             CredentialCache mycache = new CredentialCache ();
             mycache.Add (uri, "Basic", new NetworkCredential (username, password));
             myReq.Credentials = mycache;
             myReq.Headers.Add ("Authorization", "Basic " + Convert.ToBase64String (new ASCIIEncoding ().GetBytes (usernamePassword)));
-            WebResponse wr = myReq.GetResponse ();
-            Stream receiveStream = wr.GetResponseStream ();
-            StreamReader reader = new StreamReader (receiveStream, Encoding.UTF8);
-            string receiveContent = reader.ReadToEnd ();
-            Credential.SecretKey = receiveContent.Substring(Constant.KEY_SECRET_START_INDEX, Constant.KEYS_LENGTH);
-            Credential.PublicKey = receiveContent.Substring(Constant.KEY_PUBLIC_START_INDEX, Constant.KEYS_LENGTH);
+            using (WebResponse wr = myReq.GetResponse ()){
+                Stream receiveStream = wr.GetResponseStream ();
+                StreamReader reader = new StreamReader (receiveStream, Encoding.UTF8);
+                string receiveContent = reader.ReadToEnd ();
+                Newtonsoft.Json.Linq.JObject o = Newtonsoft.Json.Linq.JObject.Parse(receiveContent);               
+                Credential.SecretKey = (string)o["api_private_key"];
+                Credential.PublicKey = (string)o["api_public_key"];
+            }
             Logger.LogInfo ("Authetication", "Keys loaded");
         }   
         
@@ -59,7 +61,7 @@ namespace GreenQloud.Net.S3
             try {    
                 AmazonS3Config config = CreateConfig ();
                 connection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
-                Logger.LogInfo("Connection", "Start a new Connection.");
+                Logger.LogInfo("Connection", "Start a new connection.");
                 return connection;
             } catch (System.Net.WebException) {
                 Logger.LogInfo ("Connection", "Failed to communicate with the remote server");
@@ -123,7 +125,7 @@ namespace GreenQloud.Net.S3
                 ).S3Objects;
         }
 
-		public void Download (GreenQloud.Repository.File  file)
+        public void Download (StorageQloudObject  file)
         {            
             GetObjectResponse response = null;
             try {
@@ -143,7 +145,6 @@ namespace GreenQloud.Net.S3
                     };
                     
                     response.WriteResponseStreamToFile(file.FullLocalName);
-                    
                 }
             } catch (Exception e) {
                 Logger.LogInfo ("Error", e.Message);
@@ -152,7 +153,7 @@ namespace GreenQloud.Net.S3
             }
 		}	
 
-		public bool CreateFolder (GreenQloud.Repository.Folder folder)
+        public bool CreateFolder (StorageQloudObject folder)
 		{
 			return CreateFolder (folder.Name, folder.RelativePathInBucket);
 		}
@@ -167,6 +168,8 @@ namespace GreenQloud.Net.S3
 			try {
 	
                 Logger.LogInfo ("Connection","Creating folder "+name+".");
+                if (!name.EndsWith("/"))
+                    name+="/";
 				PutObjectRequest putObject = new PutObjectRequest (){
 					BucketName = relativePath,
 					Key = name,
@@ -228,7 +231,7 @@ namespace GreenQloud.Net.S3
 			try {
                 if (DateTime.Now.Subtract(lastDiffClock).TotalMinutes>30){
 
-                    GreenQloud.Repository.File clockFile = new RemoteFile (Constant.CLOCK_TIME);
+                    StorageQloudObject clockFile = new StorageQloudObject (Constant.CLOCK_TIME);
     				PutObjectRequest putObject = new PutObjectRequest ()
     				{
     					BucketName = bucketName,
@@ -280,7 +283,8 @@ namespace GreenQloud.Net.S3
                     SourceKey = sourceKey
                 };
 
-                Connect ().CopyObject (request);
+                using (CopyObjectResponse cor = Connect ().CopyObject (request)){}
+
             } 
             //TODO Understand why System.InvalidOperationException is catched, and the file is copied
             catch{
@@ -290,6 +294,8 @@ namespace GreenQloud.Net.S3
 
         public void GenericUpload (string bucketName, string key, string filepath)
         {
+            
+            S3Response response;
             try {
                 PutObjectRequest putObject = new PutObjectRequest ()
                 {
@@ -298,22 +304,23 @@ namespace GreenQloud.Net.S3
                     Key = key, 
                     Timeout = GlobalSettings.UploadTimeout
                 };
-                using (S3Response response = Connect ().PutObject (putObject)) {
+                using (response = Connect ().PutObject (putObject)) {
                     response.Dispose ();
                 }
-                Logger.LogInfo ("Connection", string.Format("{0} was uploaded.", filepath));
+                Logger.LogInfo ("Connection", string.Format ("{0} was uploaded.", filepath));
             } catch (ObjectDisposedException) {
                 Logger.LogInfo ("Connection", "An exception occurred, the file will be resend.");
                 GenericUpload (bucketName, key, filepath);
             } catch (AmazonS3Exception) {
 
-                if(InitializeBucket())
+                if (InitializeBucket ())
                     GenericUpload (bucketName, key, filepath);
                 else
                     Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
-            }
-			catch(Exception e) {
-                Logger.LogInfo ("Connection",e);
+            } catch (Exception e) {
+                Logger.LogInfo ("Connection", e);
+            } finally {
+                response.Dispose();
             }
         }
 
