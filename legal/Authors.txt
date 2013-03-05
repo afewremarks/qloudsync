@@ -11,9 +11,9 @@ Producer:
 	Eirikur Hrafnsson <eiki@greenqloud.com>
 	
 Code:
+	Carlos Maia <carlos@greenqloud.com> - co-producer, project manager
 	Angelo Ribeiro <angelo@greenqloud.com> - lead developer
-	Carlos Maia <carlos@greenqloud.com> - developer and co-producer
-	Þórhallur Helgason <laddi@greenqloud.com>, StorageQloud integration 
+	Þórhallur Helgason <laddi@greenqloud.com> - StorageQloud integration 
 	
 	Parts of QloudSync were inspired by the Sparkleshare project. 
 	https://github.com/hbons/SparkleShare
