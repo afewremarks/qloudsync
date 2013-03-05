@@ -118,6 +118,10 @@
     <Compile Include="Synchrony\RemoteSynchronizer.cs" />
     <Compile Include="Controller\RemoteController.cs" />
     <Compile Include="Controller\LocalController.cs" />
+    <Compile Include="UI\HyperLink.cs" />
+    <Compile Include="Synchrony\BacklogDocument.cs" />
+    <Compile Include="Util\CO2Savings.cs" />
+    <Compile Include="Util\Statistics.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />
@@ -128,11 +132,11 @@
     <Content Include="..\Common\Pixmaps\side-splash.png">
       <Link>Pixmaps\side-splash.png</Link>
     </Content>
-    <Content Include="Pixmaps\sparkleshare-folder.icns">
-      <Link>sparkleshare-folder.icns</Link>
+    <Content Include="Pixmaps\qloudsync-folder.icns">
+      <Link>qloudsync-folder.icns</Link>
     </Content>
-    <Content Include="Pixmaps\sparkleshare-app.icns">
-      <Link>sparkleshare-app.icns</Link>
+    <Content Include="Pixmaps\qloudsync-app.icns">
+      <Link>qloudsync-app.icns</Link>
     </Content>
     <Content Include="..\Common\Pixmaps\about.png">
       <Link>Pixmaps\about.png</Link>

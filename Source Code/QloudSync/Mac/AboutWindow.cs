@@ -33,7 +33,7 @@ namespace GreenQloud {
         private NSTextField updates_text_field, version_text_field;
         private NSTextField credits_text_field;
        
-        private SparkleLink website_link, credits_link, report_problem_link, debug_log_link;
+        private HyperLink website_link, credits_link, report_problem_link, debug_log_link;
 
 
         public event Action ShowWindowEvent = delegate { };
@@ -51,7 +51,7 @@ namespace GreenQloud {
                 SetFrame (new RectangleF (0, 0, 640, 281), true);
                 Center ();
 
-                Delegate    = new SparkleAboutDelegate ();
+                Delegate    = new AboutDelegate ();
                 StyleMask   = (NSWindowStyle.Closable | NSWindowStyle.Titled);
                 Title       = "About "+GlobalSettings.ApplicationName;
                 MaxSize     = new SizeF (640, 281);
@@ -119,10 +119,10 @@ namespace GreenQloud {
                     TextColor       = NSColor.FromCalibratedRgba (0.45f, 1.62f, 1.81f, 1.0f) // Tango Sky Blue #1
                 };
 
-                if(GlobalSettings.RunningVersion == VersionAvailable)
+                if(GlobalSettings.RunningVersion == Statistics.VersionAvailable)
                     updates_text_field.StringValue = "This is lastest version available..";
                 else
-                    updates_text_field.StringValue = "Lastest version available: "+VersionAvailable;
+                    updates_text_field.StringValue = "Lastest version available: "+Statistics.VersionAvailable;
 
                 NSColor color = NSColor.White;
                 this.credits_text_field = new NSTextField () {
@@ -139,21 +139,21 @@ namespace GreenQloud {
                         "Lucida Grande", NSFontTraitMask.Unbold, 0, 11),
                 };
 
-                this.website_link       = new SparkleLink ("Website", "http://qloudsync.com");
+                this.website_link       = new HyperLink ("Website", "http://qloudsync.com");
                 this.website_link.Frame = new RectangleF (new PointF (295, 25), this.website_link.Frame.Size);
                 this.website_link.TextColor =  color;
                 
-                this.credits_link       = new SparkleLink ("Credits", "https://github.com/greenqloud/qloudsync/tree/master/legal/Authors.txt");
+                this.credits_link       = new HyperLink ("Credits", "https://github.com/greenqloud/qloudsync/tree/master/legal/Authors.txt");
                 this.credits_link.Frame = new RectangleF (
                     new PointF (this.website_link.Frame.X + this.website_link.Frame.Width + 10, 25),
                     this.credits_link.Frame.Size);
                 
-                this.report_problem_link       = new SparkleLink ("Report a problem", "https://github.com/greenqloud/qloudsync/issues");
+                this.report_problem_link       = new HyperLink ("Report a problem", "https://github.com/greenqloud/qloudsync/issues");
                 this.report_problem_link.Frame = new RectangleF (
                     new PointF (this.credits_link.Frame.X + this.credits_link.Frame.Width + 10, 25),
                     this.report_problem_link.Frame.Size);
                 
-                this.debug_log_link       = new SparkleLink ("Debug log", "file://"+RuntimeSettings.LogFilePath);
+                this.debug_log_link       = new HyperLink ("Debug log", "file://"+RuntimeSettings.LogFilePath);
                 this.debug_log_link.Frame = new RectangleF (
                     new PointF (this.report_problem_link.Frame.X + this.report_problem_link.Frame.Width + 10, 25),
                     this.debug_log_link.Frame.Size);
@@ -166,26 +166,6 @@ namespace GreenQloud {
                 ContentView.AddSubview (this.credits_link);
                 ContentView.AddSubview (this.report_problem_link);
                 ContentView.AddSubview (this.debug_log_link);
-            }
-        }
-        string versionAvailable = string.Empty;
-
-        public string VersionAvailable {
-            get {
-                if(versionAvailable==string.Empty){
-                    System.Net.WebRequest myReq = System.Net.WebRequest.Create ("https://my.greenqloud.com/qloudsync/version");
-                    myReq.GetResponse();
-                    string receiveContent = string.Empty;
-                    using (System.Net.WebResponse wr = myReq.GetResponse ()){
-                        Stream receiveStream = wr.GetResponseStream ();
-                        StreamReader reader = new StreamReader (receiveStream, System.Text.Encoding.UTF8);
-                        receiveContent = reader.ReadToEnd ();
-                        
-                    }
-                    Newtonsoft.Json.Linq.JObject o = Newtonsoft.Json.Linq.JObject.Parse(receiveContent);
-                    versionAvailable = (string)o["version"];
-                }
-                return versionAvailable;
             }
         }
 
@@ -218,60 +198,12 @@ namespace GreenQloud {
     }
 
 
-    public class SparkleAboutDelegate : NSWindowDelegate {
+    public class AboutDelegate : NSWindowDelegate {
         
         public override bool WindowShouldClose (NSObject sender)
         {
             (sender as AboutWindow).WindowClosed ();
             return false;
         }
-
-
-    }
-
-
-    public class SparkleLink : NSTextField {
-
-        private NSUrl url;
-
-
-        public SparkleLink (string text, string address) : base ()
-        {
-            this.url = new NSUrl (address);
-
-            AllowsEditingTextAttributes = true;
-            BackgroundColor = NSColor.White;
-            Bordered        = false;
-            DrawsBackground = false;
-            Editable        = false;
-            Selectable      = false;
-
-            NSData name_data = NSData.FromString ("<a href='" + this.url +
-                "' style='font-size: 8pt; font-family: \"Lucida Grande\"; color: white'>" + text + "</a></font>");
-
-            NSDictionary name_dictionary       = new NSDictionary();
-            NSAttributedString name_attributes = new NSAttributedString (name_data, new NSUrl ("file://"), out name_dictionary);
-
-            NSMutableAttributedString s = new NSMutableAttributedString ();
-            s.Append (name_attributes);
-
-            Cell.AttributedStringValue = s;
-
-            SizeToFit ();
-        }
-
-
-        public override void MouseUp (NSEvent e)
-        {
-            Program.Controller.OpenWebsite (this.url.ToString ());
-        }
-
-
-        public override void ResetCursorRects ()
-        {
-            AddCursorRect (Bounds, NSCursor.PointingHandCursor);
-        }
-
-
     }
 }

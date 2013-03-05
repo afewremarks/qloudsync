@@ -47,16 +47,16 @@ namespace GreenQloud {
             };
 
             this.header_text_field = new NSTextField () {
-                Frame           = new RectangleF (190, Frame.Height - 80, Frame.Width, 24),
+                Frame           = new RectangleF (190, Frame.Height - 100, Frame.Width, 48),
                 BackgroundColor = NSColor.WindowBackground,
                 Bordered        = false,
                 Editable        = false,
                 Font            = NSFontManager.SharedFontManager.FontWithFamily (
-                    "Lucida Grande", NSFontTraitMask.Bold, 0, 15)
+                    "Lucida Grande", NSFontTraitMask.Bold, 0, 16)
             };
             
             this.description_text_field = new NSTextField () {
-                Frame           = new RectangleF (190, Frame.Height - 130, 640 - 240, 44),
+                Frame           = new RectangleF (190, Frame.Height - 210, 640 - 240, 105),
                 BackgroundColor = NSColor.WindowBackground,
                 Bordered        = false,
                 Editable        = false,

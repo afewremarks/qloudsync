@@ -64,21 +64,24 @@ namespace GreenQloud {
         public void ShowPage (PageType type, string [] warnings)
         {
             if (type == PageType.Login) {
-                Header      = string.Format("Welcome to {0}!", GlobalSettings.ApplicationName);
-
+                Header      = string.Format("Welcome to {0} for StorageQloud™!", GlobalSettings.ApplicationName);
+                Description = "With QloudSync you can sync your photos, music, documents and movies to and from your computer to StorageQloud, " +
+                    "the truly green cloud storage run on 100% renewable energy! All you need to get started is a GreenQloud Username and Password. " +
+                    "Don't have one? No problem! Click here to register in one easy step it's totally free to try.";
 
                 FullNameLabel = new NSTextField () {
                     Alignment       = NSTextAlignment.Right,
                     BackgroundColor = NSColor.WindowBackground,
                     Bordered        = false,
                     Editable        = false,
-                    Frame           = new RectangleF (165, Frame.Height - 234, 160, 17),
+                    Frame           = new RectangleF (165, Frame.Height - 254, 160, 17),
                     StringValue     = "Username:",
-                    Font            = SparkleUI.Font
+                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                        "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
                 };
 
                 FullNameTextField = new NSTextField () {
-                    Frame       = new RectangleF (330, Frame.Height - 238, 196, 22),
+                    Frame       = new RectangleF (330, Frame.Height - 258, 196, 22),
                     Delegate    = new SparkleTextFieldDelegate ()
                 };
 
@@ -87,13 +90,14 @@ namespace GreenQloud {
                     BackgroundColor = NSColor.WindowBackground,
                     Bordered        = false,
                     Editable        = false,
-                    Frame           = new RectangleF (165, Frame.Height - 264, 160, 17),
+                    Frame           = new RectangleF (165, Frame.Height - 284, 160, 17),
                     StringValue     = "Password:",
-                    Font            = SparkleUI.Font
+                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                        "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
                 };
 
                 NSSecureTextField PasswordTextField = new NSSecureTextField(){
-                    Frame       = new RectangleF (330, Frame.Height - 268, 196, 22),
+                    Frame       = new RectangleF (330, Frame.Height - 288, 196, 22),
                     Delegate    = new SparkleTextFieldDelegate (),
                 };
 
@@ -129,6 +133,7 @@ namespace GreenQloud {
 
                 CancelButton.Activated += delegate {
                     Controller.PageCancelled ();
+                    Program.Controller.Quit();
                 };
 
                 ContinueButton.Activated += delegate {
@@ -155,12 +160,12 @@ namespace GreenQloud {
             }
 
             if (type == PageType.Syncing) {
-                Header      = "Adding project ‘" + Controller.SyncingFolder + "’…";
-                Description = "This may take a while for large projects.\nIsn't it coffee-o'clock?";
+                Header      = "Winning! QloudSync is now connected to your \nGreenQloud account…";
+                Description = "You have successfully logged into GreenQloud and now QloudSync will find your truly green™ files in StorageQloud and sync them to your computer in a folder named StorageQloud.";
 
 
                 ProgressIndicator = new NSProgressIndicator () {
-                    Frame         = new RectangleF (190, Frame.Height - 200, 640 - 150 - 80, 20),
+                    Frame         = new RectangleF (190, Frame.Height - 250, 640 - 150 - 80, 20),
                     Style         = NSProgressIndicatorStyle.Bar,
                     MinValue      = 0.0,
                     MaxValue      = 100.0,

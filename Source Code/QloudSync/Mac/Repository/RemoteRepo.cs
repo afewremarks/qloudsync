@@ -32,16 +32,6 @@ namespace GreenQloud.Repository
         
         List<StorageQloudObject> immerseFolderList;
 
-        public List<StorageQloudObject> AllFoldersOutsideTrash {
-            get{
-                List<StorageQloudObject> folders = Folders;
-                immerseFolderList = new List<StorageQloudObject>();
-                foreach (StorageQloudObject folder in folders)
-                    ImmerseFolder(folder.FullLocalName);
-                return immerseFolderList;
-            }
-
-        }
 
         void ImmerseFolder (string path)
         {

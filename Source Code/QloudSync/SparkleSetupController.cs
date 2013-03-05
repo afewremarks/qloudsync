@@ -190,32 +190,15 @@ namespace GreenQloud {
 
                 WindowIsOpen = false;
                 HideWindowEvent ();
+                //this.create_startup_item = true;
 
-                if (this.create_startup_item)
-                    new Thread (() => CreateStartupItem ()).Start ();
 
             } else {
                 ChangePageEvent (PageType.Tutorial, null);
             }
         }
 
-        public void CreateStartupItem ()
-        {
-            // There aren't any bindings in MonoMac to support this yet, so
-            // we call out to an applescript to do the job
-            System.Diagnostics.Process process = new System.Diagnostics.Process ();
-            process.StartInfo.FileName               = "osascript";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute        = false;
-            
-            process.StartInfo.Arguments = "-e 'tell application \"System Events\" to " +
-                "make login item at end with properties {path:\"" + MonoMac.Foundation.NSBundle.MainBundle.BundlePath + "\", hidden:false}'";
-            
-            process.Start ();
-            process.WaitForExit ();
-            
-            Logger.LogInfo ("Controller", "Added " + MonoMac.Foundation.NSBundle.MainBundle.BundlePath + " to login items");
-        }
+
 
 
         public void StartupItemChanged (bool create_startup_item)

@@ -45,7 +45,7 @@ namespace GreenQloud {
             using (var a = new NSAutoreleasePool ())
             {
 
-                NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("sparkleshare-app.icns");
+                NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("qloudsync-app.icns");
 
                 SetFolderIcon ();
     
@@ -62,7 +62,7 @@ namespace GreenQloud {
         {
             using (var a = new NSAutoreleasePool ())
             {
-                NSImage folder_icon = NSImage.ImageNamed ("sparkleshare-folder.icns");
+                NSImage folder_icon = NSImage.ImageNamed ("qloudsync-folder.icns");
                 NSWorkspace.SharedWorkspace.SetIconforFile (folder_icon, RuntimeSettings.HomePath, 0);
             }
         }
