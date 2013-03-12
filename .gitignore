@@ -54,3 +54,4 @@ _ReSharper.*
 *.am
 Source Code/QloudSync/Common/*
 >>>>>>> origin/clean-version
+lib/
