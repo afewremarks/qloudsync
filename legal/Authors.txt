@@ -4,6 +4,7 @@ Commercial licensing and business development
 	Eirikur Hrafnsson <eiki@greenqloud.com>
 
 	Press inquiries:
+<<<<<<< HEAD
 	Paula Gould <paula@greenqloud.com>
 
 
@@ -14,6 +15,18 @@ Code:
 	Carlos Maia <carlos@greenqloud.com> - co-producer, project manager
 	Angelo Ribeiro <angelo@greenqloud.com> - lead developer
 	Þórhallur Helgason <laddi@greenqloud.com> - StorageQloud integration 
+=======
+	Paula Gould <paul@greenqloud.com>
+
+
+Product lead:
+	Eirikur Hrafnsson <eiki@greenqloud.com>
+	
+Code:
+	Angelo Ribeiro <angelo@greenqloud.com> - lead developer
+	Carlos Maia <carlos@greenqloud.com> - development and quality testing
+	Þórhallur Helgason <laddi@greenqloud.com>, StorageQloud integration 
+>>>>>>> origin/clean-version
 	
 	Parts of QloudSync were inspired by the Sparkleshare project. 
 	https://github.com/hbons/SparkleShare
@@ -25,4 +38,8 @@ Artwork:
 	Hrafn Áki Hrafnsson <rave3000@mac.com>
 
 
+<<<<<<< HEAD
 © GreenQloud all rights reserved. http://greenqloud.com
+=======
+© GreenQloud all rights reserved. http://greenqloud.com
+>>>>>>> origin/clean-version
