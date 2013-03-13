@@ -139,7 +139,7 @@ using MonoMac.AppKit;
             }
         }
 
-        static void CreatePath (string path)
+        public static void CreatePath (string path)
         {
             string parent = path.Substring (0,path.LastIndexOf("/"));
 
