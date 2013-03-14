@@ -74,7 +74,7 @@ namespace GreenQloud
         public double Percentage {
             get {
                 if(TotalSize == 0){
-                    return 1;
+                    return 100;
                 }
                 if (TransferredBits != 0){
                     return (TransferredBits / TotalSize)*100;

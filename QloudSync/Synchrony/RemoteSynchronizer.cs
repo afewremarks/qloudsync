@@ -179,7 +179,7 @@ namespace GreenQloud.Synchrony
                             Status = SyncStatus.UPLOADING;
                             Logger.LogInfo ("Synchronizing Remote",string.Format("Create: {0}",file.FullLocalName));
 
-                            remoteRepo.Upload (file); 
+                            Program.Controller.RecentsTransfers.Add (remoteRepo.Upload (file)); 
 
                             ChangesInLastSync.Add (new Change (file, WatcherChangeTypes.Created));
                             BacklogSynchronizer.GetInstance ().AddFile (file);
@@ -246,7 +246,11 @@ namespace GreenQloud.Synchrony
                             DeleteFile(r);
                     }
                 }
-                remoteRepo.MoveFolderToTrash (folder);
+                Program.Controller.RecentsTransfers.Add (remoteRepo.MoveFolderToTrash (folder));
+                if (LocalRepo.Files.Any(lf=> lf.AbsolutePath == folder.AbsolutePath+"/" || lf.AbsolutePath == folder.AbsolutePath)){
+                    StorageQloudObject local = LocalRepo.Files.First(rf=> rf.AbsolutePath == folder.AbsolutePath+"/" || rf.AbsolutePath == folder.AbsolutePath);
+                    LocalRepo.Files.Remove(local);
+                }
                 ChangesInLastSync.Add (new Change (folder, WatcherChangeTypes.Deleted));
                 BacklogSynchronizer.GetInstance().RemoveFileByAbsolutePath(folder);
             } catch {
