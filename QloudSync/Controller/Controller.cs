@@ -324,10 +324,10 @@ namespace GreenQloud {
             
             public new void Add (TransferResponse item)
             {
+                base.Add (item);
                 if (null != OnAdd) {
                     OnAdd (this, null);                
                 }
-                base.Add (item);
             }
 
         } 
