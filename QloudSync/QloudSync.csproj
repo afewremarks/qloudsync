@@ -154,15 +154,6 @@
     <Content Include="Pixmaps\side-splash.png">
       <Link>Pixmaps\side-splash.png</Link>
     </Content>
-    <Content Include="Pixmaps\16x16 idle-active-Recovered.psd">
-      <Link>Pixmaps\16x16 idle-active-Recovered.psd</Link>
-    </Content>
-    <Content Include="Pixmaps\16x16 sync-Recovered.psd">
-      <Link>Pixmaps\16x16 sync-Recovered.psd</Link>
-    </Content>
-    <Content Include="Pixmaps\16x16 sync-active-Recovered.psd">
-      <Link>Pixmaps\16x16 sync-active-Recovered.psd</Link>
-    </Content>
     <Content Include="Pixmaps\about.png">
       <Link>Pixmaps\about.png</Link>
     </Content>
@@ -207,9 +198,6 @@
     </Content>
     <Content Include="Pixmaps\user-icon-default.png">
       <Link>Pixmaps\user-icon-default.png</Link>
-    </Content>
-    <Content Include="Pixmaps\working doc.psd">
-      <Link>Pixmaps\working doc.psd</Link>
     </Content>
     <Content Include="Pixmaps\file_down.png">
       <Link>Pixmaps\file_down.png</Link>
