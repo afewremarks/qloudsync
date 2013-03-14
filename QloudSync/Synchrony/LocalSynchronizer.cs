@@ -270,8 +270,6 @@ namespace GreenQloud.Synchrony
                             StorageQloudObject localFile =  LocalRepo.Files.First(f=> f.LocalMD5Hash == remoteFile.RemoteMD5Hash);
                             if (File.Exists (localFile.FullLocalName)){                                
                                 LocalRepo.CreatePath (remoteFile.FullLocalName);
-                                foreach (StorageQloudObject rem in remoteFiles)
-                                    Console.WriteLine (rem.AbsolutePath);
                                 if (!remoteFiles.Any (r => r.AbsolutePath == localFile.AbsolutePath)){
                                     Logger.LogInfo ("LocalSynchronizer", string.Format ("Moving \"{0}\" to \"{1}\" in local repo", localFile.FullLocalName, remoteFile.FullLocalName));
                                     File.Move (localFile.FullLocalName, remoteFile.FullLocalName);
@@ -298,11 +296,15 @@ namespace GreenQloud.Synchrony
                     }
                 }
             }
-            foreach (StorageQloudObject folder in remoteRepo.Folders) {
+            foreach (StorageQloudObject folder in remoteRepo.Folders) {               
+                if (RemoteSynchronizer.GetInstance ().PendingChanges.Any (f => f.AbsolutePath+"/" == folder.AbsolutePath))
+                    continue;
                 if(!Directory.Exists(folder.FullLocalName)){
                     Status = SyncStatus.DOWNLOADING;
                     LocalRepo.CreateFolder(folder);
-                    Program.Controller.RecentsTransfers.Add (new TransferResponse(folder, GreenQloud.TransferType.DOWNLOAD));
+                    TransferResponse transfer = new TransferResponse(folder, GreenQloud.TransferType.DOWNLOAD);
+                    transfer.Status = TransferStatus.DONE;
+                    Program.Controller.RecentsTransfers.Add (transfer);
                     BacklogSynchronizer.GetInstance().AddFile(folder);
                     ChangesInLastSync.Add(new Change(folder, WatcherChangeTypes.Created));
                 }
@@ -319,8 +321,6 @@ namespace GreenQloud.Synchrony
                     deletedFiles.Add (localFile);
             }
             foreach (StorageQloudObject deletedFile in deletedFiles) { 
-                
-                
                 if (deletedFile.IsIgnoreFile)
                     continue;
                 if (RemoteSynchronizer.GetInstance().PendingChanges.Any (f=> f.AbsolutePath == deletedFile.AbsolutePath))
@@ -332,7 +332,10 @@ namespace GreenQloud.Synchrony
                 Logger.LogInfo ("LocalSynchronizer", string.Format ("\"{0}\" was deleted in StorageQloud", deletedFile.FullLocalName));
                 Logger.LogInfo ("LocalSynchronizer", string.Format ("Deleting \"{0}\" in local repo", deletedFile.FullLocalName));
                 LocalRepo.Delete (deletedFile);
-                Program.Controller.RecentsTransfers.Add(new TransferResponse(deletedFile, GreenQloud.TransferType.REMOVE)); 
+                TransferResponse transfer = new TransferResponse(deletedFile, GreenQloud.TransferType.REMOVE);
+                transfer.Status = TransferStatus.DONE;
+
+                Program.Controller.RecentsTransfers.Add(transfer); 
                 ChangesInLastSync.Add (new Change (deletedFile, WatcherChangeTypes.Deleted));
             }
         }
