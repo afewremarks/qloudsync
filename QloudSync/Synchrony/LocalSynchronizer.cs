@@ -302,7 +302,7 @@ namespace GreenQloud.Synchrony
                 if(!Directory.Exists(folder.FullLocalName)){
                     Status = SyncStatus.DOWNLOADING;
                     LocalRepo.CreateFolder(folder);
-                    TransferResponse transfer = new TransferResponse(folder, GreenQloud.TransferType.DOWNLOAD);
+                    TransferResponse transfer = new TransferResponse(folder, GreenQloud.TransferType.CREATELOCALFOLDER);
                     transfer.Status = TransferStatus.DONE;
                     Program.Controller.RecentsTransfers.Add (transfer);
                     BacklogSynchronizer.GetInstance().AddFile(folder);

@@ -240,48 +240,6 @@ namespace GreenQloud {
                 Buttons.Add (FinishButton);
                 Buttons.Add (CancelButton);
             }
-
-            /*if (type == PageType.ShowTransfers) {
-                Header      = "Recent Changes";
-                Description = "";
-
-
-                // Displaying marked up text with Cocoa is
-                // a pain, so we just use a webview instead
-                WebView web_view = new WebView ();
-                web_view.Frame   = new RectangleF (0, 0, Frame.Width, Frame.Height);
-            
-                string html = "<table style='font-size: 10pt; font-family: \"Lucida Grande\";'>";
-                List<TransferResponse> list = new List<TransferResponse>();
-                list.Add(new TransferResponse(new StorageQloudObject("teste"), GreenQloud.TransferType.DOWNLOAD));
-                
-                list.Add(new TransferResponse(new StorageQloudObject("teste"), GreenQloud.TransferType.UPLOAD));
-                list.Add(new TransferResponse(new StorageQloudObject("teste"), GreenQloud.TransferType.CREATEFOLDER));
-                list.Add(new TransferResponse(new StorageQloudObject("teste"), GreenQloud.TransferType.REMOVE));
-                foreach(TransferResponse rt in list)//Program.Controller.RecentsTransfers)
-                    html += string.Format("<tr><td>{0}</td><td>\t{1}</td><td>\t{2}</td><td>\t{3}</td></tr>", rt.StorageQloudObject.Name, rt.Type.ToString(), rt.InitialTime.ToLongTimeString(), rt.EndTime.ToLongTimeString());
-                html += "</table>";
-                web_view.MainFrame.LoadHtmlString (html, new NSUrl (""));
-                web_view.DrawsBackground = false;
-
-                TryAgainButton = new NSButton () {
-                    Title = "Done"
-                };
-
-
-
-                TryAgainButton.Activated += delegate {
-                    InvokeOnMainThread (delegate {
-                        PerformClose (this);
-                    });
-                };
-
-
-                ContentView.AddSubview (web_view);
-
-                Buttons.Add (TryAgainButton);
-            }*/
-
             if (type == PageType.Finished) {
                 Header      = "Your shared project is ready!";
                 Description = string.Format("You can find the files in your {0} folder.", GlobalSettings.ApplicationName);

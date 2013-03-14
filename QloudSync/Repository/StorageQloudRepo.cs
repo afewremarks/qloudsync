@@ -412,7 +412,7 @@ namespace GreenQloud
 
         public override TransferResponse CreateFolder (StorageQloudObject folder)
 		{
-            CurrentTransfer = new TransferResponse(folder, TransferType.UPLOAD);
+            CurrentTransfer = new TransferResponse(folder, TransferType.CREATEREMOTEFOLDER);
 			CreateFolder (folder.Name, folder.RelativePathInBucket);
             return CurrentTransfer;
 		}
