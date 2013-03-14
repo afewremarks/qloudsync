@@ -46,11 +46,8 @@ _ReSharper.*
 .DS_Store
 =======
 *.DS_Store
-*.png
 *.tiff
 *.psd
-*.icns
-*.xib
 *.am
 Source Code/QloudSync/Common/*
 >>>>>>> origin/clean-version
