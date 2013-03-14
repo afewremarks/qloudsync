@@ -12,7 +12,8 @@ namespace GreenQloud
         DOWNLOAD,
         UPLOAD,
         REMOVE,
-        CREATEFOLDER
+        CREATELOCALFOLDER,
+        CREATEREMOTEFOLDER
     }
 
     public class TransferResponse
