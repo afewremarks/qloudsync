@@ -334,7 +334,7 @@ namespace GreenQloud {
                     Enabled = false// (Controller.Folders.Length > 0)
                 };
 
-                if (Prefferences.NotificationsEnabled)
+                if (Preferences.NotificationsEnabled)
                     this.notify_item.Title = "Turn Notifications Off";
                 else
                     this.notify_item.Title = "Turn Notifications On";
@@ -343,7 +343,7 @@ namespace GreenQloud {
                     Program.Controller.ToggleNotifications ();
 
                     InvokeOnMainThread (delegate {
-                        if (Prefferences.NotificationsEnabled)
+                        if (Preferences.NotificationsEnabled)
                             this.notify_item.Title = "Turn Notifications Off";
                         else
                             this.notify_item.Title = "Turn Notifications On";

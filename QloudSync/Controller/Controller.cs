@@ -200,7 +200,7 @@ namespace GreenQloud {
         }
         
         public void ToggleNotifications () {
-            Prefferences.NotificationsEnabled = !Prefferences.NotificationsEnabled;
+            Preferences.NotificationsEnabled = !Preferences.NotificationsEnabled;
         }
         
         

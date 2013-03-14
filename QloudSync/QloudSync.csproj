@@ -83,7 +83,6 @@
   <ItemGroup>
     <Compile Include="Config\Credential.cs" />
     <Compile Include="Config\GlobalSettings.cs" />
-    <Compile Include="Config\Prefferences.cs" />
     <Compile Include="Config\RuntimeSettings.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Controller\Controller.cs" />
@@ -121,11 +120,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="SparkleUI.cs" />
+    <Compile Include="Config\Preferences.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Pixmaps\16x16 idle-active-Recovered.psd" />
-    <None Include="Pixmaps\16x16 sync-Recovered.psd" />
-    <None Include="Pixmaps\16x16 sync-active-Recovered.psd" />
     <None Include="Pixmaps\about.png" />
     <None Include="Pixmaps\down_done.png" />
     <None Include="Pixmaps\down_sync.png" />
