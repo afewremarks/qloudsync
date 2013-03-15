@@ -43,7 +43,7 @@ namespace GreenQloud {
         private NSMenuItem state_item;
         private NSMenuItem folder_item;
 
-        private NSMenuItem add_item;
+        private NSMenuItem preferences_item;
         private NSMenuItem about_item;
         private NSMenuItem openweb_item;
         private NSMenuItem notify_item;
@@ -206,8 +206,19 @@ namespace GreenQloud {
             
             Program.Controller.OnError += delegate {
                 CurrentState = IconState.Error;
-                StateText    = "Failed to send some changes";
-
+                switch(Program.Controller.ErrorType)
+                {
+                    case ERROR_TYPE.DISCONNECTION:
+                        StateText = "Lost network connection";
+                    break;
+                    case ERROR_TYPE.ACCESS_DENIED:
+                        StateText = "Access Denied. Login again!";
+                        this.preferences_item.Enabled = true;
+                    break;
+                    default:
+                        StateText = "Failed to send some changes";
+                    break;
+                }
                 UpdateQuitItemEvent (QuitItemEnabled);
                 UpdateStatusItemEvent (StateText);
                 UpdateIconEvent (CurrentState);
@@ -312,12 +323,12 @@ namespace GreenQloud {
                 this.folder_item.Image.Size = new SizeF (16, 16);
                 this.folder_item.Enabled    = true;
 
-                this.add_item = new NSMenuItem () {
+                this.preferences_item = new NSMenuItem () {
                     Title   = "Preferences…",
                     Enabled = false
                 };
 
-                this.add_item.Activated += delegate {
+                this.preferences_item.Activated += delegate {
                     AddHostedProjectClicked ();
                 };
 
@@ -399,7 +410,7 @@ namespace GreenQloud {
                 this.menu.AddItem (this.openweb_item);                
                 this.menu.AddItem (this.recent_events_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.add_item);
+                this.menu.AddItem (this.preferences_item);
                 this.menu.AddItem (help_item);
 				this.menu.AddItem (this.about_item);
 			    this.menu.AddItem (NSMenuItem.SeparatorItem);

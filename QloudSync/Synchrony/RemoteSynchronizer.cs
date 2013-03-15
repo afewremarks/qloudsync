@@ -222,7 +222,11 @@ namespace GreenQloud.Synchrony
                 remoteRepo.UpdateStorageQloud();
                 Status = SyncStatus.IDLE;
                
-            } catch (Exception e) {
+            } catch (DisconnectionException) {
+                Status = SyncStatus.IDLE;
+                Program.Controller.HandleDisconnection();
+                return false;
+            }catch (Exception e){
                 Logger.LogInfo ("UploadSynchronizer", e.Message+"\n"+e.StackTrace);
                 Status = SyncStatus.IDLE;
                 return false;
