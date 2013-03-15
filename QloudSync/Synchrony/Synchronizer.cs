@@ -99,9 +99,6 @@ namespace GreenQloud.Synchrony
             else
                 Logger.LogInfo(action, string.Format("Successful: {0} files.\n",countOperation));
         }   
-
-                
-
  
     }
 }

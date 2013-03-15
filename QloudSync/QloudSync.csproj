@@ -79,11 +79,11 @@
     <Folder Include="Synchrony\" />
     <Folder Include="UI\" />
     <Folder Include="Util\" />
+    <Folder Include="Exception\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\Credential.cs" />
     <Compile Include="Config\GlobalSettings.cs" />
-    <Compile Include="Config\Prefferences.cs" />
     <Compile Include="Config\RuntimeSettings.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Controller\Controller.cs" />
@@ -101,7 +101,6 @@
     <Compile Include="Synchrony\DeltaFile.cs" />
     <Compile Include="Synchrony\LocalSynchronizer.cs" />
     <Compile Include="Synchrony\RemoteSynchronizer.cs" />
-    <Compile Include="Synchrony\Sync.cs" />
     <Compile Include="Synchrony\Synchronizer.cs" />
     <Compile Include="UI\AboutWindow.cs" />
     <Compile Include="UI\HyperLink.cs" />
@@ -121,37 +120,76 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="SparkleUI.cs" />
+    <Compile Include="Config\Preferences.cs" />
+    <Compile Include="Exception\DisconnectionException.cs" />
+    <Compile Include="Exception\AccessDeniedException.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Pixmaps\16x16 idle-active-Recovered.psd" />
-    <None Include="Pixmaps\16x16 sync-Recovered.psd" />
-    <None Include="Pixmaps\16x16 sync-active-Recovered.psd" />
-    <None Include="Pixmaps\about.png" />
-    <None Include="Pixmaps\down_done.png" />
-    <None Include="Pixmaps\down_sync.png" />
-    <None Include="Pixmaps\process-syncing-active.png" />
-    <None Include="Pixmaps\process-syncing-active_new.png" />
-    <None Include="Pixmaps\process-syncing-down-active.png" />
-    <None Include="Pixmaps\process-syncing-down.png" />
-    <None Include="Pixmaps\process-syncing-error-active.png" />
-    <None Include="Pixmaps\process-syncing-error.png" />
-    <None Include="Pixmaps\process-syncing-idle-active.png" />
-    <None Include="Pixmaps\process-syncing-idle.png" />
-    <None Include="Pixmaps\process-syncing-up-active.png" />
-    <None Include="Pixmaps\process-syncing-up.png" />
-    <None Include="Pixmaps\process-syncing.png" />
-    <None Include="Pixmaps\qloudsync-app.icns" />
-    <None Include="Pixmaps\qloudsync-folder.icns" />
-    <None Include="Pixmaps\remove.png" />
-    <None Include="Pixmaps\side-splash.png" />
-    <None Include="Pixmaps\tutorial-slide-1.png" />
-    <None Include="Pixmaps\tutorial-slide-2.png" />
-    <None Include="Pixmaps\tutorial-slide-3.png" />
-    <None Include="Pixmaps\tutorial-slide-4.png" />
-    <None Include="Pixmaps\up_done.png" />
-    <None Include="Pixmaps\up_sync.png" />
-    <None Include="Pixmaps\user-icon-default.png" />
-    <None Include="Pixmaps\working doc.psd" />
+    <Content Include="Pixmaps\side-splash.png">
+      <Link>Pixmaps\side-splash.png</Link>
+    </Content>
+    <Content Include="Pixmaps\about.png">
+      <Link>Pixmaps\about.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing-active.png">
+      <Link>Pixmaps\process-syncing-active.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing-active_new.png">
+      <Link>Pixmaps\process-syncing-active_new.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing-down-active.png">
+      <Link>Pixmaps\process-syncing-down-active.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing-down.png">
+      <Link>Pixmaps\process-syncing-down.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing-error-active.png">
+      <Link>Pixmaps\process-syncing-error-active.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing-error.png">
+      <Link>Pixmaps\process-syncing-error.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing-idle-active.png">
+      <Link>Pixmaps\process-syncing-idle-active.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing-idle.png">
+      <Link>Pixmaps\process-syncing-idle.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing-up-active.png">
+      <Link>Pixmaps\process-syncing-up-active.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing-up.png">
+      <Link>Pixmaps\process-syncing-up.png</Link>
+    </Content>
+    <Content Include="Pixmaps\process-syncing.png">
+      <Link>Pixmaps\process-syncing.png</Link>
+    </Content>
+    <Content Include="Pixmaps\qloudsync-app.icns">
+      <Link>qloudsync-app.icns</Link>
+    </Content>
+    <Content Include="Pixmaps\qloudsync-folder.icns">
+      <Link>qloudsync-folder.icns</Link>
+    </Content>
+    <Content Include="Pixmaps\user-icon-default.png">
+      <Link>Pixmaps\user-icon-default.png</Link>
+    </Content>
+    <Content Include="Pixmaps\file_down.png">
+      <Link>Pixmaps\file_down.png</Link>
+    </Content>
+    <Content Include="Pixmaps\file_up.png">
+      <Link>Pixmaps\file_up.png</Link>
+    </Content>
+    <Content Include="Pixmaps\folder_down.png">
+      <Link>Pixmaps\folder_down.png</Link>
+    </Content>
+    <Content Include="Pixmaps\folder_up.png">
+      <Link>Pixmaps\folder_up.png</Link>
+    </Content>
+    <Content Include="Pixmaps\trash.png">
+      <Link>Pixmaps\trash.png</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="app.config" />
     <None Include="Info.plist" />
   </ItemGroup>

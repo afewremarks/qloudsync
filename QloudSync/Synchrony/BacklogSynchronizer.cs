@@ -20,6 +20,7 @@ using System.Threading;
             this.remoteRepo = new StorageQloudRepo();
             this.backlogDocument = new BacklogDocument();
             threadSynchronize = new Thread(Synchronize);
+
         }
         
         public static BacklogSynchronizer GetInstance(){
@@ -208,9 +209,18 @@ using System.Threading;
                 }
             
                 Logger.LogInfo ("Synchronizer", "Backlog Sync is finished");
-            } catch (Exception e) {
-                Logger.LogInfo ("Backlog", e.Message);
-            } finally {
+            }catch (DisconnectionException )
+            {
+                Program.Controller.HandleDisconnection();
+            }
+            catch (AccessDeniedException)
+            {
+                Program.Controller.HandleAccessDenied();
+            }
+            catch (Exception e)
+            {
+            }
+            finally {
                 Status = SyncStatus.IDLE;
             }
         }         
@@ -235,6 +245,8 @@ using System.Threading;
         {
             this.backlogDocument.EditFileByHash(file);
         }
+
+
     }
 }
 

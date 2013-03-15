@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace GreenQloud
 {
-    public class Prefferences : Settings
+    public class Preferences : Settings
     {
         public static bool NotificationsEnabled {
             get {

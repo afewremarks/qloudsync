@@ -22,7 +22,6 @@ namespace GreenQloud {
         public static void Main (string [] args)
         {
             try {
-                //new StorageQloudRepo().DeleteAllFilesInBucket();
 
                 Controller = new Controller ();
                 Controller.Initialize ();

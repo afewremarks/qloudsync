@@ -227,16 +227,25 @@ namespace GreenQloud.Synchrony
 
         public override void Synchronize ()
         {
-            Done = false;    
-            DateTime initTime = DateTime.Now;
-            ChangesInLastSync = new List<GreenQloud.Repository.Change>();
+            try{
+                Done = false;    
+                DateTime initTime = DateTime.Now;
+                ChangesInLastSync = new List<GreenQloud.Repository.Change>();
 
-            Initialize();
-            PendingFiles = RemoteChanges;
-            SynchronizeUpdates ();
-            LastSyncTime = initTime;
-            Done = true;            
-            Status = SyncStatus.IDLE;
+                Initialize();
+                PendingFiles = RemoteChanges;
+                SynchronizeUpdates ();
+                LastSyncTime = initTime;
+                Done = true;            
+                Status = SyncStatus.IDLE;
+            }
+            catch (DisconnectionException){
+                Status = SyncStatus.IDLE;
+                Program.Controller.HandleDisconnection();
+            }
+            catch (Exception e){
+                Console.WriteLine (e.Message);
+            }
         }
 
         protected void SynchronizeUpdates ()
@@ -302,7 +311,7 @@ namespace GreenQloud.Synchrony
                 if(!Directory.Exists(folder.FullLocalName)){
                     Status = SyncStatus.DOWNLOADING;
                     LocalRepo.CreateFolder(folder);
-                    TransferResponse transfer = new TransferResponse(folder, GreenQloud.TransferType.DOWNLOAD);
+                    TransferResponse transfer = new TransferResponse(folder, GreenQloud.TransferType.CREATELOCALFOLDER);
                     transfer.Status = TransferStatus.DONE;
                     Program.Controller.RecentsTransfers.Add (transfer);
                     BacklogSynchronizer.GetInstance().AddFile(folder);
