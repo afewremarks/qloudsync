@@ -169,7 +169,11 @@ namespace GreenQloud
         {
             if (file.IsAFolder)
                 return;
-            List<StorageQloudObject> versions = TrashFiles.Where (tf => tf.AbsolutePath != string.Empty && tf.AbsolutePath.Substring(0, tf.AbsolutePath.Length-3)== file.AbsolutePath).OrderByDescending(t => t.AbsolutePath).ToList<StorageQloudObject> ();
+
+            if (!TrashFiles.Any (tf => !tf.AsS3Object.Key.EndsWith("/") && tf.AbsolutePath != string.Empty && tf.AbsolutePath.Substring (0, tf.AbsolutePath.Length - 3) == file.AbsolutePath))
+                return;
+
+            List<StorageQloudObject> versions = TrashFiles.Where (tf => !tf.AsS3Object.Key.EndsWith("/") && tf.AbsolutePath != string.Empty && tf.AbsolutePath.Substring(0, tf.AbsolutePath.Length-3)== file.AbsolutePath).OrderByDescending(t => t.AbsolutePath).ToList<StorageQloudObject> ();
             
             int overload = versions.Count-2;
             for (int i=0; i<overload; i++) {
