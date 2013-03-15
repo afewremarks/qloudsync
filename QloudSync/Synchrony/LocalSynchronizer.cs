@@ -253,7 +253,6 @@ namespace GreenQloud.Synchrony
             List<StorageQloudObject> deletedFiles = new List<StorageQloudObject> ();
             Status = SyncStatus.VERIFING;
 
-
             if (PendingFiles.Count != 0) {
                 foreach (StorageQloudObject remoteFile in PendingFiles) {
                     if (RemoteSynchronizer.GetInstance ().ChangesInLastSync.Any (c => c.File.AbsolutePath == remoteFile.AbsolutePath && c.Event == WatcherChangeTypes.Created)) {
