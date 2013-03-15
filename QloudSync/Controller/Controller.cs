@@ -12,6 +12,12 @@ using GreenQloud.Synchrony;
 
 namespace GreenQloud {
 
+    
+    public enum ERROR_TYPE{
+        DISCONNECTION,
+        ACCESS_DENIED
+    }
+
 	public class Controller{
 
         public IconController StatusIcon;
@@ -44,6 +50,9 @@ namespace GreenQloud {
         public event Action OnSyncing = delegate { };
         public event Action OnError = delegate { };
 
+        
+        private System.Timers.Timer timer;
+
         bool FirstRun = RuntimeSettings.FirstRun;
 
         public Controller () : base ()
@@ -61,6 +70,21 @@ namespace GreenQloud {
             localSynchronizer.SyncStatusChanged += HandleSyncStatusChanged;
             remoteSynchronizer.SyncStatusChanged += HandleSyncStatusChanged;
             backlogSynchronizer.SyncStatusChanged +=HandleSyncStatusChanged;
+            
+            this.timer = new System.Timers.Timer (){
+                Interval = 60000
+            };
+            
+            timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e)=>{
+                try{
+                    backlogSynchronizer.Synchronize();
+                    timer.Stop();
+                    localSynchronizer.Start();
+                    remoteSynchronizer.Start ();
+                }catch{
+                    
+                }
+            };
 
             CreateConfigFolder();
 
@@ -114,7 +138,6 @@ namespace GreenQloud {
            if (localSynchronizer.Status == SyncStatus.DOWNLOADING || localSynchronizer.Status == SyncStatus.UPLOADING ||
                 remoteSynchronizer.Status == SyncStatus.DOWNLOADING || remoteSynchronizer.Status == SyncStatus.UPLOADING  
                 ) {
-
                 OnSyncing ();
             } else {
                 OnIdle ();
@@ -200,7 +223,7 @@ namespace GreenQloud {
         }
         
         public void ToggleNotifications () {
-            Prefferences.NotificationsEnabled = !Prefferences.NotificationsEnabled;
+            Preferences.NotificationsEnabled = !Preferences.NotificationsEnabled;
         }
         
         
@@ -331,5 +354,26 @@ namespace GreenQloud {
             }
 
         } 
+
+        public void HandleDisconnection(){
+            ErrorType = ERROR_TYPE.DISCONNECTION;
+            OnError ();
+            localSynchronizer.Stop ();
+            remoteSynchronizer.Stop ();
+            timer.Start ();
+        }
+
+        public void HandleAccessDenied ()
+        {
+            ErrorType = ERROR_TYPE.ACCESS_DENIED;
+            OnError ();
+            localSynchronizer.Stop ();
+            remoteSynchronizer.Stop ();
+        }
+
+        public ERROR_TYPE ErrorType {
+            set;
+            get;
+        }
    	}
 }

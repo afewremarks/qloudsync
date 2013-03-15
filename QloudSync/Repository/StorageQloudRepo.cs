@@ -277,10 +277,19 @@ namespace GreenQloud
                 connection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
                 Logger.LogInfo("Connection", "Start a new connection");
                 return connection;
-            } catch (System.Net.WebException) {
-                Logger.LogInfo ("Connection", "Failed to communicate with the remote server");
-            } catch (Exception e){
-                Logger.LogInfo ("Connection", e);
+            }catch (System.Net.WebException e){
+                if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout){
+                    throw new DisconnectionException();
+                }else{                    
+                    if (((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new AccessDeniedException(); 
+                    }
+                }
+            }catch(AmazonS3Exception s3e)
+            {
+                if (s3e.StatusCode == HttpStatusCode.Forbidden)
+                    throw new AccessDeniedException(); 
             }
             return null;
         }
@@ -334,10 +343,26 @@ namespace GreenQloud
 
         public List<S3Object> GetFiles ()
         {
-            List<S3Object> files = Reconnect().ListObjects (
-                new ListObjectsRequest ().WithBucketName (bucketName)
-                ).S3Objects;
-            return files;
+            try{
+                List<S3Object> files = Reconnect().ListObjects (
+                    new ListObjectsRequest ().WithBucketName (bucketName)
+                    ).S3Objects;
+                return files;
+            }catch (System.Net.WebException e){
+                if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout){
+                    throw new DisconnectionException();
+                }else{                    
+                    if (((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new AccessDeniedException(); 
+                    }
+                }
+            }catch(AmazonS3Exception s3e)
+            {
+                if (s3e.StatusCode == HttpStatusCode.Forbidden)
+                    throw new AccessDeniedException(); 
+            }
+            return null;
         }
 
         public override TransferResponse Download (StorageQloudObject  file)
@@ -412,7 +437,7 @@ namespace GreenQloud
 
         public override TransferResponse CreateFolder (StorageQloudObject folder)
 		{
-            CurrentTransfer = new TransferResponse(folder, TransferType.UPLOAD);
+            CurrentTransfer = new TransferResponse(folder, TransferType.CREATEREMOTEFOLDER);
 			CreateFolder (folder.Name, folder.RelativePathInBucket);
             return CurrentTransfer;
 		}
