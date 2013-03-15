@@ -79,6 +79,7 @@
     <Folder Include="Synchrony\" />
     <Folder Include="UI\" />
     <Folder Include="Util\" />
+    <Folder Include="Exception\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\Credential.cs" />
@@ -100,7 +101,6 @@
     <Compile Include="Synchrony\DeltaFile.cs" />
     <Compile Include="Synchrony\LocalSynchronizer.cs" />
     <Compile Include="Synchrony\RemoteSynchronizer.cs" />
-    <Compile Include="Synchrony\Sync.cs" />
     <Compile Include="Synchrony\Synchronizer.cs" />
     <Compile Include="UI\AboutWindow.cs" />
     <Compile Include="UI\HyperLink.cs" />
@@ -121,6 +121,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="SparkleUI.cs" />
     <Compile Include="Config\Preferences.cs" />
+    <Compile Include="Exception\AccessDeniedException.cs" />
+    <Compile Include="Exception\DisconnectionException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">
