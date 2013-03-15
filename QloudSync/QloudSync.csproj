@@ -188,8 +188,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; Refferences and new images
-    <None Include="app.config" /><None Include="Info.plist" /></ItemGroup>
+    <None Include="app.config" />
+    <None Include="Info.plist" />
+  </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" />
   </ItemGroup>
