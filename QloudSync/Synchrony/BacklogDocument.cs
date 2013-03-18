@@ -1,6 +1,7 @@
 using System;
 using System.Xml;
 using GreenQloud.Repository;
+using System.Collections.Generic;
 
 namespace GreenQloud
 {
@@ -187,6 +188,16 @@ namespace GreenQloud
                 }
             }
             return null;
+        }
+
+        public List<StorageQloudObject> GetFiles() {
+            List<StorageQloudObject> list = new List<StorageQloudObject>();
+            foreach (XmlNode node_file in SelectNodes ("/files/file")) {
+                string ap = string.Format ("{0}{1}",node_file[relativePath].InnerText, node_file[name].InnerText);
+                ap = LocalRepo.ResolveDecodingProblem (ap);
+                list.Add(new StorageQloudObject (ap));
+            }
+            return list;
         }
     }
 }

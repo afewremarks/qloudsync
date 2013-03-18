@@ -20,7 +20,6 @@ using System.Threading;
             this.remoteRepo = new StorageQloudRepo();
             this.backlogDocument = new BacklogDocument();
             threadSynchronize = new Thread(Synchronize);
-
         }
         
         public static BacklogSynchronizer GetInstance(){
@@ -103,8 +102,7 @@ using System.Threading;
                         }
                         alreadyAnalyzed.Add(remoteFile);
                         continue;
-                    }
-                       
+                    }                       
 
                     StorageQloudObject localFile = new StorageQloudObject (LocalRepo.ResolveDecodingProblem (remoteFile.AbsolutePath));
                      
@@ -206,6 +204,19 @@ using System.Threading;
                         AddFile (localFile);
                     }
                     alreadyAnalyzed.Add (localFile);
+                }
+
+                //removing files of backlog
+                // files not exist in local and remote repositories
+                foreach (StorageQloudObject sqo in backlogDocument.GetFiles())
+                {
+                    if (sqo.IsAFolder){
+                        if (!System.IO.Directory.Exists(sqo.FullLocalName))
+                            backlogDocument.RemoveFileByAbsolutePath(sqo);
+                    }
+                    else
+                        if (!System.IO.File.Exists(sqo.FullLocalName))
+                            backlogDocument.RemoveFileByAbsolutePath (sqo);
                 }
             
                 Logger.LogInfo ("Synchronizer", "Backlog Sync is finished");
