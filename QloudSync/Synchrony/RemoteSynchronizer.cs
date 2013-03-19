@@ -153,14 +153,30 @@ namespace GreenQloud.Synchrony
                         BacklogSynchronizer.GetInstance ().EditFileByHash (file);
                         ChangesInLastSync.Add (new Change (file, WatcherChangeTypes.Created));
                     } else {
-                        //Update
                         if (LocalSynchronizer.GetInstance ().ChangesInLastSync.Any (c => c.File.AbsolutePath == file.AbsolutePath && c.Event == WatcherChangeTypes.Created)){
                             Logger.LogInfo("RemoteSynchronizer", file.AbsolutePath+" is in list of changes made by LocalSynchronizer. This synchronization will be ignored.");
                             Status = SyncStatus.IDLE;
                             return true;
                         }
-                    
-                        if (remoteRepo.Files.Any (rf => rf.AbsolutePath == file.AbsolutePath && rf.RemoteMD5Hash != file.LocalMD5Hash)) { 
+                        //Create
+                        if (!remoteRepo.Exists(file)) {
+                            if (LocalSynchronizer.GetInstance ().ChangesInLastSync.Any (c => c.File.AbsolutePath == file.AbsolutePath && c.Event == WatcherChangeTypes.Created)){
+                                Logger.LogInfo("RemoteSynchronizer", file.AbsolutePath+" is in list of changes made by LocalSynchronizer. This synchronization will be ignored.");
+                                Status = SyncStatus.IDLE;
+                                return true;
+                            }
+                            Status = SyncStatus.UPLOADING;
+                            
+                            Logger.LogInfo ("Synchronizing Remote",string.Format("Create: {0}",file.FullLocalName));
+                            
+                            Program.Controller.RecentsTransfers.Add (remoteRepo.Upload (file)); 
+                            ChangesInLastSync.Add (new Change (file, WatcherChangeTypes.Created));
+                            BacklogSynchronizer.GetInstance ().AddFile (file);
+                            LocalRepo.Files.Add (file);
+                        }
+                        
+                        //Update
+                        else if (remoteRepo.Files.Any (rf => rf.AbsolutePath == file.AbsolutePath && rf.RemoteMD5Hash != file.LocalMD5Hash)) { 
                             Status = SyncStatus.UPLOADING;
                             Logger.LogInfo ("Synchronizing Remote",string.Format("Update: {0}",file.FullLocalName));
                             remoteRepo.MoveFileToTrash (file);
@@ -168,21 +184,6 @@ namespace GreenQloud.Synchrony
                             //hash changes then must be by name
                             BacklogSynchronizer.GetInstance ().EditFileByName (file);
                             ChangesInLastSync.Add (new Change (file, WatcherChangeTypes.Changed));
-                        }
-                        //Create
-                        else if (!remoteRepo.Exists(file)) {
-                            if (LocalSynchronizer.GetInstance ().ChangesInLastSync.Any (c => c.File.AbsolutePath == file.AbsolutePath && c.Event == WatcherChangeTypes.Created)){
-                                Logger.LogInfo("RemoteSynchronizer", file.AbsolutePath+" is in list of changes made by LocalSynchronizer. This synchronization will be ignored.");
-                                Status = SyncStatus.IDLE;
-                                return true;
-                            }
-                            Status = SyncStatus.UPLOADING;
-                            Logger.LogInfo ("Synchronizing Remote",string.Format("Create: {0}",file.FullLocalName));
-
-                            Program.Controller.RecentsTransfers.Add (remoteRepo.Upload (file)); 
-
-                            ChangesInLastSync.Add (new Change (file, WatcherChangeTypes.Created));
-                            BacklogSynchronizer.GetInstance ().AddFile (file);
                         }
                     }
                     //Create folder
