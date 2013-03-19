@@ -66,27 +66,14 @@ namespace GreenQloud
             ChangedEventHandler handler = Changed;
 
             for (int i = 0; i < numEvents; i++) {
+
                 string pcatched = paths[i];
-                if(!pcatched.EndsWith (".DS_Store")){
-                    if(pcatched!=last){
-                        last = pcatched;
+
+                if(!pcatched.EndsWith (".DS_Store") && !pcatched.Contains(".sb-")){
                         handler(pcatched);
-                    }
-                    else
-                    {
-                        if(cont == 2)
-                        {
-                            cont = 0;
-                            last = "";
-                        }
-                        else
-                            cont++;
-                    }
                 }
             }
         }
-        int cont = 0;
-        string last = "";
         [DllImport ("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
         extern static IntPtr CFStringCreateWithCString (IntPtr allocator, string value, int encoding);
         
