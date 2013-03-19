@@ -43,8 +43,7 @@ namespace GreenQloud
                 Load (RuntimeSettings.BacklogFile);
             }
             Logger.LogInfo ("Backlog", string.Format("Add {0} in backlog", file.FullLocalName));
-            if (!EditFileByName(file))
-            
+            if (!Exists(file))            
             {                     
                 XmlNode node_root = SelectSingleNode ("files");
                 
@@ -150,6 +149,7 @@ namespace GreenQloud
                     return true;
                 }
             }
+            AddFile (file);
             return false;
         }
         
@@ -176,7 +176,7 @@ namespace GreenQloud
             absolutePath = LocalRepo.ResolveDecodingProblem (absolutePath);
 
             foreach (XmlNode node_file in SelectNodes ("/files/file")) {
-                string ap = string.Format("{0}{1}",node_file[relativePath].InnerText, node_file[name].InnerText);
+                string ap = string.Format ("{0}{1}",node_file[relativePath].InnerText, node_file[name].InnerText);
                 ap = LocalRepo.ResolveDecodingProblem (ap);
                 if (absolutePath == ap || string.Format ("{0}/",absolutePath) == ap)
                 {
@@ -188,6 +188,18 @@ namespace GreenQloud
                 }
             }
             return null;
+        }
+
+        bool Exists (StorageQloudObject file)
+        {
+            List<StorageQloudObject> list = new List<StorageQloudObject>();
+            foreach (XmlNode node_file in SelectNodes ("/files/file")) {
+                string ap = string.Format ("{0}{1}",node_file[relativePath].InnerText, node_file[name].InnerText);
+                ap = LocalRepo.ResolveDecodingProblem (ap);                
+                if (file.AbsolutePath == ap || string.Format ("{0}/", file.AbsolutePath) == ap)
+                    return true;
+            }
+            return false;
         }
 
         public List<StorageQloudObject> GetFiles() {
