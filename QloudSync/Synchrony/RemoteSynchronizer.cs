@@ -146,11 +146,19 @@ namespace GreenQloud.Synchrony
                         //delete copys that is not in local repo and not is a trash file
                         foreach (StorageQloudObject remote in copys) {
                             if (!System.IO.File.Exists (remote.FullLocalName) && !remote.InTrash && remote.Name!=file.Name){
+                                Logger.LogInfo ("Debug - Inconsistence", string.Format("File {0} exist in remote repositoy but not exists in local repository and not was handled", remote.AbsolutePath));
                                 Program.Controller.RecentsTransfers.Add (remoteRepo.MoveFileToTrash (remote));
+                                ChangesInLastSync.Add (new Change(remote, WatcherChangeTypes.Deleted));
+                                if (LocalRepo.Files.Any(lf=>lf.FullLocalName == remote.FullLocalName))
+                                {
+                                    StorageQloudObject deleted = LocalRepo.Files.First (lf=>lf.FullLocalName == remote.FullLocalName);
+                                    LocalRepo.Files.Remove (deleted);
+                                }
+                                BacklogSynchronizer.GetInstance().RemoveFileByAbsolutePath (remote);
                             }
                         }
-                        //if there was a rename or move, the hash remains the same 
-                        BacklogSynchronizer.GetInstance ().EditFileByHash (file);
+                        //the delete code of old file exclude the refference of file in backlog, being necessary to re-add 
+                        BacklogSynchronizer.GetInstance ().AddFile (file);
                         ChangesInLastSync.Add (new Change (file, WatcherChangeTypes.Created));
                     } else {
                         if (LocalSynchronizer.GetInstance ().ChangesInLastSync.Any (c => c.File.AbsolutePath == file.AbsolutePath && c.Event == WatcherChangeTypes.Created)){
