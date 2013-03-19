@@ -187,42 +187,49 @@ namespace GreenQloud.Synchrony
 
         protected void FullLoad ()
         {
-            Stoped = false;
-            Status = SyncStatus.VERIFING;
-            remoteRepo.FullSizeTransfer = 0;
-            ChangesInLastSync = new List<Change>();
-            List<StorageQloudObject> remoteFiles = remoteRepo.Files;
-            List<StorageQloudObject> remoteFolders = remoteRepo.Folders;
-            CalculateDownloadSize(remoteFiles);
-            Logger.LogInfo("LocalSynchronizer","Init First Load");
-            foreach (StorageQloudObject remoteFile in remoteFiles) {
-                if(Stoped)
-                    return;
-                if (remoteFile.IsIgnoreFile)
-                    continue;
-                Status = SyncStatus.DOWNLOADING;
-                ChangesInLastSync.Add(new Change(remoteFile, WatcherChangeTypes.Created));
-                Logger.LogInfo ("LocalSynchronizer", string.Format("File {0} was added in list of changes of LocalSynchronizer and will be downloaded.", remoteFile.AbsolutePath));
-                remoteRepo.DownloadFull (remoteFile);            
-                BacklogSynchronizer.GetInstance().AddFile(remoteFile);
-
-                Status = SyncStatus.IDLE;
-            }
-
-            foreach(StorageQloudObject folder in remoteFolders){
-                if(Stoped)
-                    return;
-                if(!Directory.Exists (folder.FullLocalName)){
-                    ChangesInLastSync.Add(new Change(folder, WatcherChangeTypes.Created));
-                    Directory.CreateDirectory(folder.FullLocalName);
-                    BacklogSynchronizer.GetInstance().AddFile(folder);
+            try{
+                Stoped = false;
+                Status = SyncStatus.VERIFING;
+                remoteRepo.FullSizeTransfer = 0;
+                ChangesInLastSync = new List<Change>();
+                List<StorageQloudObject> remoteFiles = remoteRepo.Files;
+                List<StorageQloudObject> remoteFolders = remoteRepo.Folders;
+                CalculateDownloadSize(remoteFiles);
+                Logger.LogInfo("LocalSynchronizer","Init First Load");
+                foreach (StorageQloudObject remoteFile in remoteFiles) {
+                    if(Stoped)
+                        return;
+                    if (remoteFile.IsIgnoreFile)
+                        continue;
+                    Status = SyncStatus.DOWNLOADING;
+                    ChangesInLastSync.Add(new Change(remoteFile, WatcherChangeTypes.Created));
+                    Logger.LogInfo ("LocalSynchronizer", string.Format("File {0} was added in list of changes of LocalSynchronizer and will be downloaded.", remoteFile.AbsolutePath));
+                    remoteRepo.DownloadFull (remoteFile);            
+                    BacklogSynchronizer.GetInstance().AddFile(remoteFile);
 
                     Status = SyncStatus.IDLE;
                 }
+
+                foreach(StorageQloudObject folder in remoteFolders){
+                    if(Stoped)
+                        return;
+                    if(!Directory.Exists (folder.FullLocalName)){
+                        ChangesInLastSync.Add(new Change(folder, WatcherChangeTypes.Created));
+                        Directory.CreateDirectory(folder.FullLocalName);
+                        BacklogSynchronizer.GetInstance().AddFile(folder);
+
+                        Status = SyncStatus.IDLE;
+                    }
+                }
+
+                LastSyncTime = DateTime.Now;
+                Done = true;
+            }catch (AccessDeniedException){
+                Done = true;
+                Stoped = true;
+                Failed ();
             }
 
-            LastSyncTime = DateTime.Now;
-            Done = true;
         }
 
         public override void Synchronize ()
