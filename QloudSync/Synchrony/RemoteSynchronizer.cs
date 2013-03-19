@@ -184,6 +184,11 @@ namespace GreenQloud.Synchrony
                             //hash changes then must be by name
                             BacklogSynchronizer.GetInstance ().EditFileByName (file);
                             ChangesInLastSync.Add (new Change (file, WatcherChangeTypes.Changed));
+                            if (!LocalRepo.Files.Any (lf=> lf.FullLocalName == file.FullLocalName))
+                            {
+                                Logger.LogInfo ("Debug - Inconsistence", string.Format("File {0} is updated and not exists in list of files in local repo", file.AbsolutePath));
+                                LocalRepo.Files.Add(file);
+                            }
                         }
                     }
                     //Create folder
@@ -266,16 +271,19 @@ namespace GreenQloud.Synchrony
 
         void DeleteFile (StorageQloudObject file)
         {
-            if ( LocalRepo.Files.Any (f => f.FullLocalName == file.FullLocalName)){
-                //Tem que Ser do arquivo local por Quer Senao n'ao acha referencia
-                StorageQloudObject deleted = LocalRepo.Files.First (f => f.FullLocalName == file.FullLocalName);
+            if (remoteFiles.Any (rf=>rf.FullLocalName == file.FullLocalName)){
                 Program.Controller.RecentsTransfers.Add (remoteRepo.MoveFileToTrash (file));
-                LocalRepo.Files.Remove (deleted);
                 ChangesInLastSync.Add (new Change (file, WatcherChangeTypes.Deleted));
                 BacklogSynchronizer.GetInstance ().RemoveFileByAbsolutePath (file);
-            } else {
+                if ( LocalRepo.Files.Any (f => f.FullLocalName == file.FullLocalName)){
+                    StorageQloudObject deleted = LocalRepo.Files.First (f => f.FullLocalName == file.FullLocalName);   
+                    LocalRepo.Files.Remove (deleted);
+                } 
+                else
+                    Logger.LogInfo ("Debug - Inconsistence", string.Format("File {0} should be in list of local files.", file.AbsolutePath));
+            }               
+            else
                 Logger.LogInfo ("RemoteSynchronizer", string.Format("File {0} not exists in StorageQloud and not been deleted.", file.AbsolutePath));
-            }
         }
 
         public class ChangesCapturedByWatcher <File> : List<StorageQloudObject>
