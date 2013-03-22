@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using GreenQloud.Repository.Remote;
-using GreenQloud.Repository.Model;
+using GreenQloud.Model;
 using GreenQloud.Repository.Local;
 using System.Linq;
 
@@ -10,8 +10,8 @@ namespace GreenQloud.Test.SimpleRepository
 {
     public class SimpleRemoteRepositoryController : RemoteRepositoryController
     {
-        public Dictionary<RepoObject, string> list = new Dictionary<RepoObject, string>();
-        public List<RepoObject> trash = new List<RepoObject>();
+        public Dictionary<RepositoryItem, string> list = new Dictionary<RepositoryItem, string>();
+        public List<RepositoryItem> trash = new List<RepositoryItem>();
         SimplePhysicalRepositoryController physicalController;
 
         public SimpleRemoteRepositoryController (){
@@ -24,36 +24,32 @@ namespace GreenQloud.Test.SimpleRepository
 
         #region implemented abstract members of RemoteRepositoryController
 
-        public override List<RepoObject> GetCopys (RepoObject file)
+        public override List<RepositoryItem> GetCopys (RepositoryItem file)
         {
             throw new NotImplementedException ();
         }
 
-        public override bool ExistsVersion (RepoObject file)
+        public override bool ExistsVersion (RepositoryItem file)
         {
             throw new NotImplementedException ();
         }
 
-        public override TransferResponse Download (RepoObject request)
+        public override Transfer Download (RepositoryItem request)
         {
             if (physicalController.list.Any (o=>o.Key.FullLocalName == request.FullLocalName)){
-                RepoObject key = physicalController.list.First (o=>o.Key.FullLocalName == request.FullLocalName).Key;
+                RepositoryItem key = physicalController.list.First (o=>o.Key.FullLocalName == request.FullLocalName).Key;
                 physicalController.list[key] = list.First (o=>o.Key.FullLocalName==request.FullLocalName).Value;
-                foreach (RepoObject k in physicalController.list.Keys)
-                {
-                    Console.Write (k.FullLocalName+" "+physicalController.list[k]);
-                }
             }else{
                 physicalController.Create (request);
             }
-            return new TransferResponse (request, TransferType.DOWNLOAD);
+            return new Transfer (request, TransferType.DOWNLOAD);
         }
 
-        public override TransferResponse Upload (RepoObject request)
+        public override Transfer Upload (RepositoryItem request)
         {
             if (list.Any (o=> o.Key.FullLocalName == request.FullLocalName))
             {
-                RepoObject key = physicalController.list.First (o=>o.Key.FullLocalName == request.FullLocalName).Key;
+                RepositoryItem key = physicalController.list.First (o=>o.Key.FullLocalName == request.FullLocalName).Key;
 
                 return Upload (request, physicalController.list[key]);
             }
@@ -61,61 +57,61 @@ namespace GreenQloud.Test.SimpleRepository
                 return Upload (request, string.Empty);
         }
 
-        public TransferResponse Upload (RepoObject request, string value){
+        public Transfer Upload (RepositoryItem request, string value){
             if (list.Any (o=>o.Key.FullLocalName==request.FullLocalName)){
                 list [list.First (o=>o.Key.FullLocalName==request.FullLocalName).Key] = value;
             }else{
                 list.Add (request, value);
             }
-            return new TransferResponse(request, TransferType.UPLOAD);
+            return new Transfer(request, TransferType.UPLOAD);
         }
 
-        public override TransferResponse MoveFileToTrash (RepoObject request)
+        public override Transfer MoveFileToTrash (RepositoryItem request)
         {
             list.Remove (request);
             trash.Add (request);
-            return new TransferResponse (request, TransferType.UPLOAD);
+            return new Transfer (request, TransferType.UPLOAD);
         }
 
-        public override TransferResponse MoveFolderToTrash (RepoObject folder)
+        public override Transfer MoveFolderToTrash (RepositoryItem folder)
         {
             throw new NotImplementedException ();
         }
 
-        public override TransferResponse Delete (RepoObject request)
+        public override Transfer Delete (RepositoryItem request)
         {
             throw new NotImplementedException ();
         }
 
-        public override TransferResponse SendLocalVersionToTrash (RepoObject request)
+        public override Transfer SendLocalVersionToTrash (RepositoryItem request)
         {
             list.Remove (request);
             trash.Add (request);
            
-            return new TransferResponse (request, TransferType.UPLOAD);
+            return new Transfer (request, TransferType.UPLOAD);
         }
 
-        public override TransferResponse CreateFolder (RepoObject request)
+        public override Transfer CreateFolder (RepositoryItem request)
         {
             throw new NotImplementedException ();
         }
 
-        public override TransferResponse Copy (RepoObject source, RepoObject destination)
+        public override Transfer Copy (RepositoryItem source, RepositoryItem destination)
         {
             throw new NotImplementedException ();
         }
 
-        public override bool ExistsFolder (RepoObject folder)
+        public override bool ExistsFolder (RepositoryItem folder)
         {
             throw new NotImplementedException ();
         }
 
-        public override bool Exists (RepoObject sqObject)
+        public override bool Exists (RepositoryItem sqObject)
         {
             return list.Any (r=> r.Key.Name == sqObject.Name);
         }
 
-        public override void DownloadFull (RepoObject file)
+        public override void DownloadFull (RepositoryItem file)
         {
             throw new NotImplementedException ();
         }
@@ -125,27 +121,27 @@ namespace GreenQloud.Test.SimpleRepository
             throw new NotImplementedException ();
         }
 
-        public override List<RepoObject> AllFiles {
+        public override List<RepositoryItem> AllFiles {
             get {
                 throw new NotImplementedException ();
             }
         }
 
-        public override List<RepoObject> Files {
+        public override List<RepositoryItem> Files {
             get {
-                List<RepoObject> files = new List<RepoObject>();
+                List<RepositoryItem> files = new List<RepositoryItem>();
                 files.AddRange(list.Keys.ToList());
                 return files; 
             }
         }
 
-        public override List<RepoObject> Folders {
+        public override List<RepositoryItem> Folders {
             get {
                 throw new NotImplementedException ();
             }
         }
 
-        public override List<RepoObject> TrashFiles {
+        public override List<RepositoryItem> TrashFiles {
             get {
                 throw new NotImplementedException ();
             }
