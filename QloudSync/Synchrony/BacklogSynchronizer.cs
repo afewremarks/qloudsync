@@ -5,7 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Threading;
 using GreenQloud.Repository.Remote;
-using GreenQloud.Repository.Model;
+using GreenQloud.Model;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
 
@@ -27,91 +27,124 @@ using GreenQloud.Repository.Local;
             this.remoteRepository = remoteRepository;
         }
 
-        private enum LATEST_VERSION{
-            LOCAL,
-            REMOTE
+        public override Event GetEvent (RepositoryItem item, RepositoryType type){
+
+            if (type == RepositoryType.LOCAL)
+                return GetLocalEvent (item);
+            else
+                return GetRemoteEvent (item);
         }
 
-        //TODO TRATAR DESCONEXOES E ERROS
-        public override void Synchronize ( ){
+        Event GetLocalEvent (RepositoryItem item)
+        {
+            Event e = new Event ();
+            e.Item = item;
            
-            TransferResponse transfer;
-            List<RepoObject> objectsInRemoteRepo = remoteRepository.Files;
-            List<string> filesInPhysicalLocalRepository = physicalLocalRepository.FilesNames;
+            if (logicalLocalRepository.Exists (item)){
+                e.EventType = EventType.DELETE;
+                e.RepositoryType = RepositoryType.REMOTE;
+            }else{
+                e.EventType = EventType.CREATE;
+                e.RepositoryType = RepositoryType.LOCAL;
+            }
+            return e;
+        }
 
-            foreach (RepoObject remoteObj in objectsInRemoteRepo) {
-                if (remoteObj.IsIgnoreFile)
-                    continue;
+        Event GetRemoteEvent (RepositoryItem item)
+        {
+            Event e = new Event ();
+            e.Item = item;
 
-                transfer = null;
-                if (physicalLocalRepository.Exists (remoteObj)) {
-                    if (!remoteObj.IsSync) {
-                        if (CalculateLastestVersion (remoteObj) == LATEST_VERSION.LOCAL) {
-                             //TODO a decisao se eh pasta ou arquivo fica para ai
-                            Status = SyncStatus.UPLOADING;
-                            transfer = remoteRepository.Upload (remoteObj);
-                        }
-                        else {
-                            Status = SyncStatus.DOWNLOADING;
-                            transfer = remoteRepository.Download (remoteObj);
-                        }
+            if (physicalLocalRepository.Exists (item)) {
+                if (!item.IsSync) {
+                    if (CalculateLastestVersion (item) == RepositoryType.LOCAL) {
+                        e.EventType = EventType.UPDATE;
+                        e.RepositoryType = RepositoryType.LOCAL;
                     }
+                    else {
+                        e.EventType = EventType.UPDATE;
+                        e.RepositoryType = RepositoryType.REMOTE;
+                    }
+                }
+            }
+            else{               
+                if (logicalLocalRepository.Exists (item)){
+                    e.EventType = EventType.DELETE;
+                    e.RepositoryType = RepositoryType.LOCAL;
                 }
                 else{
-                    //exists in backlog
-                    if (logicalLocalRepository.Exists (remoteObj)){
-                        // was delete locally when offline (after disconnection)
-                        Status = SyncStatus.UPLOADING;
-                        transfer = remoteRepository.MoveFileToTrash (remoteObj);
-                    }
-                    else{
-                        // was created remotelly when client offline
-                        Status = SyncStatus.DOWNLOADING;
-                        transfer = remoteRepository.Download (remoteObj);
-                    }
+                    e.EventType = EventType.CREATE;
+                    e.RepositoryType = RepositoryType.REMOTE;
                 }
-
-                if (transfer != null)                
-                    transferDAO.Create (transfer);
-                logicalLocalRepository.Solve (remoteObj);
-                filesInPhysicalLocalRepository.Remove (remoteObj.FullLocalName); 
+            }
+            return e;
+        }
+        public override void Synchronize (){
+            List<RepositoryItem> itensInRemoteRepository = remoteRepository.Files;
+            List<RepositoryItem> filesInPhysicalLocalRepository = physicalLocalRepository.Files;
+ 
+            foreach (RepositoryItem remoteItem in itensInRemoteRepository) {
+                if (remoteItem.IsIgnoreFile)
+                    continue;            
+                Event e = GetEvent (remoteItem, RepositoryType.REMOTE);
+                Synchronize (e);
+                filesInPhysicalLocalRepository.RemoveAll (i=> i.FullLocalName == remoteItem.FullLocalName);
             }
 
-            foreach (string localObjectFullPath in filesInPhysicalLocalRepository)
+            foreach (RepositoryItem localItem in filesInPhysicalLocalRepository)
             {
-
-                RepoObject repoObj = logicalLocalRepository.CreateObjectInstance (localObjectFullPath);
-                transfer = null;
-
-                if (logicalLocalRepository.Exists (repoObj)){
-                    Status = SyncStatus.UPLOADING;
-                    remoteRepository.SendLocalVersionToTrash (repoObj);
-                    physicalLocalRepository.Delete (repoObj);
-                }else{
-                    Status = SyncStatus.UPLOADING;
-                    remoteRepository.Upload (repoObj);
-                }
-
-                if (transfer != null)
-                    transferDAO.Create (transfer);
-                logicalLocalRepository.Solve (repoObj);
+                Event e = GetEvent (localItem, RepositoryType.LOCAL);
+                Synchronize (e);
             }
 
-            Status = SyncStatus.IDLE;
         }
 
-        LATEST_VERSION CalculateLastestVersion (RepoObject remoteObj)
+        public override void Synchronize (Event e)
+        {
+            Transfer transfer = null;
+            if (e.RepositoryType == RepositoryType.LOCAL){
+
+                Status = SyncStatus.UPLOADING;
+
+                if (e.EventType == EventType.DELETE)
+                    transfer = remoteRepository.MoveFileToTrash (e.Item);
+                else
+                    transfer = remoteRepository.Upload (e.Item);
+
+            }else{
+                switch (e.EventType){
+                case EventType.CREATE: 
+                case EventType.UPDATE:
+                    Status = SyncStatus.DOWNLOADING;
+                    transfer = remoteRepository.Download (e.Item);
+                    break;
+                case EventType.DELETE:
+                    Status = SyncStatus.UPLOADING;
+                    transfer = remoteRepository.SendLocalVersionToTrash (e.Item);
+                    physicalLocalRepository.Delete (e.Item);
+                    break;
+                }
+            }
+            
+            if (transfer != null)
+                transferDAO.Create (transfer);
+            logicalLocalRepository.Solve (e.Item);
+        }
+
+
+
+        RepositoryType CalculateLastestVersion (RepositoryItem remoteObj)
         {
             TimeSpan diffClocks = remoteRepository.DiffClocks;
 
-            RepoObject physicalObjectVersion = physicalLocalRepository.CreateObjectInstance (remoteObj.FullLocalName);
+            RepositoryItem physicalObjectVersion = physicalLocalRepository.CreateObjectInstance (remoteObj.FullLocalName);
             
             DateTime referencialClock = physicalObjectVersion.TimeOfLastChange.Subtract (diffClocks);
 
             if (referencialClock.Subtract (Convert.ToDateTime (remoteObj.TimeOfLastChange)).TotalSeconds > -1) 
-                return LATEST_VERSION.LOCAL;
+                return RepositoryType.LOCAL;
 
-            return LATEST_VERSION.REMOTE;
+            return RepositoryType.REMOTE;
         }
     }
 }
