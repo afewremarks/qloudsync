@@ -5,7 +5,7 @@ using System.IO;
 using GreenQloud.Test.SimpleRepository;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
-using GreenQloud.Repository.Model;
+using GreenQloud.Model;
 
 
 namespace GreenQloud.Test
@@ -14,7 +14,28 @@ namespace GreenQloud.Test
     public class BacklogSynchronizerTest 
     {
         [Test()]
-        public void TestSynchronizingLocalObjectDeletedAfterDisconnection (){
+        public void TestGetEventLocalItemDeleted (){
+            SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
+            SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
+            SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
+            logical.PhysicalController = physical;
+            TransferDAO transfers = new SimpleTransferDAO ();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
+            
+            RepositoryItem repoObj = new RepositoryItem();
+            repoObj.Name = "teste.html";
+            repoObj.RelativePath = "home";
+            repoObj.Repo = new LocalRepository("...");
+            logical.Create (repoObj);
+            remote.Upload (repoObj);
+
+            Event e = sync.GetEvent (repoObj, RepositoryType.REMOTE);
+            Assert.AreEqual (RepositoryType.LOCAL, e.RepositoryType);
+            Assert.AreEqual (EventType.DELETE, e.EventType);
+        }
+
+        [Test()]
+        public void TestSynchronizingLocalItemDeletedAfterDisconnection (){
             SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
             SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
@@ -22,7 +43,7 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
 
-            RepoObject repoObj = new RepoObject();
+            RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
             repoObj.Repo = new LocalRepository("...");
@@ -34,8 +55,9 @@ namespace GreenQloud.Test
             Assert.False (remote.Exists (repoObj));
         }
 
+
         [Test ()]
-        public void TestSynchronizingRemoteObjectDeletedAfterDisconnection (){
+        public void TestGetEventRemoteItemDeleted (){
             SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
             SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
@@ -43,7 +65,28 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
             
-            RepoObject repoObj = new RepoObject();
+            RepositoryItem repoObj = new RepositoryItem();
+            repoObj.Name = "teste.html";
+            repoObj.RelativePath = "home";
+            repoObj.Repo = new LocalRepository("...");
+            logical.Create (repoObj);
+            physical.Create (repoObj);
+
+            Event e = sync.GetEvent (repoObj, RepositoryType.LOCAL);
+            Assert.AreEqual (EventType.DELETE, e.EventType);
+            Assert.AreEqual (RepositoryType.REMOTE, e.RepositoryType);
+        }
+
+        [Test ()]
+        public void TestSynchronizingRemoteItemDeletedAfterDisconnection (){
+            SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
+            SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
+            SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
+            logical.PhysicalController = physical;
+            TransferDAO transfers = new SimpleTransferDAO ();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
+            
+            RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
             repoObj.Repo = new LocalRepository("...");
@@ -57,7 +100,7 @@ namespace GreenQloud.Test
         }
 
         [Test ()]
-        public void TestSynchronizingLocalObjectCreatedAfterDisconnection (){
+        public void TestGetEventLocalItemCreated (){
             SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
             SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
@@ -65,7 +108,28 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
             
-            RepoObject repoObj = new RepoObject();
+            RepositoryItem repoObj = new RepositoryItem();
+            repoObj.Name = "teste.html";
+            repoObj.RelativePath = "home";
+            repoObj.Repo = new LocalRepository("...");
+            physical.Create (repoObj);
+            
+            Event e = sync.GetEvent (repoObj, RepositoryType.LOCAL);
+            Assert.AreEqual (EventType.CREATE, e.EventType);
+            Assert.AreEqual (RepositoryType.LOCAL, e.RepositoryType);
+        }
+
+
+        [Test ()]
+        public void TestSynchronizingLocalItemCreatedAfterDisconnection (){
+            SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
+            SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
+            SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
+            logical.PhysicalController = physical;
+            TransferDAO transfers = new SimpleTransferDAO ();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
+            
+            RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
             repoObj.Repo = new LocalRepository("...");
@@ -78,7 +142,7 @@ namespace GreenQloud.Test
         }
 
         [Test ()]
-        public void TestSynchronizingRemoteObjectCreatedAfterDisconnection (){
+        public void TestGetEventRemoteItemCreated (){
             SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
             SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController (physical);
@@ -86,7 +150,27 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
             
-            RepoObject repoObj = new RepoObject();
+            RepositoryItem repoObj = new RepositoryItem();
+            repoObj.Name = "teste.html";
+            repoObj.RelativePath = "home";
+            repoObj.Repo = new LocalRepository("...");
+            remote.Upload (repoObj);
+
+            Event e = sync.GetEvent (repoObj, RepositoryType.REMOTE);
+            Assert.AreEqual (EventType.CREATE, e.EventType);
+            Assert.AreEqual (RepositoryType.REMOTE, e.RepositoryType);
+        }
+
+        [Test ()]
+        public void TestSynchronizingRemoteItemCreatedAfterDisconnection (){
+            SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
+            SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
+            SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController (physical);
+            logical.PhysicalController = physical;
+            TransferDAO transfers = new SimpleTransferDAO ();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
+            
+            RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
             repoObj.Repo = new LocalRepository("...");
@@ -99,6 +183,36 @@ namespace GreenQloud.Test
         }
 
         [Test ()]
+        public void TestGetEventLocalUpdate (){
+            SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
+            SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
+            SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController (physical);
+            logical.PhysicalController = physical;
+            TransferDAO transfers = new SimpleTransferDAO ();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
+            
+            RepositoryItem localItem = new RepositoryItem();
+            localItem.Name = "teste.html";
+            localItem.RelativePath = "home";
+            localItem.Repo = new LocalRepository("***");
+            localItem.TimeOfLastChange = DateTime.Now;
+            
+            RepositoryItem remoteItem = new RepositoryItem();
+            remoteItem.Name = "teste.html";
+            remoteItem.RelativePath = "home";
+            remoteItem.Repo = new LocalRepository("***");
+            remoteItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
+            
+            remote.Upload (remoteItem,"out of date");
+            physical.Create (localItem,"updated");
+            logical.Create (localItem,"out of date");
+
+            Event e = sync.GetEvent (remoteItem, RepositoryType.REMOTE);
+            Assert.AreEqual (EventType.UPDATE, e.EventType);
+            Assert.AreEqual (RepositoryType.LOCAL, e.RepositoryType);
+        }
+
+        [Test ()]
         public void TestSynchronizingLocalUpdateAfterDisconnection (){
             SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
             SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
@@ -107,27 +221,58 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
             
-            RepoObject localObject = new RepoObject();
-            localObject.Name = "teste.html";
-            localObject.RelativePath = "home";
-            localObject.Repo = new LocalRepository("***");
-            localObject.TimeOfLastChange = DateTime.Now;
+            RepositoryItem localItem = new RepositoryItem();
+            localItem.Name = "teste.html";
+            localItem.RelativePath = "home";
+            localItem.Repo = new LocalRepository("***");
+            localItem.TimeOfLastChange = DateTime.Now;
             
-            RepoObject remoteObject = new RepoObject();
-            remoteObject.Name = "teste.html";
-            remoteObject.RelativePath = "home";
-            remoteObject.Repo = new LocalRepository("***");
-            remoteObject.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
+            RepositoryItem remoteItem = new RepositoryItem();
+            remoteItem.Name = "teste.html";
+            remoteItem.RelativePath = "home";
+            remoteItem.Repo = new LocalRepository("***");
+            remoteItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
             
-            remote.Upload (remoteObject,"out of date");
-            physical.Create (localObject,"updated");
-            logical.Create (localObject,"out of date");
+            remote.Upload (remoteItem,"out of date");
+            physical.Create (localItem,"updated");
+            logical.Create (localItem,"out of date");
             sync.Synchronize ();
             
-            Assert.AreEqual(physical.GetValue (localObject.FullLocalName),"updated");
-            Assert.AreEqual(logical.GetValue (localObject.FullLocalName),"updated");           
+            Assert.AreEqual(physical.GetValue (localItem.FullLocalName),"updated");
+            Assert.AreEqual(logical.GetValue (localItem.FullLocalName),"updated");           
         }
 
+
+        [Test()]
+        public void TestGetEventRemoteUpdate (){
+            
+            SimpleLogicalRepositoryController logical = new SimpleLogicalRepositoryController ();
+            SimplePhysicalRepositoryController physical = new SimplePhysicalRepositoryController (); 
+            SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController (physical);
+            logical.PhysicalController = physical;
+            TransferDAO transfers = new SimpleTransferDAO ();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
+            
+            RepositoryItem localItem = new RepositoryItem();
+            localItem.Name = "teste.html";
+            localItem.RelativePath = "home";
+            localItem.Repo = new LocalRepository("***");
+            localItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
+            
+            RepositoryItem remoteItem = new RepositoryItem();
+            remoteItem.Name = "teste.html";
+            remoteItem.RelativePath = "home";
+            remoteItem.Repo = new LocalRepository("***");
+            remoteItem.TimeOfLastChange = DateTime.Now;
+            
+            remote.Upload (remoteItem,"updated");
+            physical.Create (localItem,"out of date");
+            logical.Create (localItem,"out of date");
+
+            Event e = sync.GetEvent (remoteItem, RepositoryType.REMOTE);
+            Assert.AreEqual (EventType.UPDATE, e.EventType);
+            Assert.AreEqual (RepositoryType.REMOTE, e.RepositoryType);
+        }
 
         [Test()]
         public void TestSynchronizingRemoteUpdateAfterDisconnection (){
@@ -139,25 +284,25 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
 
-            RepoObject localObject = new RepoObject();
-            localObject.Name = "teste.html";
-            localObject.RelativePath = "home";
-            localObject.Repo = new LocalRepository("***");
-            localObject.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
+            RepositoryItem localItem = new RepositoryItem();
+            localItem.Name = "teste.html";
+            localItem.RelativePath = "home";
+            localItem.Repo = new LocalRepository("***");
+            localItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
 
-            RepoObject remoteObject = new RepoObject();
-            remoteObject.Name = "teste.html";
-            remoteObject.RelativePath = "home";
-            remoteObject.Repo = new LocalRepository("***");
-            remoteObject.TimeOfLastChange = DateTime.Now;
+            RepositoryItem remoteItem = new RepositoryItem();
+            remoteItem.Name = "teste.html";
+            remoteItem.RelativePath = "home";
+            remoteItem.Repo = new LocalRepository("***");
+            remoteItem.TimeOfLastChange = DateTime.Now;
 
-            remote.Upload (remoteObject,"updated");
-            physical.Create (localObject,"out of date");
-            logical.Create (localObject,"out of date");
+            remote.Upload (remoteItem,"updated");
+            physical.Create (localItem,"out of date");
+            logical.Create (localItem,"out of date");
             sync.Synchronize ();
 
-            Assert.AreEqual(physical.GetValue (localObject.FullLocalName),"updated");
-            Assert.AreEqual(logical.GetValue (localObject.FullLocalName),"updated");           
+            Assert.AreEqual(physical.GetValue (localItem.FullLocalName),"updated");
+            Assert.AreEqual(logical.GetValue (localItem.FullLocalName),"updated");           
         }
 
     }
