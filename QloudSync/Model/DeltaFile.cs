@@ -1,9 +1,9 @@
 using System;
 using System.Xml;
 
-namespace GreenQloud
+namespace GreenQloud.Model
 {
-    public class DeltaFile : XmlDocument
+    public class DeltaFile 
     {
         public DeltaFile ()
         {
