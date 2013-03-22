@@ -5,7 +5,7 @@ using System.IO;
 using GreenQloud.Test.SimpleRepository;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
-using GreenQloud.Repository.Model;
+using GreenQloud.Model;
 using GreenQloud.Repository;
 using System.Linq;
 using System.Collections.Generic;
@@ -14,9 +14,8 @@ namespace GreenQloud.Test.SimpleRepository
 {
     public class SimplePhysicalRepositoryController : PhysicalRepositoryController
 	{
-        public Dictionary<RepoObject, string> list = new Dictionary<RepoObject, string>();
-        public List<string> names = new List<string>();
-
+        public Dictionary<RepositoryItem, string> list = new Dictionary<RepositoryItem, string>();
+       
         public SimplePhysicalRepositoryController (SimpleLogicalRepositoryController logical)
         {
             throw new NotImplementedException ();
@@ -26,18 +25,18 @@ namespace GreenQloud.Test.SimpleRepository
         }
        
         #region implemented abstract members of PhysicalRepositoryController
-        public override void CreateOrUpdate (RepoObject remoteObj)
+        public override void CreateOrUpdate (RepositoryItem remoteObj)
         {
             throw new NotImplementedException ();
         }
 
-        public override bool Exists (RepoObject repoObject)
+        public override bool Exists (RepositoryItem repoObject)
         {
             bool exists = list.Any(r=> r.Key.Name == repoObject.Name);
             return exists;
         }
 
-        public override RepoObject CreateObjectInstance (string fullLocalName)
+        public override RepositoryItem CreateObjectInstance (string fullLocalName)
         {
            if (list.Any (o=> o.Key.FullLocalName == fullLocalName)){
                 return list.First (o=> o.Key.FullLocalName == fullLocalName).Key;
@@ -45,41 +44,32 @@ namespace GreenQloud.Test.SimpleRepository
            return null;
         }
 
-        public override List<string> FilesNames {
+        public override List<RepositoryItem> Files {
             get {
-                List<string> templist = new List<string>();
-                templist.AddRange (names);
+                List<RepositoryItem> templist = new List<RepositoryItem>();
+                templist.AddRange (list.Keys);
                 return templist;
             }
         }
-        public override List<RepoObject> Files {
-            get {
-                throw new NotImplementedException ();
-            }
-        }
 
-        public override void Delete (RepoObject repoObj)
+        public override void Delete (RepositoryItem repoObj)
         {
             if (list.Any (o=> o.Key.FullLocalName == repoObj.FullLocalName))
             {
-                RepoObject temp = list.First (o=> o.Key.FullLocalName == repoObj.FullLocalName).Key;
+                RepositoryItem temp = list.First (o=> o.Key.FullLocalName == repoObj.FullLocalName).Key;
                 list.Remove (temp);
             }
-            names.Remove (repoObj.FullLocalName);
-
-
         }
 
         #endregion
 
-        public void Create (RepoObject repoObj)
+        public void Create (RepositoryItem repoObj)
         {
             Create (repoObj, "");
         }
 
-        public void Create (RepoObject repoObj, string value){
+        public void Create (RepositoryItem repoObj, string value){
             list.Add (repoObj, value);
-            names.Add (repoObj.FullLocalName);
         }
 
         public string GetValue (string fullLocalName)

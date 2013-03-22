@@ -3,14 +3,14 @@ using GreenQloud.Repository.Remote;
 using GreenQloud.Repository;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
-using GreenQloud.Repository.Model;
+using GreenQloud.Model;
 using System.Collections.Generic;
 
 namespace GreenQloud.Test.SimpleRepository
 {
     public class SimpleBacklogSynchronizer : GreenQloud.Synchrony.BacklogSynchronizer
     {
-        public List<RepoObject> list = new List<RepoObject>();
+        public List<RepositoryItem> list = new List<RepositoryItem>();
 
         public SimpleBacklogSynchronizer (LogicalRepositoryController logical, PhysicalRepositoryController physical, RemoteRepositoryController remote, TransferDAO transfers) : base (logical, physical, remote, transfers)
         {
