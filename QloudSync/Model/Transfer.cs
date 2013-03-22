@@ -1,7 +1,7 @@
 using System;
 using GreenQloud.Repository;
 
-namespace GreenQloud.Repository.Model
+namespace GreenQloud.Model
 {
 
     public enum TransferStatus{
@@ -16,21 +16,21 @@ namespace GreenQloud.Repository.Model
         CREATEREMOTEFOLDER
     }
 
-    public class TransferResponse
+    public class Transfer
     {
 
-        public TransferResponse ()
+        public Transfer ()
         {
 
         }
 
-        public TransferResponse (RepoObject sqObject, TransferType type)
+        public Transfer (RepositoryItem sqObject, TransferType type)
         {
             StorageQloudObject = sqObject;
             Type = type;
         }
 
-        public RepoObject StorageQloudObject{
+        public RepositoryItem StorageQloudObject{
             set; get;
         }
         

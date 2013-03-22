@@ -1,6 +1,6 @@
 using System;
 
-namespace GreenQloud.Repository.Model
+namespace GreenQloud.Model
 {
     public class LocalRepository
     {
