@@ -20,7 +20,7 @@ using System;
 		{
 		}
 
-        public RepositoryItem File{
+        public RepositoryItem Item{
 			set; get;
 		}
 
