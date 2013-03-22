@@ -4,260 +4,115 @@ using GreenQloud.Repository;
 using System.Linq;
 using System.Xml;
 using System.Threading;
+using GreenQloud.Repository.Remote;
+using GreenQloud.Repository.Model;
+using GreenQloud.Persistence;
+using GreenQloud.Repository.Local;
 
  namespace GreenQloud.Synchrony
 {
-    public class BacklogSynchronizer : Synchronizer
+    public abstract class BacklogSynchronizer : Synchronizer
     {
-        private static BacklogSynchronizer instance;
-        private BacklogDocument backlogDocument;
-        Thread threadSynchronize;
-       
+        TransferDAO transferDAO;
+        LogicalRepositoryController logicalLocalRepository;
+        PhysicalRepositoryController physicalLocalRepository;
+        RemoteRepositoryController remoteRepository;
 
-        private BacklogSynchronizer ()
+        protected BacklogSynchronizer (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO)
         {
             Status = SyncStatus.IDLE;
-            this.remoteRepo = new StorageQloudRepo();
-            this.backlogDocument = new BacklogDocument();
-            threadSynchronize = new Thread(Synchronize);
-        }
-        
-        public static BacklogSynchronizer GetInstance(){
-            if(instance == null)
-                instance = new BacklogSynchronizer();
-            return instance;
-        }
-        
-        public List<StorageQloudObject> ChangesMade = new List<StorageQloudObject>();
-
-
-
-        public override void Start ()
-        {
-            threadSynchronize.Start();
+            this.transferDAO = transferDAO;
+            this.logicalLocalRepository = logicalLocalRepository;
+            this.physicalLocalRepository = physicalLocalRepository;
+            this.remoteRepository = remoteRepository;
         }
 
-        public override void Pause ()
-        {
-            threadSynchronize.Join();
+        private enum LATEST_VERSION{
+            LOCAL,
+            REMOTE
         }
 
-        public override void Stop ()
-        {
+        //TODO TRATAR DESCONEXOES E ERROS
+        public override void Synchronize ( ){
+           
+            TransferResponse transfer;
+            List<RepoObject> objectsInRemoteRepo = remoteRepository.Files;
+            List<string> filesInPhysicalLocalRepository = physicalLocalRepository.FilesNames;
 
-        }
+            foreach (RepoObject remoteObj in objectsInRemoteRepo) {
+                if (remoteObj.IsIgnoreFile)
+                    continue;
 
-
-        /*      Remote          Local       Backlog
-                X                           X               (foi apagado enquanto offline, envia o remoto para a lixeira)
-                                X           X               (foi apagado remotamente, envia o local para a lixeira e apaga) 
-                X               X           X               (verifica sincronia, se dessincronizado, ver qual o mais atual e atualizar)
-                                            X               (foi apagado local e remotamente, enquanto estava offline, nao faz nada)
-                X                                           (foi criado enquanto offline, faz o download)
-                                X                           (foi criado enquanto offline, faz o upload)
-                X               X                           (backlog desatualizado, remoto ganha)
-        */
-        
-        public override void Synchronize ()
-        {
-            try {
-                ChangesInLastSync = new List<Change>();
-                Logger.LogInfo ("Synchronizer", "Sync starting from backlog");
-
-                List<StorageQloudObject> filesInLocalRepo = LocalRepo.GetSQObjects (RuntimeSettings.HomePath);
-
-                List<StorageQloudObject> filesInRemoteRepo = remoteRepo.Files;
-                filesInRemoteRepo.AddRange(remoteRepo.Folders);
-
-                TimeSpan diffClocks = remoteRepo.DiffClocks;
-                List<StorageQloudObject> alreadyAnalyzed = new List<StorageQloudObject> ();
-
-                foreach (StorageQloudObject remoteFile in filesInRemoteRepo) {
-                    if (remoteFile.IsIgnoreFile)
-                        continue;
-                    if (LocalSynchronizer.GetInstance ().ChangesInLastSync.Any (c => c.File.AbsolutePath == remoteFile.AbsolutePath))
-                        continue;
-
-
-                    StorageQloudObject backlogFile = backlogDocument.Get (remoteFile.AbsolutePath);
-                    bool existsInBacklog = backlogFile != null;
-
-                    if (remoteFile.IsAFolder) {
-                        //se eh remoto e nao existe no local, mas existe no backlog apaga o remoto
-                        //else cria o local
-                        if (!System.IO.Directory.Exists (remoteFile.FullLocalName)) {
-                            if (existsInBacklog) {
-                                ChangesInLastSync.Add(new Change(remoteFile, System.IO.WatcherChangeTypes.Deleted));
-                                remoteRepo.Delete (remoteFile);
-                                RemoveFileByAbsolutePath (remoteFile);
-                            } else {
-                                ChangesInLastSync.Add(new Change(remoteFile, System.IO.WatcherChangeTypes.Created));
-
-                                System.IO.Directory.CreateDirectory (remoteFile.FullLocalName);
-                                Logger.LogInfo ("BacklogSynchronizer","Creating folder "+remoteFile.FullLocalName);
-                                AddFile (remoteFile);
-                            }
-
-
+                transfer = null;
+                if (physicalLocalRepository.Exists (remoteObj)) {
+                    if (!remoteObj.IsSync) {
+                        if (CalculateLastestVersion (remoteObj) == LATEST_VERSION.LOCAL) {
+                             //TODO a decisao se eh pasta ou arquivo fica para ai
+                            Status = SyncStatus.UPLOADING;
+                            transfer = remoteRepository.Upload (remoteObj);
                         }
-                        alreadyAnalyzed.Add(remoteFile);
-                        continue;
-                    }                       
-
-                    StorageQloudObject localFile = new StorageQloudObject (LocalRepo.ResolveDecodingProblem (remoteFile.AbsolutePath));
-                     
-                    if (existsInBacklog) {
-                        //localfile was deleted when offline
-                        if (!System.IO.File.Exists (localFile.FullLocalName)) {
-                            remoteRepo.MoveFileToTrash(remoteFile);
-                            RemoveFileByAbsolutePath (remoteFile);
-                        }
-                        //verify updates when offline
                         else {
-                            if (!remoteFile.IsSync) {
-                                
-                                DateTime localLastTime = backlogFile.TimeOfLastChange;
-                                
-                                if (localFile.TimeOfLastChange > backlogFile.TimeOfLastChange)
-                                    localLastTime = localFile.TimeOfLastChange;
-                                
-                                DateTime referencialClock = localLastTime.Subtract (diffClocks);
-                                //local version is more recent
-                                if (referencialClock.Subtract (Convert.ToDateTime (remoteFile.AsS3Object.LastModified)).TotalSeconds > -1) {
-                                    remoteRepo.MoveFileToTrash (remoteFile);
-                                    remoteRepo.Upload (localFile);
-                                }
-                                //remote version is more recent
-                                else {
-                                    remoteRepo.SendLocalVersionToTrash (localFile);
-                                    ChangesMade.Add (remoteFile);
-                                    ChangesInLastSync.Add(new Change(remoteFile, System.IO.WatcherChangeTypes.Deleted));
-                                    remoteRepo.Download (remoteFile);
-                                    LocalRepo.Files.Add (new StorageQloudObject (remoteFile.AbsolutePath));
-                                }
-                            }
-                        }                            
-                        alreadyAnalyzed.Add (localFile);
-                    } else {
-                        if (remoteFile.IsAFolder) {
-                            ChangesInLastSync.Add(new Change(remoteFile, System.IO.WatcherChangeTypes.Created));
-                            System.IO.Directory.CreateDirectory (remoteFile.FullLocalName);
-                            Logger.LogInfo ("BacklogSynchronizer","Creating folder "+remoteFile.FullLocalName);
-                            AddFile(remoteFile);
-                            alreadyAnalyzed.Add (localFile);
-                        } else {
-                            //remote file was create when offline
-                            if (System.IO.File.Exists (localFile.FullLocalName)) {
-                                if (remoteFile.IsSync) {
-                                    alreadyAnalyzed.Add (localFile);
-                                    AddFile (remoteFile);
-                                    continue;
-                                }
-                            } 
-                            ChangesMade.Add (remoteFile);
-                            ChangesInLastSync.Add(new Change(remoteFile, System.IO.WatcherChangeTypes.Created));
-                            remoteRepo.Download (remoteFile);
-                            LocalRepo.Files.Add (new StorageQloudObject (remoteFile.AbsolutePath));
-                            if (localFile != null)
-                                alreadyAnalyzed.Add (localFile);
+                            Status = SyncStatus.DOWNLOADING;
+                            transfer = remoteRepository.Download (remoteObj);
                         }
-                        AddFile (remoteFile);
                     }
                 }
-                //not exists remote file
-                foreach (StorageQloudObject localFile in filesInLocalRepo) {
-                    string resolvedPath = LocalRepo.ResolveDecodingProblem (localFile.AbsolutePath);
-                    if (alreadyAnalyzed.Any (lf => LocalRepo.ResolveDecodingProblem (lf.AbsolutePath) == resolvedPath || LocalRepo.ResolveDecodingProblem (lf.AbsolutePath).Contains (resolvedPath + "/")))
-                        continue;
-
-                    if (!System.IO.File.Exists (localFile.FullLocalName) && !localFile.IsAFolder)
-                        continue;
-
-                    StorageQloudObject backlogFile = backlogDocument.Get (localFile.AbsolutePath);
-                    bool existsInBacklog = backlogFile != null;
-                    //remote file was deleted when offline
-                    if (existsInBacklog) {
-                        if (localFile.IsAFolder) {
-                            if (System.IO.Directory.Exists (localFile.FullLocalName)) {
-                                ChangesInLastSync.Add(new Change(localFile, System.IO.WatcherChangeTypes.Deleted));
-                                LocalRepo.Delete(localFile);
-                            }
-                            continue;            
-                        }
-
-                        StorageQloudObject lf = new StorageQloudObject (localFile.AbsolutePath);
-
-                        if (remoteRepo.SendLocalVersionToTrash (lf).Status == TransferStatus.DONE) {
-                            ChangesMade.Add (lf);
-                            ChangesInLastSync.Add(new Change(localFile, System.IO.WatcherChangeTypes.Deleted));
-                            LocalRepo.Delete (localFile);
-                        }
+                else{
+                    //exists in backlog
+                    if (logicalLocalRepository.Exists (remoteObj)){
+                        // was delete locally when offline (after disconnection)
+                        Status = SyncStatus.UPLOADING;
+                        transfer = remoteRepository.MoveFileToTrash (remoteObj);
                     }
-                    // local file was created when offline
-                    else {
-                        if (localFile.IsAFolder) {    
-                            remoteRepo.CreateFolder (localFile);
-                            AddFile (localFile);
-                            continue;            
-                        }
-                        remoteRepo.Upload (localFile);
-                        AddFile (localFile);
+                    else{
+                        // was created remotelly when client offline
+                        Status = SyncStatus.DOWNLOADING;
+                        transfer = remoteRepository.Download (remoteObj);
                     }
-                    alreadyAnalyzed.Add (localFile);
                 }
 
-                //removing files of backlog
-                // files not exist in local and remote repositories
-                foreach (StorageQloudObject sqo in backlogDocument.GetFiles())
-                {
-                    if (sqo.IsAFolder){
-                        if (!System.IO.Directory.Exists(sqo.FullLocalName))
-                            backlogDocument.RemoveFileByAbsolutePath(sqo);
-                    }
-                    else
-                        if (!System.IO.File.Exists(sqo.FullLocalName))
-                            backlogDocument.RemoveFileByAbsolutePath (sqo);
+                if (transfer != null)                
+                    transferDAO.Create (transfer);
+                logicalLocalRepository.Solve (remoteObj);
+                filesInPhysicalLocalRepository.Remove (remoteObj.FullLocalName); 
+            }
+
+            foreach (string localObjectFullPath in filesInPhysicalLocalRepository)
+            {
+
+                RepoObject repoObj = logicalLocalRepository.CreateObjectInstance (localObjectFullPath);
+                transfer = null;
+
+                if (logicalLocalRepository.Exists (repoObj)){
+                    Status = SyncStatus.UPLOADING;
+                    remoteRepository.SendLocalVersionToTrash (repoObj);
+                    physicalLocalRepository.Delete (repoObj);
+                }else{
+                    Status = SyncStatus.UPLOADING;
+                    remoteRepository.Upload (repoObj);
                 }
+
+                if (transfer != null)
+                    transferDAO.Create (transfer);
+                logicalLocalRepository.Solve (repoObj);
+            }
+
+            Status = SyncStatus.IDLE;
+        }
+
+        LATEST_VERSION CalculateLastestVersion (RepoObject remoteObj)
+        {
+            TimeSpan diffClocks = remoteRepository.DiffClocks;
+
+            RepoObject physicalObjectVersion = physicalLocalRepository.CreateObjectInstance (remoteObj.FullLocalName);
             
-                Logger.LogInfo ("Synchronizer", "Backlog Sync is finished");
-            }catch (DisconnectionException )
-            {
-                Program.Controller.HandleDisconnection();
-            }
-            catch (AccessDeniedException)
-            {
-                Program.Controller.HandleAccessDenied();
-            }
-            catch (Exception e)
-            {
-            }
-            finally {
-                Status = SyncStatus.IDLE;
-            }
-        }         
+            DateTime referencialClock = physicalObjectVersion.TimeOfLastChange.Subtract (diffClocks);
 
-        public void RemoveFileByAbsolutePath (StorageQloudObject sqObj)
-        {
-            this.backlogDocument.RemoveFileByAbsolutePath (sqObj);
+            if (referencialClock.Subtract (Convert.ToDateTime (remoteObj.TimeOfLastChange)).TotalSeconds > -1) 
+                return LATEST_VERSION.LOCAL;
+
+            return LATEST_VERSION.REMOTE;
         }
-
-        public void AddFile (StorageQloudObject folder)
-        {
-
-            this.backlogDocument.AddFile(folder);
-        }
-
-        public void EditFileByName (StorageQloudObject remoteFile)
-        {
-            this.backlogDocument.EditFileByName(remoteFile);
-        }
-
-        public void EditFileByHash (StorageQloudObject file)
-        {
-            this.backlogDocument.EditFileByHash(file);
-        }
-
-
     }
 }
 
