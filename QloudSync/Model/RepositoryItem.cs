@@ -7,13 +7,13 @@ using Amazon.S3.Model;
 using System.Security.Cryptography;
 using System.Linq;
 
-namespace GreenQloud.Repository.Model
+namespace GreenQloud.Model
 {
-    public class RepoObject
+    public class RepositoryItem
     {
        
 
-        public RepoObject ()
+        public RepositoryItem ()
         {
            
         }
