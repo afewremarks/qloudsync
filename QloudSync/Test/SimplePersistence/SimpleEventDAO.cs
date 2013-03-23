@@ -13,7 +13,7 @@ namespace GreenQloud.Test.SimplePersistence
 {
 	public class SimpleEventDAO : EventDAO
 	{
-        List<Event> list = new List<Event>();
+        public List<Event> list = new List<Event>();
         #region implemented abstract members of EventDAO
 
         public override void Create (Event e)
@@ -21,9 +21,11 @@ namespace GreenQloud.Test.SimplePersistence
             list.Add (e);
         }
 
-        public override System.Collections.Generic.List<Event> GetEventsNotSynchronized ()
+        public override System.Collections.Generic.List<Event> EventsNotSynchronized 
         {
-            return list.Where (e=>e.Synchronized == false).ToList<Event>();
+            get{
+                return list.Where (e=>e.Synchronized == false).ToList<Event>();
+            }
         }
 
         public override void UpdateToSynchronized (Event e)
@@ -31,6 +33,12 @@ namespace GreenQloud.Test.SimplePersistence
             int id = list.IndexOf (e);
             e.Synchronized = true;
             list[id] = e;
+        }
+
+        public override List<Event> All{
+            get{
+                return list;
+            }
         }
 
         #endregion
