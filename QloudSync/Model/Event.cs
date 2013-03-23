@@ -6,7 +6,8 @@ using System;
         CREATE,
         UPDATE,
         DELETE,
-        MOVE_OR_RENAME
+        MOVE_OR_RENAME,
+        COPY
     }
 
     public enum RepositoryType{

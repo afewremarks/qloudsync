@@ -127,7 +127,7 @@ namespace GreenQloud.Test.SimpleRepository
             }
         }
 
-        public override List<RepositoryItem> Files {
+        public override List<RepositoryItem> Items {
             get {
                 List<RepositoryItem> files = new List<RepositoryItem>();
                 files.AddRange(list.Keys.ToList());
@@ -150,6 +150,16 @@ namespace GreenQloud.Test.SimpleRepository
         public override TimeSpan DiffClocks {
             get {
                 return new TimeSpan (0);
+            }
+        }
+
+
+        public override List<RepositoryItem> RecentChangedItems {
+            get {
+                throw new NotImplementedException ();
+            }
+            set {
+                throw new NotImplementedException ();
             }
         }
 

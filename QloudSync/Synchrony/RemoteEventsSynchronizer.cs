@@ -3,6 +3,7 @@ using GreenQloud.Model;
 using GreenQloud.Repository.Local;
 using GreenQloud.Repository.Remote;
 using GreenQloud.Persistence;
+using System.Collections.Generic;
 
 namespace GreenQloud.Synchrony
 {
@@ -22,7 +23,52 @@ namespace GreenQloud.Synchrony
 
         public void AddEvents ()
         {
-            foreach (RepositoryItem localItem in physicalLocalRepository.Files) {
+
+            foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems){
+                if (physicalLocalRepository.Exists (remoteItem)){
+                    if (!remoteItem.IsSync)
+                    {
+                        eventDAO.Create ( new Event(){
+                            EventType = EventType.UPDATE,
+                            RepositoryType = RepositoryType.REMOTE,
+                            Item = remoteItem,
+                            Synchronized = false
+                        });
+                    }
+                }
+                else {
+                    RepositoryItem copy = physicalLocalRepository.GetCopy (remoteItem);
+                    if (copy != null){
+                        if (!remoteRepository.Exists (copy)){
+                            eventDAO.Create ( new Event(){
+                                EventType = EventType.MOVE_OR_RENAME,
+                                RepositoryType = RepositoryType.REMOTE,
+                                Item = remoteItem,
+                                Synchronized = false
+                            });
+                        }
+                        else{
+                            eventDAO.Create ( new Event(){
+                                EventType = EventType.COPY,
+                                RepositoryType = RepositoryType.REMOTE,
+                                Item = remoteItem,
+                                Synchronized = false
+                            });
+                        }
+                    }
+                    else{
+                        eventDAO.Create ( new Event(){
+                            EventType = EventType.CREATE,
+                            RepositoryType = RepositoryType.REMOTE,
+                            Item = remoteItem,
+                            Synchronized = false
+                        });
+                    }
+                }
+            }
+
+
+            foreach (RepositoryItem localItem in physicalLocalRepository.Items) {
                 if (!remoteRepository.Exists(localItem)){
                     Event e = new Event ();
                     e.Item = localItem;
@@ -31,6 +77,7 @@ namespace GreenQloud.Synchrony
                     e.Synchronized = false;
                     eventDAO.Create (e);
                 }
+
             }     
         }
 
