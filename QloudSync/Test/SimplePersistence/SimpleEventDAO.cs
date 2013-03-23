@@ -9,7 +9,7 @@ using GreenQloud.Model;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GreenQloud.Test.SimpleRepository
+namespace GreenQloud.Test.SimplePersistence
 {
 	public class SimpleEventDAO : EventDAO
 	{
