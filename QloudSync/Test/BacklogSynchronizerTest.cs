@@ -6,6 +6,8 @@ using GreenQloud.Test.SimpleRepository;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
 using GreenQloud.Model;
+using GreenQloud.Test.SimpleSynchrony;
+using GreenQloud.Test.SimplePersistence;
 
 
 namespace GreenQloud.Test
@@ -20,7 +22,8 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);    
             
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
@@ -41,7 +44,8 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
 
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
@@ -63,8 +67,9 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
-            
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
+
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
@@ -84,8 +89,9 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
-            
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
+
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
@@ -106,8 +112,9 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
-            
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
+                        
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
@@ -127,7 +134,8 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController ();
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);    
             
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
@@ -148,8 +156,9 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController (physical);
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
-            
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
+                        
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
@@ -168,8 +177,9 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController (physical);
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
-            
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
+
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
@@ -189,19 +199,22 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController (physical);
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
-            
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
+
             RepositoryItem localItem = new RepositoryItem();
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
             localItem.Repo = new LocalRepository("***");
             localItem.TimeOfLastChange = DateTime.Now;
+            localItem.MD5Hash = "123";
             
             RepositoryItem remoteItem = new RepositoryItem();
             remoteItem.Name = "teste.html";
             remoteItem.RelativePath = "home";
             remoteItem.Repo = new LocalRepository("***");
             remoteItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
+            remoteItem.MD5Hash = "223";
             
             remote.Upload (remoteItem,"out of date");
             physical.Create (localItem,"updated");
@@ -219,8 +232,9 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController (physical);
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
-            
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
+
             RepositoryItem localItem = new RepositoryItem();
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
@@ -251,20 +265,23 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController (physical);
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
-            
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
+
             RepositoryItem localItem = new RepositoryItem();
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
             localItem.Repo = new LocalRepository("***");
             localItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
+            localItem.MD5Hash = "123";
             
             RepositoryItem remoteItem = new RepositoryItem();
             remoteItem.Name = "teste.html";
             remoteItem.RelativePath = "home";
             remoteItem.Repo = new LocalRepository("***");
             remoteItem.TimeOfLastChange = DateTime.Now;
-            
+            remoteItem.MD5Hash = "223";
+
             remote.Upload (remoteItem,"updated");
             physical.Create (localItem,"out of date");
             logical.Create (localItem,"out of date");
@@ -282,19 +299,22 @@ namespace GreenQloud.Test
             SimpleRemoteRepositoryController remote = new SimpleRemoteRepositoryController (physical);
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
-            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers);    
+            EventDAO eventDAO = new SimpleEventDAO();
+            BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
 
             RepositoryItem localItem = new RepositoryItem();
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
             localItem.Repo = new LocalRepository("***");
             localItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
+            localItem.MD5Hash = "123";
 
             RepositoryItem remoteItem = new RepositoryItem();
             remoteItem.Name = "teste.html";
             remoteItem.RelativePath = "home";
             remoteItem.Repo = new LocalRepository("***");
             remoteItem.TimeOfLastChange = DateTime.Now;
+            remoteItem.MD5Hash = "223";
 
             remote.Upload (remoteItem,"updated");
             physical.Create (localItem,"out of date");

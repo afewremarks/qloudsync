@@ -24,6 +24,11 @@ namespace GreenQloud.Test.SimpleRepository
 
         #region implemented abstract members of RemoteRepositoryController
 
+        public override bool ExistsCopys (RepositoryItem item)
+        {
+            return list.Any (element => element.Key.MD5Hash == item.MD5Hash && element.Key.FullLocalName != item.FullLocalName);
+        }
+
         public override List<RepositoryItem> GetCopys (RepositoryItem file)
         {
             throw new NotImplementedException ();
@@ -112,11 +117,6 @@ namespace GreenQloud.Test.SimpleRepository
         }
 
         public override void DownloadFull (RepositoryItem file)
-        {
-            throw new NotImplementedException ();
-        }
-
-        public override void UpdateStorageQloud ()
         {
             throw new NotImplementedException ();
         }
