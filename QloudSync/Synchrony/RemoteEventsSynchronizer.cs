@@ -23,7 +23,7 @@ namespace GreenQloud.Synchrony
         public void AddEvents ()
         {
             foreach (RepositoryItem localItem in physicalLocalRepository.Files) {
-                if (remoteRepository.Exists(localItem)){
+                if (!remoteRepository.Exists(localItem)){
                     Event e = new Event ();
                     e.Item = localItem;
                     e.EventType = EventType.DELETE;
