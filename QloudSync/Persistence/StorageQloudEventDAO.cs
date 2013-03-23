@@ -10,19 +10,34 @@ namespace GreenQloud.Persistence
 	public class StorageQloudEventDAO : EventDAO
 	{
         #region implemented abstract members of EventDAO
+
         public override void Create (Event e)
         {
             throw new NotImplementedException ();
         }
-        public override System.Collections.Generic.List<Event> GetEventsNotSynchronized ()
+
+        public override System.Collections.Generic.List<Event> All
         {
-            throw new NotImplementedException ();
+            get{
+                throw new NotImplementedException ();
+            }
         }
+
+        public override System.Collections.Generic.List<Event> EventsNotSynchronized
+        {
+            get{
+                throw new NotImplementedException ();
+            }
+        }
+
         public override void UpdateToSynchronized (Event e)
         {
             throw new NotImplementedException ();
         }
-        #endregion       
+
+        #endregion
+
+
 	}
 
 }
