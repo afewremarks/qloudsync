@@ -44,7 +44,7 @@ namespace GreenQloud.Test.SimpleRepository
            return null;
         }
 
-        public override List<RepositoryItem> Files {
+        public override List<RepositoryItem> Items {
             get {
                 List<RepositoryItem> templist = new List<RepositoryItem>();
                 templist.AddRange (list.Keys);
@@ -60,6 +60,12 @@ namespace GreenQloud.Test.SimpleRepository
                 list.Remove (temp);
             }
         }
+
+        public override RepositoryItem GetCopy (RepositoryItem remoteItem)
+        {
+            throw new NotImplementedException ();
+        }
+
 
         #endregion
 

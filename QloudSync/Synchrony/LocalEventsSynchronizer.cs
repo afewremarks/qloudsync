@@ -14,7 +14,7 @@ using GreenQloud.Persistence;
 
 namespace GreenQloud.Synchrony
 {
-    public class LocalEventsSynchronizer : Synchronizer
+    public abstract class LocalEventsSynchronizer : Synchronizer
     {
 
         protected LocalEventsSynchronizer 
