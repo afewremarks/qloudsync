@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using GreenQloud.Model;
 using GreenQloud.Persistence;
 
-namespace GreenQloud.Test.SimpleRepository
+namespace GreenQloud.Test.SimplePersistence
 {
     public class SimpleTransferDAO : TransferDAO
     {

@@ -80,19 +80,8 @@ namespace GreenQloud.Model
             }
         }
         
-        public string LocalMD5Hash {
-            get {
-                string md5hash;
-                try {       
-                    FileStream fs = System.IO.File.Open (FullLocalName, FileMode.Open);
-                    MD5 md5 = MD5.Create ();
-                    md5hash = BitConverter.ToString (md5.ComputeHash (fs)).Replace (@"-", @"").ToLower ();
-                    fs.Close ();
-                } catch{
-                    md5hash = string.Empty;
-                }
-                return md5hash;
-            }
+        public string MD5Hash {
+            set; get;
         }
                 
         public DateTime TimeOfLastChange{
@@ -143,7 +132,7 @@ namespace GreenQloud.Model
        
         public bool IsSync {
             get{
-                return LocalMD5Hash == RemoteMD5Hash;
+                return MD5Hash == RemoteMD5Hash;
             }
         }
 
