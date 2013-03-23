@@ -64,7 +64,7 @@ namespace GreenQloud.Test.SimpleRepository
             }
         }
 
-        public override List<RepositoryItem> Files {
+        public override List<RepositoryItem> Items {
             get {
                 throw new NotImplementedException ();
             }
