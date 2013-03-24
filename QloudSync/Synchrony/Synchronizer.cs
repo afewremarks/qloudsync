@@ -13,6 +13,9 @@ using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Repository;
 using GreenQloud.Util;
+using GreenQloud.Persistence;
+using GreenQloud.Repository.Local;
+using GreenQloud.Repository.Remote;
 
 namespace GreenQloud.Synchrony
 {
@@ -26,17 +29,71 @@ namespace GreenQloud.Synchrony
 
     public abstract class Synchronizer
     {
-        public delegate void ProgressChangedEventHandler (double percentage, double time);
+        protected delegate void ProgressChangedEventHandler (double percentage, double time);
 
-        protected Synchronizer ()
+        protected TransferDAO transferDAO;
+        protected EventDAO eventDAO;
+        protected LogicalRepositoryController logicalLocalRepository;
+        protected PhysicalRepositoryController physicalLocalRepository;
+        protected RemoteRepositoryController remoteRepository;
+        
+        protected Synchronizer 
+            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
+             RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO)
         {
+            Status = SyncStatus.IDLE;
+            this.transferDAO = transferDAO;
+            this.eventDAO = eventDAO;
+            this.logicalLocalRepository = logicalLocalRepository;
+            this.physicalLocalRepository = physicalLocalRepository;
+            this.remoteRepository = remoteRepository;
+        }
+
+
+        
+        public void Synchronize(){
+            List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
+            foreach (Event e in eventsNotSynchronized){
+                Synchronize (e);
+            }
+        }
+
+        void Synchronize(Event e){
+            Transfer transfer = null;
+
+            if (e.RepositoryType == RepositoryType.LOCAL){
+
+                Status = SyncStatus.UPLOADING;
+
+                if (e.EventType == EventType.DELETE)
+                    transfer = remoteRepository.MoveFileToTrash (e.Item);
+                else
+                    transfer = remoteRepository.Upload (e.Item);
+                
+            }else{
+
+                switch (e.EventType){
+                case EventType.CREATE: 
+                case EventType.UPDATE:
+                    Status = SyncStatus.DOWNLOADING;
+                    transfer = remoteRepository.Download (e.Item);
+                    break;
+                case EventType.DELETE:
+                    Status = SyncStatus.UPLOADING;
+                    transfer = remoteRepository.SendLocalVersionToTrash (e.Item);
+                    physicalLocalRepository.Delete (e.Item);
+                    break;
+                }
+
+            }
+            
+            if (transfer != null)
+                transferDAO.Create (transfer);
+            logicalLocalRepository.Solve (e.Item);
+            eventDAO.UpdateToSynchronized(e);
         }
 
         #region Abstract Methods
-        
-        public abstract void Synchronize();
-        public abstract void Synchronize(Event e);
-        public abstract Event GetEvent (RepositoryItem item, RepositoryType type);
 
         public abstract void Start ();
         public abstract void Pause ();
