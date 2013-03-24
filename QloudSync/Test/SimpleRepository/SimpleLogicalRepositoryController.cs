@@ -26,7 +26,7 @@ namespace GreenQloud.Test.SimpleRepository
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
-            repoObj.Repo = new LocalRepository("...");
+            repoObj.Repository = new LocalRepository("...");
             return repoObj;
         }
 
