@@ -25,14 +25,11 @@ namespace GreenQloud.Test.SimpleRepository
         }
        
         #region implemented abstract members of PhysicalRepositoryController
-        public override void CreateOrUpdate (RepositoryItem remoteObj)
-        {
-            throw new NotImplementedException ();
-        }
+
 
         public override bool Exists (RepositoryItem repoObject)
         {
-            bool exists = list.Any(r=> r.Key.Name == repoObject.Name);
+            bool exists = list.Any(r=> r.Key.FullLocalName == repoObject.FullLocalName);
             return exists;
         }
 
@@ -63,7 +60,12 @@ namespace GreenQloud.Test.SimpleRepository
 
         public override RepositoryItem GetCopy (RepositoryItem remoteItem)
         {
-            throw new NotImplementedException ();
+            if (list.Any (k=> k.Key.MD5Hash == remoteItem.MD5Hash && remoteItem.FullLocalName != k.Key.FullLocalName))
+            {
+                return list.First (k=> k.Key.MD5Hash == remoteItem.MD5Hash && remoteItem.FullLocalName != k.Key.FullLocalName).Key;
+            }
+            else
+                return null;
         }
 
 
