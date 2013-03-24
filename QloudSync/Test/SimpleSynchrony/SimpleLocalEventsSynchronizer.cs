@@ -13,24 +13,6 @@ namespace GreenQloud.Test.SimpleSynchrony
         {
         }
 
-        #region implemented abstract members of Synchronizer
-
-        public override void Start ()
-        {
-            throw new NotImplementedException ();
-        }
-
-        public override void Pause ()
-        {
-            throw new NotImplementedException ();
-        }
-
-        public override void Stop ()
-        {
-            throw new NotImplementedException ();
-        }
-
-        #endregion
     }
 }
 
