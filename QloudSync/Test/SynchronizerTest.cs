@@ -25,7 +25,7 @@ namespace GreenQloud.Test
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
-            repoObj.Repo = new LocalRepository("...");
+            repoObj.Repository = new LocalRepository("...");
             logical.Create (repoObj);
             remote.Upload (repoObj);
             sync.Synchronize ();
@@ -48,7 +48,7 @@ namespace GreenQloud.Test
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
-            repoObj.Repo = new LocalRepository("...");
+            repoObj.Repository = new LocalRepository("...");
             logical.Create (repoObj);
             physical.Create (repoObj);
             sync.Synchronize ();
@@ -71,7 +71,7 @@ namespace GreenQloud.Test
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
-            repoObj.Repo = new LocalRepository("...");
+            repoObj.Repository = new LocalRepository("...");
             physical.Create (repoObj);
             sync.Synchronize ();
             
@@ -93,7 +93,7 @@ namespace GreenQloud.Test
             RepositoryItem repoObj = new RepositoryItem();
             repoObj.Name = "teste.html";
             repoObj.RelativePath = "home";
-            repoObj.Repo = new LocalRepository("...");
+            repoObj.Repository = new LocalRepository("...");
             remote.Upload (repoObj);
             sync.Synchronize ();
             
@@ -116,13 +116,13 @@ namespace GreenQloud.Test
             RepositoryItem localItem = new RepositoryItem();
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
-            localItem.Repo = new LocalRepository("***");
+            localItem.Repository = new LocalRepository("***");
             localItem.TimeOfLastChange = DateTime.Now;
             
             RepositoryItem remoteItem = new RepositoryItem();
             remoteItem.Name = "teste.html";
             remoteItem.RelativePath = "home";
-            remoteItem.Repo = new LocalRepository("***");
+            remoteItem.Repository = new LocalRepository("***");
             remoteItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
             
             remote.Upload (remoteItem,"out of date");
@@ -149,14 +149,14 @@ namespace GreenQloud.Test
             RepositoryItem localItem = new RepositoryItem();
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
-            localItem.Repo = new LocalRepository("***");
+            localItem.Repository = new LocalRepository("***");
             localItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0));
             localItem.MD5Hash = "123";
             
             RepositoryItem remoteItem = new RepositoryItem();
             remoteItem.Name = "teste.html";
             remoteItem.RelativePath = "home";
-            remoteItem.Repo = new LocalRepository("***");
+            remoteItem.Repository = new LocalRepository("***");
             remoteItem.TimeOfLastChange = DateTime.Now;
             remoteItem.MD5Hash = "223";
             

@@ -26,7 +26,7 @@ namespace GreenQloud.Test
             RepositoryItem item = new RepositoryItem();
             item.Name = "teste.html";
             item.RelativePath = "home";
-            item.Repo = new LocalRepository("...");
+            item.Repository = new LocalRepository("...");
             physical.Create (item);
 
             Event e = sync.GetEvent (item);
@@ -49,7 +49,7 @@ namespace GreenQloud.Test
             RepositoryItem item = new RepositoryItem();
             item.Name = "teste.html";
             item.RelativePath = "home";
-            item.Repo = new LocalRepository("...");
+            item.Repository = new LocalRepository("...");
             
             Event e = sync.GetEvent (item);
             
@@ -70,7 +70,7 @@ namespace GreenQloud.Test
             RepositoryItem item = new RepositoryItem();
             item.Name = "teste.html";
             item.RelativePath = "home";
-            item.Repo = new LocalRepository("...");
+            item.Repository = new LocalRepository("...");
             item.MD5Hash = "123";
             physical.Create (item, "same text");
 
@@ -78,7 +78,7 @@ namespace GreenQloud.Test
             RepositoryItem item2 = new RepositoryItem();
             item2.Name = "teste2.html";
             item2.RelativePath = "home";
-            item2.Repo = new LocalRepository("...");
+            item2.Repository = new LocalRepository("...");
             item2.MD5Hash = "123";
             remote.Upload (item2, "same text");
             
@@ -101,7 +101,7 @@ namespace GreenQloud.Test
             RepositoryItem item = new RepositoryItem();
             item.Name = "teste.html";
             item.RelativePath = "home";
-            item.Repo = new LocalRepository("...");
+            item.Repository = new LocalRepository("...");
             physical.Create (item, "updated");
 
             remote.Upload (item, "out of date");

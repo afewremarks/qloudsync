@@ -4,13 +4,13 @@ using GreenQloud.Repository;
 using System.Linq;
 using System.Xml;
 using System.Threading;
-using GreenQloud.Repository.Model;
+using GreenQloud.Model;
 
 namespace GreenQloud.Persistence
 {
     public abstract class TransferDAO
     {
-        public abstract void Create (TransferResponse transfer);
+        public abstract void Create (Transfer transfer);
     }
 }
 

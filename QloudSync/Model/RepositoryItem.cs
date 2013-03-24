@@ -18,7 +18,7 @@ namespace GreenQloud.Model
            
         }
 
-        public LocalRepository Repo{
+        public LocalRepository Repository{
             set; get;
         }
 
@@ -26,9 +26,10 @@ namespace GreenQloud.Model
         
         public string RelativePath{ get; set; }
 
-        public bool IsAFolder {
-            set;
-            get;
+        public string AbsolutePath{
+            get {
+                return Path.Combine(RelativePath, Name);
+            }
         }
 
         private string fullLocalName = null;
@@ -37,8 +38,8 @@ namespace GreenQloud.Model
                 fullLocalName = value;
             }
             get {
-                if(fullLocalName== null)
-                    fullLocalName = Repo.Path + AbsolutePath;
+                if(fullLocalName == null)
+                    fullLocalName = Path.Combine(Repository.Path, AbsolutePath);
                 return fullLocalName;
             }
         }
@@ -47,12 +48,6 @@ namespace GreenQloud.Model
             get {
                 
                 return Path.Combine(RuntimeSettings.DefaultBucketName, AbsolutePath);
-            }
-        }
-        
-        public string AbsolutePath{
-            get {
-                return Path.Combine(RelativePath, Name);
             }
         }
         
@@ -78,6 +73,11 @@ namespace GreenQloud.Model
             get {
                 return Path.Combine (Constant.TRASH,AbsolutePath);
             }
+        }
+
+        public bool IsAFolder {
+            set;
+            get;
         }
         
         public string MD5Hash {
