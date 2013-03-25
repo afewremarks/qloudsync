@@ -44,7 +44,6 @@ namespace GreenQloud.Synchrony
             return instance;
         }
 
-        bool working;
 
         public new void Start ()
         {
@@ -54,17 +53,17 @@ namespace GreenQloud.Synchrony
             }catch{
                 // do nothing
             }
-            working = true;
+            Working = true;
         }
 
         public override void Pause ()
         {
-            working = false;
+            Working = false;
         }
 
         public new void Stop ()
         {
-            working = false;
+            Working = false;
             watchersThread.Join();
             foreach (OSXFileSystemWatcher watcher in watchers)
                 watcher.Stop();
@@ -74,12 +73,6 @@ namespace GreenQloud.Synchrony
         public ThreadState ControllerStatus{
             get{
                 return watchersThread.ThreadState;
-            }
-        }
-
-        public bool Working{
-            get{
-                return working;
             }
         }
     }

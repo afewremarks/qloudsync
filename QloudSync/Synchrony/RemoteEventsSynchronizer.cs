@@ -96,11 +96,6 @@ namespace GreenQloud.Synchrony
             eventsCreated = true;
         }
 
-        bool Working {
-            get;
-            set;
-        }
-
         #region implemented abstract members of Synchronizer
         public override void Start ()
         {
