@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Amazon.S3.Model;
 using GreenQloud.Util;
-using GreenQloud.Repository.Model;
+using GreenQloud.Model;
 using GreenQloud.Repository.Local;
 
 namespace GreenQloud.Repository.Remote
@@ -15,24 +15,10 @@ namespace GreenQloud.Repository.Remote
         public RemoteRepositoryController (){
         }
 
-        #region Repo implementation
-
-        public void CreateOrUpdate (RepoObject remoteObj)
-        {
-            throw new NotImplementedException ();
-        }
-
-        public List<string> FilesNames {
-            get {
-                throw new NotImplementedException ();
-            }
-        }
-
-        #endregion
 
         public RemoteRepositoryController (LogicalRepositoryController logicalController)
         {
-            CurrentTransfer = new TransferResponse();
+            CurrentTransfer = new Transfer();
             this.logicalController = logicalController;
         }
 
@@ -41,27 +27,25 @@ namespace GreenQloud.Repository.Remote
             set;
         }
 
-        public TransferResponse CurrentTransfer{
+        public Transfer CurrentTransfer{
             set; get;
         }
 
-        public abstract List<RepoObject> AllFiles {
+        public abstract List<RepositoryItem> AllItems {
             get;
         }
 
-        public abstract List<RepoObject> Files{
+        public abstract List<RepositoryItem> Items{
             get;
         }
 
-        public abstract List<RepoObject> Folders{
+
+        public abstract List<RepositoryItem> TrashItems {
             get;
         }
+       
 
-        public abstract List<RepoObject> TrashFiles {
-            get;
-        }
-
-        public abstract List<RepoObject> GetCopys (RepoObject file);
+        public abstract List<RepositoryItem> GetCopys (RepositoryItem file);
 
         public abstract TimeSpan DiffClocks{
             get;              
@@ -77,20 +61,23 @@ namespace GreenQloud.Repository.Remote
             }
         }
 
-        public abstract bool ExistsVersion (RepoObject file);
-        public abstract TransferResponse Download (RepoObject request);
-        public abstract TransferResponse Upload (RepoObject request);
-        public abstract TransferResponse MoveFileToTrash (RepoObject request);
-        public abstract TransferResponse MoveFolderToTrash (RepoObject folder);
-        public abstract TransferResponse Delete(RepoObject request);
-        public abstract TransferResponse SendLocalVersionToTrash (RepoObject request);
-        public abstract TransferResponse CreateFolder (RepoObject request);
-        public abstract TransferResponse Copy (RepoObject source, RepoObject destination);
-        public abstract bool ExistsFolder (RepoObject folder);
-        public abstract bool Exists (RepoObject sqObject);
-        public abstract void DownloadFull (RepoObject  file);
-
-        public abstract void UpdateStorageQloud ();
+        public abstract bool ExistsVersion (RepositoryItem file);
+        public abstract Transfer Download (RepositoryItem request);
+        public abstract Transfer Upload (RepositoryItem request);
+        public abstract Transfer MoveFileToTrash (RepositoryItem request);
+        public abstract Transfer MoveFolderToTrash (RepositoryItem folder);
+        public abstract Transfer Delete(RepositoryItem request);
+        public abstract Transfer SendLocalVersionToTrash (RepositoryItem request);
+        public abstract Transfer CreateFolder (RepositoryItem request);
+        public abstract Transfer Copy (RepositoryItem source, RepositoryItem destination);
+        public abstract bool ExistsFolder (RepositoryItem folder);
+        public abstract bool Exists (RepositoryItem sqObject);
+        public abstract void DownloadFull (RepositoryItem  file);
+        public abstract bool ExistsCopys (RepositoryItem item);
+        public abstract List<RepositoryItem> RecentChangedItems {
+            get;
+            set;
+        }
     }
 }
 

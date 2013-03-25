@@ -4,24 +4,23 @@ using GreenQloud.Repository;
 using System.Linq;
 using System.Xml;
 using System.Threading;
-using GreenQloud.Repository.Model;
+using GreenQloud.Model;
 
 namespace GreenQloud.Repository.Local
 {
     class StorageQloudLogicalRepositoryController : LogicalRepositoryController
     {
-        #region Repo implementation
+        #region RepositoryController implementation
 
-        public override List<string> FilesNames {
+        public override List<RepositoryItem> Items {
             get {
                 throw new NotImplementedException ();
             }
         }
 
-        public override List<RepoObject> Files {
-            get {
-                throw new NotImplementedException ();
-            }
+        public override bool Exists (RepositoryItem repoObject)
+        {
+            throw new NotImplementedException ();
         }
 
         #endregion
@@ -39,17 +38,12 @@ namespace GreenQloud.Repository.Local
 
         #endregion
 
-        public override RepoObject CreateObjectInstance (string fullPath)
+        public override RepositoryItem CreateObjectInstance (string fullPath)
         {
             throw new NotImplementedException ();
         }
 
-        public override bool Exists (RepoObject repoObject)
-        {
-            throw new NotImplementedException ();
-        }
-
-        public override void Solve (RepoObject remoteObj)
+        public override void Solve (RepositoryItem remoteObj)
         {
             throw new NotImplementedException ();
         }
