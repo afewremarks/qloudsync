@@ -1,40 +1,31 @@
 using System;
 using GreenQloud.Repository;
-using GreenQloud.Repository.Model;
+using GreenQloud.Model;
 
 namespace GreenQloud.Repository.Local
 {
     public abstract class PhysicalRepositoryController : RepositoryController
     {
-        protected LogicalRepositoryController logicalController;
 
         public PhysicalRepositoryController (){
         }
 
-        public PhysicalRepositoryController (LogicalRepositoryController logicalController)
-        {
-            this.logicalController = logicalController;
-        }
-
         #region RepositoryController implementation
 
-        public abstract void CreateOrUpdate (GreenQloud.Repository.Model.RepoObject remoteObj);
-        public abstract bool Exists (GreenQloud.Repository.Model.RepoObject repoObject);
+        public abstract bool Exists (GreenQloud.Model.RepositoryItem repoObject);
 
 
-        public abstract System.Collections.Generic.List<string> FilesNames {
-            get;
-        }
-
-        public abstract System.Collections.Generic.List<GreenQloud.Repository.Model.RepoObject> Files {
+        public abstract System.Collections.Generic.List<GreenQloud.Model.RepositoryItem> Items {
             get ;
         }
 
         #endregion
 
-        public abstract RepoObject CreateObjectInstance (string fullLocalName);
+        public abstract RepositoryItem CreateObjectInstance (string fullLocalName);
 
-        public abstract void Delete (RepoObject repoObj);
+        public abstract void Delete (RepositoryItem  item);
+
+        public abstract RepositoryItem GetCopy (RepositoryItem remoteItem);
     }
 }
 

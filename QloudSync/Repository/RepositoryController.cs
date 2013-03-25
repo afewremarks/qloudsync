@@ -1,18 +1,14 @@
 using System;
 using System.Collections.Generic;
-using GreenQloud.Repository.Model;
+using GreenQloud.Model;
 
 namespace GreenQloud.Repository
 {
     public interface RepositoryController
     {       
-        bool Exists (RepoObject repoObject);
+        bool Exists (RepositoryItem repoObject);
 
-        List<string> FilesNames {
-            get;
-        }
-
-        List<RepoObject> Files {
+        List<RepositoryItem> Items {
             get;
         }
 
