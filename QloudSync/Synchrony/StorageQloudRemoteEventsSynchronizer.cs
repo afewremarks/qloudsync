@@ -72,11 +72,6 @@ namespace GreenQloud.Synchrony
             }
         }
 
-        public bool Working {
-            get{
-                return remote_timer.Enabled;
-            }
-        }
     }
 }
 

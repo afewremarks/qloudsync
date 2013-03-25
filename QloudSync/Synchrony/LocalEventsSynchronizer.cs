@@ -46,11 +46,6 @@ namespace GreenQloud.Synchrony
             }
         }
 
-        private bool Working {
-            get;
-            set;
-        }
-
         public Event GetEvent (RepositoryItem item)
         {
             Event e = new Event();
