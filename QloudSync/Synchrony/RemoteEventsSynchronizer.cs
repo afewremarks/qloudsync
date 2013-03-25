@@ -4,27 +4,41 @@ using GreenQloud.Repository.Local;
 using GreenQloud.Repository.Remote;
 using GreenQloud.Persistence;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace GreenQloud.Synchrony
 {
     public class RemoteEventsSynchronizer : Synchronizer
     {
+        Thread threadSync;
+        bool eventsCreated;
 
         public RemoteEventsSynchronizer  
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
             base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
         {
+            threadSync = new Thread(() =>{
+                Synchronize ();
+            });
         }
 
-        public new void Synchronize (){
-            AddEvents ();
-            base.Synchronize();
+        public new void Synchronize(){
+            while (Working){
+                if (eventsCreated){
+                    eventsCreated = false;
+                    if(SyncStatus == SyncStatus.IDLE){
+                        base.Synchronize ();
+                    }
+                }
+                Thread.Sleep (500);
+            }
         }
 
         public void AddEvents ()
         {
 
             foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems){
+
                 if (physicalLocalRepository.Exists (remoteItem)){
                     if (!remoteItem.IsSync)
                     {
@@ -78,27 +92,36 @@ namespace GreenQloud.Synchrony
                     eventDAO.Create (e);
                 }
 
-            }     
+            }  
+            eventsCreated = true;
+        }
+
+        bool Working {
+            get;
+            set;
         }
 
         #region implemented abstract members of Synchronizer
-
         public override void Start ()
         {
-            throw new NotImplementedException ();
+            Working = true;
+            try{
+                threadSync.Start();
+            }catch{
+                // do nothing
+            }
         }
-
         public override void Pause ()
         {
-            throw new NotImplementedException ();
+            Working = false;
         }
-
+        
         public override void Stop ()
         {
-            throw new NotImplementedException ();
+            Working = false;
+            threadSync.Join();
         }
-
-        #endregion
+        #endregion    
     }
 }
 
