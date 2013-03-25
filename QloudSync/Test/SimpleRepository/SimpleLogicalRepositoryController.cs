@@ -23,11 +23,11 @@ namespace GreenQloud.Test.SimpleRepository
 
         public override RepositoryItem CreateObjectInstance (string fullPath)
         {
-            RepositoryItem repoObj = new RepositoryItem();
-            repoObj.Name = "teste.html";
-            repoObj.RelativePath = "home";
-            repoObj.Repository = new LocalRepository("...");
-            return repoObj;
+            RepositoryItem  item = new RepositoryItem();
+             item.Name = "teste.html";
+             item.RelativePath = "home";
+             item.Repository = new LocalRepository("...");
+            return  item;
         }
 
         public override void Solve (RepositoryItem remoteObj)
@@ -58,11 +58,6 @@ namespace GreenQloud.Test.SimpleRepository
             return list.Any (r=> r.Key.Name == repoObject.Name);
         }
 
-        public override List<string> FilesNames {
-            get {
-                throw new NotImplementedException ();
-            }
-        }
 
         public override List<RepositoryItem> Items {
             get {
@@ -81,13 +76,13 @@ namespace GreenQloud.Test.SimpleRepository
 
         #endregion
 
-        public void Create (RepositoryItem repoObj)
+        public void Create (RepositoryItem  item)
         {
-            list.Add (repoObj, string.Empty);
+            list.Add ( item, string.Empty);
         }
 
-        public void Create (RepositoryItem repoObj, string value){
-            list.Add (repoObj, value);
+        public void Create (RepositoryItem  item, string value){
+            list.Add ( item, value);
         }
 
         public object GetValue (string fullLocalName)
