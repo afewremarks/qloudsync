@@ -1,50 +1,67 @@
 using System;
-using GreenQloud.Repository.Remote;
-using GreenQloud.Repository;
-using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
+using GreenQloud.Repository.Remote;
+using GreenQloud.Persistence;
+using System.Threading;
 
 namespace GreenQloud.Synchrony
 {
     public class StorageQloudBacklogSynchronizer : BacklogSynchronizer
     {
-        private static StorageQloudBacklogSynchronizer instance;
+        Thread threadSync;
+        static StorageQloudBacklogSynchronizer instance;
 
-        private StorageQloudBacklogSynchronizer (LogicalRepositoryController logical, PhysicalRepositoryController physical, RemoteRepositoryController remote, TransferDAO transferDAO) : base (logical, physical, remote, transferDAO)
+        public StorageQloudBacklogSynchronizer (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
+                                                RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
+            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
         {
+            threadSync = new Thread( ()=>{
+                while (Working){
+                    base.Synchronize();
+                }
+            });
+        }
 
+        public static StorageQloudBacklogSynchronizer GetInstance(){
+            if (instance == null)
+                instance = new StorageQloudBacklogSynchronizer (new StorageQloudLogicalRepositoryController(), 
+                                                                    new StorageQloudPhysicalRepositoryController(),
+                                                                    new StorageQloudRemoteRepositoryController(),
+                                                                    new SQLiteTransferDAO (),
+                                                                    new SQLiteEventDAO ());
+            return instance;
         }
 
         #region implemented abstract members of Synchronizer
 
         public override void Start ()
         {
-            throw new NotImplementedException ();
+            try{
+                base.Working = true;
+                threadSync.Start();
+            }catch{
+                // do nothing
+            }
         }
 
         public override void Pause ()
         {
-            throw new NotImplementedException ();
+            base.Working = false;
         }
 
         public override void Stop ()
         {
-            throw new NotImplementedException ();
+            base.Working = false;
+
+            threadSync.Join();
         }
 
         #endregion
-        
-        public static StorageQloudBacklogSynchronizer GetInstance(){
-            if (instance == null) {
-                StorageQloudLogicalRepositoryController logicalController = new StorageQloudLogicalRepositoryController ();
-                instance = new StorageQloudBacklogSynchronizer (
-                    logicalController, 
-                    new StorageQloudPhysicalRepositoryController (logicalController),
-                    new StorageQloudRemoteRepository (logicalController),
-                    new StorageQloudTransferDAO()
-                    );
+
+        public ThreadState ControllerStatus{
+            get{
+                return threadSync.ThreadState;
             }
-            return instance;
         }
     }
 }

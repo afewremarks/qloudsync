@@ -49,11 +49,14 @@ namespace GreenQloud.Synchrony
             this.remoteRepository = remoteRepository;
         }
 
+        public bool Working{
+            set; get;
+        }
 
         
         public void Synchronize(){
             List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
-            while (eventsNotSynchronized.Count>0){
+            while (eventsNotSynchronized.Count>0 && Working){
                 Synchronize (eventsNotSynchronized[0]);
                 eventsNotSynchronized = eventDAO.EventsNotSynchronized;
             }
