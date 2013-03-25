@@ -10,20 +10,20 @@ namespace GreenQloud.Test
         [Test()]
         public void TestStop ()
         {
-            StorageQloudRemoteEventsSynchronizer localsynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
-            localsynchronizer.Start ();
-            localsynchronizer.Stop ();
-            Assert.AreEqual (System.Threading.ThreadState.Stopped, localsynchronizer.ControllerStatus);
+            StorageQloudRemoteEventsSynchronizer remoteSynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
+            remoteSynchronizer.Start ();
+            remoteSynchronizer.Stop ();
+            Assert.AreEqual (System.Threading.ThreadState.Stopped, remoteSynchronizer.ControllerStatus);
         }
         
         [Test]
         public void TestRestart ()
         {
-            StorageQloudRemoteEventsSynchronizer localsynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
-            localsynchronizer.Start ();
-            localsynchronizer.Pause ();
-            localsynchronizer.Start ();
-            Assert.True (localsynchronizer.Working);
+            StorageQloudRemoteEventsSynchronizer remoteSynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
+            remoteSynchronizer.Start ();
+            remoteSynchronizer.Pause ();
+            remoteSynchronizer.Start ();
+            Assert.True (remoteSynchronizer.Working);
         }
     }
 }

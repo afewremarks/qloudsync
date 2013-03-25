@@ -21,7 +21,7 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
-            
+            sync.Working = true;
             RepositoryItem  item = new RepositoryItem();
              item.Name = "teste.html";
              item.RelativePath = "home";
@@ -44,7 +44,7 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
-            
+            sync.Working = true;
             RepositoryItem  item = new RepositoryItem();
              item.Name = "teste.html";
              item.RelativePath = "home";
@@ -67,12 +67,13 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);    
-            
+            sync.Working = true;
             RepositoryItem  item = new RepositoryItem();
              item.Name = "teste.html";
              item.RelativePath = "home";
              item.Repository = new LocalRepository("...");
             physical.Create ( item);
+            sync.Working = true;
             sync.Synchronize ();
             
             Assert.True (logical.Exists ( item));
@@ -89,7 +90,7 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
-            
+            sync.Working = true;
             RepositoryItem  item = new RepositoryItem();
              item.Name = "teste.html";
              item.RelativePath = "home";
@@ -112,7 +113,7 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
-            
+            sync.Working = true;
             RepositoryItem localItem = new RepositoryItem();
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
@@ -145,7 +146,7 @@ namespace GreenQloud.Test
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
-            
+            sync.Working = true;
             RepositoryItem localItem = new RepositoryItem();
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
