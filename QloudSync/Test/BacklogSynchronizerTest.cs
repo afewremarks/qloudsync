@@ -25,14 +25,14 @@ namespace GreenQloud.Test
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);    
             
-            RepositoryItem repoObj = new RepositoryItem();
-            repoObj.Name = "teste.html";
-            repoObj.RelativePath = "home";
-            repoObj.Repository = new LocalRepository("...");
-            logical.Create (repoObj);
-            remote.Upload (repoObj);
+            RepositoryItem  item = new RepositoryItem();
+             item.Name = "teste.html";
+             item.RelativePath = "home";
+             item.Repository = new LocalRepository("...");
+            logical.Create ( item);
+            remote.Upload ( item);
 
-            Event e = sync.GetEvent (repoObj, RepositoryType.REMOTE);
+            Event e = sync.GetEvent ( item, RepositoryType.REMOTE);
             Assert.AreEqual (RepositoryType.LOCAL, e.RepositoryType);
             Assert.AreEqual (EventType.DELETE, e.EventType);
         }
@@ -47,14 +47,14 @@ namespace GreenQloud.Test
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
 
-            RepositoryItem repoObj = new RepositoryItem();
-            repoObj.Name = "teste.html";
-            repoObj.RelativePath = "home";
-            repoObj.Repository = new LocalRepository("...");
-            logical.Create (repoObj);
-            physical.Create (repoObj);
+            RepositoryItem  item = new RepositoryItem();
+             item.Name = "teste.html";
+             item.RelativePath = "home";
+             item.Repository = new LocalRepository("...");
+            logical.Create ( item);
+            physical.Create ( item);
 
-            Event e = sync.GetEvent (repoObj, RepositoryType.LOCAL);
+            Event e = sync.GetEvent ( item, RepositoryType.LOCAL);
             Assert.AreEqual (EventType.DELETE, e.EventType);
             Assert.AreEqual (RepositoryType.REMOTE, e.RepositoryType);
         }
@@ -70,13 +70,13 @@ namespace GreenQloud.Test
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
                         
-            RepositoryItem repoObj = new RepositoryItem();
-            repoObj.Name = "teste.html";
-            repoObj.RelativePath = "home";
-            repoObj.Repository = new LocalRepository("...");
-            physical.Create (repoObj);
+            RepositoryItem  item = new RepositoryItem();
+             item.Name = "teste.html";
+             item.RelativePath = "home";
+             item.Repository = new LocalRepository("...");
+            physical.Create ( item);
             
-            Event e = sync.GetEvent (repoObj, RepositoryType.LOCAL);
+            Event e = sync.GetEvent ( item, RepositoryType.LOCAL);
             Assert.AreEqual (EventType.CREATE, e.EventType);
             Assert.AreEqual (RepositoryType.LOCAL, e.RepositoryType);
         }
@@ -92,13 +92,13 @@ namespace GreenQloud.Test
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
                         
-            RepositoryItem repoObj = new RepositoryItem();
-            repoObj.Name = "teste.html";
-            repoObj.RelativePath = "home";
-            repoObj.Repository = new LocalRepository("...");
-            remote.Upload (repoObj);
+            RepositoryItem  item = new RepositoryItem();
+             item.Name = "teste.html";
+             item.RelativePath = "home";
+             item.Repository = new LocalRepository("...");
+            remote.Upload ( item);
 
-            Event e = sync.GetEvent (repoObj, RepositoryType.REMOTE);
+            Event e = sync.GetEvent ( item, RepositoryType.REMOTE);
             Assert.AreEqual (EventType.CREATE, e.EventType);
             Assert.AreEqual (RepositoryType.REMOTE, e.RepositoryType);
         }
