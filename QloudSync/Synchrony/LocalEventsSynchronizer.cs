@@ -16,17 +16,39 @@ namespace GreenQloud.Synchrony
 {
     public abstract class LocalEventsSynchronizer : Synchronizer
     {
+        Thread threadSync;
+        bool creatingEvent;
 
         protected LocalEventsSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
              base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
         {
-            
+            threadSync = new Thread(() =>{
+                Synchronize ();
+            });
+           
         }
 
         public void Synchronize (RepositoryItem item){
             eventDAO.Create ( GetEvent (item));
-            base.Synchronize();
+            creatingEvent = true;
+        }
+
+        public new void Synchronize(){
+            while (Working){
+                if (creatingEvent){
+                    creatingEvent = false;
+                    if(SyncStatus == SyncStatus.IDLE){
+                        base.Synchronize ();
+                    }
+                }
+                Thread.Sleep (500);
+            }
+        }
+
+        private bool Working {
+            get;
+            set;
         }
 
         public Event GetEvent (RepositoryItem item)
@@ -52,28 +74,29 @@ namespace GreenQloud.Synchrony
 
             return e;
             
-       }
-
-        #region implemented abstract members of Synchronizer
-
-        public override void Start ()
-        {
-            throw new NotImplementedException ();
         }
 
+        #region implemented abstract members of Synchronizer
+        public override void Start ()
+        {
+            Working = true;
+            try{
+                threadSync.Start();
+            }catch{
+                // do nothing
+            }
+        }
         public override void Pause ()
         {
-            throw new NotImplementedException ();
+            Working = false;
         }
 
         public override void Stop ()
         {
-            throw new NotImplementedException ();
+            Working = false;
+            threadSync.Join();
         }
-
         #endregion
-
-
     }
 
 }
