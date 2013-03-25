@@ -117,7 +117,7 @@ namespace GreenQloud.Test.SimpleRepository
             return list.Any (element => element.Key.MD5Hash == item.MD5Hash && element.Key.FullLocalName != item.FullLocalName);
         }
 
-        public override List<GreenQloud.Model.RepositoryItem> AllFiles {
+        public override List<GreenQloud.Model.RepositoryItem> AllItems {
             get {
                 throw new NotImplementedException ();
             }
@@ -132,7 +132,7 @@ namespace GreenQloud.Test.SimpleRepository
         }
 
        
-        public override List<GreenQloud.Model.RepositoryItem> TrashFiles {
+        public override List<GreenQloud.Model.RepositoryItem> TrashItems {
             get {
                 throw new NotImplementedException ();
             }
