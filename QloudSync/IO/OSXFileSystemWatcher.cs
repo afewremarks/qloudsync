@@ -15,10 +15,10 @@ namespace GreenQloud
         private FSEventStreamCallback callback;
         Thread runLoop;
         IntPtr stream;
-        public OSXFileSystemWatcher()
+        public OSXFileSystemWatcher(string pathwatcher)
         {
 
-            string watchedFolder = RuntimeSettings.HomePath;   
+            string watchedFolder = pathwatcher   ;
             this.callback = this.Callback;
 
             IntPtr path = CFStringCreateWithCString (IntPtr.Zero, watchedFolder, 0);
