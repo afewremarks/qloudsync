@@ -22,16 +22,16 @@ namespace GreenQloud.Test
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
             
-            RepositoryItem repoObj = new RepositoryItem();
-            repoObj.Name = "teste.html";
-            repoObj.RelativePath = "home";
-            repoObj.Repository = new LocalRepository("...");
-            logical.Create (repoObj);
-            remote.Upload (repoObj);
+            RepositoryItem  item = new RepositoryItem();
+             item.Name = "teste.html";
+             item.RelativePath = "home";
+             item.Repository = new LocalRepository("...");
+            logical.Create ( item);
+            remote.Upload ( item);
             sync.Synchronize ();
-            Assert.False (logical.Exists (repoObj));
-            Assert.False (physical.Exists (repoObj));
-            Assert.False (remote.Exists (repoObj));
+            Assert.False (logical.Exists ( item));
+            Assert.False (physical.Exists ( item));
+            Assert.False (remote.Exists ( item));
         }
 
         
@@ -45,17 +45,17 @@ namespace GreenQloud.Test
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
             
-            RepositoryItem repoObj = new RepositoryItem();
-            repoObj.Name = "teste.html";
-            repoObj.RelativePath = "home";
-            repoObj.Repository = new LocalRepository("...");
-            logical.Create (repoObj);
-            physical.Create (repoObj);
+            RepositoryItem  item = new RepositoryItem();
+             item.Name = "teste.html";
+             item.RelativePath = "home";
+             item.Repository = new LocalRepository("...");
+            logical.Create ( item);
+            physical.Create ( item);
             sync.Synchronize ();
             
-            Assert.False (logical.Exists (repoObj));
-            Assert.False (physical.Exists (repoObj));
-            Assert.False (remote.Exists (repoObj));
+            Assert.False (logical.Exists ( item));
+            Assert.False (physical.Exists ( item));
+            Assert.False (remote.Exists ( item));
         }
 
         [Test ()]
@@ -68,16 +68,16 @@ namespace GreenQloud.Test
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);    
             
-            RepositoryItem repoObj = new RepositoryItem();
-            repoObj.Name = "teste.html";
-            repoObj.RelativePath = "home";
-            repoObj.Repository = new LocalRepository("...");
-            physical.Create (repoObj);
+            RepositoryItem  item = new RepositoryItem();
+             item.Name = "teste.html";
+             item.RelativePath = "home";
+             item.Repository = new LocalRepository("...");
+            physical.Create ( item);
             sync.Synchronize ();
             
-            Assert.True (logical.Exists (repoObj));
-            Assert.True (physical.Exists (repoObj));
-            Assert.True (remote.Exists (repoObj));
+            Assert.True (logical.Exists ( item));
+            Assert.True (physical.Exists ( item));
+            Assert.True (remote.Exists ( item));
         }
 
         [Test ()]
@@ -90,16 +90,16 @@ namespace GreenQloud.Test
             EventDAO eventDAO = new SimpleEventDAO();
             BacklogSynchronizer sync = new SimpleBacklogSynchronizer (logical, physical, remote, transfers, eventDAO);
             
-            RepositoryItem repoObj = new RepositoryItem();
-            repoObj.Name = "teste.html";
-            repoObj.RelativePath = "home";
-            repoObj.Repository = new LocalRepository("...");
-            remote.Upload (repoObj);
+            RepositoryItem  item = new RepositoryItem();
+             item.Name = "teste.html";
+             item.RelativePath = "home";
+             item.Repository = new LocalRepository("...");
+            remote.Upload ( item);
             sync.Synchronize ();
             
-            Assert.True (logical.Exists (repoObj));
-            Assert.True (physical.Exists (repoObj));
-            Assert.True (remote.Exists (repoObj));
+            Assert.True (logical.Exists ( item));
+            Assert.True (physical.Exists ( item));
+            Assert.True (remote.Exists ( item));
         }
         
 
