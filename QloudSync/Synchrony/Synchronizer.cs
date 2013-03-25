@@ -41,7 +41,7 @@ namespace GreenQloud.Synchrony
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
              RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO)
         {
-            Status = SyncStatus.IDLE;
+            SyncStatus = SyncStatus.IDLE;
             this.transferDAO = transferDAO;
             this.eventDAO = eventDAO;
             this.logicalLocalRepository = logicalLocalRepository;
@@ -53,8 +53,9 @@ namespace GreenQloud.Synchrony
         
         public void Synchronize(){
             List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
-            foreach (Event e in eventsNotSynchronized){
-                Synchronize (e);
+            while (eventsNotSynchronized.Count>0){
+                Synchronize (eventsNotSynchronized[0]);
+                eventsNotSynchronized = eventDAO.EventsNotSynchronized;
             }
         }
 
@@ -63,7 +64,7 @@ namespace GreenQloud.Synchrony
 
             if (e.RepositoryType == RepositoryType.LOCAL){
 
-                Status = SyncStatus.UPLOADING;
+                SyncStatus = SyncStatus.UPLOADING;
 
                 if (e.EventType == EventType.DELETE)
                     transfer = remoteRepository.MoveFileToTrash (e.Item);
@@ -75,11 +76,11 @@ namespace GreenQloud.Synchrony
                 switch (e.EventType){
                 case EventType.CREATE: 
                 case EventType.UPDATE:
-                    Status = SyncStatus.DOWNLOADING;
+                    SyncStatus = SyncStatus.DOWNLOADING;
                     transfer = remoteRepository.Download (e.Item);
                     break;
                 case EventType.DELETE:
-                    Status = SyncStatus.UPLOADING;
+                    SyncStatus = SyncStatus.UPLOADING;
                     transfer = remoteRepository.SendLocalVersionToTrash (e.Item);
                     physicalLocalRepository.Delete (e.Item);
                     break;
@@ -107,7 +108,7 @@ namespace GreenQloud.Synchrony
         public delegate void SyncStatusChangedHandler (SyncStatus status);
         public event SyncStatusChangedHandler SyncStatusChanged = delegate {};
 
-        public SyncStatus Status {
+        public SyncStatus SyncStatus {
             get {
                 return status;
             }
