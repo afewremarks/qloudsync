@@ -1,5 +1,4 @@
 using System;
-using NUnit.Framework;
 using GreenQloud.Synchrony;
 using System.IO;
 using GreenQloud.Test.SimpleRepository;
@@ -49,11 +48,11 @@ namespace GreenQloud.Test.SimpleRepository
             }
         }
 
-        public override void Delete (RepositoryItem repoObj)
+        public override void Delete (RepositoryItem  item)
         {
-            if (list.Any (o=> o.Key.FullLocalName == repoObj.FullLocalName))
+            if (list.Any (o=> o.Key.FullLocalName ==  item.FullLocalName))
             {
-                RepositoryItem temp = list.First (o=> o.Key.FullLocalName == repoObj.FullLocalName).Key;
+                RepositoryItem temp = list.First (o=> o.Key.FullLocalName ==  item.FullLocalName).Key;
                 list.Remove (temp);
             }
         }
@@ -71,13 +70,13 @@ namespace GreenQloud.Test.SimpleRepository
 
         #endregion
 
-        public void Create (RepositoryItem repoObj)
+        public void Create (RepositoryItem  item)
         {
-            Create (repoObj, "");
+            Create (item, "");
         }
 
-        public void Create (RepositoryItem repoObj, string value){
-            list.Add (repoObj, value);
+        public void Create (RepositoryItem  item, string value){
+            list.Add ( item, value);
         }
 
         public string GetValue (string fullLocalName)
