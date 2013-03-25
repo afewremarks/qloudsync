@@ -74,6 +74,14 @@ namespace GreenQloud
             }
         }
 
+        private static string defaultBucketName = null;
+        public static string DefaultBucketName {
+            get{
+                if (defaultBucketName == null)
+                    defaultBucketName = Credential.Username+GlobalSettings.SuffixNameBucket;
+                return defaultBucketName;
+            }
+        }
     }
 }
 
