@@ -28,18 +28,18 @@ namespace GreenQloud.Test
             item.Name = "teste.html";
             item.RelativePath = "home";
             item.Repository = new LocalRepository("...");
-            item.MD5Hash = "123";
+            item.RemoteMD5Hash = "123";
             remote.Upload (item);
 
             RepositoryItem item2 = new RepositoryItem();
             item2.Name = "teste2.html";
             item2.RelativePath = "home";
             item2.Repository = new LocalRepository("...");
-            item2.MD5Hash = "123";
+            item2.RemoteMD5Hash = "123";
             physical.Create (item2);
             remote.Upload (item2);
             
-            remote.RecentChangedItems.Add (item);
+            remote.RecentChangedItems(DateTime.Now).Add (item);
             
             sync.AddEvents ();
             
@@ -66,7 +66,7 @@ namespace GreenQloud.Test
             item.Repository = new LocalRepository("...");
             remote.Upload (item);
             
-            remote.RecentChangedItems.Add (item);
+            remote.RecentChangedItems (DateTime.Now).Add (item);
             
             sync.AddEvents ();
             
@@ -116,18 +116,18 @@ namespace GreenQloud.Test
             item.Name = "teste.html";
             item.RelativePath = "home";
             item.Repository = new LocalRepository("...");
-            item.MD5Hash = "123";
+            item.RemoteMD5Hash = "123";
             remote.Upload (item);
             
             RepositoryItem item2 = new RepositoryItem();
             item2.Name = "teste2.html";
             item2.RelativePath = "home";
             item2.Repository = new LocalRepository("...");
-            item2.MD5Hash = "123";
+            item2.RemoteMD5Hash = "123";
             physical.Create (item2);
 
             
-            remote.RecentChangedItems.Add (item);
+            remote.RecentChangedItems(DateTime.Now).Add (item);
             
             sync.AddEvents ();
             
@@ -152,13 +152,13 @@ namespace GreenQloud.Test
             item.Name = "teste.html";
             item.RelativePath = "home";
             item.Repository = new LocalRepository("...");
-            item.MD5Hash = "123";
+            item.RemoteMD5Hash = "123";
             remote.Upload (item);
 
-            item.MD5Hash = "122";
+            item.RemoteMD5Hash = "122";
             physical.Create (item);
             
-            remote.RecentChangedItems.Add (item);
+            remote.RecentChangedItems(DateTime.Now).Add (item);
             
             sync.AddEvents ();
             
@@ -166,6 +166,13 @@ namespace GreenQloud.Test
             
             Assert.AreEqual (EventType.UPDATE, e.EventType);
             Assert.AreEqual (RepositoryType.REMOTE, e.RepositoryType);
+        }
+
+        
+        [Test]
+        public void TestFirst(){
+            StorageQloudRemoteEventsSynchronizer sync = StorageQloudRemoteEventsSynchronizer.GetInstance();
+            sync.FirstLoad();
         }
     }
 }

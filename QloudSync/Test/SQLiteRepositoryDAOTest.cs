@@ -8,7 +8,7 @@ using Mono.Data.Sqlite;
 namespace GreenQloud.Test
 {
     [TestFixture()]
-    public class StorageQloudRepositoryDAOTest
+    public class SQLiteRepositoryDAOTest
     {
         [Test()]
         public void TestDelete ()
@@ -42,7 +42,25 @@ namespace GreenQloud.Test
             SQLiteRepositoryDAO dao = new SQLiteRepositoryDAO();
             LocalRepository repo = new LocalRepository(RuntimeSettings.HomePath);
             dao.Create(repo);
-            Assert.AreEqual (dao.GetRepositoryByItemFullName (Path.Combine(RuntimeSettings.HomePath, "teste/")).Path, RuntimeSettings.HomePath);
+            Assert.AreEqual (RuntimeSettings.HomePath, dao.GetRepositoryByItemFullName (Path.Combine(RuntimeSettings.HomePath, "teste/")).Path);
+        }
+
+        [Test()]
+        public void TestGetRepositoryByItemFullNameWhenRepositoryNotMatched ()
+        {            
+            SQLiteRepositoryDAO dao = new SQLiteRepositoryDAO();
+            LocalRepository repo = new LocalRepository(RuntimeSettings.HomePath);
+            dao.Create(repo);
+            Assert.AreEqual (RuntimeSettings.HomePath, dao.GetRepositoryByItemFullName (Path.Combine(RuntimeSettings.HomePath, "notwatched/")).Path);
+        }
+
+        [Test()]
+        public void TestGetRepositoryByRootNameWhenRepositoryNotMatched ()
+        {            
+            SQLiteRepositoryDAO dao = new SQLiteRepositoryDAO();
+            LocalRepository repo = new LocalRepository(RuntimeSettings.HomePath);
+            dao.Create(repo);
+            Assert.AreEqual (RuntimeSettings.HomePath, dao.GetRepositoryByRootName ("teste/").Path);
         }
 
     }

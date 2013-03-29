@@ -13,6 +13,7 @@ namespace GreenQloud.Persistence
         public abstract List<RepositoryItem> All{
             get;
         }
+
     }
 
 }

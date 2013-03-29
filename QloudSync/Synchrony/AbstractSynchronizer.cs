@@ -27,17 +27,38 @@ namespace GreenQloud.Synchrony
         VERIFING
     }
 
-    public abstract class Synchronizer
+    public abstract class AbstractSynchronizer
     {
-        protected delegate void ProgressChangedEventHandler (double percentage, double time);
 
         protected TransferDAO transferDAO;
         protected EventDAO eventDAO;
         protected LogicalRepositoryController logicalLocalRepository;
         protected PhysicalRepositoryController physicalLocalRepository;
         protected RemoteRepositoryController remoteRepository;
+
+        private SyncStatus status;
+        public delegate void SyncStatusChangedHandler (SyncStatus status);
+        public event SyncStatusChangedHandler SyncStatusChanged = delegate {};
         
-        protected Synchronizer 
+        public SyncStatus SyncStatus {
+            get {
+                return status;
+            }
+            set {
+                status = value;
+                SyncStatusChanged(status);
+            }
+        }
+        
+        public bool Done {
+            set; get;
+        }
+
+        public bool Working{
+            set; get;
+        }
+        
+        protected AbstractSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
              RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO)
         {
@@ -47,54 +68,6 @@ namespace GreenQloud.Synchrony
             this.logicalLocalRepository = logicalLocalRepository;
             this.physicalLocalRepository = physicalLocalRepository;
             this.remoteRepository = remoteRepository;
-        }
-
-        public bool Working{
-            set; get;
-        }
-
-        
-        public void Synchronize(){
-            List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
-            while (eventsNotSynchronized.Count>0 && Working){
-                Synchronize (eventsNotSynchronized[0]);
-                eventsNotSynchronized = eventDAO.EventsNotSynchronized;
-            }
-        }
-
-        void Synchronize(Event e){
-            Transfer transfer = null;
-
-            if (e.RepositoryType == RepositoryType.LOCAL){
-
-                SyncStatus = SyncStatus.UPLOADING;
-
-                if (e.EventType == EventType.DELETE)
-                    transfer = remoteRepository.MoveFileToTrash (e.Item);
-                else
-                    transfer = remoteRepository.Upload (e.Item);
-                
-            }else{
-
-                switch (e.EventType){
-                case EventType.CREATE: 
-                case EventType.UPDATE:
-                    SyncStatus = SyncStatus.DOWNLOADING;
-                    transfer = remoteRepository.Download (e.Item);
-                    break;
-                case EventType.DELETE:
-                    SyncStatus = SyncStatus.UPLOADING;
-                    transfer = remoteRepository.SendLocalVersionToTrash (e.Item);
-                    physicalLocalRepository.Delete (e.Item);
-                    break;
-                }
-
-            }
-            
-            if (transfer != null)
-                transferDAO.Create (transfer);
-            logicalLocalRepository.Solve (e.Item);
-            eventDAO.UpdateToSynchronized(e);
         }
 
         #region Abstract Methods
@@ -107,23 +80,50 @@ namespace GreenQloud.Synchrony
 
         #region Implemented Methods
 
-        private SyncStatus status;
-        public delegate void SyncStatusChangedHandler (SyncStatus status);
-        public event SyncStatusChangedHandler SyncStatusChanged = delegate {};
-
-        public SyncStatus SyncStatus {
-            get {
-                return status;
+        public void Synchronize(){
+            List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
+            while (eventsNotSynchronized.Count>0 && Working){
+                Synchronize (eventsNotSynchronized[0]);
+                eventsNotSynchronized = eventDAO.EventsNotSynchronized;
             }
-            set {
-                status = value;
-                SyncStatusChanged(status);
-            }
+            SyncStatus = SyncStatus.IDLE;
+            Done = true;
         }
 
-        public bool Done {
-            set; get;
+        void Synchronize(Event e){
+            Transfer transfer = null;
+            
+            if (e.RepositoryType == RepositoryType.LOCAL){
+                
+                SyncStatus = SyncStatus.UPLOADING;
+                
+                if (e.EventType == EventType.DELETE)
+                    transfer = remoteRepository.MoveToTrash (e.Item);
+                else
+                    transfer = remoteRepository.Upload (e.Item);
+                
+            }else{
+                switch (e.EventType){
+                case EventType.CREATE: 
+                case EventType.UPDATE:
+                    SyncStatus = SyncStatus.DOWNLOADING;
+                    transfer = remoteRepository.Download (e.Item);
+                    break;
+                case EventType.DELETE:
+                    SyncStatus = SyncStatus.UPLOADING;
+                    transfer = remoteRepository.SendLocalVersionToTrash (e.Item);
+                    physicalLocalRepository.Delete (e.Item);
+                    break;
+                }                
+            }
+            
+            if (transfer != null)
+                transferDAO.Create (transfer);
+            logicalLocalRepository.Solve (e.Item);
+            eventDAO.UpdateToSynchronized(e);
         }
+
+
 
         int countOperation = 0;
 

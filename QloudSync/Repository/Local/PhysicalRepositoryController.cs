@@ -1,10 +1,11 @@
 using System;
 using GreenQloud.Repository;
 using GreenQloud.Model;
+using System.Collections.Generic;
 
 namespace GreenQloud.Repository.Local
 {
-    public abstract class PhysicalRepositoryController : RepositoryController
+    public abstract class PhysicalRepositoryController : IRepositoryController
     {
 
         public PhysicalRepositoryController (){
@@ -12,20 +13,22 @@ namespace GreenQloud.Repository.Local
 
         #region RepositoryController implementation
 
-        public abstract bool Exists (GreenQloud.Model.RepositoryItem repoObject);
+        public abstract bool Exists (RepositoryItem repoObject);
 
 
-        public abstract System.Collections.Generic.List<GreenQloud.Model.RepositoryItem> Items {
+        public abstract List<RepositoryItem> Items {
             get ;
         }
 
         #endregion
 
-        public abstract RepositoryItem CreateObjectInstance (string fullLocalName);
+        public abstract RepositoryItem CreateItemInstance (string fullLocalName);
 
         public abstract void Delete (RepositoryItem  item);
 
         public abstract RepositoryItem GetCopy (RepositoryItem remoteItem);
+
+        public abstract bool IsSync (RepositoryItem item);
     }
 }
 

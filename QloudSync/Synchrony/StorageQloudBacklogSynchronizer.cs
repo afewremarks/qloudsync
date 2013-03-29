@@ -3,10 +3,11 @@ using GreenQloud.Repository.Local;
 using GreenQloud.Repository.Remote;
 using GreenQloud.Persistence;
 using System.Threading;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Synchrony
 {
-    public class StorageQloudBacklogSynchronizer : BacklogSynchronizer
+    public class StorageQloudBacklogSynchronizer : AbstractBacklogSynchronizer
     {
         Thread threadSync;
         static StorageQloudBacklogSynchronizer instance;
@@ -17,7 +18,7 @@ namespace GreenQloud.Synchrony
         {
             threadSync = new Thread( ()=>{
                 while (Working){
-                    base.Synchronize();
+                    Synchronize();
                 }
             });
         }
@@ -37,7 +38,7 @@ namespace GreenQloud.Synchrony
         public override void Start ()
         {
             try{
-                base.Working = true;
+                Working = true;
                 threadSync.Start();
             }catch{
                 // do nothing
@@ -46,13 +47,12 @@ namespace GreenQloud.Synchrony
 
         public override void Pause ()
         {
-            base.Working = false;
+            Working = false;
         }
 
         public override void Stop ()
         {
-            base.Working = false;
-
+            Working = false;
             threadSync.Join();
         }
 

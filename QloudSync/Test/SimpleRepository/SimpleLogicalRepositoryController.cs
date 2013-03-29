@@ -21,14 +21,6 @@ namespace GreenQloud.Test.SimpleRepository
 
         #region implemented abstract members of LogicalRepositoryController
 
-        public override RepositoryItem CreateObjectInstance (string fullPath)
-        {
-            RepositoryItem  item = new RepositoryItem();
-             item.Name = "teste.html";
-             item.RelativePath = "home";
-             item.Repository = new LocalRepository("...");
-            return  item;
-        }
 
         public override void Solve (RepositoryItem remoteObj)
         {

@@ -17,15 +17,10 @@ namespace GreenQloud.Test.SimpleRepository
                 return new TimeSpan (0);
             }
         }
-
+       
         List<RepositoryItem> recentChangedItems = new List<RepositoryItem>();
-        public override List<GreenQloud.Model.RepositoryItem> RecentChangedItems {
-            get {
-                return recentChangedItems;
-            }
-            set {
-                recentChangedItems = value;
-            }
+        public override List<GreenQloud.Model.RepositoryItem> RecentChangedItems (DateTime LastSyncTime) {
+            return recentChangedItems;
         }
 
 
@@ -39,55 +34,50 @@ namespace GreenQloud.Test.SimpleRepository
             throw new NotImplementedException ();
         }
 
-        public override Transfer Download (GreenQloud.Model.RepositoryItem request)
+        public override Transfer Download (RepositoryItem item)
         {
-            if (physicalController.list.Any (o=>o.Key.FullLocalName == request.FullLocalName)){
-                RepositoryItem key = physicalController.list.First (o=>o.Key.FullLocalName == request.FullLocalName).Key;
-                physicalController.list[key] = list.First (o=>o.Key.FullLocalName==request.FullLocalName).Value;
+            if (physicalController.list.Any (o=>o.Key.FullLocalName == item.FullLocalName)){
+                RepositoryItem key = physicalController.list.First (o=>o.Key.FullLocalName == item.FullLocalName).Key;
+                physicalController.list[key] = list.First (o=>o.Key.FullLocalName==item.FullLocalName).Value;
             }else{
-                physicalController.Create (request);
+                physicalController.Create (item);
             }
-            return new Transfer (request, TransferType.DOWNLOAD);
+            return new Transfer (item, TransferType.DOWNLOAD);
         }
 
-        public override Transfer Upload (GreenQloud.Model.RepositoryItem request)
+        public override Transfer Upload (RepositoryItem item)
         {
-            if (list.Any (o=> o.Key.FullLocalName == request.FullLocalName))
+            if (list.Any (o=> o.Key.FullLocalName == item.FullLocalName))
             {
-                RepositoryItem key = physicalController.list.First (o=>o.Key.FullLocalName == request.FullLocalName).Key;
+                RepositoryItem key = physicalController.list.First (o=>o.Key.FullLocalName == item.FullLocalName).Key;
                 
-                return Upload (request, physicalController.list[key]);
+                return Upload (item, physicalController.list[key]);
             }
             else
-                return Upload (request, string.Empty);
+                return Upload (item, string.Empty);
         }
 
-        public override Transfer MoveFileToTrash (GreenQloud.Model.RepositoryItem request)
+        public override Transfer MoveToTrash (RepositoryItem item)
         {
-            list.Remove (request);
-            trash.Add (request);
-            return new Transfer (request, TransferType.UPLOAD);
+            list.Remove (item);
+            trash.Add (item);
+            return new Transfer (item, TransferType.UPLOAD);
         }
 
-        public override Transfer MoveFolderToTrash (GreenQloud.Model.RepositoryItem folder)
-        {
-            throw new NotImplementedException ();
-        }
-
-        public override Transfer Delete (GreenQloud.Model.RepositoryItem request)
+        public override Transfer Delete (RepositoryItem item)
         {
             throw new NotImplementedException ();
         }
 
-        public override Transfer SendLocalVersionToTrash (GreenQloud.Model.RepositoryItem request)
+        public override Transfer SendLocalVersionToTrash (RepositoryItem item)
         {
-            list.Remove (request);
-            trash.Add (request);
+            list.Remove (item);
+            trash.Add (item);
             
-            return new Transfer (request, TransferType.UPLOAD);
+            return new Transfer (item, TransferType.UPLOAD);
         }
 
-        public override Transfer CreateFolder (GreenQloud.Model.RepositoryItem request)
+        public override Transfer CreateFolder (RepositoryItem item)
         {
             throw new NotImplementedException ();
         }
@@ -97,24 +87,15 @@ namespace GreenQloud.Test.SimpleRepository
             throw new NotImplementedException ();
         }
 
-        public override bool ExistsFolder (GreenQloud.Model.RepositoryItem folder)
-        {
-            throw new NotImplementedException ();
-        }
-
         public override bool Exists (GreenQloud.Model.RepositoryItem sqObject)
         {
             return list.Any (r=> r.Key.Name == sqObject.Name);
         }
 
-        public override void DownloadFull (GreenQloud.Model.RepositoryItem file)
-        {
-            throw new NotImplementedException ();
-        }
 
-        public override bool ExistsCopys (GreenQloud.Model.RepositoryItem item)
+        public override bool ExistsCopies (GreenQloud.Model.RepositoryItem item)
         {
-            return list.Any (element => element.Key.MD5Hash == item.MD5Hash && element.Key.FullLocalName != item.FullLocalName);
+            return list.Any (element => element.Key.RemoteMD5Hash == item.RemoteMD5Hash && element.Key.FullLocalName != item.FullLocalName);
         }
 
         public override List<GreenQloud.Model.RepositoryItem> AllItems {
