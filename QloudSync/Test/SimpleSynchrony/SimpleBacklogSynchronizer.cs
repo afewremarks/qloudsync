@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace GreenQloud.Test.SimpleSynchrony
 {
-    public class SimpleBacklogSynchronizer : GreenQloud.Synchrony.BacklogSynchronizer
+    public class SimpleBacklogSynchronizer : GreenQloud.Synchrony.AbstractBacklogSynchronizer
     {
         public List<RepositoryItem> list = new List<RepositoryItem>();
 

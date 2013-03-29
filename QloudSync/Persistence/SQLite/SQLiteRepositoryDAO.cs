@@ -8,7 +8,7 @@ using Mono.Data.Sqlite;
 
 namespace GreenQloud.Persistence.SQLite
 {
-    class SQLiteRepositoryDAO : RepositoryDAO
+    public class SQLiteRepositoryDAO : RepositoryDAO
     {
 
         #region implemented abstract members of RepositoryDAO
@@ -25,13 +25,28 @@ namespace GreenQloud.Persistence.SQLite
 
         public void DeleteAll ()
         {
-            ExecuteNonQuery ("DELETE FROM Repository");
+            ExecuteNonQuery ("DELETE FROM REPOSITORY");
         }
         #endregion
 
         public LocalRepository GetRepositoryByItemFullName (string itemFullName)
         {
-            return All.First (r=> itemFullName.Contains(r.Path));
+            LocalRepository repo = All.First (r=> itemFullName.Contains(r.Path));
+
+            if (repo == null)
+                return new LocalRepository (RuntimeSettings.HomePath);
+            else
+                return repo;
+        }
+
+        public LocalRepository GetRepositoryByRootName (string root)
+        {
+            List<LocalRepository> repos = ExecuteReader (string.Format("SELECT * FROM REPOSITORY WHERE PATH LIKE '%{0}'", root));
+
+            if (repos.Count == 0)
+                return new LocalRepository (RuntimeSettings.HomePath);
+            else
+                return repos.First();
         }
 
         public void ExecuteNonQuery (string sqlCommand)

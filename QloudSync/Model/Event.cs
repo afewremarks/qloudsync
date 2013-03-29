@@ -37,6 +37,11 @@ using System;
             set; get;
         }
 
+        public DateTime InsertTime {
+            get;
+            set;
+        }
+
 		public string User {
 			set; get;
 		}

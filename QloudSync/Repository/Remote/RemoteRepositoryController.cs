@@ -8,7 +8,7 @@ using GreenQloud.Repository.Local;
 
 namespace GreenQloud.Repository.Remote
 {
-    public abstract class RemoteRepositoryController : RepositoryController
+    public abstract class RemoteRepositoryController : IRepositoryController
     {
         protected LogicalRepositoryController logicalController;
 
@@ -64,20 +64,14 @@ namespace GreenQloud.Repository.Remote
         public abstract bool ExistsVersion (RepositoryItem file);
         public abstract Transfer Download (RepositoryItem request);
         public abstract Transfer Upload (RepositoryItem request);
-        public abstract Transfer MoveFileToTrash (RepositoryItem request);
-        public abstract Transfer MoveFolderToTrash (RepositoryItem folder);
+        public abstract Transfer MoveToTrash (RepositoryItem request);
         public abstract Transfer Delete(RepositoryItem request);
         public abstract Transfer SendLocalVersionToTrash (RepositoryItem request);
         public abstract Transfer CreateFolder (RepositoryItem request);
         public abstract Transfer Copy (RepositoryItem source, RepositoryItem destination);
-        public abstract bool ExistsFolder (RepositoryItem folder);
         public abstract bool Exists (RepositoryItem sqObject);
-        public abstract void DownloadFull (RepositoryItem  file);
-        public abstract bool ExistsCopys (RepositoryItem item);
-        public abstract List<RepositoryItem> RecentChangedItems {
-            get;
-            set;
-        }
+        public abstract bool ExistsCopies (RepositoryItem item);
+        public abstract List<RepositoryItem> RecentChangedItems (DateTime LastSyncTime);
     }
 }
 

@@ -5,48 +5,58 @@ using System.Linq;
 using System.Xml;
 using System.Threading;
 using GreenQloud.Model;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Repository.Local
 {
-    class StorageQloudLogicalRepositoryController : LogicalRepositoryController
+    public class StorageQloudLogicalRepositoryController : LogicalRepositoryController
     {
-        #region RepositoryController implementation
+                
+        private SQLiteRepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO();
+        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+        private StorageQloudPhysicalRepositoryController physicalController = new StorageQloudPhysicalRepositoryController();
+        public StorageQloudLogicalRepositoryController (){
+        }
+        
+        #region implemented abstract members of LogicalRepositoryController
+        
 
+        public override void Solve (RepositoryItem remoteObj)
+        {
+            if (!physicalController.Exists (remoteObj)){
+                if (Exists(remoteObj))                
+                    repositoryItemDAO.Remove (remoteObj);
+
+            }
+            else{
+                if (!Exists(remoteObj)) 
+                    repositoryItemDAO.Create (remoteObj);
+            }
+        }
+        
+        public override bool Exists (RepositoryItem item)
+        {
+            return repositoryItemDAO.Exists(item);
+        }
+        
+        
         public override List<RepositoryItem> Items {
             get {
                 throw new NotImplementedException ();
             }
         }
-
-        public override bool Exists (RepositoryItem repoObject)
-        {
-            throw new NotImplementedException ();
-        }
-
-        #endregion
-
-        #region implemented abstract members of LogicalRepositoryController
-
+        
         public override List<LocalRepository> LocalRepositories {
-            get {
-                throw new NotImplementedException ();
+            get{
+                return repositoryDAO.All;
             }
-            set {
-                throw new NotImplementedException ();
-            }
+            set{}
         }
-
+        
         #endregion
+        
+       
 
-        public override RepositoryItem CreateObjectInstance (string fullPath)
-        {
-            throw new NotImplementedException ();
-        }
-
-        public override void Solve (RepositoryItem remoteObj)
-        {
-            throw new NotImplementedException ();
-        }
     }
 
 }

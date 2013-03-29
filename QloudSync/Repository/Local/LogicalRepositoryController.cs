@@ -8,7 +8,7 @@ using GreenQloud.Model;
 
 namespace GreenQloud.Repository.Local
 {
-	public abstract class LogicalRepositoryController : RepositoryController
+	public abstract class LogicalRepositoryController : IRepositoryController
 	{
         #region RepositoryController implementation
 
@@ -20,9 +20,6 @@ namespace GreenQloud.Repository.Local
 
         #endregion
 
-
-
-        public abstract RepositoryItem CreateObjectInstance (string fullPath);
         public abstract void Solve (RepositoryItem remoteObj);
         public abstract List<LocalRepository> LocalRepositories {
             get; set;

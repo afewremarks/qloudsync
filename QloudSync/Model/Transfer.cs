@@ -11,9 +11,10 @@ namespace GreenQloud.Model
     public enum TransferType{
         DOWNLOAD,
         UPLOAD,
-        REMOVE,
-        CREATELOCALFOLDER,
-        CREATEREMOTEFOLDER
+        LOCAL_REMOVE,
+        REMOTE_REMOVE,
+        LOCAL_CREATE_FOLDER,
+        REMOTE_CREATE_FOLDER
     }
 
     public class Transfer
@@ -26,11 +27,11 @@ namespace GreenQloud.Model
 
         public Transfer (RepositoryItem sqObject, TransferType type)
         {
-            StorageQloudObject = sqObject;
+            Item = sqObject;
             Type = type;
         }
 
-        public RepositoryItem StorageQloudObject{
+        public RepositoryItem Item{
             set; get;
         }
         
@@ -39,25 +40,7 @@ namespace GreenQloud.Model
         }
        
         public long TotalSize {
-            get {
-                try{
-                    if (Type == TransferType.UPLOAD)
-                    {
-                        System.IO.FileInfo f = new System.IO.FileInfo(StorageQloudObject.FullLocalName);
-                        if (f.Exists)                    
-                            return f.Length; 
-                    }
-                    else if(Type == TransferType.DOWNLOAD){
-                        /*if(StorageQloudObject.AsS3Object != null)
-                            return StorageQloudObject.AsS3Object.Size;
-*/
-                    }
-                }
-                catch{
-                    return 0;
-                }
-                return 0;
-            }
+            set;  get;
         }
 
         public DateTime InitialTime{

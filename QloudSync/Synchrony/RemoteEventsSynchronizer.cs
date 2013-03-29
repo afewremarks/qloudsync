@@ -8,10 +8,16 @@ using System.Threading;
 
 namespace GreenQloud.Synchrony
 {
-    public class RemoteEventsSynchronizer : Synchronizer
+    public class RemoteEventsSynchronizer : AbstractSynchronizer
     {
         Thread threadSync;
         bool eventsCreated;
+        DateTime LastSyncTime;
+
+        
+        
+        public new event ProgressChangedEventHandler ProgressChanged = delegate { };
+        public new delegate void ProgressChangedEventHandler (double percentage, double time);
 
         public RemoteEventsSynchronizer  
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
@@ -20,7 +26,10 @@ namespace GreenQloud.Synchrony
             threadSync = new Thread(() =>{
                 Synchronize ();
             });
+            LastSyncTime = new DateTime();
         }
+
+
 
         public new void Synchronize(){
             while (Working){
@@ -37,10 +46,10 @@ namespace GreenQloud.Synchrony
         public void AddEvents ()
         {
 
-            foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems){
+            foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems (LastSyncTime)){
 
                 if (physicalLocalRepository.Exists (remoteItem)){
-                    if (!remoteItem.IsSync)
+                    if (!physicalLocalRepository.IsSync (remoteItem))
                     {
                         eventDAO.Create ( new Event(){
                             EventType = EventType.UPDATE,
@@ -94,7 +103,26 @@ namespace GreenQloud.Synchrony
 
             }  
             eventsCreated = true;
+            LastSyncTime = DateTime.Now;
         }
+
+        public double InitFirstLoad ()
+        {
+            double size = 0;
+            Start();
+            foreach (RepositoryItem i in remoteRepository.Items){
+                size+= i.Size;
+                eventDAO.Create ( new Event(){
+                    EventType = EventType.CREATE,
+                    RepositoryType = RepositoryType.REMOTE,
+                    Item = i,
+                    Synchronized = false
+                });
+            }
+            eventsCreated = true;
+            return size;
+        }
+
 
         #region implemented abstract members of Synchronizer
         public override void Start ()
@@ -116,7 +144,11 @@ namespace GreenQloud.Synchrony
             Working = false;
             threadSync.Join();
         }
-        #endregion    
+        #endregion  
+
+        public void GenericSynchronize(){
+            base.Synchronize();
+        }
     }
 }
 

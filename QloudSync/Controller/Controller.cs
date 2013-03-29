@@ -7,6 +7,7 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 using GreenQloud.Synchrony;
+using System.Collections.Generic;
 
  
 
@@ -21,9 +22,9 @@ namespace GreenQloud {
 	public class Controller{
 
         public IconController StatusIcon;
-        LocalSynchronizer localSynchronizer;
-        RemoteSynchronizer remoteSynchronizer;
-        BacklogSynchronizer backlogSynchronizer;
+        StorageQloudLocalEventsSynchronizer localSynchronizer;
+        StorageQloudRemoteEventsSynchronizer remoteSynchronizer;
+        StorageQloudBacklogSynchronizer backlogSynchronizer;
 
         public double ProgressPercentage = 0.0;
         public string ProgressSpeed      = "";
@@ -50,6 +51,8 @@ namespace GreenQloud {
         public event Action OnSyncing = delegate { };
         public event Action OnError = delegate { };
 
+        protected List<string> warnings = new List<string> ();
+        protected List<string> errors   = new List<string> ();
         
         private System.Timers.Timer timer;
 
@@ -63,9 +66,9 @@ namespace GreenQloud {
 
         public void Initialize ()
         {
-            localSynchronizer = LocalSynchronizer.GetInstance();
-            remoteSynchronizer = RemoteSynchronizer.GetInstance();
-            backlogSynchronizer = BacklogSynchronizer.GetInstance();
+            localSynchronizer = StorageQloudLocalEventsSynchronizer.GetInstance();
+            remoteSynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
+            backlogSynchronizer = StorageQloudBacklogSynchronizer.GetInstance();
 
             localSynchronizer.SyncStatusChanged += HandleSyncStatusChanged;
             remoteSynchronizer.SyncStatusChanged += HandleSyncStatusChanged;
@@ -95,6 +98,7 @@ namespace GreenQloud {
         public void UIHasLoaded ()
         {
             if (FirstRun) {
+                Persistence.SQLite.SQLiteDatabase.CreateDataBase();
                 ShowSetupWindow (PageType.Login);
                 foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
                     File.Delete (f);
@@ -108,11 +112,11 @@ namespace GreenQloud {
         private void InitializeSynchronizers ()
         {
             if(!FirstRun)
-                GreenQloud.Synchrony.BacklogSynchronizer.GetInstance ().Start();
+                backlogSynchronizer.Start();
             localSynchronizer.Start();
             remoteSynchronizer.Start();
                         
-            localSynchronizer.ProgressChanged += delegate (double percentage, double speed) {
+            remoteSynchronizer.ProgressChanged += delegate (double percentage, double speed) {
                 ProgressPercentage = percentage;
                 ProgressSpeed      = speed.ToString();
                 
@@ -135,8 +139,8 @@ namespace GreenQloud {
         // Fires events for the current syncing state
         private void UpdateState ()
         {
-           if (localSynchronizer.Status == SyncStatus.DOWNLOADING || localSynchronizer.Status == SyncStatus.UPLOADING ||
-                remoteSynchronizer.Status == SyncStatus.DOWNLOADING || remoteSynchronizer.Status == SyncStatus.UPLOADING  
+            if (localSynchronizer.SyncStatus == SyncStatus.DOWNLOADING || localSynchronizer.SyncStatus == SyncStatus.UPLOADING ||
+                remoteSynchronizer.SyncStatus == SyncStatus.DOWNLOADING || remoteSynchronizer.SyncStatus == SyncStatus.UPLOADING  
                 ) {
                 OnSyncing ();
             } else {
@@ -155,10 +159,10 @@ namespace GreenQloud {
                 SyncStop();
             };
             
-            localSynchronizer.ProgressChanged += delegate (double percentage, double time) {
+            remoteSynchronizer.ProgressChanged += delegate (double percentage, double time) {
                 FolderFetching (percentage, time);
             };
-            localSynchronizer.FirstLoad();
+            remoteSynchronizer.FirstLoad();
             FinishFetcher();
         }
 
@@ -172,6 +176,7 @@ namespace GreenQloud {
         {  
             Logger.LogInfo ("Controller", "First load sucessfully");
             FolderFetched (localSynchronizer.Warnings);
+            new Persistence.SQLite.SQLiteRepositoryDAO().Create (new GreenQloud.Model.LocalRepository(RuntimeSettings.HomePath));
             new Thread (() => CreateStartupItem ()).Start ();
             InitializeSynchronizers ();
         }
@@ -191,7 +196,7 @@ namespace GreenQloud {
             process.Start ();
             process.WaitForExit ();
             
-            Logger.LogInfo ("Controller", "Added " + MonoMac.Foundation.NSBundle.MainBundle.BundlePath + " to login items");
+            Logger.LogInfo ("Controller", "Added " + MonoMac.Foundation.NSBundle.MainBundle.BundlePath + " to startup items");
         }
         
         public void ShowSetupWindow (PageType page_type)
@@ -331,29 +336,6 @@ namespace GreenQloud {
             NSWorkspace.SharedWorkspace.OpenUrl (new NSUrl (url));
         }
 
-        private TransferResponseList<TransferResponse> recentTransfers;
-        public TransferResponseList<TransferResponse> RecentsTransfers {
-            get {
-                if(recentTransfers == null)
-                    recentTransfers = new TransferResponseList<TransferResponse>();
-                return recentTransfers;
-            }
-        }
-
-        public class TransferResponseList <TransferResponse> : System.Collections.Generic.List<TransferResponse>
-        {
-            public event EventHandler OnAdd;
-
-            
-            public new void Add (TransferResponse item)
-            {
-                base.Add (item);
-                if (null != OnAdd) {
-                    OnAdd (this, null);                
-                }
-            }
-
-        } 
 
         public void HandleDisconnection(){
             ErrorType = ERROR_TYPE.DISCONNECTION;

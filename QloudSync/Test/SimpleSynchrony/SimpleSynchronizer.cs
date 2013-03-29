@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace GreenQloud.Test.SimpleSynchrony
 {
-    public class SimpleSynchronizer : Synchronizer
+    public class SimpleSynchronizer : AbstractSynchronizer
     {
         public List<RepositoryItem> list = new List<RepositoryItem>();
         public SimpleSynchronizer (LogicalRepositoryController logical, PhysicalRepositoryController physical, 
