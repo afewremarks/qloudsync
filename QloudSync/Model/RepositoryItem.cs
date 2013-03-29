@@ -35,11 +35,17 @@ namespace GreenQloud.Model
         private string fullLocalName = null;
         public string FullLocalName {
             set{
+               
                 fullLocalName = value;
             }
             get {
-                if(fullLocalName == null)
+                if(fullLocalName == null){                    
+
                     fullLocalName = Path.Combine(Repository.Path, AbsolutePath);
+
+                }
+                
+
                 return fullLocalName;
             }
         }
@@ -79,11 +85,25 @@ namespace GreenQloud.Model
             set;
             get;
         }
-        
-        public string MD5Hash {
-            set; get;
+        string remotehash = string.Empty;
+        public string RemoteMD5Hash {
+            get{
+                return remotehash;
+            }set{
+                remotehash = value;
+            }
+        }   
+
+        string localhash = string.Empty;
+        public string LocalMD5Hash {
+            get{
+                return localhash;
+            }set{
+                localhash = value;
+            }
         }
-                
+
+
         public DateTime TimeOfLastChange{
             set;
             get;
@@ -94,7 +114,7 @@ namespace GreenQloud.Model
             get;
         }
         
-        public int Id {
+        public string Id {
             set;
             get;
         }       
@@ -123,17 +143,6 @@ namespace GreenQloud.Model
         private string CorrectsDelimiter (string path)
         {
             return path.Replace (Constant.DELIMITER_INVERSE, Constant.DELIMITER);
-        }
-
-        string RemoteMD5Hash {
-            get;
-            set;
-        }
-       
-        public bool IsSync {
-            get{
-                return MD5Hash == RemoteMD5Hash;
-            }
         }
 
         public long Size {

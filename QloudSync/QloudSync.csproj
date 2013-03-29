@@ -59,7 +59,6 @@
     <Reference Include="Mono.Posix" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Configuration" />
-    <Reference Include="nunit.framework" />
     <Reference Include="System.Web" />
     <Reference Include="AWSSDK">
       <HintPath>..\lib\AWSSDK.dll</HintPath>
@@ -67,6 +66,11 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Data.Sqlite" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
@@ -80,6 +84,14 @@
     <Folder Include="UI\" />
     <Folder Include="Util\" />
     <Folder Include="Exception\" />
+    <Folder Include="Persistence\" />
+    <Folder Include="Test\" />
+    <Folder Include="Repository\Local\" />
+    <Folder Include="Repository\Remote\" />
+    <Folder Include="Test\SimpleSynchrony\" />
+    <Folder Include="Test\SimpleRepository\" />
+    <Folder Include="Test\SimplePersistence\" />
+    <Folder Include="Persistence\SQLite\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\Credential.cs" />
@@ -90,39 +102,81 @@
     <Compile Include="Controller\IconController.cs" />
     <Compile Include="Controller\SparkleSetupController.cs" />
     <Compile Include="IO\OSXFileSystemWatcher.cs" />
-    <Compile Include="Repository\Change.cs" />
-    <Compile Include="Repository\LocalRepo.cs" />
-    <Compile Include="Repository\RemoteRepo.cs" />
-    <Compile Include="Repository\StorageQloudObject.cs" />
-    <Compile Include="Repository\StorageQloudRepo.cs" />
-    <Compile Include="Repository\TransferResponse.cs" />
-    <Compile Include="Synchrony\BacklogDocument.cs" />
-    <Compile Include="Synchrony\BacklogSynchronizer.cs" />
-    <Compile Include="Synchrony\DeltaFile.cs" />
-    <Compile Include="Synchrony\LocalSynchronizer.cs" />
-    <Compile Include="Synchrony\RemoteSynchronizer.cs" />
-    <Compile Include="Synchrony\Synchronizer.cs" />
     <Compile Include="UI\AboutWindow.cs" />
     <Compile Include="UI\HyperLink.cs" />
     <Compile Include="UI\SparkleSetup.cs" />
     <Compile Include="UI\SparkleSetupWindow.cs" />
     <Compile Include="UI\TransferWindow.cs" />
-    <Compile Include="Util\CO2Savings.cs" />
     <Compile Include="Util\Crypto.cs" />
     <Compile Include="Util\IOHelper.cs" />
     <Compile Include="Util\Logger.cs" />
     <Compile Include="Util\Statistics.cs" />
-    <Compile Include="Util\Test.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="Constant.cs" />
     <Compile Include="MainMenu.xib.designer.cs">
       <DependentUpon>MainMenu.xib</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="SparkleUI.cs" />
     <Compile Include="Config\Preferences.cs" />
     <Compile Include="Exception\AccessDeniedException.cs" />
+<<<<<<< HEAD
     <Compile Include="Exception\DisconnectionException.cs" />
+=======
+    <Compile Include="Persistence\TransferDAO.cs" />
+    <Compile Include="Test\BacklogSynchronizerTest.cs" />
+    <Compile Include="Exception\PhysicalLocalRepositoryException.cs" />
+    <Compile Include="Repository\Local\LogicalRepositoryController.cs" />
+    <Compile Include="Repository\Remote\RemoteRepositoryController.cs" />
+    <Compile Include="Repository\Local\StorageQloudLogicalRepositoryController.cs" />
+    <Compile Include="Repository\Local\StorageQloudPhysicalRepositoryController.cs" />
+    <Compile Include="Repository\Local\PhysicalRepositoryController.cs" />
+    <Compile Include="Model\LocalRepository.cs" />
+    <Compile Include="Model\Event.cs" />
+    <Compile Include="Model\RepositoryItem.cs" />
+    <Compile Include="Model\Transfer.cs" />
+    <Compile Include="Model\CO2Savings.cs" />
+    <Compile Include="Model\DeltaFile.cs" />
+    <Compile Include="Persistence\EventDAO.cs" />
+    <Compile Include="Test\LocalEventsSynchronizerTest.cs" />
+    <Compile Include="Test\SimpleSynchrony\SimpleBacklogSynchronizer.cs" />
+    <Compile Include="Test\SimpleSynchrony\SimpleLocalEventsSynchronizer.cs" />
+    <Compile Include="Test\SimpleRepository\SimpleRemoteRepositoryController.cs" />
+    <Compile Include="Test\SimpleRepository\SimplePhysicalRepositoryController.cs" />
+    <Compile Include="Test\SimpleRepository\SimpleLogicalRepositoryController.cs" />
+    <Compile Include="Test\SimplePersistence\SimpleEventDAO.cs" />
+    <Compile Include="Test\SimplePersistence\SimpleTransferDAO.cs" />
+    <Compile Include="Synchrony\RemoteEventsSynchronizer.cs" />
+    <Compile Include="Test\SimpleSynchrony\SimpleRemoteEventsSynchronizer.cs" />
+    <Compile Include="Test\RemoteEventsSynchronizerTest.cs" />
+    <Compile Include="Test\SynchronizerTest.cs" />
+    <Compile Include="Test\SimpleSynchrony\SimpleSynchronizer.cs" />
+    <Compile Include="Test\RepositoryItemTest.cs" />
+    <Compile Include="Persistence\RepositoryItemDAO.cs" />
+    <Compile Include="Persistence\RepositoryDAO.cs" />
+    <Compile Include="Synchrony\StorageQloudLocalEventsSynchronizer.cs" />
+    <Compile Include="Repository\Remote\StorageQloudRemoteRepositoryController.cs" />
+    <Compile Include="Test\StorageQloudLocalEventsSynchronizerTest.cs" />
+    <Compile Include="Persistence\SQLite\SQLiteDataBase.cs" />
+    <Compile Include="Persistence\SQLite\SQLiteRepositoryDAO.cs" />
+    <Compile Include="Persistence\SQLite\SQLiteRepositoryItemDAO.cs" />
+    <Compile Include="Persistence\SQLite\SQLiteTransferDAO.cs" />
+    <Compile Include="Synchrony\StorageQloudRemoteEventsSynchronizer.cs" />
+    <Compile Include="Test\StorageQloudRemoteEventsSynchonizerTest.cs" />
+    <Compile Include="Synchrony\StorageQloudBacklogSynchronizer.cs" />
+    <Compile Include="Test\StorageQloudBacklogSynchronizerTest.cs" />
+    <Compile Include="Util\Constant.cs" />
+    <Compile Include="Test\StorageQloudRemoteRepositoryControllerTest.cs" />
+    <Compile Include="Test\StorageQloudPhysicalRepositoryControllerTest.cs" />
+    <Compile Include="Repository\IRepositoryController.cs" />
+    <Compile Include="Synchrony\AbstractSynchronizer.cs" />
+    <Compile Include="Synchrony\AbstractBacklogSynchronizer.cs" />
+    <Compile Include="Synchrony\AbstractLocalEventsSynchronizer.cs" />
+    <Compile Include="Persistence\SQLite\SQLiteEventDAO.cs" />
+    <Compile Include="Test\SQLiteTransferDAOTest.cs" />
+    <Compile Include="Test\SQLiteRepositoryDAOTest.cs" />
+    <Compile Include="Test\SQLiteRepositoryItemDAOTest.cs" />
+    <Compile Include="Test\SQLiteEventDAOTest.cs" />
+    <Compile Include="UI\SparkleUI.cs" />
+>>>>>>> version RC 1.2
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">

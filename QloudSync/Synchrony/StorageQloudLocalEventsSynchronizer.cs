@@ -9,13 +9,20 @@ using System.Collections.Generic;
 
 namespace GreenQloud.Synchrony
 {
-    public class StorageQloudLocalEventsSynchronizer : LocalEventsSynchronizer
+    public class StorageQloudLocalEventsSynchronizer : AbstractLocalEventsSynchronizer
     {
         static StorageQloudLocalEventsSynchronizer instance;
 
         List<OSXFileSystemWatcher> watchers;
         SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
         Thread watchersThread;
+
+        
+ 
+        public event Action Failed = delegate { };
+        
+        public event FinishedEventHandler Finished = delegate { };
+        public delegate void FinishedEventHandler ();
 
         private StorageQloudLocalEventsSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
@@ -27,7 +34,7 @@ namespace GreenQloud.Synchrony
                     OSXFileSystemWatcher watcher = new OSXFileSystemWatcher(repo.Path);
                     watcher.Changed += delegate(string path) {
                         if(Working) 
-                            Synchronize( physicalLocalRepository.CreateObjectInstance (path));                
+                            Synchronize( physicalLocalRepository.CreateItemInstance (path));                
                     };
                     watchers.Add (watcher);
                 }
@@ -73,6 +80,21 @@ namespace GreenQloud.Synchrony
         public ThreadState ControllerStatus{
             get{
                 return watchersThread.ThreadState;
+            }
+        }
+
+        protected List<string> warnings = new List<string> ();
+        protected List<string> errors   = new List<string> ();
+
+        public string [] Warnings {
+            get {
+                return this.warnings.ToArray ();
+            }
+        }
+        
+        public string [] Errors {
+            get {
+                return this.errors.ToArray ();
             }
         }
     }

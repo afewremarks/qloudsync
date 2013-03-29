@@ -13,6 +13,7 @@ namespace GreenQloud.Model
             get;
             set;
         }
+
     }
 }
 

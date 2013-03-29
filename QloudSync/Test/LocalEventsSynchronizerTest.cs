@@ -21,7 +21,7 @@ namespace GreenQloud.Test
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
-            LocalEventsSynchronizer sync = new SimpleLocalEventsSynchronizer (logical, physical, remote, transfers, eventDAO); 
+            AbstractLocalEventsSynchronizer sync = new SimpleLocalEventsSynchronizer (logical, physical, remote, transfers, eventDAO); 
 
             RepositoryItem item = new RepositoryItem();
             item.Name = "teste.html";
@@ -44,7 +44,7 @@ namespace GreenQloud.Test
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
-            LocalEventsSynchronizer sync = new SimpleLocalEventsSynchronizer (logical, physical, remote, transfers, eventDAO); 
+            AbstractLocalEventsSynchronizer sync = new SimpleLocalEventsSynchronizer (logical, physical, remote, transfers, eventDAO); 
             sync.Start ();
             RepositoryItem item = new RepositoryItem();
             item.Name = "teste.html";
@@ -68,7 +68,7 @@ namespace GreenQloud.Test
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
-            LocalEventsSynchronizer sync = new SimpleLocalEventsSynchronizer (logical, physical, remote, transfers, eventDAO); 
+            AbstractLocalEventsSynchronizer sync = new SimpleLocalEventsSynchronizer (logical, physical, remote, transfers, eventDAO); 
             
             RepositoryItem item = new RepositoryItem();
             item.Name = "teste.html";
@@ -89,13 +89,13 @@ namespace GreenQloud.Test
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
-            LocalEventsSynchronizer sync = new SimpleLocalEventsSynchronizer (logical, physical, remote, transfers, eventDAO); 
+            AbstractLocalEventsSynchronizer sync = new SimpleLocalEventsSynchronizer (logical, physical, remote, transfers, eventDAO); 
             
             RepositoryItem item = new RepositoryItem();
             item.Name = "teste.html";
             item.RelativePath = "home";
             item.Repository = new LocalRepository("...");
-            item.MD5Hash = "123";
+            item.LocalMD5Hash = "123";
             physical.Create (item, "same text");
 
 
@@ -103,7 +103,7 @@ namespace GreenQloud.Test
             item2.Name = "teste2.html";
             item2.RelativePath = "home";
             item2.Repository = new LocalRepository("...");
-            item2.MD5Hash = "123";
+            item2.LocalMD5Hash = "123";
             remote.Upload (item2, "same text");
             
             Event e = sync.GetEvent (item);
@@ -120,7 +120,7 @@ namespace GreenQloud.Test
             logical.PhysicalController = physical;
             TransferDAO transfers = new SimpleTransferDAO ();
             EventDAO eventDAO = new SimpleEventDAO();
-            LocalEventsSynchronizer sync = new SimpleLocalEventsSynchronizer (logical, physical, remote, transfers, eventDAO); 
+            AbstractLocalEventsSynchronizer sync = new SimpleLocalEventsSynchronizer (logical, physical, remote, transfers, eventDAO); 
             
             RepositoryItem item = new RepositoryItem();
             item.Name = "teste.html";

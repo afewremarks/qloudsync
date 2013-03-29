@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json.Linq;
+using GreenQloud.Model;
 
 namespace GreenQloud
 {

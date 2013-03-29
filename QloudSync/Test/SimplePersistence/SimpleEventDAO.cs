@@ -20,7 +20,7 @@ namespace GreenQloud.Test.SimplePersistence
             list.Add (e);
         }
 
-        public override System.Collections.Generic.List<Event> EventsNotSynchronized 
+        public override List<Event> EventsNotSynchronized 
         {
             get{
                 return list.Where (e=>e.Synchronized == false).ToList<Event>();

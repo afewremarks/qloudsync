@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using GreenQloud.Synchrony;
 
  
 
@@ -270,7 +271,7 @@ namespace GreenQloud {
 
         public void SyncingCancelled ()
         {
-            GreenQloud.Synchrony.LocalSynchronizer.GetInstance().Stop();
+            StorageQloudLocalEventsSynchronizer.GetInstance().Stop();
             string credential_path = Path.Combine(RuntimeSettings.ConfigPath, "credentials.xml");
             if (System.IO.File.Exists(credential_path))
                 System.IO.File.Delete(credential_path);

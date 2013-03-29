@@ -4,7 +4,7 @@ using GreenQloud.Model;
 
 namespace GreenQloud.Repository
 {
-    public interface RepositoryController
+    public interface IRepositoryController
     {       
         bool Exists (RepositoryItem repoObject);
 

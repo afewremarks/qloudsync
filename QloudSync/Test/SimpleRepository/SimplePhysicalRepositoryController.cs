@@ -26,13 +26,18 @@ namespace GreenQloud.Test.SimpleRepository
         #region implemented abstract members of PhysicalRepositoryController
 
 
+        public override bool IsSync (RepositoryItem item)
+        {
+            return item.LocalMD5Hash == item.RemoteMD5Hash;
+        }
+
         public override bool Exists (RepositoryItem repoObject)
         {
             bool exists = list.Any(r=> r.Key.FullLocalName == repoObject.FullLocalName);
             return exists;
         }
 
-        public override RepositoryItem CreateObjectInstance (string fullLocalName)
+        public override RepositoryItem CreateItemInstance (string fullLocalName)
         {
            if (list.Any (o=> o.Key.FullLocalName == fullLocalName)){
                 return list.First (o=> o.Key.FullLocalName == fullLocalName).Key;
@@ -59,9 +64,9 @@ namespace GreenQloud.Test.SimpleRepository
 
         public override RepositoryItem GetCopy (RepositoryItem remoteItem)
         {
-            if (list.Any (k=> k.Key.MD5Hash == remoteItem.MD5Hash && remoteItem.FullLocalName != k.Key.FullLocalName))
+            if (list.Any (k=> k.Key.RemoteMD5Hash == remoteItem.RemoteMD5Hash && remoteItem.FullLocalName != k.Key.FullLocalName))
             {
-                return list.First (k=> k.Key.MD5Hash == remoteItem.MD5Hash && remoteItem.FullLocalName != k.Key.FullLocalName).Key;
+                return list.First (k=> k.Key.RemoteMD5Hash == remoteItem.RemoteMD5Hash && remoteItem.FullLocalName != k.Key.FullLocalName).Key;
             }
             else
                 return null;
