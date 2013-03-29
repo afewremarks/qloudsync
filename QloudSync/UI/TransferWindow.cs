@@ -9,6 +9,7 @@ using MonoMac.Foundation;
 using MonoMac.ObjCRuntime;
 using MonoMac.WebKit;
 using System.Collections.Generic;
+using GreenQloud.Model;
 
 namespace GreenQloud {
     
@@ -26,10 +27,6 @@ namespace GreenQloud {
                 ShowWindowEvent ();
             };
 
-            Program.Controller.RecentsTransfers.OnAdd += delegate {
-                ListingTransfers ();
-            };
-            
             using (var a = new NSAutoreleasePool ())
             {
                 SetFrame (new RectangleF (100, 50, 500, 800), true);
@@ -59,37 +56,37 @@ namespace GreenQloud {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
-                        ListingTransfers();
+                        //ListingTransfers();
                         OrderFrontRegardless ();
                     });
                 }
             };
         }
 
-        void ListingTransfers ()
-        {
-            System.Text.StringBuilder html = new System.Text.StringBuilder ();
-            html.AppendLine ("<div style=\"width: 505px; font-family:'myriad-pro';border-bottom:1px solid #005580; background: -webkit-linear-gradient(top,#05c4ed 150px,#6ccddd 420px);\">");
-            html.AppendLine ("<div style=\"font-size: 22px; width:500px; border-bottom: 2px #28a8e2 solid; padding-left: 22px; color: #fff;  background-color: #10c4ea; padding-top: 10px; margin-bottom: 5 px; border-top-left-radius: 6px;\">Recent Changes</div>");
-            List<TransferResponse> listTransfers = Program.Controller.RecentsTransfers;
-
-            int count = listTransfers.Count-1;
-            for (int i=count; i>=0; i--){
-                TransferResponse tr = listTransfers [i];
-                html.AppendLine ("<div style=\"height: 60px; width: 500px; float:left; border-bottom:1px solid #18b4ee\"> ");   
-                html.AppendLine ("    <div style=\"height: 40px; width: 69px; float:left; display:block; margin-left:auto;margin-right:auto\">");
-                html.AppendLine (string.Format("        <div style=\"vertical-align: central;margin-top:13px; text-align: center;\"><img src='{0}'/></div>", this.GetImageSyncToTransfer(tr)));
-                html.AppendLine ("        </div>    ");
-                html.AppendLine ( "        <div style=\"height: 50px; width: 315px; float:left\">        ");
-                html.AppendLine ( string.Format("        <div  style=\"height: 22px; margin-top: 15px;\"><div style=\"height: 25px; font-size:14px\">{0}</div></div>", tr.StorageQloudObject.Name));
-                html.AppendLine ( string.Format("                           <div  style=\"height: 17px; font-size: 12px\">{0} - {1}</div>", tr.InitialTime.ToString("MM/dd/yyyy hh:mm:ss tt"), tr.EndTime.ToString("MM/dd/yyyy hh:mm:ss tt")));
-                html.AppendLine ( "</div>        ");
-                html.AppendLine ( "                   </div>");
-            }
-            
-            html.AppendLine ( "</div>");
-            transfersView.MainFrame.LoadHtmlString(html.ToString(), new NSUrl(""));
-        }        
+//        void ListingTransfers ()
+//        {
+//            System.Text.StringBuilder html = new System.Text.StringBuilder ();
+//            html.AppendLine ("<div style=\"width: 505px; font-family:'myriad-pro';border-bottom:1px solid #005580; background: -webkit-linear-gradient(top,#05c4ed 150px,#6ccddd 420px);\">");
+//            html.AppendLine ("<div style=\"font-size: 22px; width:500px; border-bottom: 2px #28a8e2 solid; padding-left: 22px; color: #fff;  background-color: #10c4ea; padding-top: 10px; margin-bottom: 5 px; border-top-left-radius: 6px;\">Recent Changes</div>");
+//            List<Transfer> listTransfers = Program.Controller.RecentsTransfers;
+//
+//            int count = listTransfers.Count-1;
+//            for (int i=count; i>=0; i--){
+//                Transfer tr = listTransfers [i];
+//                html.AppendLine ("<div style=\"height: 60px; width: 500px; float:left; border-bottom:1px solid #18b4ee\"> ");   
+//                html.AppendLine ("    <div style=\"height: 40px; width: 69px; float:left; display:block; margin-left:auto;margin-right:auto\">");
+//                html.AppendLine (string.Format("        <div style=\"vertical-align: central;margin-top:13px; text-align: center;\"><img src='{0}'/></div>", this.GetImageSyncToTransfer(tr)));
+//                html.AppendLine ("        </div>    ");
+//                html.AppendLine ( "        <div style=\"height: 50px; width: 315px; float:left\">        ");
+//                html.AppendLine ( string.Format("        <div  style=\"height: 22px; margin-top: 15px;\"><div style=\"height: 25px; font-size:14px\">{0}</div></div>", tr.Item.Name));
+//                html.AppendLine ( string.Format("                           <div  style=\"height: 17px; font-size: 12px\">{0} - {1}</div>", tr.InitialTime.ToString("MM/dd/yyyy hh:mm:ss tt"), tr.EndTime.ToString("MM/dd/yyyy hh:mm:ss tt")));
+//                html.AppendLine ( "</div>        ");
+//                html.AppendLine ( "                   </div>");
+//            }
+//            
+//            html.AppendLine ( "</div>");
+//            transfersView.MainFrame.LoadHtmlString(html.ToString(), new NSUrl(""));
+//        }        
         
         private void CreateTransfer ()
         {
@@ -103,8 +100,8 @@ namespace GreenQloud {
 
                 string html = "";
 
-                foreach (TransferResponse tr in Program.Controller.RecentsTransfers)
-                    html += string.Format("{0}<br>", tr.StorageQloudObject.Name);
+//                foreach (Transfer tr in Program.Controller.RecentsTransfers)
+//                    html += string.Format("{0}<br>", tr.Item.Name);
 
 
                 transfersView.MainFrame.LoadHtmlString(html, new NSUrl(""));
@@ -139,14 +136,14 @@ namespace GreenQloud {
             return;
         }
 
-        string GetImageSyncToTransfer (TransferResponse tr)
+        string GetImageSyncToTransfer (Transfer tr)
         {
             string path;
             switch (tr.Type) {
-                case TransferType.CREATELOCALFOLDER:
+                case TransferType.LOCAL_CREATE_FOLDER:
                     path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps","folder_down.png");
                     break;
-                case TransferType.CREATEREMOTEFOLDER:
+                case TransferType.REMOTE_CREATE_FOLDER:
                     path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps","folder_up.png");
                 break;
                 case TransferType.DOWNLOAD:
@@ -155,7 +152,8 @@ namespace GreenQloud {
                 case TransferType.UPLOAD:
                     path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps","file_up.png");
                     break;
-                case TransferType.REMOVE:
+                case TransferType.LOCAL_REMOVE:
+                case TransferType.REMOTE_REMOVE:
                     path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps","trash.png");
                     break;
                 default:

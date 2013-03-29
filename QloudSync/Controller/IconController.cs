@@ -24,6 +24,7 @@ using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 using System.Threading;
 using GreenQloud.Synchrony;
+using GreenQloud.Model;
 
 namespace GreenQloud {
 
@@ -68,8 +69,6 @@ namespace GreenQloud {
         private NSImage caution_image;
         private NSImage sparkleshare_image;
 
-        private EventHandler [] folder_tasks;
-        private EventHandler [] overflow_tasks;
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
         public delegate void UpdateIconEventHandler (IconState state);
         
@@ -177,12 +176,13 @@ namespace GreenQloud {
             };
 
             Program.Controller.OnSyncing += delegate {
-                bool syncDown = LocalSynchronizer.GetInstance().Status == SyncStatus.DOWNLOADING || 
-                    RemoteSynchronizer.GetInstance().Status == SyncStatus.DOWNLOADING || 
-                    BacklogSynchronizer.GetInstance().Status == SyncStatus.DOWNLOADING;                
-                bool syncUp = LocalSynchronizer.GetInstance().Status == SyncStatus.UPLOADING || 
-                    RemoteSynchronizer.GetInstance().Status == SyncStatus.UPLOADING || 
-                        BacklogSynchronizer.GetInstance().Status == SyncStatus.UPLOADING;
+                bool syncDown = StorageQloudLocalEventsSynchronizer.GetInstance().SyncStatus == SyncStatus.DOWNLOADING || 
+                    StorageQloudRemoteEventsSynchronizer.GetInstance().SyncStatus == SyncStatus.DOWNLOADING 
+                || StorageQloudBacklogSynchronizer.GetInstance().SyncStatus == SyncStatus.DOWNLOADING; 
+
+                bool syncUp = StorageQloudLocalEventsSynchronizer.GetInstance().SyncStatus == SyncStatus.UPLOADING || 
+                    StorageQloudRemoteEventsSynchronizer.GetInstance().SyncStatus == SyncStatus.UPLOADING 
+                || StorageQloudBacklogSynchronizer.GetInstance().SyncStatus == SyncStatus.UPLOADING;
                 if(syncDown && syncUp){
                     CurrentState = IconState.Syncing;
                     StateText    = "Syncing changes…";
@@ -292,7 +292,7 @@ namespace GreenQloud {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
-                        this.recent_events_item.Enabled = Program.Controller.RecentsTransfers.Count != 0;
+                      //  this.recent_events_item.Enabled = Program.Controller.RecentsTransfers.Count != 0;
                     });
                 }
             };
@@ -334,7 +334,7 @@ namespace GreenQloud {
 
                 this.recent_events_item = new NSMenuItem () {
                     Title   = "Recent Changes…",
-                    Enabled =  Program.Controller.RecentsTransfers.Count != 0
+                    Enabled =  false//Program.Controller.RecentsTransfers.Count != 0
                 };
 
                 recent_events_item.Activated += delegate {

@@ -5,7 +5,7 @@ using GreenQloud.Persistence;
 
 namespace GreenQloud.Test.SimpleSynchrony
 {
-    public class SimpleLocalEventsSynchronizer : GreenQloud.Synchrony.LocalEventsSynchronizer
+    public class SimpleLocalEventsSynchronizer : GreenQloud.Synchrony.AbstractLocalEventsSynchronizer
     {
         public SimpleLocalEventsSynchronizer (LogicalRepositoryController logical, PhysicalRepositoryController physical, 
                                               RemoteRepositoryController remote, TransferDAO transfers, EventDAO eventDAO) : 

@@ -14,12 +14,12 @@ using GreenQloud.Persistence;
 
 namespace GreenQloud.Synchrony
 {
-    public abstract class LocalEventsSynchronizer : Synchronizer
+    public abstract class AbstractLocalEventsSynchronizer : AbstractSynchronizer
     {
         Thread threadSync;
         bool creatingEvent;
 
-        protected LocalEventsSynchronizer 
+        protected AbstractLocalEventsSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
              base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
         {
@@ -30,7 +30,7 @@ namespace GreenQloud.Synchrony
         }
 
         public void Synchronize (RepositoryItem item){
-            eventDAO.Create ( GetEvent (item));
+            eventDAO.Create (GetEvent (item));
             creatingEvent = true;
         }
 
@@ -54,13 +54,12 @@ namespace GreenQloud.Synchrony
             e.Synchronized = false;
 
             if (physicalLocalRepository.Exists (item)){
-                if (remoteRepository.ExistsCopys (item)){
-                    e.EventType = EventType.MOVE_OR_RENAME;
+                if (remoteRepository.ExistsCopies (item)){                                       
+                       e.EventType = EventType.MOVE_OR_RENAME;
                 }
                 else{
                     if (remoteRepository.Exists (item))
                         e.EventType = EventType.UPDATE;
-
                     else
                         e.EventType = EventType.CREATE;
                 }
