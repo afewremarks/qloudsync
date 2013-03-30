@@ -69,7 +69,7 @@ namespace GreenQloud
 
                 string pcatched = paths[i];
 
-                if(!pcatched.EndsWith (".DS_Store") && !pcatched.Contains(".sb-")){
+                if(!pcatched.EndsWith (".DS_Store") && !pcatched.Contains(".sb-") && !pcatched.Contains("untitled folder")){
                         handler(pcatched);
                 }
             }

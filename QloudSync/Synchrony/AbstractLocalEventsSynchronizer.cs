@@ -52,7 +52,7 @@ namespace GreenQloud.Synchrony
             e.Item = item;
             e.RepositoryType = RepositoryType.LOCAL;
             e.Synchronized = false;
-
+            Console.WriteLine (item.FullLocalName);
             if (physicalLocalRepository.Exists (item)){
                 if (remoteRepository.ExistsCopies (item)){                                       
                        e.EventType = EventType.MOVE_OR_RENAME;
@@ -65,6 +65,8 @@ namespace GreenQloud.Synchrony
                 }
             }else
                 e.EventType = EventType.DELETE;
+
+            Console.WriteLine ("LocalEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName);
 
             return e;
             
