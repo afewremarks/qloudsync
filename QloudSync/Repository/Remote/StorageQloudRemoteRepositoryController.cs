@@ -367,6 +367,7 @@ namespace GreenQloud.Repository.Remote
                 List<S3Object> files = Reconnect().ListObjects (
                     new ListObjectsRequest ().WithBucketName (RuntimeSettings.DefaultBucketName)
                     ).S3Objects;
+
                 return files;
             }catch (System.Net.WebException e){
                 if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout || e.Status == WebExceptionStatus.ConnectFailure){
@@ -392,7 +393,10 @@ namespace GreenQloud.Repository.Remote
             
             foreach (S3Object s3item in s3items) {
                 if (s3item.Key != Constant.TRASH)
+                {    
                     remoteItems.Add ( CreateObjectInstance (s3item));
+                    //add folders that have items to persist too                   
+                }
             }
             return remoteItems;
         }

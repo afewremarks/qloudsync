@@ -48,41 +48,50 @@ namespace GreenQloud.Synchrony
                 if (physicalLocalRepository.Exists (remoteItem)){
                     if (!physicalLocalRepository.IsSync (remoteItem))
                     {
-                        eventDAO.Create ( new Event(){
+                        Event e = new Event(){
                             EventType = EventType.UPDATE,
                             RepositoryType = RepositoryType.REMOTE,
                             Item = remoteItem,
                             Synchronized = false
-                        });
+                        };
+                        Console.WriteLine ("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName);
+                        eventDAO.Create (e);
                     }
                 }
                 else {
                     RepositoryItem copy = physicalLocalRepository.GetCopy (remoteItem);
                     if (copy != null){
                         if (!remoteRepository.Exists (copy)){
-                            eventDAO.Create ( new Event(){
+
+                            Event e = new Event(){
                                 EventType = EventType.MOVE_OR_RENAME,
                                 RepositoryType = RepositoryType.REMOTE,
                                 Item = remoteItem,
                                 Synchronized = false
-                            });
+                            };
+                            Console.WriteLine ("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName);
+                            eventDAO.Create (e);
                         }
                         else{
-                            eventDAO.Create ( new Event(){
+                            Event e = new Event(){
                                 EventType = EventType.COPY,
                                 RepositoryType = RepositoryType.REMOTE,
                                 Item = remoteItem,
                                 Synchronized = false
-                            });
+                            };
+                            Console.WriteLine ("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName);
+                            eventDAO.Create (e);
                         }
                     }
                     else{
-                        eventDAO.Create ( new Event(){
+                        Event e = new Event(){
                             EventType = EventType.CREATE,
                             RepositoryType = RepositoryType.REMOTE,
                             Item = remoteItem,
                             Synchronized = false
-                        });
+                        };
+                        Console.WriteLine ("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName);
+                        eventDAO.Create (e);
                     }
                 }
             }
@@ -98,6 +107,7 @@ namespace GreenQloud.Synchrony
                     e.EventType = EventType.DELETE;
                     e.RepositoryType = RepositoryType.REMOTE;
                     e.Synchronized = false;
+                    Console.WriteLine ("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName);
                     eventDAO.Create (e);
                 }
 
