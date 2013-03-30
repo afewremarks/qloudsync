@@ -43,10 +43,11 @@ namespace GreenQloud.Repository.Local
                     item.RelativePath = item.RelativePath.Substring(0, item.RelativePath.Length-2);
                 item.IsAFolder = false;
             }
-            else if(Directory.Exists (itemFullName)){               
+            else if(Directory.Exists (itemFullName)){   
+                itemFullName += "/";
                 DirectoryInfo dir = new DirectoryInfo(itemFullName);
                 item.Name = dir.Name+"/";
-                item.IsAFolder = false;
+                item.IsAFolder = true;
                 item.RelativePath = itemFullName.Replace (item.Repository.Path+"/", string.Empty).Replace(item.Name, string.Empty);
             }
 

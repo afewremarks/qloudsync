@@ -37,7 +37,6 @@ using GreenQloud.Repository.Local;
             
             foreach (RepositoryItem localItem in filesInPhysicalLocalRepository)
             {
-
                 eventDAO.Create (GetEvent (localItem, RepositoryType.LOCAL));
                 
             }
