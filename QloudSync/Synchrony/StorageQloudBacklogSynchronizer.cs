@@ -18,7 +18,12 @@ namespace GreenQloud.Synchrony
         {
             threadSync = new Thread( ()=>{
                 while (Working){
-                    Synchronize();
+                    try{
+                        Synchronize();
+                    }catch (DisconnectionException){
+                        SyncStatus = SyncStatus.IDLE;
+                        Program.Controller.HandleDisconnection();
+                    }
                 }
             });
         }

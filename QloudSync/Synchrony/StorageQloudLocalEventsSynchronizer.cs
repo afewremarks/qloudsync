@@ -29,14 +29,20 @@ namespace GreenQloud.Synchrony
                 base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
         {
             watchersThread = new Thread(()=>{
-                watchers = new List<OSXFileSystemWatcher>();
-                foreach (LocalRepository repo in repositoryDAO.All){ 
-                    OSXFileSystemWatcher watcher = new OSXFileSystemWatcher(repo.Path);
-                    watcher.Changed += delegate(string path) {
-                        if(Working) 
-                            Synchronize( physicalLocalRepository.CreateItemInstance (path));                
-                    };
-                    watchers.Add (watcher);
+                try{
+                    watchers = new List<OSXFileSystemWatcher>();
+                    foreach (LocalRepository repo in repositoryDAO.All){ 
+                        OSXFileSystemWatcher watcher = new OSXFileSystemWatcher(repo.Path);
+                        watcher.Changed += delegate(string path) {
+                            if(Working) 
+                                Synchronize( physicalLocalRepository.CreateItemInstance (path));                
+                        };
+                        watchers.Add (watcher);
+                    }
+                }catch (DisconnectionException)
+                {
+                    SyncStatus = SyncStatus.IDLE;
+                    Program.Controller.HandleDisconnection();
                 }
             });
         }

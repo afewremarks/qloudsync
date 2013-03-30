@@ -92,7 +92,6 @@ namespace GreenQloud.Synchrony
 
         void Synchronize(Event e){
             Transfer transfer = null;
-            
             if (e.RepositoryType == RepositoryType.LOCAL){
                 
                 SyncStatus = SyncStatus.UPLOADING;

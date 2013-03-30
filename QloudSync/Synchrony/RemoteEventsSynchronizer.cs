@@ -16,9 +16,7 @@ namespace GreenQloud.Synchrony
 
         
         
-        public new event ProgressChangedEventHandler ProgressChanged = delegate { };
-        public new delegate void ProgressChangedEventHandler (double percentage, double time);
-
+  
         public RemoteEventsSynchronizer  
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
             base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
@@ -47,7 +45,6 @@ namespace GreenQloud.Synchrony
         {
 
             foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems (LastSyncTime)){
-
                 if (physicalLocalRepository.Exists (remoteItem)){
                     if (!physicalLocalRepository.IsSync (remoteItem))
                     {
@@ -92,8 +89,11 @@ namespace GreenQloud.Synchrony
 
 
             foreach (RepositoryItem localItem in physicalLocalRepository.Items) {
+
                 if (!remoteRepository.Exists(localItem)){
+
                     Event e = new Event ();
+
                     e.Item = localItem;
                     e.EventType = EventType.DELETE;
                     e.RepositoryType = RepositoryType.REMOTE;
@@ -110,8 +110,10 @@ namespace GreenQloud.Synchrony
         {
             double size = 0;
             Start();
+           
             foreach (RepositoryItem i in remoteRepository.Items){
                 size+= i.Size;
+
                 eventDAO.Create ( new Event(){
                     EventType = EventType.CREATE,
                     RepositoryType = RepositoryType.REMOTE,
