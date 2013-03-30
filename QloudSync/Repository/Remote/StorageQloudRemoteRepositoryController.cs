@@ -210,8 +210,8 @@ namespace GreenQloud.Repository.Remote
         public override List<GreenQloud.Model.RepositoryItem> RecentChangedItems (DateTime LastSyncTime) {
             TimeSpan diffClocks = DiffClocks;
             DateTime referencialClock = LastSyncTime.Subtract (diffClocks);               
-            List<RepositoryItem> list = GetInstancesOfItems (GetS3Objects().Where (rf => Convert.ToDateTime (rf.LastModified).Subtract (referencialClock).TotalSeconds > 0).ToList());
-            
+            List<RepositoryItem> list = GetInstancesOfItems (GetS3Objects().Where (rf => Convert.ToDateTime (rf.LastModified).Subtract (referencialClock).TotalSeconds > 0 && !rf.Key.Contains(Constant.TRASH)).ToList());
+          
             return list;
         }
 
@@ -250,14 +250,20 @@ namespace GreenQloud.Repository.Remote
                     Key = key
                 };
                 AmazonS3Client connection = Connect();
+                
+                if(key!=Constant.CLOCK_TIME)  
                 CurrentTransfer.InitialTime = DateTime.Now;
+
                 using (DeleteObjectResponse response = connection.DeleteObject (request)) {
                     response.Dispose ();
                 }
-                CurrentTransfer.EndTime = DateTime.Now;
-                if(key!=Constant.CLOCK_TIME)
+
+                if(key!=Constant.CLOCK_TIME)  {              
                     Logger.LogInfo ("Connection", string.Format("{0} was deleted in bucket.", key));
-                CurrentTransfer.Status = TransferStatus.DONE;
+
+                    CurrentTransfer.EndTime = DateTime.Now;
+                    CurrentTransfer.Status = TransferStatus.DONE;
+                }
             } catch (AmazonS3Exception) {
                 if(InitializeBucket())
                     GenericDelete (key);
@@ -363,9 +369,10 @@ namespace GreenQloud.Repository.Remote
                     ).S3Objects;
                 return files;
             }catch (System.Net.WebException e){
-                if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout){
+                if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout || e.Status == WebExceptionStatus.ConnectFailure){
                     throw new DisconnectionException();
-                }else{                    
+                }else{
+
                     if (((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.Unauthorized)
                     {
                         throw new AccessDeniedException(); 
@@ -474,6 +481,7 @@ namespace GreenQloud.Repository.Remote
                     clockFile.Name = Constant.CLOCK_TIME;
                     clockFile.RelativePath = string.Empty;
                     clockFile.Repository = new LocalRepository (RuntimeSettings.HomePath);
+                   
                     PutObjectRequest putObject = new PutObjectRequest ()
                     {
                         BucketName = DefaultBucketName,
@@ -486,13 +494,10 @@ namespace GreenQloud.Repository.Remote
                         localClock = DateTime.Now;
                         response.Dispose ();
                     }
-                    
                     ListObjectsResponse files = Connect ().ListObjects (new ListObjectsRequest ().WithBucketName (DefaultBucketName));
                     S3Object remotefile = files.S3Objects.Where (o => o.Key == clockFile.Name).FirstOrDefault();
                     string sRemoteclock = remotefile.LastModified;
-                    
                     GenericDelete (clockFile.AbsolutePath);
-                    
                     DateTime remoteClock = Convert.ToDateTime (sRemoteclock);
                     diff = localClock.Subtract(remoteClock);
                     lastDiffClock = localClock;
@@ -687,6 +692,8 @@ namespace GreenQloud.Repository.Remote
         {
             CreateFolder (item.Name, item.TrashRelativePath);
         }
+
+
         #endregion
     }
 }

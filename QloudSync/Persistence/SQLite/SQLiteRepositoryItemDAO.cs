@@ -13,14 +13,15 @@ namespace GreenQloud.Persistence.SQLite
         #region implemented abstract members of RepositoryItemDAO
         public override void Create (RepositoryItem item)
         {
-            string sql = string.Format("INSERT INTO REPOSITORYITEM (Name, RelativePath, RepoPath, IsFolder) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\")", item.Name, item.RelativePath, item.Repository.Path, item.IsAFolder);
+            string sql = string.Format("INSERT INTO REPOSITORYITEM (Name, RelativePath, RepoPath, IsFolder, DELETED) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",\"{4}\")", item.Name, item.RelativePath, item.Repository.Path, item.IsAFolder, bool.FalseString);
             ExecuteNonQuery (sql);
-        }
 
+        }
         public RepositoryItem Create (Event e)
         {
-            if (!Exists (e.Item))
+            if (!Exists (e.Item)){
                 Create (e.Item);
+            }
 
             e.Item.Id = GetId (e.Item);
             return e.Item;
@@ -36,18 +37,23 @@ namespace GreenQloud.Persistence.SQLite
 
         public bool Exists (RepositoryItem item)
         {
-            return All.Exists (i => i.AbsolutePath == item.AbsolutePath && i.Repository.Path == item.Repository.Path);
+            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE NAME = \"{0}\" AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name, item.RelativePath, item.Repository.Path);
+           
+            return ExecuteReader(sql).Count != 0 ;
         }
 
 
 
         public void Remove (RepositoryItem item)
         {
-            ExecuteNonQuery (string.Format("DELETE REPOSITORYITEM WHERE NAME = \"{0}\" AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name, item.RelativePath, item.Repository.Path));
+
+            string sql = string.Format("UPDATE REPOSITORYITEM SET DELETED = \"{0}\" WHERE NAME = \"{1}\" AND RELATIVEPATH = \"{2}\" AND REPOPATH = \"{3}\"", bool.TrueString, item.Name, item.RelativePath, item.Repository.Path);
+            ExecuteNonQuery (sql);
         }
 
         public string GetId (RepositoryItem item)
         {
+
             if (Exists (item)){
                 return ExecuteReader (string.Format("SELECT * FROM REPOSITORYITEM WHERE NAME = \"{0}\" AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name, item.RelativePath, item.Repository.Path))[0].Id;
             }
@@ -56,6 +62,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public RepositoryItem GetById (int id)
         {   
+
             RepositoryItem item = ExecuteReader (string.Format("SELECT * FROM REPOSITORYITEM WHERE RepositoryItemID = {0}", id))[0];
 
             return item;
@@ -94,6 +101,7 @@ namespace GreenQloud.Persistence.SQLite
                         item.RelativePath = reader.GetString(2);
                         item.Repository = new LocalRepository(reader.GetString(3));
                         item.IsAFolder = bool.Parse (reader.GetString (4));
+
                         repos.Add (item);
                     }                    
                 }

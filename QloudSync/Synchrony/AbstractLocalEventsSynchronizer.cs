@@ -29,7 +29,7 @@ namespace GreenQloud.Synchrony
            
         }
 
-        public void Synchronize (RepositoryItem item){
+        public void Synchronize (RepositoryItem item){           
             eventDAO.Create (GetEvent (item));
             creatingEvent = true;
         }

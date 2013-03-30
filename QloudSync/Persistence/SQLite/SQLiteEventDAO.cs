@@ -19,11 +19,11 @@ namespace GreenQloud.Persistence
 
         public override void Create (Event e)
         {
-            e.Item = repositoryItemDAO.Create (e);
 
+            e.Item = repositoryItemDAO.Create (e);
+           
            if (NotExistsConflict(e)){
                 string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\")", e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, DateTime.Now.ToString());
-
                 ExecuteNonQuery (sql);
             }
         }
@@ -53,7 +53,9 @@ namespace GreenQloud.Persistence
 
         public bool NotExistsConflict (Event e)
         {
+
             string sql = string.Format("SELECT * FROM EVENT WHERE REPOSITORY <> \"{0}\" AND (SYNCHRONIZED = \"{1}\" OR INSERTTIME > \"{2}\" ) AND ITEMID = {3}", e.RepositoryType.ToString(), bool.FalseString, DateTime.Now.Subtract(new TimeSpan(0,0,20)),e.Item.Id);
+
             return ExecuteReader (sql).Count == 0;
         }
         
@@ -94,6 +96,8 @@ namespace GreenQloud.Persistence
                         e.RepositoryType = (RepositoryType) Enum.Parse(typeof(RepositoryType),reader.GetString(3));
                         e.Synchronized = bool.Parse (reader.GetString(4));
                         e.InsertTime = Convert.ToDateTime (reader.GetString (5));
+                        
+
                         events.Add (e);
                     }                    
                 }
