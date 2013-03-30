@@ -27,8 +27,9 @@ using GreenQloud.Repository.Local;
             List<RepositoryItem> filesInPhysicalLocalRepository = physicalLocalRepository.Items;
             
             foreach (RepositoryItem remoteItem in itensInRemoteRepository) {
+               
                 if (remoteItem.IsIgnoreFile)
-                    continue;            
+                    continue; 
                 eventDAO.Create (GetEvent (remoteItem, RepositoryType.REMOTE));
                 
                 filesInPhysicalLocalRepository.RemoveAll (i=> i.FullLocalName == remoteItem.FullLocalName);
