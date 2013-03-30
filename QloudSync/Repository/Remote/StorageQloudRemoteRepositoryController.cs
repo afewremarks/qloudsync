@@ -599,9 +599,7 @@ namespace GreenQloud.Repository.Remote
                 CurrentTransfer.EndTime = DateTime.Now;
                 return false;
             }
-            finally{
-                response.Dispose();
-            }
+
             return true;
             
             

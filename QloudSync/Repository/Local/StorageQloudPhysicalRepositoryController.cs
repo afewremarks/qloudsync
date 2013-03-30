@@ -59,7 +59,7 @@ namespace GreenQloud.Repository.Local
             item.Repository = repo;
             item.Name = name;
             item.IsAFolder = isAFolder;
-            item.RelativePath = itemFullName.Replace (item.Repository.Path, string.Empty).Replace(item.Name, string.Empty);
+            item.RelativePath = itemFullName.Replace (item.Repository.Path+"/", string.Empty).Replace(item.Name, string.Empty);
             return item;
         }
 
@@ -125,7 +125,7 @@ namespace GreenQloud.Repository.Local
                     }
                     
                     foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
-                        list.Add (CreateItemInstance(fileInfo.Parent.FullName, fileInfo.Name, repo, true));
+                        list.Add (CreateItemInstance(fileInfo.Parent.FullName, fileInfo.Name+"/", repo, true));
                     }
                 }
                 return list;

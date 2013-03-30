@@ -19,7 +19,8 @@ namespace GreenQloud.Persistence
 
         public override void Create (Event e)
         {
-
+            if (e == null)
+                return;
             e.Item = repositoryItemDAO.Create (e);
            
            if (NotExistsConflict(e)){
