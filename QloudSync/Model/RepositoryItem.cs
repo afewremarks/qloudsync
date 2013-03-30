@@ -23,7 +23,8 @@ namespace GreenQloud.Model
         }
 
         public string Name { get; set;}
-        
+
+
         public string RelativePath{ get; set; }
 
         public string AbsolutePath{
@@ -35,7 +36,6 @@ namespace GreenQloud.Model
         private string fullLocalName = null;
         public string FullLocalName {
             set{
-               
                 fullLocalName = value;
             }
             get {

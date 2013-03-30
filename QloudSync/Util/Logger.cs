@@ -37,11 +37,11 @@ namespace GreenQloud {
                 // Don't let the log get bigger than 1000 lines
                 Directory.CreateDirectory(RuntimeSettings.ConfigPath);
                 if (log_size >= 1000) {
-                    File.WriteAllText (RuntimeSettings.LogFilePath, line + Environment.NewLine);
+                    //File.WriteAllText (RuntimeSettings.LogFilePath, line + Environment.NewLine);
                     log_size = 0;
 
                 } else {
-                    File.AppendAllText (RuntimeSettings.LogFilePath, line + Environment.NewLine);
+                    //File.AppendAllText (RuntimeSettings.LogFilePath, line + Environment.NewLine);
                     log_size++;
                 }
             }

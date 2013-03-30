@@ -18,6 +18,8 @@ namespace GreenQloud.Repository.Local
         #region implemented abstract members of PhysicalRepositoryController
 
         public override bool IsSync(RepositoryItem item){
+            if(item.IsAFolder)
+                return true;
             if(item.RemoteMD5Hash == string.Empty)
                 throw new Exception ("Remote Hash not exists");
             item.LocalMD5Hash = CalculateMD5Hash(item);
@@ -116,13 +118,15 @@ namespace GreenQloud.Repository.Local
                 List<RepositoryItem> list = new List<RepositoryItem>();
                 if(dir.Exists){
                     foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ()) {
-                        RepositoryItem localFile = CreateItemInstance(fileInfo.FullName, fileInfo.Name, repo, false);
+
+                        RepositoryItem localFile = CreateItemInstance(fileInfo.DirectoryName, fileInfo.Name, repo, false);
                         if(!localFile.IsIgnoreFile)
                             list.Add (localFile);
                     }
                     
-                    foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ())
-                        list.Add (CreateItemInstance(fileInfo.FullName, fileInfo.Name, repo, true));
+                    foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
+                        list.Add (CreateItemInstance(fileInfo.Parent.FullName, fileInfo.Name, repo, true));
+                    }
                 }
                 return list;
             } catch (Exception e) {

@@ -23,12 +23,18 @@ namespace GreenQloud.Synchrony
             base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
         {
             threadTimer = new Thread( ()=>{
-                remote_timer =  new System.Timers.Timer () { Interval = GlobalSettings.IntervalBetweenChecksRemoteRepository };        
-                
-                remote_timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e)=>{
-                    base.AddEvents();               
-                };
-                remote_timer.Disposed += (object sender, EventArgs e) => Logger.LogInfo("Synchronizer","Disposing timer.");
+                try{
+                    remote_timer =  new System.Timers.Timer () { Interval = GlobalSettings.IntervalBetweenChecksRemoteRepository };        
+                    
+                    remote_timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e)=>{
+                        base.AddEvents();               
+                    };
+                    remote_timer.Disposed += (object sender, EventArgs e) => Logger.LogInfo("Synchronizer","Disposing timer.");
+                }catch (DisconnectionException)
+                {
+                    SyncStatus = SyncStatus.IDLE;
+                    Program.Controller.HandleDisconnection();
+                }
             });
         }
 
