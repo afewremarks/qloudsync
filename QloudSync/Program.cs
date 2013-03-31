@@ -14,13 +14,17 @@ namespace GreenQloud {
         public static Controller Controller;
         public static SparkleUI UI;
 
-       // private static Mutex program_mutex = new Mutex (false, "QloudSync");
+        private static Mutex program_mutex = new Mutex (false, "QloudSync");
 
         #if !__MonoCS__
         [STAThread]
         #endif
         public static void Main (string [] args)
         {
+            if (!program_mutex.WaitOne (0, false)) {
+                Console.WriteLine ("QloudSync is already running.");
+                Environment.Exit (-1);
+            }
             try {
 
                 Controller = new Controller ();
