@@ -208,10 +208,11 @@ namespace GreenQloud.Repository.Remote
         }
 
         public override List<GreenQloud.Model.RepositoryItem> RecentChangedItems (DateTime LastSyncTime) {
-            TimeSpan diffClocks = DiffClocks;
-            DateTime referencialClock = LastSyncTime.Subtract (diffClocks);               
-            List<RepositoryItem> list = GetInstancesOfItems (GetS3Objects().Where (rf => Convert.ToDateTime (rf.LastModified).Subtract (referencialClock).TotalSeconds > 0 && !rf.Key.Contains(Constant.TRASH)).ToList());
-          
+            TimeSpan diffClocks = DiffClocks;           
+            DateTime referencialClock = LastSyncTime.Subtract (diffClocks);    
+
+            List<RepositoryItem> list = GetInstancesOfItems (GetS3Objects().Where (rf => (Convert.ToDateTime (rf.LastModified).Subtract (referencialClock).TotalSeconds > 0 || rf.Key.EndsWith("/")) && !rf.Key.Contains(Constant.TRASH)).ToList());
+         
             return list;
         }
 
@@ -363,8 +364,9 @@ namespace GreenQloud.Repository.Remote
 
         public List<S3Object> GetS3Objects ()
         {
-            try{
-                List<S3Object> files = Reconnect().ListObjects (
+
+            try{               
+                List<S3Object> files = Connect().ListObjects (
                     new ListObjectsRequest ().WithBucketName (RuntimeSettings.DefaultBucketName)
                     ).S3Objects;
 
