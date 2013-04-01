@@ -35,7 +35,10 @@ namespace GreenQloud.Synchrony
                         OSXFileSystemWatcher watcher = new OSXFileSystemWatcher(repo.Path);
                         watcher.Changed += delegate(string path) {
                             if(Working) 
+                            {
+                                Console.WriteLine ("LocalEvents "+path);
                                 Synchronize( physicalLocalRepository.CreateItemInstance (path));                
+                            }
                         };
                         watchers.Add (watcher);
                     }
