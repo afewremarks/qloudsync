@@ -62,21 +62,38 @@ namespace GreenQloud.Persistence.SQLite
                 }
             }
         }
-        
-        public List<LocalRepository> ExecuteReader(string sqlCommand) {
+       
+        public List<LocalRepository> ExecuteReader(string sqlCommand) 
+        {
             List<LocalRepository> repos = new List<LocalRepository>();
-            using (var conn= new SqliteConnection(SQLiteDatabase.ConnectionString))
+            SqliteConnection conn= new SqliteConnection(SQLiteDatabase.ConnectionString);
+            SqliteCommand cmd = new SqliteCommand();
+            try
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = sqlCommand;
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    SqliteDataReader reader = cmd.ExecuteReader();  
-                    while (reader.Read()){
-                        repos.Add (new LocalRepository(reader.GetString(1)));
-                    }                    
+                cmd = conn.CreateCommand();
+
+                cmd.CommandText = sqlCommand;
+                cmd.CommandType = System.Data.CommandType.Text;
+                SqliteDataReader reader = cmd.ExecuteReader();  
+                while (reader.Read()){
+                    repos.Add (new LocalRepository(reader.GetString(1)));
                 }
+
+            }
+            catch (Exception e){
+                Logger.LogInfo ("Database", e);
+            }
+            finally{
+
+                cmd.Dispose();
+                conn.Close();
+                conn.Dispose();
+                conn = null;
+                cmd = null;
+                GC.Collect();
+                if (cmd == null && conn == null)
+                    Console.WriteLine ("Disposed");
             }
             return repos;
         }  
