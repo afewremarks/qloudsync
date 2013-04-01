@@ -41,13 +41,21 @@ namespace GreenQloud.Synchrony
             }
         }
 
+        bool ready=true;
+
         public void AddEvents ()
         {
+            Console.WriteLine ("REMOTEEVENTSSYNCHRONIZER");
+            if (!ready)
+                return;
+            ready = false;
             if (LastSyncTime == new DateTime())
                 LastSyncTime = DateTime.Now.Subtract(new TimeSpan (0,0,30));
 
             foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems (LastSyncTime)){
-                if (physicalLocalRepository.Exists (remoteItem)){
+                bool exists = physicalLocalRepository.Exists (remoteItem);
+                Console.WriteLine (remoteItem.FullLocalName+" "+exists );
+                if (exists){
                     if (!physicalLocalRepository.IsSync (remoteItem))
                     {
                         Event e = new Event(){
@@ -112,6 +120,8 @@ namespace GreenQloud.Synchrony
             }  
             eventsCreated = true;
             LastSyncTime = DateTime.Now;
+            Console.WriteLine ("END REMOTEEVENTSSYNCHRONIZER");
+            ready = true;
         }
 
         public double InitFirstLoad ()

@@ -181,6 +181,8 @@ namespace GreenQloud.Repository.Remote
 
         public override bool Exists (GreenQloud.Model.RepositoryItem item)
         {
+//            if (listItems != null)
+//                return listItems.Any (rf => rf.AbsolutePath == item.AbsolutePath);
             return Items.Any (rf => rf.AbsolutePath == item.AbsolutePath);
         }
 
@@ -191,23 +193,30 @@ namespace GreenQloud.Repository.Remote
 
         public override List<GreenQloud.Model.RepositoryItem> AllItems {
             get {
+                Console.WriteLine ("AllItems");
                 return GetInstancesOfItems (GetS3Objects());
             }
         }
 
+        List<RepositoryItem> listItems;
+
         public override List<GreenQloud.Model.RepositoryItem> Items {
             get {
-                return GetInstancesOfItems (GetS3Objects().Where(i => !i.Key.Contains(Constant.TRASH) && i.Key != Constant.CLOCK_TIME).ToList());
+                Console.WriteLine ("Items");
+                listItems = GetInstancesOfItems (GetS3Objects().Where(i => !i.Key.Contains(Constant.TRASH) && i.Key != Constant.CLOCK_TIME).ToList());
+                return listItems;
             }
         }
 
         public override List<GreenQloud.Model.RepositoryItem> TrashItems {
             get {
+                Console.WriteLine ("TrashItems");
                 return GetInstancesOfItems (GetS3Objects().Where(i => i.Key.Contains(Constant.TRASH)).ToList());
             }
         }
 
         public override List<GreenQloud.Model.RepositoryItem> RecentChangedItems (DateTime LastSyncTime) {
+            Console.WriteLine ("RecentChangedItems");
             TimeSpan diffClocks = DiffClocks;           
             DateTime referencialClock = LastSyncTime.Subtract (diffClocks);    
 
@@ -256,7 +265,7 @@ namespace GreenQloud.Repository.Remote
                 CurrentTransfer.InitialTime = DateTime.Now;
 
                 using (DeleteObjectResponse response = connection.DeleteObject (request)) {
-                    response.Dispose ();
+
                 }
 
                 if(key!=Constant.CLOCK_TIME)  {              
@@ -297,7 +306,7 @@ namespace GreenQloud.Repository.Remote
                 };                
                 CurrentTransfer.InitialTime = DateTime.Now;
                 using (response = upconnection.PutObject (putObject)) {
-                    response.Dispose ();
+
                 }
                 CurrentTransfer.EndTime = DateTime.Now;
                 Logger.LogInfo ("Connection", string.Format ("{0} was uploaded.", filepath));
@@ -361,32 +370,152 @@ namespace GreenQloud.Repository.Remote
             item.InTrash = s3item.Key.Contains (Constant.TRASH);
             return item;
         }
-
+        AmazonS3 client;
         public List<S3Object> GetS3Objects ()
         {
-
-            try{               
-                List<S3Object> files = Connect().ListObjects (
-                    new ListObjectsRequest ().WithBucketName (RuntimeSettings.DefaultBucketName)
-                    ).S3Objects;
-
-                return files;
-            }catch (System.Net.WebException e){
-                if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout || e.Status == WebExceptionStatus.ConnectFailure){
-                    throw new DisconnectionException();
-                }else{
-
-                    if (((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.Unauthorized)
+            using (client = Amazon.AWSClientFactory.CreateAmazonS3Client(
+                Credential.PublicKey, Credential.SecretKey, CreateConfig()))
+            {
+                 try
+                {
+                    ++Controller.Contador;
+                    ListObjectsRequest request = new ListObjectsRequest();
+                    request = new ListObjectsRequest();
+                    request.BucketName = RuntimeSettings.DefaultBucketName;
+                    Console.WriteLine ("Controller.Contador {0}", Controller.Contador);
+                    List<S3Object> list;
+                    do
                     {
-                        throw new AccessDeniedException(); 
+                      
+                        ListObjectsResponse response = client.ListObjects(request);
+                       
+                        list = response.S3Objects;
+                       
+                        // If response is truncated, set the marker to get the next 
+                        // set of keys.
+                        if (response.IsTruncated)
+                        {                           
+                            request.Marker = response.NextMarker;
+                        }
+                        else
+                        {
+                            request = null;
+                        }
+                    } while (request != null);
+
+                    return list;
+                }
+                catch (AmazonS3Exception amazonS3Exception)
+                {
+                    if (amazonS3Exception.ErrorCode != null &&
+                        (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
+                     ||
+                     amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
+                    {
+                        Console.WriteLine("Check the provided AWS Credentials.");
+                        Console.WriteLine(
+                            "To sign up for service, go to http://aws.amazon.com/s3");
+                    }
+                    else
+                    {
+                        Console.WriteLine(
+                            "Error occurred. Message:'{0}' when listing objects",
+                            amazonS3Exception.Message);
                     }
                 }
-            }catch(AmazonS3Exception s3e)
-            {
-                if (s3e.StatusCode == HttpStatusCode.Forbidden)
-                    throw new AccessDeniedException(); 
+                catch (Exception e){
+                    Console.WriteLine (e.GetType());
+                    Console.WriteLine (e.Message);
+                    Console.WriteLine (e.StackTrace);
+                }
+                return null;
             }
-            return null;
+//
+//            ListObjectsResponse response = new ListObjectsResponse();
+//            ListObjectsRequest request = new ListObjectsRequest();
+//            try{
+//                AmazonS3Config config = CreateConfig ();
+//                AmazonS3Client client = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
+//
+//                request.BucketName = RuntimeSettings.DefaultBucketName;
+//                do
+//                {
+//                    response = client.ListObjects(request);
+//                    
+//                    // Process response.
+//                    // ...
+//                    
+//                    // If response is truncated, set the marker to get the next 
+//                    // set of keys.
+//                    if (response.IsTruncated)
+//                    {
+//                        request.Marker = response.NextMarker;
+//                    }
+//                    else
+//                    {
+//                        request = null;
+//                    }
+//                } while (request != null);
+//                return response.S3Objects;
+//            }catch (System.Net.WebException e){
+//
+//                if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout || e.Status == WebExceptionStatus.ConnectFailure || e.Status == WebExceptionStatus.SendFailure){
+//                    Console.WriteLine ("c "+Controller.Contador+"\n"+e.GetType()+"\n"+e.Message+"\n"+e.StackTrace);
+//                    return GetS3Objects();
+//                    //throw new DisconnectionException();
+//                }else{
+//
+//                    if (((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.Unauthorized)
+//                    {
+//                        throw new AccessDeniedException(); 
+//                    }
+//                }
+//            }catch(AmazonS3Exception s3e)
+//            {
+//                if (s3e.StatusCode == HttpStatusCode.Forbidden)
+//                    throw new AccessDeniedException(); 
+//            }
+//            catch (Exception e){
+//                Console.WriteLine (e.StackTrace);
+//            }
+////            try{
+////
+////                AmazonS3Config config = CreateConfig ();
+////                AmazonS3Client client = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
+////                    int c = Controller.Contador;
+////                    Logger.LogInfo("Connection", "Start a new connection "+" "+c+" "+Credential.PublicKey);                
+////
+////                    request =  new ListObjectsRequest ().WithBucketName (RuntimeSettings.DefaultBucketName);
+////                    response = client.ListObjects (request);
+////                    
+////                    ++Controller.Contador;
+////                    Logger.LogInfo("Connection", "Finish a new connection "+" "+c+" "+Credential.PublicKey); 
+////                    return response.S3Objects;
+////
+////            }catch (System.Net.WebException e){
+////                if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout || e.Status == WebExceptionStatus.ConnectFailure){
+////                       
+////                        Console.WriteLine ("c "+Controller.Contador+"\n"+e.StackTrace);
+////
+////                    throw new DisconnectionException();
+////                }else{
+////
+////                    if (((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.Unauthorized)
+////                    {
+////                        throw new AccessDeniedException(); 
+////                    }
+////                }
+////            }catch(AmazonS3Exception s3e)
+////            {
+////                if (s3e.StatusCode == HttpStatusCode.Forbidden)
+////                    throw new AccessDeniedException(); 
+////            }
+////            catch (Exception e){
+////                Console.WriteLine (e.StackTrace);
+////            }
+//
+//            return null;
+
         }
 
         protected List<RepositoryItem> GetInstancesOfItems (List<S3Object> s3items)
@@ -435,9 +564,11 @@ namespace GreenQloud.Repository.Remote
                 return connection;
             }
             try {    
+                Console.WriteLine (DateTime.Now.ToString());
                 AmazonS3Config config = CreateConfig ();
                 connection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
-                Logger.LogInfo("Connection", "Start a new connection");
+                Logger.LogInfo("Connection", "Start a new connection");                
+                Console.WriteLine (DateTime.Now.ToString());
                 return connection;
             }catch (System.Net.WebException e){
                 if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout){
@@ -498,7 +629,6 @@ namespace GreenQloud.Repository.Remote
                     DateTime localClock;
                     using (S3Response response = Connect ().PutObject (putObject)){
                         localClock = DateTime.Now;
-                        response.Dispose ();
                     }
                     ListObjectsResponse files = Connect ().ListObjects (new ListObjectsRequest ().WithBucketName (DefaultBucketName));
                     S3Object remotefile = files.S3Objects.Where (o => o.Key == clockFile.Name).FirstOrDefault();
@@ -542,6 +672,7 @@ namespace GreenQloud.Repository.Remote
                 if (CreateBucket ())
                     return CreateTrashFolder ();
             } else {
+                Console.WriteLine ("InitializeBucket");
                 if (!GetS3Objects().Any(s3o => s3o.Key.Contains(GlobalSettings.Trash)))
                     return CreateTrashFolder ();
                 return true;
@@ -685,7 +816,7 @@ namespace GreenQloud.Repository.Remote
                     ContentBody = string.Empty
                 };
                 using (response = Connect ().PutObject (putObject)) {
-                    response.Dispose ();
+
                 }
                 GenericDelete (Constant.CLOCK_TIME);
             } catch {
