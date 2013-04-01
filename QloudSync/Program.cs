@@ -33,6 +33,7 @@ namespace GreenQloud {
                 UI = new SparkleUI ();
                 UI.Run ();  
             } catch (Exception e){
+                Console.WriteLine (e.Message);
                 Console.WriteLine (e.StackTrace);
                 Logger.LogInfo ("Init", e);
                 Environment.Exit (-1);
