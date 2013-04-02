@@ -70,41 +70,72 @@ namespace GreenQloud.Persistence.SQLite
 
         public void ExecuteNonQuery (string sqlCommand)
         {
-            using (var conn= new SqliteConnection(SQLiteDatabase.ConnectionString))
+            Console.WriteLine ("ExecuteNonQuery in RepositoryItemDAO");
+
+            SqliteConnection conn= new SqliteConnection(SQLiteDatabase.ConnectionString);
+            SqliteCommand cmd = new SqliteCommand();
+            try
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = sqlCommand;
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.ExecuteNonQuery();
-                }
+                cmd = conn.CreateCommand();
+                
+                cmd.CommandText = sqlCommand;
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.ExecuteNonQuery();
+                
+            }
+            catch (Exception e){
+                Logger.LogInfo ("Database", e);
+            }
+            finally{
+                
+                cmd.Dispose();
+                conn.Close();
+                conn.Dispose();
+                conn = null;
+                cmd = null;
+                GC.Collect();
             }
         }
 
-
-
         public List<RepositoryItem> ExecuteReader(string sqlCommand) {
+            
+            Console.WriteLine ("ExecuteReader in RepositoryItemDAO");
+
             List<RepositoryItem> repos = new List<RepositoryItem>();
-            using (var conn= new SqliteConnection(SQLiteDatabase.ConnectionString))
+            SqliteConnection conn= new SqliteConnection(SQLiteDatabase.ConnectionString);
+            SqliteCommand cmd = new SqliteCommand();
+            try
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = sqlCommand;
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    SqliteDataReader reader = cmd.ExecuteReader();  
-                    while (reader.Read()){
-                        RepositoryItem item = new RepositoryItem ();
-                        item.Id = reader.GetInt32 (0).ToString();
-                        item.Name = reader.GetString(1);
-                        item.RelativePath = reader.GetString(2);
-                        item.Repository = new LocalRepository(reader.GetString(3));
-                        item.IsAFolder = bool.Parse (reader.GetString (4));
+                cmd = conn.CreateCommand();
+                
+                cmd.CommandText = sqlCommand;
+                cmd.CommandType = System.Data.CommandType.Text;
+                SqliteDataReader reader = cmd.ExecuteReader();  
 
-                        repos.Add (item);
-                    }                    
-                }
+                while (reader.Read()){
+                    RepositoryItem item = new RepositoryItem ();
+                    item.Id = reader.GetInt32 (0).ToString();
+                    item.Name = reader.GetString(1);
+                    item.RelativePath = reader.GetString(2);
+                    item.Repository = new LocalRepository(reader.GetString(3));
+                    item.IsAFolder = bool.Parse (reader.GetString (4));
+
+                    repos.Add (item);
+                }                    
+            }
+            catch (Exception e){
+                Logger.LogInfo ("Database", e);
+            }
+            finally{
+                
+                cmd.Dispose();
+                conn.Close();
+                conn.Dispose();
+                conn = null;
+                cmd = null;
+                GC.Collect();
             }
             return repos;
         } 

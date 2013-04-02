@@ -68,46 +68,74 @@ namespace GreenQloud.Persistence
 
         public void ExecuteNonQuery (string sqlCommand)
         {
-            using (var conn= new SqliteConnection(SQLiteDatabase.ConnectionString))
+            Console.WriteLine ("ExecuteNonQuery in EventDAO");
+
+            SqliteConnection conn= new SqliteConnection(SQLiteDatabase.ConnectionString);
+            SqliteCommand cmd = new SqliteCommand();
+            try
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = sqlCommand;
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.ExecuteNonQuery();
-                }
+                cmd = conn.CreateCommand();
+                
+                cmd.CommandText = sqlCommand;
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.ExecuteNonQuery();
+                
+            }
+            catch (Exception e){
+                Logger.LogInfo ("Database", e);
+            }
+            finally{
+                
+                cmd.Dispose();
+                conn.Close();
+                conn.Dispose();
+                conn = null;
+                cmd = null;
+                GC.Collect();
             }
         }
-
         public List<Event> ExecuteReader(string sqlCommand) {
+            Console.WriteLine ("ExecuteReader in EventDAO");
             List<Event> events = new List<Event>();
-            using (var conn= new SqliteConnection(SQLiteDatabase.ConnectionString))
+            SqliteConnection conn= new SqliteConnection(SQLiteDatabase.ConnectionString);
+            SqliteCommand cmd = new SqliteCommand();
+            try
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = sqlCommand;
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    SqliteDataReader reader = cmd.ExecuteReader(); 
-                    while (reader.Read()){
-                        Event e = new Event();
-                        e.Item = repositoryItemDAO.GetById (reader.GetInt32(1));
-                        e.EventType = (EventType) Enum.Parse(typeof(EventType), reader.GetString(2));
-                        e.RepositoryType = (RepositoryType) Enum.Parse(typeof(RepositoryType),reader.GetString(3));
-                        e.Synchronized = bool.Parse (reader.GetString(4));
-                        e.InsertTime = Convert.ToDateTime (reader.GetString (5));
-                        
-
-                        events.Add (e);
-                    }                    
+                cmd = conn.CreateCommand();
+                
+                cmd.CommandText = sqlCommand;
+                cmd.CommandType = System.Data.CommandType.Text;
+                SqliteDataReader reader = cmd.ExecuteReader();  
+                while (reader.Read()){
+                    Event e = new Event();
+                    e.Item = repositoryItemDAO.GetById (reader.GetInt32(1));
+                    e.EventType = (EventType) Enum.Parse(typeof(EventType), reader.GetString(2));
+                    e.RepositoryType = (RepositoryType) Enum.Parse(typeof(RepositoryType),reader.GetString(3));
+                    e.Synchronized = bool.Parse (reader.GetString(4));
+                    e.InsertTime = Convert.ToDateTime (reader.GetString (5));
+                    
+                    
+                    events.Add (e);
                 }
+                
             }
+            catch (Exception e){
+                Logger.LogInfo ("Database", e);
+            }
+            finally{
+                
+                cmd.Dispose();
+                conn.Close();
+                conn.Dispose();
+                conn = null;
+                cmd = null;
+                GC.Collect();
+            }
+
             return events;
         }  
-
-
-	}
-
+	}   
 }
 
