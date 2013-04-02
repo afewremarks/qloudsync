@@ -51,20 +51,37 @@ namespace GreenQloud.Persistence.SQLite
 
         public void ExecuteNonQuery (string sqlCommand)
         {
-            using (var conn= new SqliteConnection(SQLiteDatabase.ConnectionString))
+            Console.WriteLine ("ExecuteReader in RepositoryDAO");
+
+            SqliteConnection conn= new SqliteConnection(SQLiteDatabase.ConnectionString);
+            SqliteCommand cmd = new SqliteCommand();
+            try
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = sqlCommand;
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.ExecuteNonQuery();
-                }
+                cmd = conn.CreateCommand();
+                
+                cmd.CommandText = sqlCommand;
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception e){
+                Logger.LogInfo ("Database", e);
+            }
+            finally{
+                
+                cmd.Dispose();
+                conn.Close();
+                conn.Dispose();
+                conn = null;
+                cmd = null;
+                GC.Collect();
             }
         }
        
         public List<LocalRepository> ExecuteReader(string sqlCommand) 
         {
+            Console.WriteLine ("ExecuteReader in RepositoryDAO");
             List<LocalRepository> repos = new List<LocalRepository>();
             SqliteConnection conn= new SqliteConnection(SQLiteDatabase.ConnectionString);
             SqliteCommand cmd = new SqliteCommand();
@@ -92,8 +109,6 @@ namespace GreenQloud.Persistence.SQLite
                 conn = null;
                 cmd = null;
                 GC.Collect();
-                if (cmd == null && conn == null)
-                    Console.WriteLine ("Disposed");
             }
             return repos;
         }  

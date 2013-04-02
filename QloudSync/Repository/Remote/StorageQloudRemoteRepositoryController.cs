@@ -8,6 +8,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using GreenQloud.Util;
+using System.Security.Cryptography.X509Certificates;
 
 namespace GreenQloud.Repository.Remote
 {
@@ -288,6 +289,25 @@ namespace GreenQloud.Repository.Remote
                 Logger.LogInfo ("Connection", e);
             }
         }
+
+        bool GetValidationCallBack (object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
+        {
+            X509Certificate2 certificate2 = new X509Certificate2 (certificate.GetRawCertData ());
+
+            string cert_fingerprint = "B79445CC7B5EBC812E0BAE00BF52D3E95D32A116";
+            
+            
+            if (!certificate2.Thumbprint.Equals (cert_fingerprint)) {
+                Console.WriteLine (certificate2.FriendlyName);
+                Logger.LogInfo ("Controller", string.Format("Invalid certificate: {0} - {1}",cert_fingerprint, certificate2.Thumbprint));
+                
+                return false;
+                
+            }
+            
+            
+            return true;
+        }
         
         private void GenericUpload (string bucketName, string key, string filepath)
         {
@@ -295,6 +315,8 @@ namespace GreenQloud.Repository.Remote
             AmazonS3Client upconnection;
             try {
                 AmazonS3Config config = CreateConfig ();
+                Console.WriteLine ("Conectando em upload");
+                ServicePointManager.ServerCertificateValidationCallback = GetValidationCallBack;
                 upconnection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
                 
                 PutObjectRequest putObject = new PutObjectRequest ()
@@ -362,7 +384,7 @@ namespace GreenQloud.Repository.Remote
                     item.RelativePath = System.IO.Path.Combine (item.RelativePath, split [cont]);
                 }
             }
-            item.Repository = new Persistence.SQLite.SQLiteRepositoryDAO().GetRepositoryByRootName (string.Format("/{0}/",root));
+            item.Repository =  new Persistence.SQLite.SQLiteRepositoryDAO().GetRepositoryByRootName (string.Format("/{0}/",root));
             item.RemoteMD5Hash = s3item.ETag.Replace("\"","");
             item.Size = s3item.Size;
 
@@ -370,9 +392,13 @@ namespace GreenQloud.Repository.Remote
             item.InTrash = s3item.Key.Contains (Constant.TRASH);
             return item;
         }
+
         AmazonS3 client;
         public List<S3Object> GetS3Objects ()
         {
+            
+            Console.WriteLine ("Conectando em S3Object");
+            ServicePointManager.ServerCertificateValidationCallback = GetValidationCallBack;
             using (client = Amazon.AWSClientFactory.CreateAmazonS3Client(
                 Credential.PublicKey, Credential.SecretKey, CreateConfig()))
             {
@@ -561,6 +587,8 @@ namespace GreenQloud.Repository.Remote
         public AmazonS3Client Connect ()
         {
             if (connection != null) {
+                
+                Console.WriteLine ("Pegando conexao");
                 return connection;
             }
             try {    
@@ -602,6 +630,7 @@ namespace GreenQloud.Repository.Remote
         {
             AmazonS3Config conf = new AmazonS3Config();
             conf.ServiceURL =  new Uri(GlobalSettings.StorageURL).Host;
+
             return conf;
         }
         #endregion

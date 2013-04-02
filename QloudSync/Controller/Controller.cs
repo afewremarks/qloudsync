@@ -21,6 +21,10 @@ namespace GreenQloud {
 
 	public class Controller{
 
+        public static int Contador{
+            set; get;
+        }
+
         public IconController StatusIcon;
         StorageQloudLocalEventsSynchronizer localSynchronizer;
         StorageQloudRemoteEventsSynchronizer remoteSynchronizer;
