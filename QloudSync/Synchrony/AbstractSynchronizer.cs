@@ -86,7 +86,6 @@ namespace GreenQloud.Synchrony
                 Synchronize (eventsNotSynchronized[0]);
                 eventsNotSynchronized = eventDAO.EventsNotSynchronized;
             }
-            Console.WriteLine ("Finish Sync");
             SyncStatus = SyncStatus.IDLE;
             Done = true;
         }

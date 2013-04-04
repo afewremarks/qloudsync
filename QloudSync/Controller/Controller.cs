@@ -102,7 +102,7 @@ namespace GreenQloud {
         public void UIHasLoaded ()
         {
             if (FirstRun) {
-                Persistence.SQLite.SQLiteDatabase.CreateDataBase();
+                new Persistence.SQLite.SQLiteDatabase().CreateDataBase();
                 ShowSetupWindow (PageType.Login);
                 foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
                     File.Delete (f);
