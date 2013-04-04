@@ -26,9 +26,9 @@ namespace GreenQloud {
 
         public AboutWindow () : base ()
         {
-//            Program.Controller.ShowAboutWindowEvent += delegate {
-//                ShowWindowEvent ();
-//            };
+            Program.Controller.ShowAboutWindowEvent += delegate {
+                ShowWindowEvent ();
+            };
 
             using (var a = new NSAutoreleasePool ())
             {
@@ -160,24 +160,24 @@ namespace GreenQloud {
 
         public override void OrderFrontRegardless ()
         {
-//            NSApplication.SharedApplication.ActivateIgnoringOtherApps (true);
-//            MakeKeyAndOrderFront (this);
-//
-//            if (Program.UI != null)
-//                Program.UI.UpdateDockIconVisibility ();
-//
-//            base.OrderFrontRegardless ();
+            NSApplication.SharedApplication.ActivateIgnoringOtherApps (true);
+            MakeKeyAndOrderFront (this);
+
+            if (Program.UI != null)
+                Program.UI.UpdateDockIconVisibility ();
+
+            base.OrderFrontRegardless ();
         }
 
 
         public override void PerformClose (NSObject sender)
         {
-//            base.OrderOut (this);
-//
-//            if (Program.UI != null)
-//                Program.UI.UpdateDockIconVisibility ();
-//
-//            return;
+            base.OrderOut (this);
+
+            if (Program.UI != null)
+                Program.UI.UpdateDockIconVisibility ();
+
+            return;
         }
     }
 
