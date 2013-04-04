@@ -15,7 +15,7 @@ namespace GreenQloud.Test
         [Test()]
         public void TestCreate ()
         {
-            SQLiteDatabase.CreateDataBase();
+            new SQLiteDatabase().CreateDataBase();
             SQLiteEventDAO eventDAO = new SQLiteEventDAO ();
                         
             if(!Directory.Exists (RuntimeSettings.HomePath))

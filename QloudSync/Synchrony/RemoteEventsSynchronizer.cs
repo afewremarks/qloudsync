@@ -45,7 +45,6 @@ namespace GreenQloud.Synchrony
 
         public void AddEvents ()
         {
-            Console.WriteLine ("REMOTEEVENTSSYNCHRONIZER");
             if (!ready)
                 return;
             ready = false;
@@ -53,74 +52,72 @@ namespace GreenQloud.Synchrony
                 LastSyncTime = DateTime.Now.Subtract(new TimeSpan (0,0,30));
 
             foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems (LastSyncTime)){
-                bool exists = physicalLocalRepository.Exists (remoteItem);
-                Console.WriteLine (remoteItem.FullLocalName+" "+exists );
-//                if (exists){
-//                    if (!physicalLocalRepository.IsSync (remoteItem))
-//                    {
-//                        Event e = new Event(){
-//                            EventType = EventType.UPDATE,
-//                            RepositoryType = RepositoryType.REMOTE,
-//                            Item = remoteItem,
-//                            Synchronized = false
-//                        };
-//                        Logger.LogInfo ("Synchronizer", string.Format("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName));
-//                        eventDAO.Create (e);
-//                    }
-//                }
-//                else {
-//                    RepositoryItem copy = physicalLocalRepository.GetCopy (remoteItem);
-//                    if (copy != null){
-//                        if (!remoteRepository.Exists (copy)){
-//                            Event e = new Event(){
-//                                EventType = EventType.MOVE_OR_RENAME,
-//                                RepositoryType = RepositoryType.REMOTE,
-//                                Item = remoteItem,
-//                                Synchronized = false
-//                            };
-//                            Logger.LogInfo ("Synchronizer", string.Format("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName));
-//                            eventDAO.Create (e);
-//                        }
-//                        else{
-//                            Event e = new Event(){
-//                                EventType = EventType.COPY,
-//                                RepositoryType = RepositoryType.REMOTE,
-//                                Item = remoteItem,
-//                                Synchronized = false
-//                            };
-//                            Logger.LogInfo ("Synchronizer", string.Format("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName));
-//                            eventDAO.Create (e);
-//                        }
-//                    }
-//                    else{
-//                        Event e = new Event(){
-//                            EventType = EventType.CREATE,
-//                            RepositoryType = RepositoryType.REMOTE,
-//                            Item = remoteItem,
-//                            Synchronized = false
-//                        };
-//                        Logger.LogInfo ("Synchronizer", string.Format("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName));
-//                        eventDAO.Create (e);
-//                    }
-//                }
-//            }
-//
-//
-//            foreach (RepositoryItem localItem in physicalLocalRepository.Items) {
-//                if (!remoteRepository.Exists(localItem)){
-//                    Event e = new Event ();
-//
-//                    e.Item = localItem;
-//                    e.EventType = EventType.DELETE;
-//                    e.RepositoryType = RepositoryType.REMOTE;
-//                    e.Synchronized = false;
-//                    Logger.LogInfo ("Synchronizer", string.Format("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName));
-//                    eventDAO.Create (e);
-//                }
+                    bool exists = physicalLocalRepository.Exists (remoteItem);
+                    if (exists){
+                        if (!physicalLocalRepository.IsSync (remoteItem))
+                        {
+                            Event e = new Event(){
+                                EventType = EventType.UPDATE,
+                                RepositoryType = RepositoryType.REMOTE,
+                                Item = remoteItem,
+                                Synchronized = false
+                            };
+                            Logger.LogInfo ("Synchronizer", string.Format("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName));
+                            eventDAO.Create (e);
+                        }
+                    }
+                    else {
+                        RepositoryItem copy = physicalLocalRepository.GetCopy (remoteItem);
+                        if (copy != null){
+                            if (!remoteRepository.Exists (copy)){
+                                Event e = new Event(){
+                                    EventType = EventType.MOVE_OR_RENAME,
+                                    RepositoryType = RepositoryType.REMOTE,
+                                    Item = remoteItem,
+                                    Synchronized = false
+                                };
+                                Logger.LogInfo ("Synchronizer", string.Format("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName));
+                                eventDAO.Create (e);
+                            }
+                            else{
+                                Event e = new Event(){
+                                    EventType = EventType.COPY,
+                                    RepositoryType = RepositoryType.REMOTE,
+                                    Item = remoteItem,
+                                    Synchronized = false
+                                };
+                                Logger.LogInfo ("Synchronizer", string.Format("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName));
+                                eventDAO.Create (e);
+                            }
+                        }
+                        else{
+                            Event e = new Event(){
+                                EventType = EventType.CREATE,
+                                RepositoryType = RepositoryType.REMOTE,
+                                Item = remoteItem,
+                                Synchronized = false
+                            };
+                            Logger.LogInfo ("Synchronizer", string.Format("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName));
+                            eventDAO.Create (e);
+                        }
+                    }
+                }
+
+
+            foreach (RepositoryItem localItem in physicalLocalRepository.Items) {
+                if (!remoteRepository.Exists(localItem)){
+                    Event e = new Event ();
+
+                    e.Item = localItem;
+                    e.EventType = EventType.DELETE;
+                    e.RepositoryType = RepositoryType.REMOTE;
+                    e.Synchronized = false;
+                    Logger.LogInfo ("Synchronizer", string.Format("RemoteEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName));
+                    eventDAO.Create (e);
+                }
             }  
             eventsCreated = true;
             LastSyncTime = DateTime.Now;
-            Console.WriteLine ("END REMOTEEVENTSSYNCHRONIZER");
             ready = true;
         }
 
