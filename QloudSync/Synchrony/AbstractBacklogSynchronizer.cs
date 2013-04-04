@@ -23,9 +23,6 @@ using GreenQloud.Repository.Local;
         }
 
         public new void Synchronize (){
-            Console.WriteLine ();
-            Console.WriteLine ("ABSTRACTBACKLOGSYNCHRONIZER");
-            Console.WriteLine ();
             List<RepositoryItem> itensInRemoteRepository = remoteRepository.Items;
             List<RepositoryItem> filesInPhysicalLocalRepository = physicalLocalRepository.Items;
             
@@ -45,9 +42,6 @@ using GreenQloud.Repository.Local;
             }
             base.Synchronize();
             Pause();
-            Console.WriteLine ();
-            Console.WriteLine ("END ABSTRACTBACKLOGSYNCHRONIZER");
-            Console.WriteLine ();
         }
 
         public Event GetEvent (RepositoryItem item, RepositoryType type){
