@@ -36,7 +36,6 @@ namespace GreenQloud.Synchrony
                         watcher.Changed += delegate(string path) {
                             if(Working) 
                             {
-                                Console.WriteLine ("LocalEvents "+path);
                                 Synchronize( physicalLocalRepository.CreateItemInstance (path));                
                             }
                         };

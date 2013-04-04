@@ -12,20 +12,20 @@ namespace GreenQloud.Persistence.SQLite
     {
 
         #region implemented abstract members of RepositoryDAO
-
+        SQLiteDatabase database = new SQLiteDatabase ();
         public override void Create (LocalRepository e)
         {
-            ExecuteNonQuery (string.Format("INSERT INTO Repository (Path) VALUES (\"{0}\")", e.Path));
+            database.ExecuteNonQuery (string.Format("INSERT INTO Repository (Path) VALUES (\"{0}\")", e.Path));
         }
         public override List<LocalRepository> All {
             get {        
-                return ExecuteReader("SELECT * FROM REPOSITORY");
+              return Select("SELECT * FROM REPOSITORY");
             }
         }
 
         public void DeleteAll ()
         {
-            ExecuteNonQuery ("DELETE FROM REPOSITORY");
+            database.ExecuteNonQuery ("DELETE FROM REPOSITORY");
         }
         #endregion
 
@@ -41,7 +41,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public LocalRepository GetRepositoryByRootName (string root)
         {
-            List<LocalRepository> repos = ExecuteReader (string.Format("SELECT * FROM REPOSITORY WHERE PATH LIKE '%{0}'", root));
+            List<LocalRepository> repos = Select(string.Format("SELECT * FROM REPOSITORY WHERE PATH LIKE '%{0}'", root));
 
             if (repos.Count == 0)
                 return new LocalRepository (RuntimeSettings.HomePath);
@@ -49,69 +49,15 @@ namespace GreenQloud.Persistence.SQLite
                 return repos.First();
         }
 
-        public void ExecuteNonQuery (string sqlCommand)
-        {
-            Console.WriteLine ("ExecuteReader in RepositoryDAO");
 
-            SqliteConnection conn= new SqliteConnection(SQLiteDatabase.ConnectionString);
-            SqliteCommand cmd = new SqliteCommand();
-            try
-            {
-                conn.Open();
-                cmd = conn.CreateCommand();
-                
-                cmd.CommandText = sqlCommand;
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.ExecuteNonQuery();
-
-            }
-            catch (Exception e){
-                Logger.LogInfo ("Database", e);
-            }
-            finally{
-                
-                cmd.Dispose();
-                conn.Close();
-                conn.Dispose();
-                conn = null;
-                cmd = null;
-                GC.Collect();
-            }
-        }
-       
-        public List<LocalRepository> ExecuteReader(string sqlCommand) 
-        {
-            Console.WriteLine ("ExecuteReader in RepositoryDAO");
+        public List<LocalRepository> Select (string sql){
             List<LocalRepository> repos = new List<LocalRepository>();
-            SqliteConnection conn= new SqliteConnection(SQLiteDatabase.ConnectionString);
-            SqliteCommand cmd = new SqliteCommand();
-            try
-            {
-                conn.Open();
-                cmd = conn.CreateCommand();
-
-                cmd.CommandText = sqlCommand;
-                cmd.CommandType = System.Data.CommandType.Text;
-                SqliteDataReader reader = cmd.ExecuteReader();  
-                while (reader.Read()){
-                    repos.Add (new LocalRepository(reader.GetString(1)));
-                }
-
-            }
-            catch (Exception e){
-                Logger.LogInfo ("Database", e);
-            }
-            finally{
-
-                cmd.Dispose();
-                conn.Close();
-                conn.Dispose();
-                conn = null;
-                cmd = null;
-                GC.Collect();
+            DataTable dt = database.GetDataTable(sql);
+            foreach(DataRow dr in dt.Rows){
+                repos.Add (new LocalRepository(dr[1].ToString()));
             }
             return repos;
-        }  
+        }
     }
 
 }
