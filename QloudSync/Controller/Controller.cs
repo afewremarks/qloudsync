@@ -101,8 +101,11 @@ namespace GreenQloud {
 
         public void UIHasLoaded ()
         {
-            if (!File.Exists (RuntimeSettings.DatabaseFile))
+            if (!File.Exists (RuntimeSettings.DatabaseFile)){
+                if (!Directory.Exists(RuntimeSettings.DatabaseFolder))
+                    Directory.CreateDirectory (RuntimeSettings.DatabaseFolder);
                 new Persistence.SQLite.SQLiteDatabase().CreateDataBase();
+            }
 
             if (File.Exists (RuntimeSettings.BacklogFile))
                 File.Delete(RuntimeSettings.BacklogFile);
