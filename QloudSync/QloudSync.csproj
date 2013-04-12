@@ -15,20 +15,20 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>bin\Release</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <IncludeMonoRuntime>True</IncludeMonoRuntime>
     <I18n />
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <UseSGen>False</UseSGen>
+    <UseSGen>true</UseSGen>
     <EnableCodeSigning>False</EnableCodeSigning>
     <ConsolePause>False</ConsolePause>
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     <EnablePackageSigning>False</EnablePackageSigning>
-    <CreatePackage>False</CreatePackage>
+    <CreatePackage>true</CreatePackage>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -38,16 +38,16 @@
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <IncludeMonoRuntime>False</IncludeMonoRuntime>
+    <IncludeMonoRuntime>true</IncludeMonoRuntime>
     <I18n />
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <UseSGen>False</UseSGen>
+    <UseSGen>true</UseSGen>
     <EnableCodeSigning>False</EnableCodeSigning>
     <Externalconsole>True</Externalconsole>
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     <EnablePackageSigning>False</EnablePackageSigning>
-    <CreatePackage>False</CreatePackage>
+    <CreatePackage>true</CreatePackage>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -29,8 +29,8 @@ namespace GreenQloud.Synchrony
            
         }
 
-        public void Synchronize (RepositoryItem item){           
-            eventDAO.Create (GetEvent (item));
+        public void Synchronize (Event e){           
+            eventDAO.SetEventType (GetEventType (e));
             creatingEvent = true;
         }
 
@@ -46,25 +46,26 @@ namespace GreenQloud.Synchrony
             }
         }
 
-        public Event GetEvent (RepositoryItem item)
+
+
+        public Event GetEventType (Event e)
         {
-            Event e = new Event();
-            e.Item = item;
-            e.RepositoryType = RepositoryType.LOCAL;
-            e.Synchronized = false;
-            if (physicalLocalRepository.Exists (item)){
-                if (remoteRepository.ExistsCopies (item)){                                       
+            bool exists = physicalLocalRepository.Exists (e.Item);
+            if (exists){
+                if (remoteRepository.ExistsCopies (e.Item)){
                        e.EventType = EventType.MOVE_OR_RENAME;
                 }
                 else{
-                    if (remoteRepository.Exists (item))
+                    if (remoteRepository.Exists (e.Item)){
                         e.EventType = EventType.UPDATE;
-                    else
+                    }
+                    else{
                         e.EventType = EventType.CREATE;
+                    }
                 }
-            }else
+            }else{
                 e.EventType = EventType.DELETE;
-
+            }
             Console.WriteLine ("LocalEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName);
 
             return e;
