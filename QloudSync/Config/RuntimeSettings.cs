@@ -82,6 +82,12 @@ namespace GreenQloud
                 return defaultBucketName;
             }
         }
+
+        public static string DatabaseFile {
+            get{
+                return Path.Combine (ConfigPath, ConfigurationManager.AppSettings ["DatabaseFile"]);
+            }
+        }
     }
 }
 

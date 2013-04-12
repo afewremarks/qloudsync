@@ -101,13 +101,18 @@ namespace GreenQloud {
 
         public void UIHasLoaded ()
         {
-            if (FirstRun) {
+            if (!File.Exists (RuntimeSettings.DatabaseFile))
                 new Persistence.SQLite.SQLiteDatabase().CreateDataBase();
+
+            if (File.Exists (RuntimeSettings.BacklogFile))
+                File.Delete(RuntimeSettings.BacklogFile);
+
+            if (FirstRun) {
                 ShowSetupWindow (PageType.Login);
                 foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
                     File.Delete (f);
-
             } else {
+                backlogSynchronizer.Start();
                 InitializeSynchronizers();
             }
         }
@@ -115,8 +120,7 @@ namespace GreenQloud {
 
         private void InitializeSynchronizers ()
         {
-            if(!FirstRun)
-                backlogSynchronizer.Start();
+
             localSynchronizer.Start();
             remoteSynchronizer.Start();
                         
