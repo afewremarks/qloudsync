@@ -6,6 +6,7 @@ using GreenQloud.Model;
 using System.Threading;
 using GreenQloud.Persistence.SQLite;
 using System.Collections.Generic;
+using System.IO;
 
 namespace GreenQloud.Synchrony
 {
@@ -15,6 +16,7 @@ namespace GreenQloud.Synchrony
 
         List<OSXFileSystemWatcher> watchers;
         SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+        SQLiteEventDAO eventDAO = new SQLiteEventDAO();
         Thread watchersThread;
 
         
@@ -24,10 +26,18 @@ namespace GreenQloud.Synchrony
         public event FinishedEventHandler Finished = delegate { };
         public delegate void FinishedEventHandler ();
 
+        private Event LastLocalEvent = new Event();
+        private DateTime LastTimeSync = new DateTime();
         private StorageQloudLocalEventsSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
                 base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
         {
+
+            RepositoryItem r = new RepositoryItem();
+            r.Name = string.Empty;
+            r.RelativePath = string.Empty;
+            r.Repository = new LocalRepository (string.Empty);
+            LastLocalEvent.Item = r;
             watchersThread = new Thread(()=>{
                 try{
                     watchers = new List<OSXFileSystemWatcher>();
@@ -36,7 +46,7 @@ namespace GreenQloud.Synchrony
                         watcher.Changed += delegate(string path) {
                             if(Working) 
                             {
-                                Synchronize( physicalLocalRepository.CreateItemInstance (path));                
+                                Method (path);
                             }
                         };
                         watchers.Add (watcher);
@@ -59,6 +69,40 @@ namespace GreenQloud.Synchrony
             return instance;
         }
 
+        void Method (string path)
+        {
+            RepositoryItem item;
+            LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (path);
+
+            if (Directory.Exists(path)){
+                item = RepositoryItem.CreateInstance (repo, path, true, 0, DateTime.Now);
+            }
+            else if (File.Exists (path)){
+                item = RepositoryItem.CreateInstance (repo, path, false, 0, DateTime.Now);
+            }else{
+                item = RepositoryItem.CreateInstance (repo, path, false, 0, DateTime.Now);
+                item.IsAFolder = new SQLiteRepositoryItemDAO().IsFolder(item);
+            }
+
+            if(!item.IsIgnoreFile){
+                Event e = new Event();
+                e.Item = item;
+                e.RepositoryType = RepositoryType.LOCAL;
+                double seconds = DateTime.Now.Subtract(LastTimeSync).TotalSeconds;
+                bool itemsEquals = e.Item.FullLocalName == LastLocalEvent.Item.FullLocalName;
+ 
+                if (itemsEquals && seconds < 60){
+                    Logger.LogInfo ("StorageQloudLocalEventsSynchronizer", "An event duplicate has been identified and ignored");
+                    return;
+                }
+                Logger.LogInfo ("StorageQloudLocalEventsSynchronizer", string.Format("An event has been identified to {0}", e.Item.FullLocalName));
+                eventDAO.CreateWithoutType(e);
+                Synchronize(e);
+                
+                LastLocalEvent = e;
+                LastTimeSync = DateTime.Now;
+            }
+        }
 
         public new void Start ()
         {

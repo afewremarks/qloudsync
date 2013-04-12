@@ -18,14 +18,58 @@ namespace GreenQloud.Model
            
         }
 
+        public static RepositoryItem CreateInstance (LocalRepository repo, string fullPath, bool isFolder, long size, DateTime lastModified){
+
+            if (fullPath.EndsWith ("/")){
+                fullPath = fullPath.Substring (0, fullPath.Length-1);
+                isFolder = true;
+            }
+
+            if (!fullPath.StartsWith("/"))
+                fullPath = "/"+fullPath;
+
+            if (fullPath.Contains (Constant.TRASH))
+                fullPath =  fullPath.Replace (Constant.TRASH, string.Empty);
+
+            int lastIndexDelimiter = fullPath.LastIndexOf ("/");
+
+            string name = fullPath.Substring (lastIndexDelimiter+1, fullPath.Length-lastIndexDelimiter-1);
+            string repoPath = repo.Path;
+
+            if (!repoPath.EndsWith ("/"))
+                repoPath += "/";
+
+            string relativePath = fullPath.Replace (repoPath, string.Empty).Replace(name, string.Empty);
+            if (relativePath == "/")
+                relativePath = "";
+            if (relativePath.StartsWith ("/"))
+                relativePath = relativePath.Substring (1, relativePath.Length-1);
+            if (relativePath.EndsWith ("/"))
+                relativePath = relativePath.Substring (0, relativePath.Length-1);
+
+            return CreateInstance (repo, name, relativePath, isFolder, size, lastModified);
+        }
+
+        public static RepositoryItem CreateInstance  (LocalRepository repo, string name, string path, bool isFolder, long size, DateTime lastModified){
+            RepositoryItem item = new RepositoryItem();
+            item.Repository = repo;
+            item.Name = name;
+            item.RelativePath = path;
+            item.IsAFolder = isFolder;
+            item.Size = size;
+            item.TimeOfLastChange = lastModified;
+            return item;
+        }
+
         public LocalRepository Repository{
             set; get;
         }
 
         public string Name { get; set;}
 
-
-        public string RelativePath{ get; set; }
+        public string RelativePath{ 
+            get; set;
+        }
 
         public string AbsolutePath{
             get {
@@ -59,6 +103,7 @@ namespace GreenQloud.Model
         
         public string RelativePathInBucket {
             get {
+               
                 return Path.Combine (RuntimeSettings.DefaultBucketName,RelativePath);
             }
         }
