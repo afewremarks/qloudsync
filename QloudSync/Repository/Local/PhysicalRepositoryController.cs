@@ -22,13 +22,13 @@ namespace GreenQloud.Repository.Local
 
         #endregion
 
-        public abstract RepositoryItem CreateItemInstance (string fullLocalName);
-
         public abstract void Delete (RepositoryItem  item);
 
         public abstract RepositoryItem GetCopy (RepositoryItem remoteItem);
 
         public abstract bool IsSync (RepositoryItem item);
+
+        public abstract RepositoryItem CreateItemInstance (string fullLocalName);
     }
 }
 

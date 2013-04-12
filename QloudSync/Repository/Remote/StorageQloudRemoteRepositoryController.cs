@@ -118,16 +118,21 @@ namespace GreenQloud.Repository.Remote
             else{
                 CurrentTransfer = new Transfer (item, TransferType.REMOTE_REMOVE); 
 
-                string destinationName;     
-                if(item.IsAFolder)
+                string destinationName;
+
+                if(item.IsAFolder){
                     destinationName = item.Name;
+                }
                 else
                     destinationName = item.Name + "(1)";
                 
                 UpdateTrashFolder (item);            
                 
                 GenericCopy (RuntimeSettings.DefaultBucketName, item.AbsolutePath, item.TrashRelativePath, destinationName);
-                GenericDelete (item.AbsolutePath);
+                string key = item.AbsolutePath;
+                if (!GetS3Objects().Any(s=> s.Key == item.AbsolutePath))
+                    key+="/";
+                GenericDelete (key);
                 CurrentTransfer.EndTime = DateTime.Now;
                 return CurrentTransfer;
             }
@@ -182,9 +187,8 @@ namespace GreenQloud.Repository.Remote
 
         public override bool Exists (GreenQloud.Model.RepositoryItem item)
         {
-            if (listItems != null)
-                return listItems.Any (rf => rf.AbsolutePath == item.AbsolutePath);
-            return Items.Any (rf => rf.AbsolutePath == item.AbsolutePath);
+            listItems = Items;
+            return listItems.Any (rf => rf.AbsolutePath == item.AbsolutePath);
         }
 
         public override bool ExistsCopies (GreenQloud.Model.RepositoryItem item)
@@ -214,11 +218,15 @@ namespace GreenQloud.Repository.Remote
         }
 
         public override List<GreenQloud.Model.RepositoryItem> RecentChangedItems (DateTime LastSyncTime) {
-            TimeSpan diffClocks = DiffClocks;           
-            DateTime referencialClock = LastSyncTime.Subtract (diffClocks);    
 
-            List<RepositoryItem> list = GetInstancesOfItems (GetS3Objects().Where (rf => (Convert.ToDateTime (rf.LastModified).Subtract (referencialClock).TotalSeconds > 0 || rf.Key.EndsWith("/")) && !rf.Key.Contains(Constant.TRASH)).ToList());
-         
+
+            TimeSpan diffClocks = DiffClocks;  
+
+            DateTime referencialClock = LastSyncTime.Subtract (diffClocks);   
+            List<S3Object> listS3O = GetS3Objects();
+
+            List<RepositoryItem> list = GetInstancesOfItems (listS3O.Where (rf => (Convert.ToDateTime (rf.LastModified).Subtract (referencialClock).TotalSeconds > 0 || rf.Key.EndsWith("/")) && !rf.Key.Contains(Constant.TRASH)).ToList());
+
             return list;
         }
 
@@ -250,7 +258,6 @@ namespace GreenQloud.Repository.Remote
             try {
                 if (key == "")
                     return;
-                
                 
                 DeleteObjectRequest request = new DeleteObjectRequest (){
                     BucketName = RuntimeSettings.DefaultBucketName,
@@ -311,8 +318,6 @@ namespace GreenQloud.Repository.Remote
             AmazonS3Client upconnection;
             try {
                 AmazonS3Config config = CreateConfig ();
-
-                ServicePointManager.ServerCertificateValidationCallback = GetValidationCallBack;
                 upconnection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
                 
                 PutObjectRequest putObject = new PutObjectRequest ()
@@ -328,8 +333,11 @@ namespace GreenQloud.Repository.Remote
                 }
                 CurrentTransfer.EndTime = DateTime.Now;
                 Logger.LogInfo ("Connection", string.Format ("{0} was uploaded.", filepath));
-                UpdateStorageQloud();
                 CurrentTransfer.Status = TransferStatus.DONE;
+                UpdateStorageQloud();
+
+
+
             } catch (ObjectDisposedException) {
                 Logger.LogInfo ("Connection", "An exception occurred, the file will be resend.");
                 GenericUpload (bucketName, key, filepath);
@@ -356,35 +364,17 @@ namespace GreenQloud.Repository.Remote
 
         public RepositoryItem CreateObjectInstance (S3Object s3item)
         {
-            RepositoryItem item = new RepositoryItem ();
-            item.IsAFolder = s3item.Key.EndsWith("/");
-            string key = s3item.Key;
-            if (s3item.Key.Contains (Constant.TRASH))
-                key =  s3item.Key.Replace (Constant.TRASH, "");
-            string [] split = key.Split('/');
-            string root = split[0];
-            int finalcont = split.Length - 1;
-            if (item.IsAFolder)
-                finalcont--;
-            item.RelativePath = "";
-            
-            for (int cont = 0; cont <= finalcont; cont++){
-                if (cont == finalcont){
-                    string pathMark = "";
-                    if (item.IsAFolder)
-                        pathMark = "/";
-                    
-                    item.Name = split[cont]+pathMark;
-                }
-                else{
-                    item.RelativePath = System.IO.Path.Combine (item.RelativePath, split [cont]);
-                }
+            LocalRepository repo;
+            if (s3item.Key.Contains ("/")){
+                string root = s3item.Key.Substring(0, s3item.Key.IndexOf ("/"));
+                repo =  new Persistence.SQLite.SQLiteRepositoryDAO().GetRepositoryByRootName (string.Format("/{0}/",root));
             }
-            item.Repository =  new LocalRepository(RuntimeSettings.HomePath);//new Persistence.SQLite.SQLiteRepositoryDAO().GetRepositoryByRootName (string.Format("/{0}/",root));
+            else{
+                repo = new LocalRepository(RuntimeSettings.HomePath);
+            }
+            RepositoryItem item = RepositoryItem.CreateInstance (repo,
+                                                                 s3item.Key, false, s3item.Size, Convert.ToDateTime(s3item.LastModified));
             item.RemoteMD5Hash = s3item.ETag.Replace("\"","");
-            item.Size = s3item.Size;
-
-            item.TimeOfLastChange = Convert.ToDateTime(s3item.LastModified);
             item.InTrash = s3item.Key.Contains (Constant.TRASH);
             return item;
         }
@@ -392,7 +382,7 @@ namespace GreenQloud.Repository.Remote
         AmazonS3 client;
         public List<S3Object> GetS3Objects ()
         {
-            ServicePointManager.ServerCertificateValidationCallback = GetValidationCallBack;
+           // ServicePointManager.ServerCertificateValidationCallback = GetValidationCallBack;
             using (client = Amazon.AWSClientFactory.CreateAmazonS3Client(
                 Credential.PublicKey, Credential.SecretKey, CreateConfig()))
             {

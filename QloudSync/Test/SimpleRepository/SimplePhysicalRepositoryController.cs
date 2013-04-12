@@ -39,6 +39,7 @@ namespace GreenQloud.Test.SimpleRepository
 
         public override RepositoryItem CreateItemInstance (string fullLocalName)
         {
+
            if (list.Any (o=> o.Key.FullLocalName == fullLocalName)){
                 return list.First (o=> o.Key.FullLocalName == fullLocalName).Key;
            }

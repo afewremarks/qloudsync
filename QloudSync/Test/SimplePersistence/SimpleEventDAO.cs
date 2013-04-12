@@ -40,6 +40,20 @@ namespace GreenQloud.Test.SimplePersistence
             }
         }
 
+        public override void CreateWithoutType (Event e)
+        {
+            throw new NotImplementedException ();
+        }
+
+        public override void SetEventType (Event e)
+        {
+            throw new NotImplementedException ();
+        }
+
+        public override void RemoveAllUnsynchronized ()
+        {
+            throw new NotImplementedException ();
+        }
         #endregion
 
 

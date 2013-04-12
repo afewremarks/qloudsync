@@ -34,7 +34,7 @@ namespace GreenQloud.Persistence.SQLite{
         public void CreateDataBase(){
             ExecuteNonQuery("CREATE TABLE Repository (RepositoryID INTEGER PRIMARY KEY AUTOINCREMENT , Path ntext)");
             ExecuteNonQuery ("CREATE TABLE RepositoryItem (RepositoryItemID INTEGER PRIMARY KEY AUTOINCREMENT , Name ntext, RelativePath ntext, RepoPath ntext, IsFolder ntext, Deleted ntext)");
-            ExecuteNonQuery ("CREATE TABLE EVENT (EventID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId INTEGER, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext)");
+            ExecuteNonQuery ("CREATE TABLE EVENT (EventID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId ntext, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext)");
             ExecuteNonQuery ("CREATE TABLE TRANSFER (TransferID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId INTEGER, INITIALTIME ntext, ENDTIME ntext, TYPE ntext, STATUS ntext)");
         }
 
@@ -85,7 +85,7 @@ namespace GreenQloud.Persistence.SQLite{
                     {
                         // Ignore Null fields.
                         if (reader.IsDBNull(i)) continue;
-                        
+
                         if (reader.GetFieldType(i) == typeof(String))
                         {
                             row[dt.Columns[i].ColumnName] = reader.GetString(i);
