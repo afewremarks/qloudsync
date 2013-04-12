@@ -226,6 +226,23 @@ namespace GreenQloud.Test
             Assert.True (repositoryController.ExistsVersion(item));            
         }
 
+        [Test()]
+        public void TestUpload_ListOfS3ObjectIsUpdated(){
+            string testfile = Path.Combine (RuntimeSettings.HomePath, "local.html");
+            if (!File.Exists (testfile)){               
+                File.WriteAllText (testfile,"test file");
+            }
+
+            StorageQloudPhysicalRepositoryController physicalRepository = new StorageQloudPhysicalRepositoryController();
+            RepositoryItem item = physicalRepository.CreateItemInstance (testfile);
+            item.IsAFolder = false;
+            StorageQloudRemoteRepositoryController repositoryController = new StorageQloudRemoteRepositoryController();
+            int count = repositoryController.AllItems.Count;
+            repositoryController.Upload (item);
+            
+            Assert.AreNotEqual (count, repositoryController.AllItems.Count);
+        }
+
      }
 }
 

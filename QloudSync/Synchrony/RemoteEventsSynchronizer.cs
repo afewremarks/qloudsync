@@ -5,6 +5,7 @@ using GreenQloud.Repository.Remote;
 using GreenQloud.Persistence;
 using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
 
 namespace GreenQloud.Synchrony
 {
@@ -12,11 +13,9 @@ namespace GreenQloud.Synchrony
     {
         Thread threadSync;
         bool eventsCreated;
+
         DateTime LastSyncTime;
 
-        
-        
-  
         public RemoteEventsSynchronizer  
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
             base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
@@ -45,13 +44,18 @@ namespace GreenQloud.Synchrony
 
         public void AddEvents ()
         {
+
             if (!ready)
                 return;
             ready = false;
             if (LastSyncTime == new DateTime())
                 LastSyncTime = DateTime.Now.Subtract(new TimeSpan (0,0,30));
+            DateTime time = LastSyncTime;
+            LastSyncTime = DateTime.Now;
 
-            foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems (LastSyncTime)){
+            foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems (time)){
+
+
                     bool exists = physicalLocalRepository.Exists (remoteItem);
                     if (exists){
                         if (!physicalLocalRepository.IsSync (remoteItem))
@@ -102,9 +106,8 @@ namespace GreenQloud.Synchrony
                         }
                     }
                 }
+           foreach (RepositoryItem localItem in physicalLocalRepository.Items) {
 
-
-            foreach (RepositoryItem localItem in physicalLocalRepository.Items) {
                 if (!remoteRepository.Exists(localItem)){
                     Event e = new Event ();
 
@@ -117,7 +120,7 @@ namespace GreenQloud.Synchrony
                 }
             }  
             eventsCreated = true;
-            LastSyncTime = DateTime.Now;
+
             ready = true;
         }
 

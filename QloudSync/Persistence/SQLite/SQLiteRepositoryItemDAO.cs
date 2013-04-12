@@ -36,13 +36,22 @@ namespace GreenQloud.Persistence.SQLite
         }
         #endregion
 
+        public bool IsFolder (RepositoryItem item)
+        {
+            if (Exists(item))
+            {
+                string ID =  GetId (item);
+                return GetById (int.Parse(ID)).IsAFolder;
+            }
+            return true;
+        }
+
         public bool Exists (RepositoryItem item)
         {
-            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE NAME = \"{0}\" AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name, item.RelativePath, item.Repository.Path);
+            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE NAME = \"{0}\"  AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name, item.RelativePath, item.Repository.Path);
            
             return Select(sql).Count != 0 ;
         }
-
 
 
         public void Remove (RepositoryItem item)
@@ -56,7 +65,7 @@ namespace GreenQloud.Persistence.SQLite
         {
 
             if (Exists (item)){
-                return Select(string.Format("SELECT * FROM REPOSITORYITEM WHERE NAME = \"{0}\" AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name, item.RelativePath, item.Repository.Path))[0].Id;
+                return Select(string.Format("SELECT * FROM REPOSITORYITEM WHERE  NAME = \"{0}\" AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name,  item.RelativePath, item.Repository.Path))[0].Id;
             }
             return "";
         }

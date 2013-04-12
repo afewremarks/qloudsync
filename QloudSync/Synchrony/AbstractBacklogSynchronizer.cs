@@ -25,6 +25,7 @@ using GreenQloud.Repository.Local;
         public new void Synchronize (){
             List<RepositoryItem> itensInRemoteRepository = remoteRepository.Items;
             List<RepositoryItem> filesInPhysicalLocalRepository = physicalLocalRepository.Items;
+            eventDAO.RemoveAllUnsynchronized();
             
             foreach (RepositoryItem remoteItem in itensInRemoteRepository) {
                
@@ -105,7 +106,10 @@ using GreenQloud.Repository.Local;
             TimeSpan diffClocks = remoteRepository.DiffClocks;
 
             RepositoryItem physicalObjectVersion = physicalLocalRepository.CreateItemInstance (remoteObj.FullLocalName);
-            
+
+            if(physicalObjectVersion.TimeOfLastChange==new DateTime())
+                return RepositoryType.REMOTE;
+
             DateTime referencialClock = physicalObjectVersion.TimeOfLastChange.Subtract (diffClocks);
 
             if (referencialClock.Subtract (Convert.ToDateTime (remoteObj.TimeOfLastChange)).TotalSeconds > -1) 

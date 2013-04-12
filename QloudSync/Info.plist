@@ -20,5 +20,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>CFBundleShortVersionString</key>
+	<string>RC 1.2.0e</string>
 </dict>
 </plist>

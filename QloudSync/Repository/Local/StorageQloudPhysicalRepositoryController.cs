@@ -28,54 +28,24 @@ namespace GreenQloud.Repository.Local
 
         public override bool Exists (RepositoryItem item)
         {
-            return File.Exists (item.FullLocalName) || Directory.Exists (item.FullLocalName);
-        }
+            bool exists = File.Exists (item.FullLocalName) || Directory.Exists (item.FullLocalName);
 
-        public override RepositoryItem CreateItemInstance (string itemFullName)
-        {
-            RepositoryItem item = new RepositoryItem ();
-            item.Repository = repoDAO.GetRepositoryByItemFullName(itemFullName);
-
-            if (File.Exists(itemFullName)){
-                item.Name = Path.GetFileName(itemFullName);
-                item.RelativePath = Path.GetDirectoryName(itemFullName).Replace (item.Repository.Path, string.Empty);
-                if(item.RelativePath.EndsWith("/"))
-                    item.RelativePath = item.RelativePath.Substring(0, item.RelativePath.Length-2);
-                item.IsAFolder = false;
-            }
-            else if(Directory.Exists (itemFullName)){   
-                itemFullName += "/";
-                DirectoryInfo dir = new DirectoryInfo(itemFullName);
-                item.Name = dir.Name+"/";
-                item.IsAFolder = true;
-                item.RelativePath = itemFullName.Replace (item.Repository.Path+"/", string.Empty).Replace(item.Name, string.Empty);
-            }
-
-            return item;
-        }
-
-        public RepositoryItem CreateItemInstance (string itemFullName, string name, LocalRepository repo, bool isAFolder)
-        {
-            RepositoryItem item = new RepositoryItem ();
-            item.Repository = repo;
-            item.Name = name;
-            item.IsAFolder = isAFolder;
-            if (itemFullName == repo.Path)
-                item.RelativePath = "";
-            else
-                item.RelativePath = itemFullName.Replace (item.Repository.Path+"/", string.Empty);
-            return item;
+            return exists;
         }
 
         public override void Delete (RepositoryItem item)
         {
+            try{
             string path = Path.Combine(RuntimeSettings.TrashPath, item.Name);
 
             if (item.IsAFolder)
             {
                 if(Directory.Exists(path)){
+                    if (path.EndsWith ("/"))
+                        path = path.Substring (0, path.Length-1);
                     Directory.Move (path, path+" "+DateTime.Now.ToString("dd.mm.ss tt"));
                 }else{
+                    CreatePath (path);
                     Directory.Move (item.FullLocalName, path);                   
                 }
             }
@@ -88,6 +58,34 @@ namespace GreenQloud.Repository.Local
                     CreatePath (path);
                     File.Move(item.FullLocalName, path);
                 }
+            }
+            }catch (IOException ioex){
+                Console.WriteLine (ioex.Message);
+                Delete (item);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             }
         }
 
@@ -122,13 +120,13 @@ namespace GreenQloud.Repository.Local
                 List<RepositoryItem> list = new List<RepositoryItem>();
                 if(dir.Exists){
                     foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ()) {
-                        RepositoryItem localFile = CreateItemInstance(fileInfo.DirectoryName, fileInfo.Name, repo, false);
+                        RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName(fileInfo.FullName), fileInfo.FullName, false, fileInfo.Length, fileInfo.LastWriteTime);
                         if(!localFile.IsIgnoreFile)
                             list.Add (localFile);
                     }
                     
                     foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
-                        RepositoryItem localFile = CreateItemInstance(fileInfo.Parent.FullName, fileInfo.Name+"/", repo, true);
+                        RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, DateTime.Now);
                         list.Add (localFile);
                     }
                 }
@@ -139,11 +137,23 @@ namespace GreenQloud.Repository.Local
                 return null;
             }
         }
+
+        public override RepositoryItem CreateItemInstance (string fullLocalName)
+        {
+            FileInfo file = new FileInfo (fullLocalName);
+            if (file.Exists){
+                return RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fullLocalName), fullLocalName, false, file.Length, file.LastWriteTime);
+            }
+            throw new NotImplementedException ();
+        }
+
         #endregion
 
         public void CreateFolder(RepositoryItem item){
-            if (!Exists(item))
+            if (!Exists(item)){
+                CreatePath (item.FullLocalName);
                 Directory.CreateDirectory (item.FullLocalName);
+            }
         }
 
         void CreatePath (string path)
