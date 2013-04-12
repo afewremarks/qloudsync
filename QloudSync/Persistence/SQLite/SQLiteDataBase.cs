@@ -15,19 +15,10 @@ namespace GreenQloud.Persistence.SQLite{
         public SQLiteDatabase(){
         }
 
-        public string PathToDataBase{
-            get{
-                string databaseName = "QloudSync.db";
-                string folder = Path.Combine(RuntimeSettings.ConfigPath, "Db");
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory (folder);
-                return Path.Combine(folder, databaseName);
-            }
-        }
         
         public string ConnectionString{
             get{
-                return String.Format("URI=file:{0};Version=3;", PathToDataBase);;
+                return String.Format("URI=file:{0};Version=3;", RuntimeSettings.DatabaseFile);;
             }
         }
         
