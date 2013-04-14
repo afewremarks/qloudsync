@@ -62,30 +62,9 @@ namespace GreenQloud.Repository.Local
             }catch (IOException ioex){
                 Console.WriteLine (ioex.Message);
                 Delete (item);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            }
+            catch (Exception e){
+                Console.WriteLine (e.GetType() +" "+ e.Message);
             }
         }
 
@@ -126,6 +105,8 @@ namespace GreenQloud.Repository.Local
                     }
                     
                     foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
+                        if (fileInfo.Name.Contains ("untitled folder")) 
+                            continue;
                         RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, DateTime.Now);
                         list.Add (localFile);
                     }
