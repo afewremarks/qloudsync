@@ -47,6 +47,8 @@ namespace GreenQloud.Synchrony
 
             if (!ready)
                 return;
+            if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
+                return;
             ready = false;
             if (LastSyncTime == new DateTime())
                 LastSyncTime = DateTime.Now.Subtract(new TimeSpan (0,0,30));

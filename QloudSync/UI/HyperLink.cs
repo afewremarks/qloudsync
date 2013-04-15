@@ -43,7 +43,7 @@ namespace GreenQloud
         
         public override void MouseUp (NSEvent e)
         {
-            //Program.Controller.OpenWebsite (this.url.ToString ());
+            Program.Controller.OpenWebsite (this.url.ToString ());
         }
         
         

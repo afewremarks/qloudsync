@@ -93,11 +93,12 @@ namespace GreenQloud.Persistence.SQLite
                 sql = string.Format (query, RepositoryType.LOCAL, e.Item.Id);
             }
             List<Event> list = Select (sql);
-            if (list.Any (ev=> ev.InsertTime >  limitDate || !e.Synchronized)){
+
+            if(list.Any(ev=>ev.InsertTime >  limitDate || !ev.Synchronized)){
                 return true;
             }
-            return false;
 
+            return false;
         }
         
         public bool Exists (Event e)
