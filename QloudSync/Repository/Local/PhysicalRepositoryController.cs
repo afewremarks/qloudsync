@@ -29,6 +29,8 @@ namespace GreenQloud.Repository.Local
         public abstract bool IsSync (RepositoryItem item);
 
         public abstract RepositoryItem CreateItemInstance (string fullLocalName);
+
+        public abstract List<RepositoryItem> GetSubRepositoyItems (RepositoryItem item);
     }
 }
 
