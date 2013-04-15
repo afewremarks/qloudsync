@@ -90,7 +90,7 @@ namespace GreenQloud.Persistence.SQLite
                 sql = string.Format (query, RepositoryType.REMOTE, e.Item.Id);
             }
             else{
-                sql = string.Format (query, RepositoryType.REMOTE, e.Item.Id);
+                sql = string.Format (query, RepositoryType.LOCAL, e.Item.Id);
             }
             List<Event> list = Select (sql);
             if (list.Any (ev=> ev.InsertTime >  limitDate || !e.Synchronized)){
