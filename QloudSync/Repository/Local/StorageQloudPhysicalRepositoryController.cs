@@ -61,8 +61,7 @@ namespace GreenQloud.Repository.Local
                 }
             }
             }catch (IOException ioex){
-                Console.WriteLine (ioex.Message);
-                Delete (item);
+
             }
             catch (Exception e){
                 Console.WriteLine (e.GetType() +" "+ e.Message);
