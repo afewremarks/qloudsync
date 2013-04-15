@@ -125,7 +125,7 @@ namespace GreenQloud.Test
             e.RepositoryType = RepositoryType.REMOTE;
            
             
-            Assert.False(eventDAO.NotExistsConflict(e));  
+            Assert.True(eventDAO.ExistsConflict(e));  
         }
 
         [Test()]
@@ -154,7 +154,7 @@ namespace GreenQloud.Test
             eventDAO.Create (e);
             
             
-            Assert.True(eventDAO.NotExistsConflict(e));  
+            Assert.False(eventDAO.ExistsConflict(e));  
         }
 
 

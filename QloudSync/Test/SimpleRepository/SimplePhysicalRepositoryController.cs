@@ -73,8 +73,13 @@ namespace GreenQloud.Test.SimpleRepository
                 return null;
         }
 
+        public override List<RepositoryItem> GetSubRepositoyItems (RepositoryItem item)
+        {
+            throw new NotImplementedException ();
+        }
 
         #endregion
+
 
         public void Create (RepositoryItem  item)
         {
