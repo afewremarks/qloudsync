@@ -61,15 +61,24 @@ namespace GreenQloud.Synchrony
                     }
                     else{
                         e.EventType = EventType.CREATE;
+                        CreateSubEvents(e);
                     }
                 }
             }else{
                 e.EventType = EventType.DELETE;
             }
-            Console.WriteLine ("LocalEvents found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName);
-
             return e;
             
+        }
+
+        void CreateSubEvents (Event e)
+        {
+            foreach(RepositoryItem item in physicalLocalRepository.GetSubRepositoyItems(e.Item)){
+                eventDAO.Create (new Event(){
+                    Item = item,
+                    EventType = e.EventType,
+                    RepositoryType = e.RepositoryType
+                });            }
         }
 
         #region implemented abstract members of Synchronizer

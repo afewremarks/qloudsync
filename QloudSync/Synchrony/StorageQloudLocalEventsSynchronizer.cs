@@ -91,10 +91,10 @@ namespace GreenQloud.Synchrony
                 double seconds = DateTime.Now.Subtract(LastTimeSync).TotalSeconds;
                 bool itemsEquals = e.Item.FullLocalName == LastLocalEvent.Item.FullLocalName;
  
-                if (itemsEquals && seconds < 60){
-                    Logger.LogInfo ("StorageQloudLocalEventsSynchronizer", "An event duplicate has been identified and ignored");
-                    return;
-                }
+//                if (itemsEquals && seconds < 60){
+//                    Logger.LogInfo ("StorageQloudLocalEventsSynchronizer", "An event duplicate has been identified and ignored");
+//                    return;
+//                }
                 Logger.LogInfo ("StorageQloudLocalEventsSynchronizer", string.Format("An event has been identified to {0}", e.Item.FullLocalName));
                 eventDAO.CreateWithoutType(e);
                 Synchronize(e);

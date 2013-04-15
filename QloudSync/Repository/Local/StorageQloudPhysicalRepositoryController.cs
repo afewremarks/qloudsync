@@ -37,7 +37,8 @@ namespace GreenQloud.Repository.Local
         {
             try{
             string path = Path.Combine(RuntimeSettings.TrashPath, item.Name);
-
+            if (!Exists(item))
+                    return;
             if (item.IsAFolder)
             {
                 if(Directory.Exists(path)){
@@ -126,6 +127,18 @@ namespace GreenQloud.Repository.Local
                 return RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fullLocalName), fullLocalName, false, file.Length, file.LastWriteTime);
             }
             throw new NotImplementedException ();
+        }
+
+        public override List<RepositoryItem> GetSubRepositoyItems (RepositoryItem item)
+        {
+            List<RepositoryItem> list = new List<RepositoryItem>();
+            if (item.IsAFolder){
+                if (Directory.Exists (item.FullLocalName)){
+                    LocalRepository repo = new LocalRepository (item.FullLocalName);
+                    list = GetItens (repo);
+                }
+            }
+            return list;
         }
 
         #endregion
