@@ -176,7 +176,6 @@
     <Compile Include="Test\SQLiteRepositoryItemDAOTest.cs" />
     <Compile Include="Test\SQLiteEventDAOTest.cs" />
     <Compile Include="UI\SparkleUI.cs" />
->>>>>>> version RC 1.2
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">
