@@ -120,9 +120,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Config\Preferences.cs" />
     <Compile Include="Exception\AccessDeniedException.cs" />
-<<<<<<< HEAD
     <Compile Include="Exception\DisconnectionException.cs" />
-=======
     <Compile Include="Persistence\TransferDAO.cs" />
     <Compile Include="Test\BacklogSynchronizerTest.cs" />
     <Compile Include="Exception\PhysicalLocalRepositoryException.cs" />
