@@ -56,8 +56,10 @@ namespace GreenQloud.Persistence.SQLite
 
         public override void CreateWithoutType (Event e){
             e.Item = repositoryItemDAO.Create (e);
-            string sql = string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME) VALUES (\"{0}\", \"NULL\", \"{1}\", \"{2}\", \"{3}\")", e.Item.Id, e.RepositoryType.ToString(), bool.FalseString, DateTime.Now.ToString());
-            database.ExecuteNonQuery (sql);
+            if (!ExistsConflict(e)){
+                string sql = string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME) VALUES (\"{0}\", \"NULL\", \"{1}\", \"{2}\", \"{3}\")", e.Item.Id, e.RepositoryType.ToString(), bool.FalseString, DateTime.Now.ToString());
+                database.ExecuteNonQuery (sql);
+            }
         }
 
         public override void SetEventType (Event e)
@@ -77,9 +79,6 @@ namespace GreenQloud.Persistence.SQLite
 
         #endregion
 
-
-        //se existe um evento no repositorio contrario nao sincronizado ou que acabou de ocorrer, existe conflito
-
         public bool ExistsConflict (Event e)
         {
             string query = "SELECT * FROM EVENT WHERE REPOSITORY= \"{0}\" AND ITEMID = \"{1}\"";
@@ -92,6 +91,7 @@ namespace GreenQloud.Persistence.SQLite
             else{
                 sql = string.Format (query, RepositoryType.LOCAL, e.Item.Id);
             }
+
             List<Event> list = Select (sql);
 
             if(list.Any(ev=>ev.InsertTime >  limitDate || !ev.Synchronized)){
