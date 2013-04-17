@@ -19,6 +19,7 @@ namespace GreenQloud {
 
         public SparkleSetupController Controller = new SparkleSetupController ();
 
+        private NSButton RegisterButton;
         private NSButton ContinueButton;
         private NSButton TryAgainButton;
         private NSButton CancelButton;
@@ -32,6 +33,7 @@ namespace GreenQloud {
         private NSTextField EmailLabel;
         private NSTextField FullNameTextField;
         private NSTextField FullNameLabel;
+        private NSTextField DescriptionText;
         private NSTextField WarningTextField;
         private NSImage WarningImage;
         private NSImageView WarningImageView;
@@ -69,29 +71,43 @@ namespace GreenQloud {
                 Header      = string.Format("Welcome to {0} for StorageQloud™!", GlobalSettings.ApplicationName);
                 Description = "";
 
-                string pretext = "<div style='font-size: 10pt; font-family: \"Lucida Grande\";'>With QloudSync you can sync your photos, music, documents and movies to and from your computer to StorageQloud, " +
-                    "the truly green cloud storage run on 100% renewable energy! All you need to get started is a GreenQloud Username and Password. " +
-                    "Don't have one? No problem! Click ";
-                    string linktext = "here";
-                    string postext =" to register in one easy step it's totally free to try.</div>";
+                //string pretext = "<div style='font-size: 10pt; font-family: \"Lucida Grande\";'>With QloudSync you can sync your photos, music, documents and movies to and from your computer to StorageQloud, " +
+                //    "the truly green cloud storage run on 100% renewable energy! All you need to get started is a GreenQloud Username and Password. " +
+                //    "Don't have one? No problem! Click on the register button below to register in one easy step, it's totally free to try.</div>";
+                    
 
-                hDescription = new HyperLink (pretext, linktext, postext, "https://my.greenqloud.com/registration", ""){
-                    Frame           = new RectangleF (190, Frame.Height - 210, 640 - 240, 105)
+               // hDescription = new HyperLink (pretext, "", "", "", ""){
+               //   Frame           = new RectangleF (190, Frame.Height - 230, 640 - 240, 125)
+               // };
+
+                    DescriptionText = new NSTextField () {
+                    Alignment       = NSTextAlignment.Justified,
+                    BackgroundColor = NSColor.WindowBackground,
+                    Bordered        = false,
+                    Editable        = false,
+                    Frame           = new RectangleF (190, Frame.Height - 230, 640 - 240, 125),
+                    StringValue     = "With QloudSync you can sync your photos, music, documents and movies to and from your computer to StorageQloud, " +
+                    "the truly green cloud storage run on 100% renewable energy! All you need to get started is a GreenQloud Username and Password. " +
+                    "Don't have one? No problem! Click on the register button below to register in one easy step, it's totally free to try.",
+                                       
+                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                       "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
                 };
+
 
                 FullNameLabel = new NSTextField () {
                     Alignment       = NSTextAlignment.Right,
                     BackgroundColor = NSColor.WindowBackground,
                     Bordered        = false,
                     Editable        = false,
-                    Frame           = new RectangleF (165, Frame.Height - 254, 160, 17),
+                    Frame           = new RectangleF (165, Frame.Height - 262, 160, 17),
                     StringValue     = "Username:",
                     Font            = NSFontManager.SharedFontManager.FontWithFamily (
                         "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
                 };
 
                 FullNameTextField = new NSTextField () {
-                    Frame       = new RectangleF (330, Frame.Height - 258, 196, 22),
+                    Frame       = new RectangleF (330, Frame.Height - 266, 196, 22),
                     Delegate    = new SparkleTextFieldDelegate ()
                 };
 
@@ -100,14 +116,15 @@ namespace GreenQloud {
                     BackgroundColor = NSColor.WindowBackground,
                     Bordered        = false,
                     Editable        = false,
-                    Frame           = new RectangleF (165, Frame.Height - 284, 160, 17),
+                    Frame           = new RectangleF (165, Frame.Height - 296, 160, 17),
+
                     StringValue     = "Password:",
                     Font            = NSFontManager.SharedFontManager.FontWithFamily (
                         "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
                 };
 
                 NSSecureTextField PasswordTextField = new NSSecureTextField(){
-                    Frame       = new RectangleF (330, Frame.Height - 288, 196, 22),
+                    Frame       = new RectangleF (330, Frame.Height - 300, 196, 22),
                     Delegate    = new SparkleTextFieldDelegate (),
                 };
 
@@ -129,6 +146,10 @@ namespace GreenQloud {
                     Title = "Cancel"
                 };
 
+                RegisterButton = new NSButton () {
+                    Title = "Register"
+                };
+
                 ContinueButton = new NSButton () {
                     Title    = "Continue",
                     Enabled  = false
@@ -139,6 +160,10 @@ namespace GreenQloud {
                         ContinueButton.Enabled = false;
                     else
                         ContinueButton.Enabled = true;
+                };
+
+                RegisterButton.Activated += delegate {
+                    Program.Controller.OpenWebsite("https://my.greenqloud.com/registration");
                 };
 
                 CancelButton.Activated += delegate {
@@ -158,7 +183,7 @@ namespace GreenQloud {
                     }
                 };
 
-                ContentView.AddSubview (hDescription);
+                ContentView.AddSubview (DescriptionText);
                 ContentView.AddSubview (FullNameLabel);
                 ContentView.AddSubview (FullNameTextField);
                 ContentView.AddSubview (EmailLabel);
@@ -167,6 +192,7 @@ namespace GreenQloud {
 
                 Buttons.Add (ContinueButton);
                 Buttons.Add (CancelButton);
+                Buttons.Add (RegisterButton);
             }
 
             if (type == PageType.Syncing) {
