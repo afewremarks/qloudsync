@@ -9,6 +9,5 @@ obj/
 *.tiff
 *.psd
 *.am
-lib/
 
 QloudSync/test-results/
