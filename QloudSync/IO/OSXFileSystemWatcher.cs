@@ -69,6 +69,7 @@ namespace GreenQloud
 
                 string pcatched = paths[i];
 
+                //TODO Put the list in file configuration
                 if(!pcatched.EndsWith (".DS_Store") && !pcatched.Contains(".sb-") && !pcatched.Contains("untitled folder")){
                         handler(pcatched);
                 }
