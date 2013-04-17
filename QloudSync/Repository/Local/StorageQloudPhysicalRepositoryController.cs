@@ -64,7 +64,7 @@ namespace GreenQloud.Repository.Local
 
             }
             catch (Exception e){
-                Console.WriteLine (e.GetType() +" "+ e.Message);
+
             }
         }
 

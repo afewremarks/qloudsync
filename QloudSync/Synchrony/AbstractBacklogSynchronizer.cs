@@ -65,7 +65,6 @@ using GreenQloud.Repository.Local;
                 e.EventType = EventType.CREATE;
                 e.RepositoryType = RepositoryType.LOCAL;
             }
-            Console.WriteLine ("Backlog found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName);
             return e;
         }
 
@@ -97,7 +96,6 @@ using GreenQloud.Repository.Local;
                     e.RepositoryType = RepositoryType.REMOTE;
                 }
             }
-            Console.WriteLine ("Backlog found an event: {0} {1} {2}", e.EventType, e.RepositoryType, e.Item.FullLocalName);
             return e;
         }
 

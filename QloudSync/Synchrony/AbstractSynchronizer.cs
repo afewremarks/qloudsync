@@ -92,7 +92,7 @@ namespace GreenQloud.Synchrony
 
 
         void Synchronize(Event e){
-            Console.WriteLine ("\nSynchronizing: {0} {1} {2} {3}\n",e.EventType, e.RepositoryType, e.Item.FullLocalName, e.Synchronized);
+            Console.WriteLine ("\nSynchronizing: {0} {1} {2}\n",e.EventType, e.RepositoryType, e.Item.FullLocalName);
 
             Transfer transfer = null;
             if (e.RepositoryType == RepositoryType.LOCAL){
