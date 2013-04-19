@@ -349,6 +349,7 @@ namespace GreenQloud {
 
 
         public void HandleDisconnection(){
+            Console.WriteLine("Disconnected!");
             ErrorType = ERROR_TYPE.DISCONNECTION;
             OnError ();
             localSynchronizer.Stop ();
