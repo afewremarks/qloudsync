@@ -163,7 +163,7 @@ namespace GreenQloud {
                 };
 
                 RegisterButton.Activated += delegate {
-                    Program.Controller.OpenWebsite("https://my.greenqloud.com/registration");
+                    Program.Controller.OpenWebsite("https://my.greenqloud.com/registration/qloudsync");
                 };
 
                 CancelButton.Activated += delegate {
@@ -269,7 +269,7 @@ namespace GreenQloud {
             }
             if (type == PageType.Finished) {
                 Header      = "Your shared project is ready!";
-                Description = string.Format("You can find the files in your {0} folder.", GlobalSettings.ApplicationName);
+                Description = string.Format("You can find the files in your {0} folder.", GlobalSettings.HomeFolderName);
 
 
                 if (warnings.Length > 0) {
