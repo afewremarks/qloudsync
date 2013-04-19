@@ -109,6 +109,7 @@ namespace GreenQloud.Synchrony
                 case EventType.CREATE: 
                 case EventType.UPDATE:
                 case EventType.COPY:
+                case EventType.MOVE_OR_RENAME:
                     SyncStatus = SyncStatus.DOWNLOADING;
                     transfer = remoteRepository.Download (e.Item);
                     break;
