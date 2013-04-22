@@ -21,6 +21,8 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>CFBundleShortVersionString</key>
-	<string>RC 1.2.0h</string>
+	<string>RC 1.2.1</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>GreenQloud</string>
 </dict>
 </plist>
