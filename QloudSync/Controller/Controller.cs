@@ -106,20 +106,63 @@ namespace GreenQloud {
                     Directory.CreateDirectory (RuntimeSettings.DatabaseFolder);
                 new Persistence.SQLite.SQLiteDatabase().CreateDataBase();
             }
-
+            
             if (File.Exists (RuntimeSettings.BacklogFile))
                 File.Delete(RuntimeSettings.BacklogFile);
-
-            if (FirstRun) {
-                ShowSetupWindow (PageType.Login);
-                foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
-                    File.Delete (f);
-            } else {
-                backlogSynchronizer.Start();
-                InitializeSynchronizers();
+            
+            bool available = InitOSInfoString() == "10.8";
+            if(available){
+                if (FirstRun) {
+                    ShowSetupWindow (PageType.Login);
+                    foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
+                        File.Delete (f);
+                } else {
+                    backlogSynchronizer.Start();
+                    InitializeSynchronizers();
+                }
+            }
+            else{
+                var alert = new NSAlert {
+                    MessageText = "QloudSync is only available to OSX Mountain Lion.",
+                    AlertStyle = NSAlertStyle.Informational
+                };
+                
+                alert.AddButton ("OK");
+                
+                var returnValue = alert.RunModal();
+                Quit ();
             }
         }
-       
+        
+        [System.Runtime.InteropServices.DllImport("/System/Library/Frameworks/CoreServices.framework/CoreServices")]
+        internal static extern short Gestalt(int selector, ref int response);
+        static string m_OSInfoString = null;
+        static string InitOSInfoString()
+        {
+            try{
+                //const int gestaltSystemVersion = 0x73797376;
+                const int gestaltSystemVersionMajor = 0x73797331;
+                const int gestaltSystemVersionMinor = 0x73797332;
+                const int gestaltSystemVersionBugFix = 0x73797333;
+                
+                int major = 0;
+                int minor = 0;
+                int bugFix = 0;
+                
+                Gestalt(gestaltSystemVersionMajor, ref major);
+                Gestalt(gestaltSystemVersionMinor, ref minor);
+                Gestalt(gestaltSystemVersionBugFix, ref bugFix);
+                
+                
+                
+                Console.WriteLine("Mac OS X/{0}.{1}.{2}", major, minor, bugFix);
+                return string.Format ("{0}.{1}", major, minor);}
+            catch (Exception e){
+                Console.WriteLine (e.Message);
+            }
+            return "";
+        }
+
 
         private void InitializeSynchronizers ()
         {
