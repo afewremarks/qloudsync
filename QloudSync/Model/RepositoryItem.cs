@@ -19,7 +19,6 @@ namespace GreenQloud.Model
         }
 
         public static RepositoryItem CreateInstance (LocalRepository repo, string fullPath, bool isFolder, long size, DateTime lastModified){
-
             if (fullPath.EndsWith ("/")){
                 fullPath = fullPath.Substring (0, fullPath.Length-1);
                 isFolder = true;
@@ -38,8 +37,15 @@ namespace GreenQloud.Model
 
             if (!repoPath.EndsWith ("/"))
                 repoPath += "/";
-
-            string relativePath = fullPath.Replace (repoPath, string.Empty).Replace(name, string.Empty);
+            string relativePath = "";
+            if (name == string.Empty)
+            {
+                //TODO
+            }else if(repoPath == string.Empty){
+                relativePath = fullPath.Replace (RuntimeSettings.HomePath, string.Empty).Replace(name, string.Empty);
+            }else {
+                relativePath = fullPath.Replace (repoPath, string.Empty).Replace(name, string.Empty);
+            }
             if (relativePath == "/")
                 relativePath = "";
             if (relativePath.StartsWith ("/"))
