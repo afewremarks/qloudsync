@@ -130,12 +130,7 @@ namespace GreenQloud.Persistence.SQLite{
                     dt.Rows.Add(row);
                 }
                 
-                reader.Close();
-                reader = null;
-                mycommand.Dispose();
-                mycommand = null;
-                cnn.Close();
-                cnn = null;
+                close(ref reader, ref cnn, ref mycommand);
             }
             catch (Exception e)
             {
@@ -156,7 +151,8 @@ namespace GreenQloud.Persistence.SQLite{
             SqliteCommand mycommand = new SqliteCommand(cnn);
             mycommand.CommandText = sql;
             int rowsUpdated = mycommand.ExecuteNonQuery();
-            cnn.Close();
+  
+            close(ref cnn, ref mycommand);
             return rowsUpdated;
         }
         
@@ -177,6 +173,9 @@ namespace GreenQloud.Persistence.SQLite{
             {
                 return value.ToString();
             }
+
+            close(ref cnn, ref mycommand);
+
             return "";
         }
         
@@ -301,6 +300,21 @@ namespace GreenQloud.Persistence.SQLite{
                 return false;
             }
         }       
+
+        private void close (ref SqliteConnection cnn, ref SqliteCommand mycommand)
+        {
+            mycommand.Dispose ();
+            mycommand = null;
+            cnn.Close ();
+            cnn = null;
+        }
+
+        private void close (ref SqliteDataReader reader, ref SqliteConnection cnn, ref SqliteCommand mycommand)
+        {
+            reader.Close ();
+            reader = null;
+            close(ref cnn, ref mycommand);
+        }
     }
 }
 
