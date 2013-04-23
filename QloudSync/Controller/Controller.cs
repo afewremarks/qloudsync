@@ -79,12 +79,15 @@ namespace GreenQloud {
             backlogSynchronizer.SyncStatusChanged +=HandleSyncStatusChanged;
             
             this.timer = new System.Timers.Timer (){
-                Interval = 60000
+                Interval = 10000
             };
             
             timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e)=>{
                 try{
-                    backlogSynchronizer.Synchronize();
+                    backlogSynchronizer.Start();
+                    // have to wait the synchronize finish
+                    while(backlogSynchronizer.Working);
+                    
                     timer.Stop();
                     localSynchronizer.Start();
                     remoteSynchronizer.Start ();
@@ -392,7 +395,6 @@ namespace GreenQloud {
 
 
         public void HandleDisconnection(){
-            Console.WriteLine("Disconnected!");
             ErrorType = ERROR_TYPE.DISCONNECTION;
             OnError ();
             localSynchronizer.Stop ();
