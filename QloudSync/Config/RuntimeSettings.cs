@@ -94,6 +94,17 @@ namespace GreenQloud
                 return Path.Combine (DatabaseFolder, ConfigurationManager.AppSettings ["DatabaseFile"]);
             }
         }
+
+        public static string DatabaseVersion {
+            get{
+                return ConfigurationManager.AppSettings ["DatabaseVersion"];
+            }
+        }
+        public static string DatabaseInfoFile {
+            get{
+                return Path.Combine (DatabaseFolder, ConfigurationManager.AppSettings ["DatabaseInfoFile"]);
+            }
+        }
     }
 }
 

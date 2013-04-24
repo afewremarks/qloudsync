@@ -108,6 +108,22 @@ namespace GreenQloud {
                 if (!Directory.Exists(RuntimeSettings.DatabaseFolder))
                     Directory.CreateDirectory (RuntimeSettings.DatabaseFolder);
                 new Persistence.SQLite.SQLiteDatabase().CreateDataBase();
+                File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
+            } else {
+                if (!File.Exists (RuntimeSettings.DatabaseInfoFile)){
+                    File.Delete(RuntimeSettings.DatabaseFile);
+                }else{
+                    string version = File.OpenText(RuntimeSettings.DatabaseInfoFile).ReadLine();
+                    if(Double.Parse(version) <  Double.Parse(RuntimeSettings.DatabaseVersion)){
+                        //TODO run migrations
+                        File.Delete(RuntimeSettings.DatabaseInfoFile);
+                        File.Delete(RuntimeSettings.DatabaseFile);
+                    } 
+                }
+                if(!File.Exists (RuntimeSettings.DatabaseFile)){
+                    new Persistence.SQLite.SQLiteDatabase().CreateDataBase();
+                    File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
+                }
             }
             
             if (File.Exists (RuntimeSettings.BacklogFile))

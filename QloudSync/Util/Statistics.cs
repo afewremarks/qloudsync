@@ -58,7 +58,7 @@ namespace GreenQloud
             string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
 
             string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hash={1}", Credential.Username, hash);
-            JObject data = GetInfo (uri);
+            JObject data = JSONHelper.GetInfo (uri);
             co2savings.Used = (string)data["used"];
             co2savings.Saved = (string)data["saved"];
             return co2savings;
@@ -66,26 +66,10 @@ namespace GreenQloud
 
         private static string GetVersionAvaliable(){
 
-            return (string)GetInfo ("https://my.greenqloud.com/qloudsync/version")["version"];
+            return (string)JSONHelper.GetInfo ("https://my.greenqloud.com/qloudsync/version")["version"];
         }
 
-        private static JObject GetInfo (string url)
-        {
-            System.Net.WebRequest myReq = System.Net.WebRequest.Create (url);
-            string receiveContent = string.Empty;
-            try {
-                using (System.Net.WebResponse wr = myReq.GetResponse ()) {
-                    Stream receiveStream = wr.GetResponseStream ();
-                    StreamReader reader = new StreamReader (receiveStream, System.Text.Encoding.UTF8);
-                    receiveContent = reader.ReadToEnd ();
-                
-                }
-                
-                return Newtonsoft.Json.Linq.JObject.Parse(receiveContent);
-            } catch {
-                return new JObject();
-            }
-        }
+  
     }
 }
 

@@ -54,7 +54,26 @@ namespace GreenQloud.Synchrony
                 LastSyncTime = DateTime.Now.Subtract(new TimeSpan (0,0,30));
             DateTime time = LastSyncTime;
             LastSyncTime = DateTime.Now;
-            foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems (time)){
+            string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
+            string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}", RuntimeSettings.DefaultBucketName, Credential.Username, hash);
+            foreach(Newtonsoft.Json.Linq.JObject jsonObject in JSONHelper.GetInfoArray(uri)){
+                Event e = new Event();
+                e.RepositoryType = RepositoryType.REMOTE;
+                e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
+                e.User = (string)jsonObject["username"];
+                e.Application = (string)jsonObject["application"];
+                e.ApplicationVersion = (string)jsonObject["applicationVersion"];
+                e.DeviceId = (string)jsonObject["deviceId"];
+                e.OS = (string)jsonObject["os"];
+                e.Bucket = (string)jsonObject["bucket"];
+                e.InsertTime = Convert.ToDateTime((string)jsonObject["createdDate"]);
+                string relativePath = (string)jsonObject["object"];
+                e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
+                e.Synchronized = false;
+                eventDAO.Create(e);
+            }
+
+        /*    foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems (time)){
                     bool exists = physicalLocalRepository.Exists (remoteItem);
 
                     if (exists){
@@ -101,20 +120,20 @@ namespace GreenQloud.Synchrony
                             eventDAO.Create (e);
                         }
                     }
-                }
-           foreach (RepositoryItem localItem in physicalLocalRepository.Items) {
-
-                if (!remoteRepository.Exists(localItem)){
-
-                    Event e = new Event ();
-
-                    e.Item = localItem;
-                    e.EventType = EventType.DELETE;
-                    e.RepositoryType = RepositoryType.REMOTE;
-                    e.Synchronized = false;
-                    eventDAO.Create (e);
-                }
-            }  
+                }*/
+//           foreach (RepositoryItem localItem in physicalLocalRepository.Items) {
+//
+//                if (!remoteRepository.Exists(localItem)){
+//
+//                    Event e = new Event ();
+//
+//                    e.Item = localItem;
+//                    e.EventType = EventType.DELETE;
+//                    e.RepositoryType = RepositoryType.REMOTE;
+//                    e.Synchronized = false;
+//                    eventDAO.Create (e);
+//                }
+//            }  
             eventsCreated = true;
 
             ready = true;

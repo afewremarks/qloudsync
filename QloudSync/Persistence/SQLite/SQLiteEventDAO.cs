@@ -27,7 +27,8 @@ namespace GreenQloud.Persistence.SQLite
             bool noConflicts = !ExistsConflict(e);
 
            if (noConflicts){
-                string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\")", e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, DateTime.Now.ToString());
+                string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
+                                          e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, DateTime.Now.ToString(), e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
                 database.ExecuteNonQuery (sql);
             }
         }
@@ -51,14 +52,6 @@ namespace GreenQloud.Persistence.SQLite
                 List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\"", bool.FalseString));
 
                 return list;
-            }
-        }
-
-        public override void CreateWithoutType (Event e){
-            e.Item = repositoryItemDAO.Create (e);
-            if (!ExistsConflict(e)){
-                string sql = string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME) VALUES (\"{0}\", \"NULL\", \"{1}\", \"{2}\", \"{3}\")", e.Item.Id, e.RepositoryType.ToString(), bool.FalseString, DateTime.Now.ToString());
-                database.ExecuteNonQuery (sql);
             }
         }
 
@@ -117,7 +110,12 @@ namespace GreenQloud.Persistence.SQLite
                 e.RepositoryType = (RepositoryType) Enum.Parse(typeof(RepositoryType),dr[3].ToString());
                 e.Synchronized = bool.Parse (dr[4].ToString());
                 e.InsertTime = Convert.ToDateTime (dr[5].ToString());
-                
+                e.User = dr[6].ToString();
+                e.Application = dr[7].ToString();
+                e.ApplicationVersion = dr[8].ToString();
+                e.DeviceId = dr[9].ToString();
+                e.OS = dr[10].ToString();
+                e.Bucket = dr[11].ToString();
                 events.Add (e);
             }
             return events;
