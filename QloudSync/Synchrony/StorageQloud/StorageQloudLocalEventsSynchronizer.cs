@@ -89,7 +89,6 @@ namespace GreenQloud.Synchrony
                 Event e = new Event();
                 e.Item = item;
                 e.RepositoryType = RepositoryType.LOCAL;
-                eventDAO.CreateWithoutType(e);
                 Synchronize(e);
                 
                 LastLocalEvent = e;

@@ -15,8 +15,6 @@ namespace GreenQloud.Persistence
         }
         public abstract void UpdateToSynchronized (Event e);
 
-        public abstract void CreateWithoutType (Event e);
-
         public abstract void SetEventType (Event e);
 
         public abstract void RemoveAllUnsynchronized ();

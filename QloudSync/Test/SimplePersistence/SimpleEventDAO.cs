@@ -39,12 +39,7 @@ namespace GreenQloud.Test.SimplePersistence
                 return list;
             }
         }
-
-        public override void CreateWithoutType (Event e)
-        {
-            throw new NotImplementedException ();
-        }
-
+       
         public override void SetEventType (Event e)
         {
             throw new NotImplementedException ();

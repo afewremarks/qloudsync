@@ -30,7 +30,7 @@ namespace GreenQloud.Synchrony
         }
 
         public void Synchronize (Event e){           
-            eventDAO.SetEventType (GetEventType (e));
+            eventDAO.Create (GetEventType (e));
             creatingEvent = true;
         }
 
@@ -67,6 +67,12 @@ namespace GreenQloud.Synchrony
             }else{
                 e.EventType = EventType.DELETE;
             }
+            e.User = Credential.Username;
+            e.Application = "QloudSync";
+            e.ApplicationVersion = GlobalSettings.RunningVersion;
+            e.DeviceId = "";
+            e.OS = "";
+            e.Bucket = RuntimeSettings.DefaultBucketName;
             return e;
             
         }
