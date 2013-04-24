@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Security.Cryptography;
+using System.Web;
 
 namespace GreenQloud
 {
@@ -17,7 +18,7 @@ namespace GreenQloud
             b64 = Convert.ToBase64String(hashValue);
             
             if (urlEncode)            
-                return Uri.EscapeUriString(b64);
+                return HttpUtility.UrlEncode(b64);
             else                            
                 return b64;
         }
