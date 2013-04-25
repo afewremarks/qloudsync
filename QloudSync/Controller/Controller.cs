@@ -89,7 +89,7 @@ namespace GreenQloud {
                     while(backlogSynchronizer.Working);
                     
                     timer.Stop();
-                    localSynchronizer.Start();
+                    //localSynchronizer.Start();
                     remoteSynchronizer.Start ();
                 }catch{
                     
@@ -186,7 +186,7 @@ namespace GreenQloud {
         private void InitializeSynchronizers ()
         {
 
-            localSynchronizer.Start();
+            //localSynchronizer.Start();
             remoteSynchronizer.Start();
                         
             remoteSynchronizer.ProgressChanged += delegate (double percentage, double speed) {

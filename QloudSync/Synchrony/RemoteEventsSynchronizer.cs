@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace GreenQloud.Synchrony
 {
@@ -28,6 +29,8 @@ namespace GreenQloud.Synchrony
 
         public new void Synchronize(){
             while (Working){
+                Console.WriteLine(this);
+                Thread.Sleep (20000);
                 if (eventsCreated){
                     eventsCreated = false;
                     if(SyncStatus == SyncStatus.IDLE){
@@ -38,7 +41,7 @@ namespace GreenQloud.Synchrony
         }
 
         bool ready=true;
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void AddEvents ()
         {
             if (!ready)
@@ -46,7 +49,6 @@ namespace GreenQloud.Synchrony
             if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
                 return;
             ready = false;
-            Thread.Sleep (20000);
             string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
             string time = eventDAO.LastSyncTime;
             Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
