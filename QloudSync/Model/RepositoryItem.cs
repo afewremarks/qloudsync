@@ -18,7 +18,7 @@ namespace GreenQloud.Model
            
         }
 
-        public static RepositoryItem CreateInstance (LocalRepository repo, string fullPath, bool isFolder, long size, DateTime lastModified){
+        public static RepositoryItem CreateInstance (LocalRepository repo, string fullPath, bool isFolder, long size, string lastModified){
             if (fullPath.EndsWith ("/")){
                 fullPath = fullPath.Substring (0, fullPath.Length-1);
                 isFolder = true;
@@ -56,7 +56,7 @@ namespace GreenQloud.Model
             return CreateInstance (repo, name, relativePath, isFolder, size, lastModified);
         }
 
-        public static RepositoryItem CreateInstance  (LocalRepository repo, string name, string path, bool isFolder, long size, DateTime lastModified){
+        public static RepositoryItem CreateInstance  (LocalRepository repo, string name, string path, bool isFolder, long size, string lastModified){
             RepositoryItem item = new RepositoryItem();
             item.Repository = repo;
             item.Name = name;
@@ -155,7 +155,7 @@ namespace GreenQloud.Model
         }
 
 
-        public DateTime TimeOfLastChange{
+        public string TimeOfLastChange{
             set;
             get;
         }

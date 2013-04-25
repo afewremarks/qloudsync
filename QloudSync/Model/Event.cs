@@ -38,7 +38,7 @@ using System;
             set; get;
         }
 
-        public DateTime InsertTime {
+        public string InsertTime {
             get;
             set;
         }

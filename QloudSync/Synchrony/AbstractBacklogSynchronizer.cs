@@ -105,13 +105,13 @@ using GreenQloud.Repository.Local;
 
             RepositoryItem physicalObjectVersion = physicalLocalRepository.CreateItemInstance (remoteObj.FullLocalName);
 
-            if(physicalObjectVersion.TimeOfLastChange==new DateTime())
+           // if(physicalObjectVersion.TimeOfLastChange==new DateTime())
                 return RepositoryType.REMOTE;
 
-            DateTime referencialClock = physicalObjectVersion.TimeOfLastChange.Subtract (diffClocks);
+           // DateTime referencialClock = physicalObjectVersion.TimeOfLastChange.Subtract (diffClocks);
 
-            if (referencialClock.Subtract (Convert.ToDateTime (remoteObj.TimeOfLastChange)).TotalSeconds > -1) 
-                return RepositoryType.LOCAL;
+            //if (referencialClock.Subtract (Convert.ToDateTime (remoteObj.TimeOfLastChange)).TotalSeconds > -1) 
+              //  return RepositoryType.LOCAL;
 
             return RepositoryType.REMOTE;
         }

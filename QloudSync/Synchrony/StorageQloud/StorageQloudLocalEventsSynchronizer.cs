@@ -34,6 +34,7 @@ namespace GreenQloud.Synchrony
         {
 
             RepositoryItem r = new RepositoryItem();
+            Console.WriteLine("Creating LocalEvents");
             r.Name = string.Empty;
             r.RelativePath = string.Empty;
             r.Repository = new LocalRepository (string.Empty);
@@ -43,6 +44,7 @@ namespace GreenQloud.Synchrony
                 foreach (LocalRepository repo in repositoryDAO.All){ 
                     OSXFileSystemWatcher watcher = new OSXFileSystemWatcher(repo.Path);
                     watcher.Changed += delegate(string path) {
+                        Console.WriteLine(path);
                         if(Working) 
                         {
                             try{
@@ -76,12 +78,12 @@ namespace GreenQloud.Synchrony
             LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (path);
 
             if (Directory.Exists(path)){
-                item = RepositoryItem.CreateInstance (repo, path, true, 0, DateTime.Now);
+                item = RepositoryItem.CreateInstance (repo, path, true, 0, DateTime.Now.ToString ());
             }
             else if (File.Exists (path)){
-                item = RepositoryItem.CreateInstance (repo, path, false, 0, DateTime.Now);
+                item = RepositoryItem.CreateInstance (repo, path, false, 0, DateTime.Now.ToString ());
             }else{
-                item = RepositoryItem.CreateInstance (repo, path, false, 0, DateTime.Now);
+                item = RepositoryItem.CreateInstance (repo, path, false, 0, DateTime.Now.ToString ());
                 item.IsAFolder = new SQLiteRepositoryItemDAO().IsFolder(item);
             }
 

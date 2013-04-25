@@ -87,7 +87,8 @@ namespace GreenQloud.Persistence.SQLite
 
             List<Event> list = Select (sql);
 
-            if(list.Any(ev=>ev.InsertTime >  limitDate || !ev.Synchronized)){
+            if(list.Any(ev=> DateTime.ParseExact(e.InsertTime, "MM/dd/yyyy hh:mm:ss", System.Globalization.CultureInfo.CurrentCulture)
+                        >limitDate || !ev.Synchronized)){
                 return true;
             }
 
@@ -109,7 +110,7 @@ namespace GreenQloud.Persistence.SQLite
                 e.EventType = (EventType) Enum.Parse(typeof(EventType), dr[2].ToString());
                 e.RepositoryType = (RepositoryType) Enum.Parse(typeof(RepositoryType),dr[3].ToString());
                 e.Synchronized = bool.Parse (dr[4].ToString());
-                e.InsertTime = Convert.ToDateTime (dr[5].ToString());
+                e.InsertTime = dr[5].ToString();
                 e.User = dr[6].ToString();
                 e.Application = dr[7].ToString();
                 e.ApplicationVersion = dr[8].ToString();

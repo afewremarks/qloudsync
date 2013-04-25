@@ -27,6 +27,7 @@ namespace GreenQloud.Persistence.SQLite{
             ExecuteNonQuery ("CREATE TABLE RepositoryItem (RepositoryItemID INTEGER PRIMARY KEY AUTOINCREMENT , Name ntext, RelativePath ntext, RepoPath ntext, IsFolder ntext, Deleted ntext)");
             ExecuteNonQuery ("CREATE TABLE EVENT (EventID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId ntext, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext, USER ntext, APPLICATION ntext, APPLICATION_VERSION ntext, DEVICE_ID ntext, OS ntext, BUCKET ntext)");
             ExecuteNonQuery ("CREATE TABLE TRANSFER (TransferID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId INTEGER, INITIALTIME ntext, ENDTIME ntext, TYPE ntext, STATUS ntext)");
+            ExecuteNonQuery (string.Format("INSERT INTO Repository (Path) VALUES (\"{0}\")", RuntimeSettings.HomePath));
         }
 
 
