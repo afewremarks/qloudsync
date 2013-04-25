@@ -134,7 +134,6 @@ namespace GreenQloud.Persistence.SQLite{
             }
             catch (Exception e)
             {
-                Console.WriteLine ("acontce "+e.Message);
                 Console.WriteLine (e.StackTrace);
                 throw new Exception(e.Message);
             }

@@ -126,7 +126,7 @@ namespace GreenQloud.Repository.Remote
                 else
                     destinationName = item.Name + "(1)";
                 
-                UpdateTrashFolder (item);            
+                //UpdateTrashFolder (item);            
                 
                 GenericCopy (RuntimeSettings.DefaultBucketName, item.AbsolutePath, item.TrashRelativePath, destinationName);
                 string key = item.AbsolutePath;
@@ -157,7 +157,7 @@ namespace GreenQloud.Repository.Remote
             } else {
                 key =  item.Name + "(1)";
             
-                UpdateTrashFolder (item);
+               // UpdateTrashFolder (item);
                 Logger.LogInfo ("Connection","Uploading the file "+key+" to trash.");
                 GenericUpload ( item.TrashRelativePath, key,  item.FullLocalName);
                 Logger.LogInfo ("Connection","File "+item.Name+" was sent to trash folder.");
