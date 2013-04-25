@@ -1,3 +1,4 @@
+
 using System;
 using System.Configuration;
 
@@ -40,6 +41,12 @@ namespace GreenQloud
         public static string SuffixNameBucket {
             get{
                 return ConfigurationManager.AppSettings ["SuffixNameBucket"];
+            }
+        }
+
+        public static string AvailableOSXVersion {
+            get{
+                return ConfigurationManager.AppSettings ["AvailableOSXVersion"];
             }
         }
         
