@@ -69,7 +69,6 @@ namespace GreenQloud.Persistence.SQLite{
                     col.ColumnName = reader.GetName(i);
                     dt.Columns.Add(col);
                 }
-                
                 while (reader.Read())
                 {
                     DataRow row = dt.NewRow();
@@ -135,6 +134,8 @@ namespace GreenQloud.Persistence.SQLite{
             }
             catch (Exception e)
             {
+                Console.WriteLine ("acontce "+e.Message);
+                Console.WriteLine (e.StackTrace);
                 throw new Exception(e.Message);
             }
             return dt;

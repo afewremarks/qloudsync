@@ -15,6 +15,12 @@ namespace GreenQloud.Test.SimplePersistence
         public List<Event> list = new List<Event>();
         #region implemented abstract members of EventDAO
 
+        public override string LastSyncTime {
+            get {
+                throw new NotImplementedException ();
+            }
+        }
+
         public override void Create (Event e)
         { 
             list.Add (e);
