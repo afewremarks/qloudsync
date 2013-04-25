@@ -15,8 +15,6 @@ namespace GreenQloud.Synchrony
         Thread threadSync;
         bool eventsCreated;
 
-        string LastSyncTime;
-
         public RemoteEventsSynchronizer  
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
             base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
@@ -24,7 +22,6 @@ namespace GreenQloud.Synchrony
             threadSync = new Thread(() =>{
                 Synchronize ();
             });
-            LastSyncTime = string.Empty;
         }
 
 
@@ -37,7 +34,6 @@ namespace GreenQloud.Synchrony
                         base.Synchronize ();
                     }
                 }
-                Thread.Sleep (10000);
             }
         }
 
@@ -50,9 +46,13 @@ namespace GreenQloud.Synchrony
             if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
                 return;
             ready = false;
+            Thread.Sleep (20000);
             string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
-            string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", RuntimeSettings.DefaultBucketName, Credential.Username, hash, LastSyncTime);
-            Logger.LogInfo("StorageQloud", "Looking for new changes");
+            string time = eventDAO.LastSyncTime;
+            Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
+
+            string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", RuntimeSettings.DefaultBucketName, Credential.Username, hash, time);
+
             foreach(Newtonsoft.Json.Linq.JObject jsonObject in JSONHelper.GetInfoArray(uri)){
                 Event e = new Event();
                 e.RepositoryType = RepositoryType.REMOTE;
@@ -68,25 +68,12 @@ namespace GreenQloud.Synchrony
                 e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
                 e.Synchronized = false;
                 eventDAO.Create(e);
-                LastSyncTime = e.InsertTime;
-                
-                UpdateLastSyncTime();
             }
             eventsCreated = true;
 
             ready = true;
         }
 
-        void UpdateLastSyncTime ()
-        {
-            int d = int.Parse (LastSyncTime.Substring(LastSyncTime.Length-2,2).ToString());
-
-            if (d!=59){
-                d++;
-            }
-            LastSyncTime = LastSyncTime.Substring(0,LastSyncTime.Length-2) + d.ToString();
-           
-        }
 
         public double InitFirstLoad ()
         {

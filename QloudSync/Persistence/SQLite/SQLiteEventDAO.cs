@@ -70,6 +70,28 @@ namespace GreenQloud.Persistence.SQLite
             }
         }
 
+        
+        public override string LastSyncTime{
+            get{
+                List<Event> events = Select("SELECT * FROM EVENT WHERE REPOSITORY = \"REMOTE\" ORDER BY INSERTTIME DESC LIMIT 1");
+                if(events.Count == 0)
+                    return string.Empty;
+
+                string time = events[0].InsertTime;
+                if(time == null)
+                    return string.Empty;
+                try{
+
+                    DateTime dtime =  Convert.ToDateTime(time);// DateTime.ParseExact(time, "dd/MM/yyyy hh:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                    return dtime.AddSeconds(1).ToString("MM/dd/yyyy hh:mm:ss");
+                }catch(Exception e )
+                {
+                    Console.WriteLine(e.Message);
+                }
+                return "";
+            }
+        }
+
         #endregion
 
         public bool ExistsConflict (Event e)
@@ -87,13 +109,23 @@ namespace GreenQloud.Persistence.SQLite
 
             List<Event> list = Select (sql);
 
-            if(list.Any(ev=> DateTime.ParseExact(e.InsertTime, "MM/dd/yyyy hh:mm:ss", System.Globalization.CultureInfo.CurrentCulture)
-                        >limitDate || !ev.Synchronized)){
-                return true;
+            foreach (Event ev in list)
+            {
+               if (!ev.Synchronized)
+                    return true;
+                if (e.InsertTime != null){
+                    try{
+
+                        if(Convert.ToDateTime(e.InsertTime)  >limitDate){
+                            return true;
+                        }
+                    }catch{}
+                }
             }
 
             return false;
         }
+
         
         public bool Exists (Event e)
         {

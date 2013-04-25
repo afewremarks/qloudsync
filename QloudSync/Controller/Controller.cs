@@ -129,7 +129,7 @@ namespace GreenQloud {
             if (File.Exists (RuntimeSettings.BacklogFile))
                 File.Delete(RuntimeSettings.BacklogFile);
             
-            bool available = InitOSInfoString() == "10.8";
+            bool available = double.Parse(InitOSInfoString()) >= double.Parse(GlobalSettings.AvailableOSXVersion);
             if(available){
                 if (FirstRun) {
                     ShowSetupWindow (PageType.Login);
