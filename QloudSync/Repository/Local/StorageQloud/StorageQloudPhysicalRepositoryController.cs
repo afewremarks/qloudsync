@@ -99,7 +99,7 @@ namespace GreenQloud.Repository.Local
                 List<RepositoryItem> list = new List<RepositoryItem>();
                 if(dir.Exists){
                     foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ()) {
-                        RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName(fileInfo.FullName), fileInfo.FullName, false, fileInfo.Length, fileInfo.LastWriteTime);
+                        RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName(fileInfo.FullName), fileInfo.FullName, false, fileInfo.Length, fileInfo.LastWriteTime.ToString());
                         if(!localFile.IsIgnoreFile)
                             list.Add (localFile);
                     }
@@ -107,7 +107,7 @@ namespace GreenQloud.Repository.Local
                     foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
                         if (fileInfo.Name.Contains ("untitled folder")) 
                             continue;
-                        RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, DateTime.Now);
+                        RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, DateTime.Now.ToString());
                         list.Add (localFile);
                     }
                 }
@@ -123,7 +123,7 @@ namespace GreenQloud.Repository.Local
         {
             FileInfo file = new FileInfo (fullLocalName);
             if (file.Exists){
-                return RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fullLocalName), fullLocalName, false, file.Length, file.LastWriteTime);
+                return RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fullLocalName), fullLocalName, false, file.Length, file.LastWriteTime.ToString());
             }
             throw new NotImplementedException ();
         }

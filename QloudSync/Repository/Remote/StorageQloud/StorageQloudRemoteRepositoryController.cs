@@ -373,7 +373,7 @@ namespace GreenQloud.Repository.Remote
                 repo = new LocalRepository(RuntimeSettings.HomePath);
             }
             RepositoryItem item = RepositoryItem.CreateInstance (repo,
-                                                                 s3item.Key, false, s3item.Size, Convert.ToDateTime(s3item.LastModified));
+                                                                 s3item.Key, false, s3item.Size, s3item.LastModified);
             item.RemoteMD5Hash = s3item.ETag.Replace("\"","");
             item.InTrash = s3item.Key.Contains (Constant.TRASH);
             return item;
