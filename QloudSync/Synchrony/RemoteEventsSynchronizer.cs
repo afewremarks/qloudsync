@@ -74,7 +74,7 @@ namespace GreenQloud.Synchrony
                 }
                 eventsCreated = true;
             } catch (Exception e){
-                Logger.LogInfo(e.Message)
+                Logger.LogInfo("ERROR", e);
             }
             ready = true;
         }
