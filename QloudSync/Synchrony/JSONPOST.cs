@@ -31,8 +31,9 @@ namespace GreenQloud
 
         public string getJSON (Event e)
         {
+
             string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(string.Format("https://my.greenqloud.com/qloudsync/{0}?username={1}&hash={2}&returnUrl=/storageQloud", Credential.Username, hash,RuntimeSettings.DefaultBucketName));
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(string.Format("https://my.greenqloud.com/qloudsync/history/{0}?username={1}&hash={2}",RuntimeSettings.DefaultBucketName, Credential.Username, hash));
             httpWebRequest.ContentType = "text/json";
             httpWebRequest.Method = "POST";
             string json = "";
@@ -41,8 +42,9 @@ namespace GreenQloud
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
 
+ 
                 json = "{\"action\":\""+e.EventType+"\"," +
-                    "\"application\":\""+GlobalSettings.ApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\"unknown\"," + "\"hash\":\""+hash+"\"," + "\"object\":\"" + e.Item.FullLocalName +"\"," + "\"os\":\"unknown\"," + "\"resultObject\":\"\"," + "\"username\":\""+Credential.Username+"\"}";
+                    "\"application\":\""+GlobalSettings.ApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\"unknown\"," + "\"hash\":\""+hash+"\"," + "\"object\":\"" + e.Item.FullLocalName +"\"," + "\"os\":\"unknown\"," + "\"resultObject\":\"test\"," + "\"username\":\""+Credential.Username+"\"}";
             
                 streamWriter.Write(json);
                 streamWriter.Flush();
@@ -52,9 +54,13 @@ namespace GreenQloud
                 var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
-                    var result = streamReader.ReadToEnd();
+                    
+                        var result = streamReader.ReadToEnd();
+
+                    
                 }
             return json;
+            
         }
     }
 
