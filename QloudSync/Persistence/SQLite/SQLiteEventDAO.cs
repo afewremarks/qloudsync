@@ -25,11 +25,15 @@ namespace GreenQloud.Persistence.SQLite
                 return;
             e.Item = repositoryItemDAO.Create (e);
             bool noConflicts = !ExistsConflict(e);
-
+//VETIRY THIS METHOD!
            if (noConflicts){
-                string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
-                                          e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, DateTime.Now.ToString(), e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
-                database.ExecuteNonQuery (sql);
+                try{
+                    string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
+                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, (e.InsertTime == null ? DateTime.Now.ToString() : e.InsertTime.ToString()), e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
+                    database.ExecuteNonQuery (sql);
+                }catch(Exception err){
+                    Logger.LogInfo("ERROR", err);
+                }
             }
         }
 
@@ -83,7 +87,7 @@ namespace GreenQloud.Persistence.SQLite
                 try{
 
                     DateTime dtime =  Convert.ToDateTime(time);// DateTime.ParseExact(time, "dd/MM/yyyy hh:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                    return dtime.AddSeconds(1).ToString("MM/dd/yyyy hh:mm:ss");
+                    return dtime.AddSeconds(1).ToString("MM/dd/yyyy HH:mm:ss");
                 }catch(Exception e )
                 {
                     Console.WriteLine(e.Message);
