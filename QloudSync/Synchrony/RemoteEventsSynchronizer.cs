@@ -44,35 +44,38 @@ namespace GreenQloud.Synchrony
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void AddEvents ()
         {
-            if (!ready)
-                return;
-            if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
-                return;
-            ready = false;
-            string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
-            string time = eventDAO.LastSyncTime;
-            Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
+            try{
+                if (!ready)
+                    return;
+                if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
+                    return;
+                ready = false;
+                string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
+                string time = eventDAO.LastSyncTime;
+                Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
 
-            string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", RuntimeSettings.DefaultBucketName, Credential.Username, hash, time);
+                string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", RuntimeSettings.DefaultBucketName, Credential.Username, hash, time);
 
-            foreach(Newtonsoft.Json.Linq.JObject jsonObject in JSONHelper.GetInfoArray(uri)){
-                Event e = new Event();
-                e.RepositoryType = RepositoryType.REMOTE;
-                e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
-                e.User = (string)jsonObject["username"];
-                e.Application = (string)jsonObject["application"];
-                e.ApplicationVersion = (string)jsonObject["applicationVersion"];
-                e.DeviceId = (string)jsonObject["deviceId"];
-                e.OS = (string)jsonObject["os"];
-                e.Bucket = (string)jsonObject["bucket"];
-                e.InsertTime = (string)jsonObject["createdDate"];
-                string relativePath = (string)jsonObject["object"];
-                e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
-                e.Synchronized = false;
-                eventDAO.Create(e);
+                foreach(Newtonsoft.Json.Linq.JObject jsonObject in JSONHelper.GetInfoArray(uri)){
+                    Event e = new Event();
+                    e.RepositoryType = RepositoryType.REMOTE;
+                    e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
+                    e.User = (string)jsonObject["username"];
+                    e.Application = (string)jsonObject["application"];
+                    e.ApplicationVersion = (string)jsonObject["applicationVersion"];
+                    e.DeviceId = (string)jsonObject["deviceId"];
+                    e.OS = (string)jsonObject["os"];
+                    e.Bucket = (string)jsonObject["bucket"];
+                    e.InsertTime = (string)jsonObject["createdDate"];
+                    string relativePath = (string)jsonObject["object"];
+                    e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
+                    e.Synchronized = false;
+                    eventDAO.Create(e);
+                }
+                eventsCreated = true;
+            } catch (Exception e){
+                Logger.LogInfo(e.Message)
             }
-            eventsCreated = true;
-
             ready = true;
         }
 

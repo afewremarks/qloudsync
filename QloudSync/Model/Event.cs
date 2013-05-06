@@ -6,7 +6,7 @@ using System;
         CREATE,
         UPDATE,
         DELETE,
-        MOVE_OR_RENAME,
+        MOVE,
         COPY,
         NULL
     }

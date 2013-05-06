@@ -53,7 +53,7 @@ namespace GreenQloud.Synchrony
             bool exists = physicalLocalRepository.Exists (e.Item);
             if (exists){
                 if (remoteRepository.ExistsCopies (e.Item)){
-                       e.EventType = EventType.MOVE_OR_RENAME;
+                       e.EventType = EventType.MOVE;
                 }
                 else{
                     if (remoteRepository.Exists (e.Item)){

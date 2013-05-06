@@ -133,7 +133,7 @@ namespace GreenQloud.Test
             
             Event e = eventDAO.EventsNotSynchronized [0];
             
-            Assert.AreEqual (EventType.MOVE_OR_RENAME, e.EventType);
+            Assert.AreEqual (EventType.MOVE, e.EventType);
             Assert.AreEqual (RepositoryType.REMOTE, e.RepositoryType);
         }
 
