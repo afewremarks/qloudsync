@@ -125,7 +125,7 @@ namespace GreenQloud.Synchrony
                 transferDAO.Create (transfer);
             logicalLocalRepository.Solve (e.Item);
             eventDAO.UpdateToSynchronized(e);
-            //new JSON_POST().send(e);
+            new JSON_POST().send(e);
         }
 
 
