@@ -25,11 +25,16 @@ namespace GreenQloud.Persistence.SQLite
                 return;
             e.Item = repositoryItemDAO.Create (e);
             bool noConflicts = !ExistsConflict(e);
-//VETIRY THIS METHOD!
+
            if (noConflicts){
                 try{
+                    string dateOfEvent =  e.InsertTime;
+                    if(dateOfEvent==null){
+                        dateOfEvent = DateTime.Now.ToString();
+                    }
+
                     string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
-                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, (e.InsertTime == null ? DateTime.Now.ToString() : e.InsertTime.ToString()), e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
+                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
                     database.ExecuteNonQuery (sql);
                 }catch(Exception err){
                     Logger.LogInfo("ERROR", err);
@@ -87,7 +92,7 @@ namespace GreenQloud.Persistence.SQLite
                 try{
 
                     DateTime dtime =  Convert.ToDateTime(time);// DateTime.ParseExact(time, "dd/MM/yyyy hh:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                    return dtime.AddSeconds(1).ToString("MM/dd/yyyy HH:mm:ss");
+                    return dtime.AddSeconds(1).ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");ToString();
                 }catch(Exception e )
                 {
                     Console.WriteLine(e.Message);
