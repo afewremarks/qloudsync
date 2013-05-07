@@ -92,7 +92,7 @@ namespace GreenQloud.Persistence.SQLite
                 try{
 
                     DateTime dtime =  Convert.ToDateTime(time);// DateTime.ParseExact(time, "dd/MM/yyyy hh:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                    return dtime.AddSeconds(1).ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");ToString();
+                    return dtime.AddSeconds(1).ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
                 }catch(Exception e )
                 {
                     Console.WriteLine(e.Message);
