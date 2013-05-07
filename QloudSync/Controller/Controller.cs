@@ -83,7 +83,7 @@ namespace GreenQloud {
             };
             
             timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e)=>{
-                /*try{
+                try{
                     backlogSynchronizer.Start();
                     // have to wait the synchronize finish
                     while(backlogSynchronizer.Working);
@@ -93,7 +93,7 @@ namespace GreenQloud {
                     remoteSynchronizer.Start ();
                 }catch{
                     
-                }*/
+                }
             };
 
             CreateConfigFolder();
@@ -249,7 +249,6 @@ namespace GreenQloud {
         {  
             Logger.LogInfo ("Controller", "First load sucessfully");
             FolderFetched (localSynchronizer.Warnings);
-            new Persistence.SQLite.SQLiteRepositoryDAO().Create (new GreenQloud.Model.LocalRepository(RuntimeSettings.HomePath));
             new Thread (() => CreateStartupItem ()).Start ();
             InitializeSynchronizers ();
         }
