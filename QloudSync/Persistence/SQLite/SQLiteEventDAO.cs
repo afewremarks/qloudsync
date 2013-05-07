@@ -30,7 +30,7 @@ namespace GreenQloud.Persistence.SQLite
                 try{
                     string dateOfEvent =  e.InsertTime;
                     if(dateOfEvent==null){
-                        dateOfEvent = DateTime.Now.ToString();
+                        dateOfEvent = DateTime.Now.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
                     }
 
                     string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
