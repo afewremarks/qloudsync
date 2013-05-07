@@ -66,7 +66,10 @@ namespace GreenQloud.Synchrony
                     e.DeviceId = (string)jsonObject["deviceId"];
                     e.OS = (string)jsonObject["os"];
                     e.Bucket = (string)jsonObject["bucket"];
-                    e.InsertTime = (string)jsonObject["createdDate"];
+
+                    string date = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                    //e.InsertTime = date.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+
                     string relativePath = (string)jsonObject["object"];
                     e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
                     e.Synchronized = false;
