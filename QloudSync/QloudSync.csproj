@@ -179,7 +179,7 @@
     <Compile Include="Synchrony\StorageQloud\StorageQloudLocalEventsSynchronizer.cs" />
     <Compile Include="Synchrony\StorageQloud\StorageQloudRemoteEventsSynchronizer.cs" />
     <Compile Include="Util\JSONHelper.cs" />
-    <Compile Include="Synchrony\JSONPOST.cs" />
+    <Compile Include="Util\JSONPost.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">
