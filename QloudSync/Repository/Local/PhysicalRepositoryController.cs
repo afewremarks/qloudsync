@@ -24,6 +24,8 @@ namespace GreenQloud.Repository.Local
 
         public abstract void Delete (RepositoryItem  item);
 
+        public abstract void Move (RepositoryItem item, string resultObject);
+
         public abstract RepositoryItem GetCopy (RepositoryItem remoteItem);
 
         public abstract bool IsSync (RepositoryItem item);

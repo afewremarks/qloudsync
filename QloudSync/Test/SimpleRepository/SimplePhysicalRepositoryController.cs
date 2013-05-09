@@ -63,6 +63,10 @@ namespace GreenQloud.Test.SimpleRepository
             }
         }
 
+        public override void Move (RepositoryItem item, string resultObject){
+            throw new NotImplementedException();
+        }
+
         public override RepositoryItem GetCopy (RepositoryItem remoteItem)
         {
             if (list.Any (k=> k.Key.RemoteMD5Hash == remoteItem.RemoteMD5Hash && remoteItem.FullLocalName != k.Key.FullLocalName))
