@@ -66,6 +66,7 @@ namespace GreenQloud.Synchrony
                     e.DeviceId = (string)jsonObject["deviceId"];
                     e.OS = (string)jsonObject["os"];
                     e.Bucket = (string)jsonObject["bucket"];
+                    e.ResultObject = (string)jsonObject["resultObject"];
 
                     e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 

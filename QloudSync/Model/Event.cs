@@ -22,6 +22,11 @@ using System;
 		{
 		}
 
+        public string ResultObject {
+            get;
+            set;
+        }
+
         public RepositoryItem Item{
 			set; get;
 		}

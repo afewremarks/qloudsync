@@ -68,6 +68,29 @@ namespace GreenQloud.Repository.Local
             }
         }
 
+        public override void Move (RepositoryItem item, string resultObject)
+        {
+            try{
+                string path = RuntimeSettings.HomePath +"/"+ resultObject;
+                if (path.EndsWith ("/"))
+                    path = path.Substring (0, path.Length-1);
+
+                if (!Exists(item))
+                    return;
+                if (item.IsAFolder)
+                {
+                    Directory.Move (item.FullLocalName, path);
+                }else{
+                    File.Move(item.FullLocalName, path);
+                }
+            }catch (IOException ioex){
+                Logger.LogInfo("Error", ioex);
+            }
+            catch (Exception e){
+                Logger.LogInfo("Error", e);
+            }
+        }
+
         public override RepositoryItem GetCopy (RepositoryItem item)
         {
             if (item.IsAFolder)

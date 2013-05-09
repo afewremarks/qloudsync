@@ -106,10 +106,12 @@ namespace GreenQloud.Synchrony
                 
             }else{
                 switch (e.EventType){
+                case EventType.MOVE:
+                    physicalLocalRepository.Move(e.Item, e.ResultObject);
+                    break;
                 case EventType.CREATE: 
                 case EventType.UPDATE:
                 case EventType.COPY:
-                case EventType.MOVE:
                     SyncStatus = SyncStatus.DOWNLOADING;
                     transfer = remoteRepository.Download (e.Item);
                     break;
