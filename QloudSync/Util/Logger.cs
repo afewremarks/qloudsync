@@ -51,7 +51,7 @@ namespace GreenQloud {
             string message = string.Format("{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.Message, e.StackTrace, e.GetBaseException());
             if(e.InnerException != null)
                 message+= e.InnerException.Message;
-            LogInfo (type, "");
+            LogInfo(type, message);
         }
     }
 }
