@@ -97,6 +97,7 @@ namespace GreenQloud {
             };
 
             CreateConfigFolder();
+            UpdateConfigFile ();
 
             if (CreateHomeFolder ())
                 AddToBookmarks ();
@@ -388,6 +389,11 @@ namespace GreenQloud {
                 return false;
             }
 		}
+
+        void UpdateConfigFile ()
+        {
+            ConfigFile.UpdateConfigFile ();
+        }
 
         void CreateConfigFolder ()
         {

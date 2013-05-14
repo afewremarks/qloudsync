@@ -13,15 +13,28 @@ namespace GreenQloud
      */ 
     public class ConfigFile
     {
-        private string CONFIG_FOLDER = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), GlobalSettings.ApplicationName);
-        private string FULLNAME = Path.Combine(CONFIG_FOLDER, "qloudsync.config");
+        private static string CONFIG_FOLDER = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), GlobalSettings.ApplicationName);
+        private static string INIT_CONFIG_FOLDER = AppDomain.CurrentDomain.BaseDirectory;
+
+        private static string INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, "../Resources/qloudsync.config");
+        private static string FULLNAME = Path.Combine(CONFIG_FOLDER, "qloudsync.config");
 
 
         public ConfigFile ()
         {
         }
 
-        public Hashtable Read(){
+        public static void UpdateConfigFile ()
+        {
+            try{
+                if (!File.Exists(FULLNAME)) 
+                    File.Move(INIT_FULLNAME, FULLNAME);
+            }catch(Exception e){
+                    Logger.LogInfo("Update Config File Error", e);
+            }
+        }
+
+        public static Hashtable Read(){
             if (File.Exists (FULLNAME)) {
                 string[] lines = File.ReadAllLines (FULLNAME);
                 Hashtable ht = new Hashtable ();
@@ -36,7 +49,7 @@ namespace GreenQloud
                 throw new ConfigurationException ("Config file do not exists.");
         }
 
-        public string Read(string key){
+        public static string Read(string key){
             try{
                 return Read () [key].ToString();
             }catch{
@@ -44,7 +57,7 @@ namespace GreenQloud
             }
         }
 
-        public bool Write(string key, string value){
+        public static bool Write(string key, string value){
             Hashtable properties = Read ();
             properties [key] = value;
             try{
