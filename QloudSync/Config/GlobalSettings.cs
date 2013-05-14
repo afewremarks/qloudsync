@@ -28,7 +28,7 @@ namespace GreenQloud
 
         public static string ApplicationName {
             get {
-                return ConfigurationManager.AppSettings ["ApplicationName"];
+                return "QloudSync";
             }
         }
 
