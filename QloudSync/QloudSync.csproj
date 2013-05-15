@@ -179,6 +179,7 @@
     <Compile Include="Synchrony\StorageQloud\StorageQloudLocalEventsSynchronizer.cs" />
     <Compile Include="Synchrony\StorageQloud\StorageQloudRemoteEventsSynchronizer.cs" />
     <Compile Include="Util\JSONHelper.cs" />
+    <Compile Include="Util\UrlEncode.cs" />
     <Compile Include="Util\JSONPost.cs" />
     <Compile Include="Config\ConfigFile.cs" />
     <Compile Include="Exception\ConfigurationException.cs" />
