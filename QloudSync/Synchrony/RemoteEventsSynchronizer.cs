@@ -50,11 +50,12 @@ namespace GreenQloud.Synchrony
                 if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
                     return;
                 ready = false;
-                string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
+                string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
                 string time = eventDAO.LastSyncTime;
                 Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
 
-                string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", RuntimeSettings.DefaultBucketName, Credential.Username, hash, time);
+                UrlEncode encoder = new UrlEncode();
+                string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", encoder.Encode (RuntimeSettings.DefaultBucketName), encoder.Encode (Credential.Username), encoder.Encode (hash), encoder.Encode (time));
 
                 foreach(Newtonsoft.Json.Linq.JObject jsonObject in JSONHelper.GetInfoArray(uri)){
                     Event e = new Event();
