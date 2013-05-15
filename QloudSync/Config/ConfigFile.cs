@@ -28,7 +28,7 @@ namespace GreenQloud
         {
             try{
                 if (!File.Exists(FULLNAME)) 
-                    File.Move(INIT_FULLNAME, FULLNAME);
+                    File.Copy(INIT_FULLNAME, FULLNAME);
             }catch(Exception e){
                     Logger.LogInfo("Update Config File Error", e);
             }
@@ -53,7 +53,7 @@ namespace GreenQloud
             try{
                 return Read () [key].ToString();
             }catch{
-                throw new ConfigurationException ("Key is not found");
+                throw new ConfigurationException ("Key "+key+" is not found");
             }
         }
 

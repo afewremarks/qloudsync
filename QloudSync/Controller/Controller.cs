@@ -136,6 +136,8 @@ namespace GreenQloud {
                     ShowSetupWindow (PageType.Login);
                     foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
                         File.Delete (f);
+
+                    UpdateConfigFile ();
                 } else {
                     backlogSynchronizer.Start();
                     InitializeSynchronizers();
