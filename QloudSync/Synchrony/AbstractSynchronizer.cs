@@ -129,7 +129,7 @@ namespace GreenQloud.Synchrony
             eventDAO.UpdateToSynchronized(e);
 
             if(e.RepositoryType == RepositoryType.LOCAL){
-                new JSON_POST().send (e);
+                new JSONHelper().postJSON (e);
             }
         }
 
