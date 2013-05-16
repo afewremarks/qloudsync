@@ -8,6 +8,7 @@ using System.Threading;
 using System.Linq;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Newtonsoft.Json.Linq;
 
 namespace GreenQloud.Synchrony
 {
@@ -57,7 +58,10 @@ namespace GreenQloud.Synchrony
                 UrlEncode encoder = new UrlEncode();
                 string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", encoder.Encode (RuntimeSettings.DefaultBucketName), encoder.Encode (Credential.Username), encoder.Encode (hash), encoder.Encode (time));
 
-                foreach(Newtonsoft.Json.Linq.JObject jsonObject in JSONHelper.GetInfoArray(uri)){
+                JArray jsonObjects = JSONHelper.GetInfoArray(uri);
+                Logger.LogInfo("Chagens to process", jsonObjects.Count().ToString() );
+
+                foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
                     Event e = new Event();
                     e.RepositoryType = RepositoryType.REMOTE;
                     e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
