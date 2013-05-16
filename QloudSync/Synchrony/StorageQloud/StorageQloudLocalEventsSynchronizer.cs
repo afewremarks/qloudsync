@@ -43,11 +43,11 @@ namespace GreenQloud.Synchrony
                 foreach (LocalRepository repo in repositoryDAO.All){ 
                     OSXFileSystemWatcher watcher = new OSXFileSystemWatcher(repo.Path);
                     watcher.Changed += delegate(string path) {
-                        Console.WriteLine(path);
+                        Logger.LogInfo("Event found",path);
                         if(Working) 
                         {
                             try{
-                                Method (path);
+                                CreateEvent (path);
                             }catch (DisconnectionException)
                             {
                                 SyncStatus = SyncStatus.IDLE;
@@ -71,7 +71,7 @@ namespace GreenQloud.Synchrony
             return instance;
         }
 
-        void Method (string path)
+        void CreateEvent (string path)
         {
             RepositoryItem item;
             LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (path);
