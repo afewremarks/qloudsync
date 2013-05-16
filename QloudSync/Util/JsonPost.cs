@@ -26,10 +26,10 @@ namespace GreenQloud
     {
         public void send (Event e)
         {
-            string json = getJSON(e);
+            postJSON(e);
         }
 
-        public string getJSON (Event e)
+        public string postJSON (Event e)
         {
 
             string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
@@ -37,14 +37,14 @@ namespace GreenQloud
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
             string json = "";
-
+            string result = null;
             
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
 
  
                 json = "{\"action\":\""+e.EventType+"\"," +
-                    "\"application\":\""+GlobalSettings.ApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\"unknown\"," + "\"hash\":\""+hash+"\"," + "\"object\":\"" + e.Item.FullLocalName +"\"," + "\"os\":\"unknown\"," + "\"resultObject\":\"test\"," + "\"username\":\""+Credential.Username+"\"}";
+                    "\"application\":\""+GlobalSettings.ApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\"unknown\"," + "\"hash\":\""+hash+"\"," + "\"object\":\"" + e.Item.FullLocalName +"\"," + "\"os\":\"unknown\"," + "\"resultObject\":\""+e.ResultObject+"\"," + "\"username\":\""+Credential.Username+"\"}";
             
                 streamWriter.Write(json);
                 streamWriter.Flush();
@@ -55,11 +55,11 @@ namespace GreenQloud
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     
-                        var result = streamReader.ReadToEnd();
+                      result = streamReader.ReadToEnd();
 
                     
                 }
-            return json;
+            return result;
             
         }
     }
