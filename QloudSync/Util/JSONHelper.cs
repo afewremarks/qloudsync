@@ -81,7 +81,7 @@ namespace GreenQloud
 
 
                 json = "{\"action\":\""+e.EventType+"\"," +
-                    "\"application\":\""+GlobalSettings.ApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\"unknown\"," + "\"hash\":\""+hash+"\"," + "\"object\":\"" + e.Item.FullLocalName +"\"," + "\"os\":\"unknown\"," + "\"resultObject\":\""+e.ResultObject+"\"," + "\"username\":\""+Credential.Username+"\"}";
+                    "\"application\":\""+GlobalSettings.FullApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\"unknown\"," + "\"hash\":\""+hash+"\"," + "\"object\":\"" + e.Item.FullLocalName +"\"," + "\"os\":\"unknown\"," + "\"resultObject\":\""+e.ResultObject+"\"," + "\"username\":\""+Credential.Username+"\"}";
 
                 streamWriter.Write(json);
                 streamWriter.Flush();

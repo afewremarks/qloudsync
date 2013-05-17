@@ -30,7 +30,6 @@ namespace GreenQloud.Synchrony
 
         public new void Synchronize(){
             while (Working){
-                Console.WriteLine(this);
                 Thread.Sleep (20000);
                 if (eventsCreated){
                     eventsCreated = false;
@@ -59,26 +58,26 @@ namespace GreenQloud.Synchrony
                 string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", encoder.Encode (RuntimeSettings.DefaultBucketName), encoder.Encode (Credential.Username), encoder.Encode (hash), encoder.Encode (time));
 
                 JArray jsonObjects = JSONHelper.GetInfoArray(uri);
-                Logger.LogInfo("Chagens to process", jsonObjects.Count().ToString() );
-
                 foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
-                    Event e = new Event();
-                    e.RepositoryType = RepositoryType.REMOTE;
-                    e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
-                    e.User = (string)jsonObject["username"];
-                    e.Application = (string)jsonObject["application"];
-                    e.ApplicationVersion = (string)jsonObject["applicationVersion"];
-                    e.DeviceId = (string)jsonObject["deviceId"];
-                    e.OS = (string)jsonObject["os"];
-                    e.Bucket = (string)jsonObject["bucket"];
-                    e.ResultObject = (string)jsonObject["resultObject"];
+                    if(!((string)jsonObject["application"]).Equals(GlobalSettings.FullApplicationName)){
+                        Event e = new Event();
+                        e.RepositoryType = RepositoryType.REMOTE;
+                        e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
+                        e.User = (string)jsonObject["username"];
+                        e.Application = (string)jsonObject["application"];
+                        e.ApplicationVersion = (string)jsonObject["applicationVersion"];
+                        e.DeviceId = (string)jsonObject["deviceId"];
+                        e.OS = (string)jsonObject["os"];
+                        e.Bucket = (string)jsonObject["bucket"];
+                        e.ResultObject = (string)jsonObject["resultObject"];
 
-                    e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                        e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 
-                    string relativePath = (string)jsonObject["object"];
-                    e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
-                    e.Synchronized = false;
-                    eventDAO.Create(e);
+                        string relativePath = (string)jsonObject["object"];
+                        e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
+                        e.Synchronized = false;
+                        eventDAO.Create(e);
+                    }
                 }
                 eventsCreated = true;
             } catch (Exception e){

@@ -21,6 +21,13 @@ namespace GreenQloud
             else                            
                 return b64;
         }
+
+        public static string Getbase64(string value)
+        {
+            byte[] key = new Byte[64];
+            key = Encoding.UTF8.GetBytes(value);
+            return Convert.ToBase64String(key);
+        }
     }
 }
 

@@ -154,6 +154,19 @@ namespace GreenQloud {
                 var returnValue = alert.RunModal();
                 Quit ();
             }
+            verifyConfigRequirements ();
+        }
+
+        void verifyConfigRequirements ()
+        {
+            try{
+                ConfigFile.Read("InstanceID");
+            }catch(ConfigurationException e){
+                string id = Crypto.Getbase64(ConfigFile.Read("ApplicationName") + Credential.Username + DateTime.Now.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+                ConfigFile.Write ("InstanceID", id); 
+                ConfigFile.Read("InstanceID");
+                Logger.LogInfo ("INFO", "Generated InstanceID: " + id);
+            }
         }
         
         [System.Runtime.InteropServices.DllImport("/System/Library/Frameworks/CoreServices.framework/CoreServices")]
