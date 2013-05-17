@@ -31,6 +31,11 @@ namespace GreenQloud
                 return "QloudSync";
             }
         }
+        public static string FullApplicationName {
+            get {
+                return ApplicationName + "; InstanceID: "+ConfigFile.Read("InstanceID");
+            }
+        }
 
         public static string HomeFolderName {
             get {
