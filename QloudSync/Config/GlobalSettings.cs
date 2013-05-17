@@ -8,6 +8,18 @@ namespace GreenQloud
     {
         private static string trash = null;
 
+        public static string MachineName {
+            get{
+                return System.Environment.MachineName;
+            }
+        }
+
+        public static string OSVersion {
+            get{
+                return System.Environment.OSVersion.ToString();
+            }
+        }
+
         public static string RunningVersion {
             get {
                 return ConfigFile.Read ("RunningVersion");
@@ -99,6 +111,8 @@ namespace GreenQloud
                 }
             }
         }
+
+
     }
 }
 
