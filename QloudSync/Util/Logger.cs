@@ -27,7 +27,7 @@ namespace GreenQloud {
 
         public static void LogInfo (string type, string message)
         {
-            string timestamp = DateTime.Now.ToString ("HH:mm:ss");
+            string timestamp = GlobalDateTime.Now.ToString ("HH:mm:ss");
             string line      = timestamp + " | " + type + " | " + message;
 
 #if DEBUG

@@ -182,6 +182,7 @@
     <Compile Include="Util\UrlEncode.cs" />
     <Compile Include="Config\ConfigFile.cs" />
     <Compile Include="Exception\ConfigurationException.cs" />
+    <Compile Include="Util\GlobalDateTime.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">

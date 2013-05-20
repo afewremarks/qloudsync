@@ -68,10 +68,10 @@ namespace GreenQloud.Synchrony
                 e.EventType = EventType.DELETE;
             }
             e.User = Credential.Username;
-            e.Application = "QloudSync";
+            e.Application = GlobalSettings.FullApplicationName;
             e.ApplicationVersion = GlobalSettings.RunningVersion;
-            e.DeviceId = "";
-            e.OS = "";
+            e.DeviceId = GlobalSettings.MachineName;
+            e.OS = GlobalSettings.OSVersion;
             e.Bucket = RuntimeSettings.DefaultBucketName;
             return e;
             

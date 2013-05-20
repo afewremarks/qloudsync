@@ -44,7 +44,7 @@ namespace GreenQloud.Repository.Local
                 if(Directory.Exists(path)){
                     if (path.EndsWith ("/"))
                         path = path.Substring (0, path.Length-1);
-                    Directory.Move (path, path+" "+DateTime.Now.ToString("dd.mm.ss tt"));
+                    Directory.Move (path, path+" "+GlobalDateTime.Now.ToString("dd.mm.ss tt"));
                 }else{
                     CreatePath (path);
                     Directory.Move (item.FullLocalName, path);                   
@@ -52,7 +52,7 @@ namespace GreenQloud.Repository.Local
             }
             else{
                 if(File.Exists (path)){
-                    string newpath =  path+" "+DateTime.Now.ToString ("dd.mm.ss tt");
+                    string newpath =  path+" "+GlobalDateTime.Now.ToString ("dd.mm.ss tt");
                     File.Move (path, newpath);
                 }
                 else{
@@ -130,7 +130,7 @@ namespace GreenQloud.Repository.Local
                     foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
                         if (fileInfo.Name.Contains ("untitled folder")) 
                             continue;
-                        RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, DateTime.Now.ToString());
+                        RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, GlobalDateTime.Now.ToString());
                         list.Add (localFile);
                     }
                 }

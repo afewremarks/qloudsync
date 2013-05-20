@@ -117,14 +117,14 @@ namespace GreenQloud.Test
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
             localItem.Repository = new LocalRepository("***");
-            localItem.TimeOfLastChange = DateTime.Now.ToString();
+            localItem.TimeOfLastChange = GlobalDateTime.Now.ToString();
             localItem.LocalMD5Hash = "123";
             
             RepositoryItem remoteItem = new RepositoryItem();
             remoteItem.Name = "teste.html";
             remoteItem.RelativePath = "home";
             remoteItem.Repository = new LocalRepository("***");
-            remoteItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0)).ToString();
+            remoteItem.TimeOfLastChange = GlobalDateTime.Now.Subtract(new TimeSpan(1,0,0)).ToString();
             remoteItem.RemoteMD5Hash = "223";
             
             remote.Upload (remoteItem,"out of date");
@@ -151,14 +151,14 @@ namespace GreenQloud.Test
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
             localItem.Repository = new LocalRepository("***");
-            localItem.TimeOfLastChange = DateTime.Now.Subtract(new TimeSpan(1,0,0)).ToString();
+            localItem.TimeOfLastChange = GlobalDateTime.Now.Subtract(new TimeSpan(1,0,0)).ToString();
             localItem.LocalMD5Hash = "123";
             
             RepositoryItem remoteItem = new RepositoryItem();
             remoteItem.Name = "teste.html";
             remoteItem.RelativePath = "home";
             remoteItem.Repository = new LocalRepository("***");
-            remoteItem.TimeOfLastChange = DateTime.Now.ToString();
+            remoteItem.TimeOfLastChange = GlobalDateTime.Now.ToString();
             remoteItem.RemoteMD5Hash = "223";
 
             remote.Upload (remoteItem,"updated");

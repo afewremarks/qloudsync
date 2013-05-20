@@ -90,7 +90,7 @@ namespace GreenQloud.Synchrony
                     Size = InitFirstLoad();
                 }).Start();
                 double lastSize = 0;
-                DateTime lastTime = DateTime.Now;
+                DateTime lastTime = GlobalDateTime.Now;
                 TimeRemaining = 0;
                 Model.Transfer transfer = new GreenQloud.Model.Transfer();
                 transfer.Item = new Model.RepositoryItem();
@@ -103,7 +103,7 @@ namespace GreenQloud.Synchrony
                     if (Done)
                         break;
                     if(OldCurrentTransfer.Item.FullLocalName == Current.Item.FullLocalName){
-                        DateTime time = DateTime.Now;
+                        DateTime time = GlobalDateTime.Now;
                         double size = Size;
                         double transferred = BytesTransferred + Current.TransferredBits;
                         
