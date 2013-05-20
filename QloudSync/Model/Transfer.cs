@@ -98,7 +98,7 @@ namespace GreenQloud.Model
                 if (InitialTime == new DateTime())
                     return new TimeSpan (0);
                 if (EndTime ==  new DateTime())
-                    return DateTime.Now.Subtract(InitialTime);
+                    return GlobalDateTime.Now.Subtract(InitialTime);
                 return EndTime.Subtract(InitialTime);
             }
         }

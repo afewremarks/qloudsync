@@ -30,7 +30,7 @@ namespace GreenQloud.Persistence.SQLite
                 try{
                     string dateOfEvent =  e.InsertTime;
                     if(dateOfEvent==null){
-                        dateOfEvent = DateTime.Now.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                        dateOfEvent = GlobalDateTime.Now.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
                     }
 
                     string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET, ResultObject) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\", \"{11}\")", 
@@ -107,7 +107,7 @@ namespace GreenQloud.Persistence.SQLite
         {
             string query = "SELECT * FROM EVENT WHERE REPOSITORY= \"{0}\" AND ITEMID = \"{1}\"";
             string sql ="";
-            DateTime limitDate = DateTime.Now.Subtract(new TimeSpan(0,0,60));
+            DateTime limitDate = GlobalDateTime.Now.Subtract(new TimeSpan(0,0,60));
             if (e.RepositoryType == RepositoryType.LOCAL)
             {
                 sql = string.Format (query, RepositoryType.REMOTE, e.Item.Id);

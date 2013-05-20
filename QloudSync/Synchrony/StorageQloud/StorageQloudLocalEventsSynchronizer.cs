@@ -77,12 +77,12 @@ namespace GreenQloud.Synchrony
             LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (path);
 
             if (Directory.Exists(path)){
-                item = RepositoryItem.CreateInstance (repo, path, true, 0, DateTime.Now.ToString ());
+                item = RepositoryItem.CreateInstance (repo, path, true, 0, GlobalDateTime.Now.ToString ());
             }
             else if (File.Exists (path)){
-                item = RepositoryItem.CreateInstance (repo, path, false, 0, DateTime.Now.ToString ());
+                item = RepositoryItem.CreateInstance (repo, path, false, 0, GlobalDateTime.Now.ToString ());
             }else{
-                item = RepositoryItem.CreateInstance (repo, path, false, 0, DateTime.Now.ToString ());
+                item = RepositoryItem.CreateInstance (repo, path, false, 0, GlobalDateTime.Now.ToString ());
                 item.IsAFolder = new SQLiteRepositoryItemDAO().IsFolder(item);
             }
 
@@ -91,9 +91,9 @@ namespace GreenQloud.Synchrony
                 e.Item = item;
                 e.RepositoryType = RepositoryType.LOCAL;
                 Synchronize(e);
-                
+
                 LastLocalEvent = e;
-                LastTimeSync = DateTime.Now;
+                LastTimeSync = GlobalDateTime.Now;
             }
         }
 

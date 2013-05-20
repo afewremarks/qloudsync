@@ -54,7 +54,7 @@ namespace GreenQloud.Repository.Remote
                     };
 
                     long lastTransferredBytes = 0;
-                    CurrentTransfer.InitialTime = DateTime.Now;
+                    CurrentTransfer.InitialTime = GlobalDateTime.Now;
                     using (response = Connect().GetObject(objectRequest))
                     {
                         response.WriteObjectProgressEvent += (object sender, WriteObjectProgressArgs e) => {
@@ -65,13 +65,13 @@ namespace GreenQloud.Repository.Remote
                         
                         response.WriteResponseStreamToFile(item.FullLocalName);
                     }
-                    CurrentTransfer.EndTime = DateTime.Now;
+                    CurrentTransfer.EndTime = GlobalDateTime.Now;
                 }catch(System.Threading.ThreadInterruptedException){
                 }
                 catch (Exception e) {
                     Logger.LogInfo ("Error", e);
                     CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
-                    CurrentTransfer.EndTime = DateTime.Now;
+                    CurrentTransfer.EndTime = GlobalDateTime.Now;
                 } finally {
                     if (response!=null) response.Dispose();
                 }
@@ -133,7 +133,7 @@ namespace GreenQloud.Repository.Remote
                 if (!GetS3Objects().Any(s=> s.Key == item.AbsolutePath))
                     key+="/";
                 GenericDelete (key);
-                CurrentTransfer.EndTime = DateTime.Now;
+                CurrentTransfer.EndTime = GlobalDateTime.Now;
                 return CurrentTransfer;
             }
         }
@@ -236,7 +236,7 @@ namespace GreenQloud.Repository.Remote
         private void GenericCopy (string sourceBucket, string sourceKey, string destinationBucket, string destinationKey)
         {
             try {
-                CurrentTransfer.InitialTime = DateTime.Now;
+                CurrentTransfer.InitialTime = GlobalDateTime.Now;
                 CopyObjectRequest request = new CopyObjectRequest (){
                     DestinationBucket = destinationBucket,
                     DestinationKey = destinationKey,
@@ -245,7 +245,7 @@ namespace GreenQloud.Repository.Remote
                 };
                 
                 using (CopyObjectResponse cor = Connect ().CopyObject (request)){}
-                CurrentTransfer.EndTime = DateTime.Now;
+                CurrentTransfer.EndTime = GlobalDateTime.Now;
             } 
             //TODO Understand why System.InvalidOperationException is catched, and the file is copied
             catch{
@@ -266,7 +266,7 @@ namespace GreenQloud.Repository.Remote
                 AmazonS3Client connection = Connect();
                 
                 if(key!=Constant.CLOCK_TIME)  
-                CurrentTransfer.InitialTime = DateTime.Now;
+                CurrentTransfer.InitialTime = GlobalDateTime.Now;
 
                 using (DeleteObjectResponse response = connection.DeleteObject (request)) {
 
@@ -275,19 +275,19 @@ namespace GreenQloud.Repository.Remote
                 if(key!=Constant.CLOCK_TIME)  {              
                     Logger.LogInfo ("Connection", string.Format("{0} was deleted in bucket.", key));
 
-                    CurrentTransfer.EndTime = DateTime.Now;
+                    CurrentTransfer.EndTime = GlobalDateTime.Now;
                     CurrentTransfer.Status = TransferStatus.DONE;
                 }
             } catch (AmazonS3Exception) {
                 if(InitializeBucket())
                     GenericDelete (key);
                 else{
-                    CurrentTransfer.EndTime = DateTime.Now;
+                    CurrentTransfer.EndTime = GlobalDateTime.Now;
                     Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
                     CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
                 }
             }catch (Exception e){
-                CurrentTransfer.EndTime = DateTime.Now;
+                CurrentTransfer.EndTime = GlobalDateTime.Now;
                 CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
                 Logger.LogInfo ("Connection", e);
             }
@@ -327,11 +327,11 @@ namespace GreenQloud.Repository.Remote
                     Key = key, 
                     Timeout = GlobalSettings.UploadTimeout
                 };                
-                CurrentTransfer.InitialTime = DateTime.Now;
+                CurrentTransfer.InitialTime = GlobalDateTime.Now;
                 using (response = upconnection.PutObject (putObject)) {
 
                 }
-                CurrentTransfer.EndTime = DateTime.Now;
+                CurrentTransfer.EndTime = GlobalDateTime.Now;
                 Logger.LogInfo ("Connection", string.Format ("{0} was uploaded.", filepath));
                 CurrentTransfer.Status = TransferStatus.DONE;
                 UpdateStorageQloud();
@@ -528,7 +528,7 @@ namespace GreenQloud.Repository.Remote
         public TimeSpan CalculateDiffClocks ()
         {
             try {
-                if (DateTime.Now.Subtract(lastDiffClock).TotalMinutes>30){
+                if (GlobalDateTime.Now.Subtract(lastDiffClock).TotalMinutes>30){
                     
                     RepositoryItem clockFile = new RepositoryItem ();
                     clockFile.Name = Constant.CLOCK_TIME;
@@ -544,7 +544,7 @@ namespace GreenQloud.Repository.Remote
                     
                     DateTime localClock;
                     using (S3Response response = Connect ().PutObject (putObject)){
-                        localClock = DateTime.Now;
+                        localClock = GlobalDateTime.Now;
                     }
                     ListObjectsResponse files = Connect ().ListObjects (new ListObjectsRequest ().WithBucketName (DefaultBucketName));
                     S3Object remotefile = files.S3Objects.Where (o => o.Key == clockFile.Name).FirstOrDefault();
@@ -626,13 +626,13 @@ namespace GreenQloud.Repository.Remote
                     Key = name,
                     ContentBody = string.Empty
                 };
-                CurrentTransfer.InitialTime = DateTime.Now;
+                CurrentTransfer.InitialTime = GlobalDateTime.Now;
                 using (response = Connect ().PutObject (putObject))
                 {
                     
                 }
                 
-                CurrentTransfer.EndTime = DateTime.Now;
+                CurrentTransfer.EndTime = GlobalDateTime.Now;
                 UpdateStorageQloud();
                 Logger.LogInfo ("Connection", "Folder "+name+" created");
             }catch (AmazonS3Exception) {
@@ -641,14 +641,14 @@ namespace GreenQloud.Repository.Remote
                 else{
                     Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
                     CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
-                    CurrentTransfer.EndTime = DateTime.Now;
+                    CurrentTransfer.EndTime = GlobalDateTime.Now;
                     return false;
                 }
             }
             catch(Exception e) {
                 Logger.LogInfo ("Connection","Fail to upload "+e.Message);
                 CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
-                CurrentTransfer.EndTime = DateTime.Now;
+                CurrentTransfer.EndTime = GlobalDateTime.Now;
                 return false;
             }
 

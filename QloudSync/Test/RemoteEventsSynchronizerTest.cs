@@ -39,7 +39,7 @@ namespace GreenQloud.Test
             physical.Create (item2);
             remote.Upload (item2);
             
-            remote.RecentChangedItems(DateTime.Now).Add (item);
+            remote.RecentChangedItems(GlobalDateTime.Now).Add (item);
             
             sync.AddEvents ();
             
@@ -66,7 +66,7 @@ namespace GreenQloud.Test
             item.Repository = new LocalRepository("...");
             remote.Upload (item);
             
-            remote.RecentChangedItems (DateTime.Now).Add (item);
+            remote.RecentChangedItems (GlobalDateTime.Now).Add (item);
             
             sync.AddEvents ();
             
@@ -127,7 +127,7 @@ namespace GreenQloud.Test
             physical.Create (item2);
 
             
-            remote.RecentChangedItems(DateTime.Now).Add (item);
+            remote.RecentChangedItems(GlobalDateTime.Now).Add (item);
             
             sync.AddEvents ();
             
@@ -158,7 +158,7 @@ namespace GreenQloud.Test
             item.RemoteMD5Hash = "122";
             physical.Create (item);
             
-            remote.RecentChangedItems(DateTime.Now).Add (item);
+            remote.RecentChangedItems(GlobalDateTime.Now).Add (item);
             
             sync.AddEvents ();
             

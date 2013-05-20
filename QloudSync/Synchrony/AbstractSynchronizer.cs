@@ -80,7 +80,7 @@ namespace GreenQloud.Synchrony
 
         #region Implemented Methods
 
-        public void Synchronize(){
+        public void Synchronize(){//REFATORAR!!!!!!
             List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
             while (eventsNotSynchronized.Count>0 && Working){
                 Synchronize (eventsNotSynchronized[0]);

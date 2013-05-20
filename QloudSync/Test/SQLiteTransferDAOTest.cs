@@ -24,10 +24,10 @@ namespace GreenQloud.Test
             RepositoryItem item = physicalRepository.CreateItemInstance (testfile);
 
             Transfer transfer = new Transfer();
-            transfer.InitialTime = DateTime.Now;
+            transfer.InitialTime = GlobalDateTime.Now;
             transfer.Type = TransferType.DOWNLOAD;
             transfer.Item = item;
-            transfer.EndTime = DateTime.Now;
+            transfer.EndTime = GlobalDateTime.Now;
             SQLiteRepositoryItemDAO repoDAO = new SQLiteRepositoryItemDAO();
             repoDAO.Create (item);
             transferDAO.Create (transfer);
