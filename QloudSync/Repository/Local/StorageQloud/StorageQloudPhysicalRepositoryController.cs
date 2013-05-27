@@ -35,29 +35,11 @@ namespace GreenQloud.Repository.Local
 
         public override void Delete (RepositoryItem item)
         {
-            string path = Path.Combine(RuntimeSettings.TrashPath, item.Name);
-            if (!Exists(item))
-                    return;
-            if (item.IsAFolder)
-            {
-                if(Directory.Exists(path)){
-                    if (path.EndsWith ("/"))
-                        path = path.Substring (0, path.Length-1);
-                    Directory.Move (path, path+" "+GlobalDateTime.Now.ToString("dd.mm.ss tt"));
-                }else{
-                    CreatePath (path);
-                    Directory.Move (item.FullLocalName, path);                   
-                }
+            if(Directory.Exists(item.FullLocalName)){
+                Directory.Delete (item.FullLocalName);     
             }
-            else{
-                if(File.Exists (path)){
-                    string newpath =  path+" "+GlobalDateTime.Now.ToString ("dd.mm.ss tt");
-                    File.Move (path, newpath);
-                }
-                else{
-                    CreatePath (path);
-                    File.Move(item.FullLocalName, path);
-                }
+            if(File.Exists(item.FullLocalName)){
+                File.Delete (item.FullLocalName);
             }
         }
 
