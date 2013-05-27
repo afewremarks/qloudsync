@@ -99,8 +99,11 @@ namespace GreenQloud.Synchrony
                 
                 SyncStatus = SyncStatus.UPLOADING;
                 
-                if (e.EventType == EventType.DELETE)
+                if (e.EventType == EventType.DELETE) {
                     transfer = remoteRepository.MoveToTrash (e.Item);
+                    e.ResultObject =  e.Item.TrashFullName;
+                    eventDAO.UpdateResultObject (e);
+                }
                 else
                     transfer = remoteRepository.Upload (e.Item);
                 
@@ -117,8 +120,6 @@ namespace GreenQloud.Synchrony
                     break;
                 case EventType.DELETE:
                     SyncStatus = SyncStatus.UPLOADING;
-                    //transfer = remoteRepository.SendLocalVersionToTrash (e.Item);
-                    transfer = remoteRepository.MoveToTrash(e.Item);
                     physicalLocalRepository.Delete (e.Item);
                     break;
                 }                

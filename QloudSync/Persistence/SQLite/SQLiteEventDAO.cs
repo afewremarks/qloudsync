@@ -55,6 +55,11 @@ namespace GreenQloud.Persistence.SQLite
             database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\" WHERE ITEMID =\"{1}\"", bool.TrueString, id));
         }
 
+        public override void UpdateResultObject (Event e)
+        {            
+            string id = repositoryItemDAO.GetId(e.Item);
+            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  ResultObject = \"{0}\" WHERE ITEMID =\"{1}\"", e.ResultObject, id));
+        }
  
         public override List<Event> EventsNotSynchronized {
             get {
