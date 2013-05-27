@@ -148,6 +148,9 @@ namespace GreenQloud.Model
         string localhash = string.Empty;
         public string LocalMD5Hash {
             get{
+                if (localhash == null || localhash.Equals("")) {
+                    localhash = new Crypto ().md5hash (this);
+                }
                 return localhash;
             }set{
                 localhash = value;

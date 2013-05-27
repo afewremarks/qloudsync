@@ -188,17 +188,11 @@ namespace GreenQloud.Repository.Local
                 Directory.CreateDirectory(parent);
         }
 
+
+
         public string CalculateMD5Hash (RepositoryItem item)
         {
-            string md5hash;
-            try {       
-                FileStream fs = System.IO.File.Open (item.FullLocalName, FileMode.Open);
-                System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create ();
-                md5hash = BitConverter.ToString (md5.ComputeHash (fs)).Replace (@"-", @"").ToLower ();
-                fs.Close ();
-            } catch{
-                md5hash = string.Empty;
-            }
+            var md5hash = new Crypto().md5hash(item);
             return md5hash;
         }
     }
