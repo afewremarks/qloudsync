@@ -14,6 +14,7 @@ namespace GreenQloud.Persistence
             get;
         }
         public abstract void UpdateToSynchronized (Event e);
+        public abstract void UpdateResultObject (Event e);
 
         public abstract void SetEventType (Event e);
 

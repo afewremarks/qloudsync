@@ -40,6 +40,13 @@ namespace GreenQloud.Test.SimplePersistence
             list[id] = e;
         }
 
+        public override void UpdateResultObject (Event e)
+        {
+            int id = list.IndexOf (e);
+            list[id] = e;
+        }
+
+
         public override List<Event> All{
             get{
                 return list;
