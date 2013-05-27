@@ -80,7 +80,7 @@ namespace GreenQloud.Synchrony
 
         #region Implemented Methods
 
-        public void Synchronize(){//REFATORAR!!!!!!
+        public void Synchronize(){//TODO REFATORAR!!!!!!
             List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
             while (eventsNotSynchronized.Count>0 && Working){
                 Synchronize (eventsNotSynchronized[0]);
@@ -117,7 +117,8 @@ namespace GreenQloud.Synchrony
                     break;
                 case EventType.DELETE:
                     SyncStatus = SyncStatus.UPLOADING;
-                    transfer = remoteRepository.SendLocalVersionToTrash (e.Item);
+                    //transfer = remoteRepository.SendLocalVersionToTrash (e.Item);
+                    transfer = remoteRepository.MoveToTrash(e.Item);
                     physicalLocalRepository.Delete (e.Item);
                     break;
                 }                
