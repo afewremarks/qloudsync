@@ -124,7 +124,7 @@ namespace GreenQloud.Repository.Remote
                     destinationName = item.Name;
                 }
                 else
-                    destinationName = item.Name + "(1)";
+                    destinationName = item.Name;
                 
                 //UpdateTrashFolder (item);            
                 
