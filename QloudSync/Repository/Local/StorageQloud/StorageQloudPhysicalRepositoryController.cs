@@ -35,7 +35,6 @@ namespace GreenQloud.Repository.Local
 
         public override void Delete (RepositoryItem item)
         {
-            try{
             string path = Path.Combine(RuntimeSettings.TrashPath, item.Name);
             if (!Exists(item))
                     return;
@@ -60,34 +59,21 @@ namespace GreenQloud.Repository.Local
                     File.Move(item.FullLocalName, path);
                 }
             }
-            }catch (IOException ioex){
-
-            }
-            catch (Exception e){
-
-            }
         }
 
         public override void Move (RepositoryItem item, string resultObject)
         {
-            try{
-                string path = RuntimeSettings.HomePath +"/"+ resultObject;
-                if (path.EndsWith ("/"))
-                    path = path.Substring (0, path.Length-1);
+            string path = RuntimeSettings.HomePath +"/"+ resultObject;
+            if (path.EndsWith ("/"))
+                path = path.Substring (0, path.Length-1);
 
-                if (!Exists(item))
-                    return;
-                if (item.IsAFolder)
-                {
-                    Directory.Move (item.FullLocalName, path);
-                }else{
-                    File.Move(item.FullLocalName, path);
-                }
-            }catch (IOException ioex){
-                Logger.LogInfo("Error", ioex);
-            }
-            catch (Exception e){
-                Logger.LogInfo("Error", e);
+            if (!Exists(item))
+                return;
+            if (item.IsAFolder)
+            {
+                Directory.Move (item.FullLocalName, path);
+            }else{
+                File.Move(item.FullLocalName, path);
             }
         }
 
@@ -116,30 +102,24 @@ namespace GreenQloud.Repository.Local
         }
 
         public List<RepositoryItem> GetItens (LocalRepository repo)
-        {
-            try {                
-                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo (repo.Path);
-                List<RepositoryItem> list = new List<RepositoryItem>();
-                if(dir.Exists){
-                    foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ()) {
-                        RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName(fileInfo.FullName), fileInfo.FullName, false, fileInfo.Length, fileInfo.LastWriteTime.ToString());
-                        if(!localFile.IsIgnoreFile)
-                            list.Add (localFile);
-                    }
-                    
-                    foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
-                        if (fileInfo.Name.Contains ("untitled folder")) 
-                            continue;
-                        RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, GlobalDateTime.Now.ToString());
+        {              
+            System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo (repo.Path);
+            List<RepositoryItem> list = new List<RepositoryItem>();
+            if(dir.Exists){
+                foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ()) {
+                    RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName(fileInfo.FullName), fileInfo.FullName, false, fileInfo.Length, fileInfo.LastWriteTime.ToString());
+                    if(!localFile.IsIgnoreFile)
                         list.Add (localFile);
-                    }
                 }
-                return list;
-            } catch (Exception e) {
-                Logger.LogInfo ("Error", "Fail to load local files");
-                Logger.LogInfo("Error", e);
-                return null;
+                
+                foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
+                    if (fileInfo.Name.Contains ("untitled folder")) 
+                        continue;
+                    RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, GlobalDateTime.Now.ToString());
+                    list.Add (localFile);
+                }
             }
+            return list;
         }
 
         public override RepositoryItem CreateItemInstance (string fullLocalName)
