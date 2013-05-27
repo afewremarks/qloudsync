@@ -81,7 +81,7 @@ namespace GreenQloud
 
 
                 json = "{\"action\":\""+e.EventType+"\"," +
-                    "\"application\":\""+GlobalSettings.FullApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\""+GlobalSettings.MachineName+"\"," + "\"hash\":\""+hash+"\"," + "\"object\":\"" + e.Item.FullLocalName +"\"," + "\"os\":\""+GlobalSettings.OSVersion+"\"," + "\"resultObject\":\""+e.ResultObject+"\"," + "\"username\":\""+Credential.Username+"\"}";
+                    "\"application\":\""+GlobalSettings.FullApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\""+GlobalSettings.DeviceIdHash+"\"," + "\"hash\":\""+e.Item.LocalMD5Hash+"\"," + "\"object\":\"" + e.Item.FullRemoteName +"\"," + "\"os\":\""+GlobalSettings.OSVersion+"\"," + "\"resultObject\":\""+e.ResultObject+"\"," + "\"username\":\""+Credential.Username+"\"}";
 
                 streamWriter.Write(json);
                 streamWriter.Flush();

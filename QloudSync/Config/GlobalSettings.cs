@@ -14,6 +14,12 @@ namespace GreenQloud
             }
         }
 
+        public static string DeviceIdHash {
+            get {
+                return new Crypto ().md5hash(MachineName+Credential.Username);
+            }
+        }
+
         public static string OSVersion {
             get{
                 return System.Environment.OSVersion.ToString();
