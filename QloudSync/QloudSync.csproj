@@ -183,6 +183,7 @@
     <Compile Include="Config\ConfigFile.cs" />
     <Compile Include="Exception\ConfigurationException.cs" />
     <Compile Include="Util\GlobalDateTime.cs" />
+    <Compile Include="Synchrony\SynchronizerResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">

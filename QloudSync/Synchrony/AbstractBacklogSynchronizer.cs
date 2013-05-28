@@ -41,7 +41,7 @@ using GreenQloud.Repository.Local;
                 eventDAO.Create (GetEvent (localItem, RepositoryType.LOCAL));
                 
             }
-            base.Synchronize();
+            //base.Synchronize();
             Pause();
         }
 

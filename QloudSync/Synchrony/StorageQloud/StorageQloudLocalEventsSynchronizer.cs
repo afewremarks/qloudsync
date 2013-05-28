@@ -50,7 +50,7 @@ namespace GreenQloud.Synchrony
                                 CreateEvent (path);
                             }catch (DisconnectionException)
                             {
-                                SyncStatus = SyncStatus.IDLE;
+                                //SyncStatus = SyncStatus.IDLE;
                                 Program.Controller.HandleDisconnection();
                             }
                         }
@@ -77,12 +77,12 @@ namespace GreenQloud.Synchrony
             LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (path);
 
             if (Directory.Exists(path)){
-                item = RepositoryItem.CreateInstance (repo, path, true, 0, GlobalDateTime.Now.ToString ());
+                item = RepositoryItem.CreateInstance (repo, path, true, 0, GlobalDateTime.NowUniversalString);
             }
             else if (File.Exists (path)){
-                item = RepositoryItem.CreateInstance (repo, path, false, 0, GlobalDateTime.Now.ToString ());
+                item = RepositoryItem.CreateInstance (repo, path, false, 0, GlobalDateTime.NowUniversalString);
             }else{
-                item = RepositoryItem.CreateInstance (repo, path, false, 0, GlobalDateTime.Now.ToString ());
+                item = RepositoryItem.CreateInstance (repo, path, false, 0, GlobalDateTime.NowUniversalString);
                 item.IsAFolder = new SQLiteRepositoryItemDAO().IsFolder(item);
             }
 

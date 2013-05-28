@@ -32,7 +32,7 @@ namespace GreenQloud.Test
 
             Event e = new Event();
             e.EventType = EventType.DELETE;
-            e.InsertTime = GlobalDateTime.Now.ToString();
+            e.InsertTime = GlobalDateTime.Now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
             e.RepositoryType = RepositoryType.LOCAL;
             e.Item = item;
            
@@ -60,7 +60,7 @@ namespace GreenQloud.Test
             
             Event e = new Event();
             e.EventType = EventType.DELETE;
-            e.InsertTime = GlobalDateTime.Now.ToString();
+            e.InsertTime = GlobalDateTime.Now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
             e.RepositoryType = RepositoryType.LOCAL;
             e.Item = item;
             
@@ -88,7 +88,7 @@ namespace GreenQloud.Test
             
             Event e = new Event();
             e.EventType = EventType.DELETE;
-            e.InsertTime = GlobalDateTime.Now.ToString ();
+            e.InsertTime = GlobalDateTime.Now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
             e.RepositoryType = RepositoryType.LOCAL;
             e.Item = item;
             
@@ -116,7 +116,7 @@ namespace GreenQloud.Test
             
             Event e = new Event();
             e.EventType = EventType.DELETE;
-            e.InsertTime = GlobalDateTime.Now.ToString();
+            e.InsertTime = GlobalDateTime.Now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
             e.RepositoryType = RepositoryType.LOCAL;
             e.Item = item;
             
@@ -147,7 +147,7 @@ namespace GreenQloud.Test
             
             Event e = new Event();
             e.EventType = EventType.DELETE;
-            e.InsertTime = GlobalDateTime.Now.ToString();
+            e.InsertTime = GlobalDateTime.Now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
             e.RepositoryType = RepositoryType.LOCAL;
             e.Item = item;
             

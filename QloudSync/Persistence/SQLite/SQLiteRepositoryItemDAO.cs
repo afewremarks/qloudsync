@@ -84,10 +84,10 @@ namespace GreenQloud.Persistence.SQLite
             foreach(DataRow dr in dt.Rows){
                 RepositoryItem item = new RepositoryItem ();
                 item.Id = dr[0].ToString();
-                    item.Name = dr[1].ToString();
-                    item.RelativePath = dr[2].ToString();
-                    item.Repository = new LocalRepository(dr[3].ToString());
-                    item.IsAFolder = bool.Parse (dr[4].ToString());
+                item.Name = dr[1].ToString();
+                item.RelativePath = dr[2].ToString();
+                item.Repository = new LocalRepository(dr[3].ToString());
+                item.IsAFolder = bool.Parse (dr[4].ToString());
 
                 items.Add (item);
             }

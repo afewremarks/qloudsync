@@ -21,7 +21,7 @@ namespace GreenQloud.Synchrony
                     try{
                         Synchronize();
                     }catch (DisconnectionException){
-                        SyncStatus = SyncStatus.IDLE;
+                        //SyncStatus = SyncStatus.IDLE;
                         Program.Controller.HandleDisconnection();
                     }
                 }

@@ -36,6 +36,8 @@ namespace GreenQloud.Repository.Local
         public override void Delete (RepositoryItem item)
         {
             if(Directory.Exists(item.FullLocalName)){
+                var dir = new DirectoryInfo(item.FullLocalName);
+                dir.GetFiles("*", SearchOption.AllDirectories).ToList().ForEach(file=>file.Delete());
                 Directory.Delete (item.FullLocalName);     
             }
             if(File.Exists(item.FullLocalName)){
@@ -97,7 +99,7 @@ namespace GreenQloud.Repository.Local
                 foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
                     if (fileInfo.Name.Contains ("untitled folder")) 
                         continue;
-                    RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, GlobalDateTime.Now.ToString());
+                    RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, GlobalDateTime.NowUniversalString);
                     list.Add (localFile);
                 }
             }
