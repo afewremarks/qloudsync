@@ -38,6 +38,7 @@ namespace GreenQloud.Repository.Local
             if(Directory.Exists(item.FullLocalName)){
                 var dir = new DirectoryInfo(item.FullLocalName);
                 dir.GetFiles("*", SearchOption.AllDirectories).ToList().ForEach(file=>file.Delete());
+                dir.GetDirectories().ToList().ForEach(directory=>directory.Delete());
                 Directory.Delete (item.FullLocalName);     
             }
             if(File.Exists(item.FullLocalName)){
