@@ -118,7 +118,7 @@ namespace GreenQloud.Test
             localItem.Name = "teste.html";
             localItem.RelativePath = "home";
             localItem.Repository = new LocalRepository("***");
-            localItem.TimeOfLastChange = GlobalDateTime.Now.ToString();
+            localItem.TimeOfLastChange = GlobalDateTime.NowUniversalString;
             
             RepositoryItem remoteItem = new RepositoryItem();
             remoteItem.Name = "teste.html";
@@ -158,7 +158,7 @@ namespace GreenQloud.Test
             remoteItem.Name = "teste.html";
             remoteItem.RelativePath = "home";
             remoteItem.Repository = new LocalRepository("***");
-            remoteItem.TimeOfLastChange = GlobalDateTime.Now.ToString();
+            remoteItem.TimeOfLastChange = GlobalDateTime.NowUniversalString;
             remoteItem.RemoteMD5Hash = "223";
             
             remote.Upload (remoteItem,"updated");

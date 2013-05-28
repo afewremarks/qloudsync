@@ -33,9 +33,9 @@ namespace GreenQloud.Synchrony
                 Thread.Sleep (20000);
                 if (eventsCreated){
                     eventsCreated = false;
-                    if(SyncStatus == SyncStatus.IDLE){
-                        base.Synchronize ();
-                    }
+                    //if(SyncStatus == SyncStatus.IDLE){
+                        //base.Synchronize ();
+                    //}
                 }
             }
         }
@@ -47,8 +47,8 @@ namespace GreenQloud.Synchrony
             try{
                 if (!ready)
                     return;
-                if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
-                    return;
+                //if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
+                //    return;
                 ready = false;
                 string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
                 string time = eventDAO.LastSyncTime;
@@ -130,7 +130,7 @@ namespace GreenQloud.Synchrony
         #endregion  
 
         public void GenericSynchronize(){
-            base.Synchronize();
+            //base.Synchronize();
         }
     }
 }

@@ -176,13 +176,9 @@ namespace GreenQloud {
             };
 
             Program.Controller.OnSyncing += delegate {
-                bool syncDown = StorageQloudLocalEventsSynchronizer.GetInstance().SyncStatus == SyncStatus.DOWNLOADING || 
-                    StorageQloudRemoteEventsSynchronizer.GetInstance().SyncStatus == SyncStatus.DOWNLOADING 
-                || StorageQloudBacklogSynchronizer.GetInstance().SyncStatus == SyncStatus.DOWNLOADING; 
+                bool syncDown = SynchronizerResolver.GetInstance().SyncStatus == SyncStatus.DOWNLOADING;
+                bool syncUp = SynchronizerResolver.GetInstance().SyncStatus == SyncStatus.UPLOADING;
 
-                bool syncUp = StorageQloudLocalEventsSynchronizer.GetInstance().SyncStatus == SyncStatus.UPLOADING || 
-                    StorageQloudRemoteEventsSynchronizer.GetInstance().SyncStatus == SyncStatus.UPLOADING 
-                || StorageQloudBacklogSynchronizer.GetInstance().SyncStatus == SyncStatus.UPLOADING;
                 if(syncDown && syncUp){
                     CurrentState = IconState.Syncing;
                     StateText    = "Syncing changes…";

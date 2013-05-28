@@ -30,10 +30,16 @@ namespace GreenQloud
                 } catch (Exception e){
                     Logger.LogInfo("ERROR", "Cannot find global time on server, using local time.");
                     Logger.LogInfo("ERROR", e);
-                    return GlobalDateTime.Now;
+                    throw new DisconnectionException ();
                 }
             }
         }
+        public static string NowUniversalString {
+            get{
+                return Now.ToUniversalTime ().ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+            }
+        }
+
 	}
 }
 

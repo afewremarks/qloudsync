@@ -32,7 +32,7 @@ namespace GreenQloud.Synchrony
                     remote_timer.Disposed += (object sender, EventArgs e) => Logger.LogInfo("Synchronizer","Disposing timer.");
                 }catch (DisconnectionException)
                 {
-                    SyncStatus = SyncStatus.IDLE;
+                    //SyncStatus = SyncStatus.IDLE;
                     Program.Controller.HandleDisconnection();
                 }
             });

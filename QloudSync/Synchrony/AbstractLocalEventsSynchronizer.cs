@@ -38,9 +38,9 @@ namespace GreenQloud.Synchrony
             while (Working){
                 if (creatingEvent){
                     creatingEvent = false;
-                    if(SyncStatus == SyncStatus.IDLE){
-                        base.Synchronize ();
-                    }
+                    //if(SyncStatus == SyncStatus.IDLE){
+                        //base.Synchronize ();
+                    //}
                 }
                 Thread.Sleep (500);
             }

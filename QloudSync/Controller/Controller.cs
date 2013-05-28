@@ -26,9 +26,10 @@ namespace GreenQloud {
         }
 
         public IconController StatusIcon;
-        StorageQloudLocalEventsSynchronizer localSynchronizer;
-        StorageQloudRemoteEventsSynchronizer remoteSynchronizer;
-        StorageQloudBacklogSynchronizer backlogSynchronizer;
+        private StorageQloudLocalEventsSynchronizer localSynchronizer;
+        private StorageQloudRemoteEventsSynchronizer remoteSynchronizer;
+        private StorageQloudBacklogSynchronizer backlogSynchronizer;
+        private SynchronizerResolver synchronizerResolver;
 
         public double ProgressPercentage = 0.0;
         public string ProgressSpeed      = "";
@@ -73,10 +74,9 @@ namespace GreenQloud {
             localSynchronizer = StorageQloudLocalEventsSynchronizer.GetInstance();
             remoteSynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
             backlogSynchronizer = StorageQloudBacklogSynchronizer.GetInstance();
+            synchronizerResolver = SynchronizerResolver.GetInstance();
 
-            localSynchronizer.SyncStatusChanged += HandleSyncStatusChanged;
-            remoteSynchronizer.SyncStatusChanged += HandleSyncStatusChanged;
-            backlogSynchronizer.SyncStatusChanged +=HandleSyncStatusChanged;
+            synchronizerResolver.SyncStatusChanged +=HandleSyncStatusChanged;
             
             this.timer = new System.Timers.Timer (){
                 Interval = 10000
@@ -90,7 +90,8 @@ namespace GreenQloud {
                     
                     timer.Stop();
                     localSynchronizer.Start();
-                    remoteSynchronizer.Start ();
+                    remoteSynchronizer.Start();
+                    synchronizerResolver.Start();
                 }catch{
                     
                 }
@@ -162,7 +163,7 @@ namespace GreenQloud {
             try{
                 ConfigFile.Read("InstanceID");
             }catch(ConfigurationException e){
-                string id = Crypto.Getbase64(ConfigFile.Read("ApplicationName") + Credential.Username + GlobalDateTime.Now.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+                string id = Crypto.Getbase64(ConfigFile.Read("ApplicationName") + Credential.Username + GlobalDateTime.NowUniversalString);
                 ConfigFile.Write ("InstanceID", id); 
                 ConfigFile.Read("InstanceID");
                 Logger.LogInfo ("INFO", "Generated InstanceID: " + id);
@@ -204,6 +205,7 @@ namespace GreenQloud {
 
             localSynchronizer.Start();
             remoteSynchronizer.Start();
+            synchronizerResolver.Start();
                         
             remoteSynchronizer.ProgressChanged += delegate (double percentage, double speed) {
                 ProgressPercentage = percentage;
@@ -228,9 +230,7 @@ namespace GreenQloud {
         // Fires events for the current syncing state
         private void UpdateState ()
         {
-            if (localSynchronizer.SyncStatus == SyncStatus.DOWNLOADING || localSynchronizer.SyncStatus == SyncStatus.UPLOADING ||
-                remoteSynchronizer.SyncStatus == SyncStatus.DOWNLOADING || remoteSynchronizer.SyncStatus == SyncStatus.UPLOADING  
-                ) {
+            if (synchronizerResolver.SyncStatus == SyncStatus.DOWNLOADING || synchronizerResolver.SyncStatus == SyncStatus.UPLOADING) {
                 OnSyncing ();
             } else {
                 OnIdle ();
