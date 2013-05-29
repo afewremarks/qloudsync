@@ -37,13 +37,16 @@ namespace GreenQloud.Repository.Local
         {
             if(Directory.Exists(item.FullLocalName)){
                 var dir = new DirectoryInfo(item.FullLocalName);
-                dir.GetFiles("*", SearchOption.AllDirectories).ToList().ForEach(file=>file.Delete());
-                dir.GetDirectories().ToList().ForEach(directory=>directory.Delete());
-                Directory.Delete (item.FullLocalName);     
+                DeleteDir (dir);
             }
             if(File.Exists(item.FullLocalName)){
                 File.Delete (item.FullLocalName);
             }
+        }
+        private void DeleteDir(DirectoryInfo dir){
+            dir.GetDirectories().ToList().ForEach(directory=>DeleteDir(directory));
+            dir.GetFiles("*", SearchOption.AllDirectories).ToList().ForEach(file=>file.Delete());
+            Directory.Delete (dir.FullName);     
         }
 
         public override void Move (RepositoryItem item, string resultObject)
