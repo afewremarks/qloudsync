@@ -75,6 +75,8 @@ namespace GreenQloud.Synchrony
 
                         string relativePath = (string)jsonObject["object"];
                         e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
+                        e.Item.RemoteMD5Hash = (string)jsonObject["hash"];
+
                         e.Synchronized = false;
                         eventDAO.Create(e);
                     }

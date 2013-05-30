@@ -160,7 +160,7 @@ namespace GreenQloud.Repository.Local
 
         public string CalculateMD5Hash (RepositoryItem item)
         {
-            var md5hash = new Crypto().md5hash(item);
+            var md5hash = new Crypto().md5hash(item.FullLocalName);
             return md5hash;
         }
     }

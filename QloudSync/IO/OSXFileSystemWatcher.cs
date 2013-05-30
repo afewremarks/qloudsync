@@ -6,18 +6,20 @@ using MonoMac.Foundation;
 
 using System.Threading;
 using System.Text;
+using System.Collections.Concurrent;
 
 namespace GreenQloud
 {
-    class OSXFileSystemWatcher
+    public class OSXFileSystemWatcher
     {
-        
+
+        private ConcurrentBag<string> ignoreBag;
         private FSEventStreamCallback callback;
         Thread runLoop;
         IntPtr stream;
         public OSXFileSystemWatcher(string pathwatcher)
         {
-
+            ignoreBag = new ConcurrentBag<string>();
             string watchedFolder = pathwatcher   ;
             this.callback = this.Callback;
 
@@ -47,6 +49,14 @@ namespace GreenQloud
             runLoop.Join(1000);
         }
 
+        public void Block(string path){
+            ignoreBag.Add (path);
+        }
+
+        public void Unblock(string path){
+            ignoreBag.TryTake(out path);
+        }
+
         private void Callback (IntPtr streamRef, IntPtr clientCallBackInfo, int numEvents, IntPtr eventPaths, IntPtr eventFlags, IntPtr eventIds)
         {
 
@@ -71,7 +81,10 @@ namespace GreenQloud
 
                 //TODO Put the list in file configuration
                 if(!pcatched.EndsWith (".DS_Store") && !pcatched.Contains(".sb-") && !pcatched.Contains("untitled folder")){
+                        string peek;
+                    if(!ignoreBag.TryPeek(out peek)){
                         handler(pcatched);
+                    }
                 }
             }
         }

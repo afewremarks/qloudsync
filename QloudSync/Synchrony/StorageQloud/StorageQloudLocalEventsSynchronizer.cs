@@ -14,7 +14,7 @@ namespace GreenQloud.Synchrony
     {
         static StorageQloudLocalEventsSynchronizer instance;
 
-        List<OSXFileSystemWatcher> watchers;
+        Dictionary<string, OSXFileSystemWatcher> watchers;
         SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
         SQLiteEventDAO eventDAO = new SQLiteEventDAO();
         Thread watchersThread;
@@ -39,7 +39,7 @@ namespace GreenQloud.Synchrony
             r.Repository = new LocalRepository (string.Empty);
             LastLocalEvent.Item = r;
             watchersThread = new Thread(()=>{
-                watchers = new List<OSXFileSystemWatcher>();
+                watchers = new Dictionary<string, OSXFileSystemWatcher>();
                 foreach (LocalRepository repo in repositoryDAO.All){ 
                     OSXFileSystemWatcher watcher = new OSXFileSystemWatcher(repo.Path);
                     watcher.Changed += delegate(string path) {
@@ -55,7 +55,7 @@ namespace GreenQloud.Synchrony
                             }
                         }
                     };
-                    watchers.Add (watcher);
+                    watchers.Add (repo.Path, watcher);
                 }
             
             });
@@ -69,6 +69,12 @@ namespace GreenQloud.Synchrony
                                                                     new SQLiteTransferDAO (),
                                                                     new SQLiteEventDAO ());
             return instance;
+        }
+
+        public OSXFileSystemWatcher GetWatcher(string path){
+            OSXFileSystemWatcher watcher;
+            watchers.TryGetValue (path, out watcher);
+            return watcher;
         }
 
         void CreateEvent (string path)
@@ -117,7 +123,7 @@ namespace GreenQloud.Synchrony
         {
             Working = false;
             watchersThread.Join();
-            foreach (OSXFileSystemWatcher watcher in watchers)
+            foreach (OSXFileSystemWatcher watcher in watchers.Values)
                 watcher.Stop();
             base.Stop();
         }
