@@ -31,7 +31,7 @@ namespace GreenQloud
             return Convert.ToBase64String(key);
         }
 
-        public string md5hash (string input)
+        /*public string md5hash (string input)
         {
             System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create();
             byte[] data = md5.ComputeHash(System.Text.Encoding.Default.GetBytes(input));
@@ -39,14 +39,14 @@ namespace GreenQloud
             for (int i = 0; i < data.Length; i++)
                 sbString.Append(data[i].ToString("x2"));
             return sbString.ToString();
-        }
+        }*/
 
         
-        public string md5hash (RepositoryItem item)
+        public string md5hash (string input)
         {
             string md5hash;
             try {
-                FileStream fs = System.IO.File.Open (item.FullLocalName, FileMode.Open);
+                FileStream fs = System.IO.File.Open (input, FileMode.Open);
                 System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create ();
                 md5hash = BitConverter.ToString (md5.ComputeHash (fs)).Replace (@"-", @"").ToLower ();
                 fs.Close ();

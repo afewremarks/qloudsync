@@ -126,6 +126,8 @@ namespace GreenQloud.Synchrony
 
         void Synchronize(Event e){
             try{
+                BlockWatcher (e);
+
                 Console.WriteLine ("\nSynchronizing: {0} {1} {2}\n",e.EventType, e.RepositoryType, e.Item.FullLocalName);
 
                 Transfer transfer = null;
@@ -162,6 +164,9 @@ namespace GreenQloud.Synchrony
                 if (transfer != null)
                     transferDAO.Create (transfer);
                 logicalLocalRepository.Solve (e.Item);
+
+                VerifySucess(e);
+
                 eventDAO.UpdateToSynchronized(e);
 
                 if(e.RepositoryType == RepositoryType.LOCAL){
@@ -170,6 +175,76 @@ namespace GreenQloud.Synchrony
             } catch (Exception exc){
                 //TODO refactor to catch error and treat
                 Logger.LogInfo("ERROR", exc);
+            } finally {
+                UnblockWatcher (e);
+            }
+        }
+
+        static void BlockWatcher (Event e)
+        {
+            StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (e.Item.Repository.Path).Block (e.Item.FullLocalName);
+            if(e.ResultObject.Length > 0)
+                StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (e.Item.Repository.Path).Block (e.FullLocalResultObject);
+        }
+
+        static void UnblockWatcher (Event e)
+        {
+            StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (e.Item.Repository.Path).Unblock (e.Item.FullLocalName);
+            if(e.ResultObject.Length > 0)
+                StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (e.Item.Repository.Path).Unblock (e.FullLocalResultObject);
+        }
+
+        void VerifySucess (Event e)
+        {
+            Logger.LogInfo("EVENT VERIFY", String.Format("{0} {1} {2}\n",e.EventType, e.RepositoryType, e.Item.FullLocalName));
+            SyncStatus = SyncStatus.VERIFING;
+
+            if (e.RepositoryType == RepositoryType.LOCAL){
+                switch (e.EventType){
+                    case EventType.MOVE:
+                        VerifyMD5 (e);
+                        break;
+                    case EventType.CREATE:
+                        VerifyMD5 (e);
+                        break;
+                    case EventType.UPDATE:
+                        VerifyMD5 (e);
+                        break;
+                    case EventType.COPY:
+                        VerifyMD5 (e);
+                        break;
+                    case EventType.DELETE:
+                    break;
+                }
+            }else{
+                switch (e.EventType){
+                    case EventType.MOVE:
+                        VerifyMD5 (e);
+                        break;
+                    case EventType.CREATE:
+                        VerifyMD5 (e);
+                        break;
+                    case EventType.UPDATE:
+                        VerifyMD5 (e);
+                        break;
+                    case EventType.COPY:
+                        VerifyMD5 (e);
+                        break;
+                    case EventType.DELETE:
+                    break;
+                }                
+            }
+        }
+
+        void VerifyMD5 (Event e)
+        {
+            if (e.ResultObject.Length == 0) {
+                e.Item.LocalMD5Hash = new Crypto ().md5hash (e.Item.FullLocalName);
+            } else {
+                e.Item.LocalMD5Hash = new Crypto ().md5hash (e.FullLocalResultObject);
+            }
+            if (!e.Item.LocalMD5Hash.Equals (e.Item.RemoteMD5Hash)) {
+                Logger.LogInfo ("VERIFY ERROR", "MD5 not match!");
             }
         }
     }

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
  namespace GreenQloud.Model
 {
@@ -25,6 +26,16 @@ using System;
         public string ResultObject {
             get;
             set;
+        }
+        /*public string RelativeResultObject{
+            get {
+                return Path.Combine(Item.RelativePath, ResultObject);
+            }
+        }*/
+        public string FullLocalResultObject{
+            get {
+                return Path.Combine(Item.Repository.Path, ResultObject);
+            }
         }
 
         public RepositoryItem Item{
