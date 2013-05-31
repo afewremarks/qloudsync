@@ -9,9 +9,11 @@ using System.Text;
 using System.Linq;
 using GreenQloud.Util;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 
 namespace GreenQloud.Repository.Remote
 {
+    //TODO refactor md5 to eTag.. missmatch names
     public class StorageQloudRemoteRepositoryController : RemoteRepositoryController
     {
         Local.StorageQloudPhysicalRepositoryController physicalController = new Local.StorageQloudPhysicalRepositoryController();
@@ -23,7 +25,7 @@ namespace GreenQloud.Repository.Remote
 
         public override List<GreenQloud.Model.RepositoryItem> GetCopys (GreenQloud.Model.RepositoryItem item)
         {
-            return AllItems.Where (rf => rf.RemoteMD5Hash == item.RemoteMD5Hash && rf.AbsolutePath != item.AbsolutePath && !rf.IsAFolder && rf.Size>0).ToList<RepositoryItem> ();
+            return AllItems.Where (rf => rf.RemoteETAG == item.RemoteETAG && rf.AbsolutePath != item.AbsolutePath && !rf.IsAFolder && rf.Size>0).ToList<RepositoryItem> ();
         }
 
         public override bool ExistsVersion (GreenQloud.Model.RepositoryItem item)
@@ -193,7 +195,12 @@ namespace GreenQloud.Repository.Remote
 
         public override bool ExistsCopies (GreenQloud.Model.RepositoryItem item)
         {
-            return AllItems.Any(rf => rf.RemoteMD5Hash == item.RemoteMD5Hash && rf.AbsolutePath != item.AbsolutePath && !rf.IsAFolder && rf.Size>0);
+            return AllItems.Any(rf => rf.RemoteETAG == item.RemoteETAG && rf.AbsolutePath != item.AbsolutePath && !rf.IsAFolder && rf.Size>0);
+        }
+
+        public override string GetRemoteMD5 (string path)
+        {
+            return GetS3Objects().First(rf => rf.Key != path).ETag;
         }
 
         public override List<GreenQloud.Model.RepositoryItem> AllItems {
@@ -374,7 +381,7 @@ namespace GreenQloud.Repository.Remote
             }
             RepositoryItem item = RepositoryItem.CreateInstance (repo,
                                                                  s3item.Key, false, s3item.Size, s3item.LastModified);
-            item.RemoteMD5Hash = s3item.ETag.Replace("\"","");
+            item.RemoteETAG = s3item.ETag;
             item.InTrash = s3item.Key.Contains (Constant.TRASH);
             return item;
         }

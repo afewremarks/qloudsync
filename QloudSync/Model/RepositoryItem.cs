@@ -6,6 +6,7 @@ using System.Dynamic.Utils;
 using Amazon.S3.Model;
 using System.Security.Cryptography;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace GreenQloud.Model
 {
@@ -71,6 +72,30 @@ namespace GreenQloud.Model
             set; get;
         }
 
+        private string resultObject = null;
+        public string ResultObject {
+            set{
+                resultObject = value;
+            }
+            get {
+                if (resultObject == null)
+                    return "";
+                return resultObject;
+            }
+        }
+
+        public string FullResultObjectName {
+            get{
+                return Path.Combine(RelativePath, ResultObject);
+            }
+        }
+        public string FullLocalResultObject{
+            get {
+                string s = Path.Combine(Repository.Path, ResultObject);
+                return s;
+            }
+        }
+
         public string Name { get; set;}
 
         public string RelativePath{ 
@@ -89,14 +114,7 @@ namespace GreenQloud.Model
                 fullLocalName = value;
             }
             get {
-                if(fullLocalName == null){                    
-
-                    fullLocalName = Path.Combine(Repository.Path, AbsolutePath);
-
-                }
-                
-
-                return fullLocalName;
+                return Path.Combine(Repository.Path, AbsolutePath);
             }
         }
         
@@ -137,19 +155,13 @@ namespace GreenQloud.Model
             get;
         }
         string remotehash = string.Empty;
-        public string RemoteMD5Hash {
+        public string RemoteETAG {
             get{
                 return remotehash;
             }set{
                 remotehash = value;
             }
         }   
-
-        public string LocalMD5Hash {
-            set;
-            get;
-        }
-
 
         public string TimeOfLastChange{
             set;
@@ -176,7 +188,7 @@ namespace GreenQloud.Model
                     FullLocalName.Contains(".app/") || Name.EndsWith(".app") || Name=="untitled folder";
                 if(File.Exists(FullLocalName))
                 {
-                    ignored |= (File.GetAttributes(fullLocalName) & FileAttributes.Hidden) == FileAttributes.Hidden;
+                    ignored |= (File.GetAttributes(FullLocalName) & FileAttributes.Hidden) == FileAttributes.Hidden;
                 }
                 else if (Directory.Exists(FullLocalName)){
                     DirectoryInfo d = new DirectoryInfo(FullLocalName);

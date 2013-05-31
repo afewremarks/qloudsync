@@ -33,8 +33,8 @@ namespace GreenQloud.Persistence.SQLite
                         dateOfEvent = GlobalDateTime.NowUniversalString;
                     }
 
-                    string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET, ResultObject) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\", \"{11}\")", 
-                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket, e.ResultObject);
+                    string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
+                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
 
                     database.ExecuteNonQuery (sql);
                 }catch(Exception err){
@@ -56,12 +56,6 @@ namespace GreenQloud.Persistence.SQLite
             database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\" WHERE ITEMID =\"{1}\"", bool.TrueString, id));
         }
 
-        public override void UpdateResultObject (Event e)
-        {            
-            string id = repositoryItemDAO.GetId(e.Item);
-            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  ResultObject = \"{0}\" WHERE ITEMID =\"{1}\"", e.ResultObject, id));
-        }
- 
         public override List<Event> EventsNotSynchronized {
             get {
                 List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\"", bool.FalseString));
@@ -164,7 +158,6 @@ namespace GreenQloud.Persistence.SQLite
                 e.DeviceId = dr[9].ToString();
                 e.OS = dr[10].ToString();
                 e.Bucket = dr[11].ToString();
-                e.ResultObject = dr[12].ToString();
                 events.Add (e);
             }
             return events;

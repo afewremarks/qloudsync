@@ -15,7 +15,7 @@ namespace GreenQloud.Persistence.SQLite
         SQLiteDatabase database = new SQLiteDatabase();
         public override void Create (RepositoryItem item)
         {
-            database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Name, RelativePath, RepoPath, IsFolder, DELETED) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",\"{4}\")", item.Name, item.RelativePath, item.Repository.Path, item.IsAFolder, bool.FalseString));
+            database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Name, RelativePath, RepoPath, IsFolder, DELETED, eTag, ResultObject) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",\"{4}\",'{5}', \"{6}\")", item.Name, item.RelativePath, item.Repository.Path, item.IsAFolder, bool.FalseString, item.RemoteETAG, item.ResultObject));
 
         }
         public RepositoryItem Create (Event e)
@@ -28,6 +28,11 @@ namespace GreenQloud.Persistence.SQLite
             return e.Item;
         }
 
+
+        public override void Update (RepositoryItem i)
+        {            
+            database.ExecuteNonQuery (string.Format("UPDATE REPOSITORYITEM SET  ResultObject = \"{1}\", eTag = '{2}' WHERE RepositoryItemID =\"{0}\"", i.Id, i.ResultObject, i.RemoteETAG));
+        }
 
         public override List<RepositoryItem> All {
             get {
@@ -88,6 +93,8 @@ namespace GreenQloud.Persistence.SQLite
                 item.RelativePath = dr[2].ToString();
                 item.Repository = new LocalRepository(dr[3].ToString());
                 item.IsAFolder = bool.Parse (dr[4].ToString());
+                item.ResultObject = dr[6].ToString();
+                item.RemoteETAG = dr[7].ToString();
 
                 items.Add (item);
             }
