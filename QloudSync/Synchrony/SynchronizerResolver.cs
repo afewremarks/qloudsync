@@ -132,7 +132,11 @@ namespace GreenQloud.Synchrony
             try{
                 BlockWatcher (e);
 
-                Console.WriteLine ("\nSynchronizing: {0} {1} {2}\n",e.EventType, e.RepositoryType, e.Item.FullLocalName);
+                string s = String.Format (" {0} {1} {2}",e.EventType, e.RepositoryType, e.Item.FullLocalName);
+                if(e.Item.ResultObject != ""){
+                    s += String.Format ("  Result Object: {0} \n",e.Item.ResultObject);
+                }
+                Logger.LogInfo("Event Synchronizing", s);
 
                 Transfer transfer = null;
                 if (e.RepositoryType == RepositoryType.LOCAL){
@@ -150,13 +154,16 @@ namespace GreenQloud.Synchrony
                 }else{
                     switch (e.EventType){
                     case EventType.MOVE:
-                        physicalLocalRepository.Move(e.Item, e.Item.ResultObject);
+                        physicalLocalRepository.Move(e.Item);
                         break;
                     case EventType.CREATE: 
                     case EventType.UPDATE:
-                    case EventType.COPY:
                         SyncStatus = SyncStatus.DOWNLOADING;
                         transfer = remoteRepository.Download (e.Item);
+                        break;
+                    case EventType.COPY:
+                        SyncStatus = SyncStatus.DOWNLOADING;
+                        physicalLocalRepository.Copy (e.Item);
                         break;
                     case EventType.DELETE:
                         SyncStatus = SyncStatus.DOWNLOADING;

@@ -7,6 +7,7 @@ using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Repository.Local
 {
+    //TODO Refactor... only create folders if dir doesnt exists
     public class StorageQloudPhysicalRepositoryController : PhysicalRepositoryController
     {
         SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO();
@@ -51,9 +52,36 @@ namespace GreenQloud.Repository.Local
             Directory.Delete (dir.FullName);     
         }
 
-        public override void Move (RepositoryItem item, string resultObject)
+        public override void Copy (RepositoryItem item)
         {
-            string path = RuntimeSettings.HomePath +"/"+ resultObject;
+            string path = RuntimeSettings.HomePath +"/"+ item.ResultObject;
+            if (path.EndsWith ("/"))
+                path = path.Substring (0, path.Length-1);
+
+            if (!Exists(item))
+                return;
+            if (item.IsAFolder)
+            {
+                if(!Directory.Exists(path)){
+                    var dir = new DirectoryInfo(item.FullLocalName);
+                    CopyDir (dir, path);
+                }
+            }else{
+                File.Copy(item.FullLocalName, path);
+            }
+        }
+
+        private void CopyDir(DirectoryInfo dir, string to){
+            if(!Directory.Exists(to)){
+                Directory.CreateDirectory (to);
+            }
+            dir.GetDirectories().ToList().ForEach(directory=>CopyDir(directory, to+"/"+directory.Name));
+            dir.GetFiles("*", SearchOption.AllDirectories).ToList().ForEach(file=>file.CopyTo(to+"/"+file.Name));
+        }
+
+        public override void Move (RepositoryItem item)
+        {
+            string path = RuntimeSettings.HomePath +"/"+ item.ResultObject;
             if (path.EndsWith ("/"))
                 path = path.Substring (0, path.Length-1);
 
