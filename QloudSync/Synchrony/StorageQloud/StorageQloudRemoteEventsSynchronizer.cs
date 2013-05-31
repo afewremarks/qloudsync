@@ -19,8 +19,8 @@ namespace GreenQloud.Synchrony
         public new delegate void ProgressChangedEventHandler (double percentage, double time);
 
         public StorageQloudRemoteEventsSynchronizer (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
-                                                     RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
-            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
+                                                     RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
+            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO, repositoryItemDAO)
         {
             threadTimer = new Thread( ()=>{
                 try{
@@ -44,7 +44,8 @@ namespace GreenQloud.Synchrony
                                                                     new StorageQloudPhysicalRepositoryController(),
                                                                     new StorageQloudRemoteRepositoryController(),
                                                                     new SQLiteTransferDAO (),
-                                                                    new SQLiteEventDAO ());
+                                                                    new SQLiteEventDAO (),
+                                                                    new SQLiteRepositoryItemDAO());
             return instance;
         }
 

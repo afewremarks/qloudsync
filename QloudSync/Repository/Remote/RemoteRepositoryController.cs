@@ -61,6 +61,7 @@ namespace GreenQloud.Repository.Remote
             }
         }
 
+        public abstract string GetRemoteMD5 (string path);
         public abstract bool ExistsVersion (RepositoryItem file);
         public abstract Transfer Download (RepositoryItem request);
         public abstract Transfer Upload (RepositoryItem request);

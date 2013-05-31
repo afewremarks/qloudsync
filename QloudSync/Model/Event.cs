@@ -22,22 +22,6 @@ using System.IO;
 		public Event ()
 		{
 		}
-
-        public string ResultObject {
-            get;
-            set;
-        }
-        /*public string RelativeResultObject{
-            get {
-                return Path.Combine(Item.RelativePath, ResultObject);
-            }
-        }*/
-        public string FullLocalResultObject{
-            get {
-                return Path.Combine(Item.Repository.Path, ResultObject);
-            }
-        }
-
         public RepositoryItem Item{
 			set; get;
 		}

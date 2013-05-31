@@ -18,8 +18,8 @@ namespace GreenQloud.Synchrony
         bool eventsCreated;
 
         public RemoteEventsSynchronizer  
-            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
-            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
+            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
+                base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO, repositoryItemDAO)
         {
             threadSync = new Thread(() =>{
                 Synchronize ();
@@ -69,16 +69,18 @@ namespace GreenQloud.Synchrony
                         e.DeviceId = (string)jsonObject["deviceId"];
                         e.OS = (string)jsonObject["os"];
                         e.Bucket = (string)jsonObject["bucket"];
-                        e.ResultObject = (string)jsonObject["resultObject"];
 
                         e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 
                         string relativePath = (string)jsonObject["object"];
                         e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
-                        e.Item.RemoteMD5Hash = (string)jsonObject["hash"];
+
+                        e.Item.ResultObject = (string)jsonObject["resultObject"];
+                        e.Item.RemoteETAG = (string)jsonObject["hash"];
 
                         e.Synchronized = false;
                         eventDAO.Create(e);
+                        repositoryItemDAO.Update(e.Item);
                     }
                 }
                 eventsCreated = true;

@@ -17,13 +17,15 @@ namespace GreenQloud.Repository.Local
 
         #region implemented abstract members of PhysicalRepositoryController
 
+        //TODO understand and refactor
         public override bool IsSync(RepositoryItem item){
             if(item.IsAFolder)
                 return true;
-            if(item.RemoteMD5Hash == string.Empty)
+            if(item.RemoteETAG == string.Empty)
                 throw new Exception ("Remote Hash not exists");
-            item.LocalMD5Hash = CalculateMD5Hash(item);
-            return item.RemoteMD5Hash == item.LocalMD5Hash;
+            //item.LocalMD5Hash = CalculateMD5Hash(item);
+            //return item.RemoteMD5Hash == item.LocalMD5Hash;
+            return true;
         }
 
         public override bool Exists (RepositoryItem item)
@@ -70,9 +72,9 @@ namespace GreenQloud.Repository.Local
             if (item.IsAFolder)
                 return null;
 
-            if (Items.Any (i=> i.FullLocalName != item.FullLocalName && i.RemoteMD5Hash == item.LocalMD5Hash))
+            if (Items.Any (i=> i.FullLocalName != item.FullLocalName && i.RemoteETAG == item.RemoteETAG))
             {
-                return Items.First (i=> i.FullLocalName != item.FullLocalName && i.RemoteMD5Hash == item.LocalMD5Hash);
+                return Items.First (i=> i.FullLocalName != item.FullLocalName && i.RemoteETAG == item.RemoteETAG);
             }
             else
                 return null;

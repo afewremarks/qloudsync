@@ -20,8 +20,8 @@ namespace GreenQloud.Synchrony
         bool creatingEvent;
 
         protected AbstractLocalEventsSynchronizer 
-            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
-             base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
+            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
+                base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO, repositoryItemDAO)
         {
             threadSync = new Thread(() =>{
                 Synchronize ();

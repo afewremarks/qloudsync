@@ -25,6 +25,7 @@ namespace GreenQloud.Synchrony
 
         protected TransferDAO transferDAO;
         protected EventDAO eventDAO;
+        protected RepositoryItemDAO repositoryItemDAO;
         protected LogicalRepositoryController logicalLocalRepository;
         protected PhysicalRepositoryController physicalLocalRepository;
         protected RemoteRepositoryController remoteRepository;
@@ -39,13 +40,14 @@ namespace GreenQloud.Synchrony
         
         protected AbstractSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
-             RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO)
+             RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO)
         {
             this.transferDAO = transferDAO;
             this.eventDAO = eventDAO;
             this.logicalLocalRepository = logicalLocalRepository;
             this.physicalLocalRepository = physicalLocalRepository;
             this.remoteRepository = remoteRepository;
+            this.repositoryItemDAO = repositoryItemDAO;
         }
 
         #region Abstract Methods
