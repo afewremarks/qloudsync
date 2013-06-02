@@ -142,15 +142,24 @@ namespace GreenQloud.Synchrony
                 if (e.RepositoryType == RepositoryType.LOCAL){
                     
                     SyncStatus = SyncStatus.UPLOADING;
-                    
-                    if (e.EventType == EventType.DELETE) {
-                        transfer = remoteRepository.MoveToTrash (e.Item);
-                        e.Item.ResultObject =  e.Item.TrashFullName;
-                        repositoryItemDAO.Update (e.Item);
+
+                    switch (e.EventType){
+                        case EventType.CREATE: 
+                        case EventType.UPDATE:
+                            SyncStatus = SyncStatus.DOWNLOADING;
+                            transfer = remoteRepository.Upload (e.Item);
+                            break;
+                        case EventType.DELETE:  
+                            e.Item.ResultObject =  e.Item.TrashFullName;
+                            repositoryItemDAO.Update (e.Item);
+                            transfer = remoteRepository.MoveToTrash (e.Item);
+                            break;
+                        case EventType.MOVE:
+                            transfer = remoteRepository.Move (e.Item);
+                            break;
+                        case EventType.COPY:
+                        break;
                     }
-                    else
-                        transfer = remoteRepository.Upload (e.Item);
-                    
                 }else{
                     switch (e.EventType){
                     case EventType.MOVE:
