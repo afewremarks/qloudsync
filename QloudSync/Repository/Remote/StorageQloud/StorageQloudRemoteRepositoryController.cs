@@ -25,7 +25,7 @@ namespace GreenQloud.Repository.Remote
 
         public override List<GreenQloud.Model.RepositoryItem> GetCopys (GreenQloud.Model.RepositoryItem item)
         {
-            return AllItems.Where (rf => rf.RemoteETAG == item.RemoteETAG && rf.AbsolutePath != item.AbsolutePath && !rf.IsAFolder && rf.Size>0).ToList<RepositoryItem> ();
+            return AllItems.Where (rf => rf.RemoteETAG == item.RemoteETAG && rf.AbsolutePath != item.AbsolutePath).ToList<RepositoryItem> ();
         }
 
         public override bool ExistsVersion (GreenQloud.Model.RepositoryItem item)
@@ -45,7 +45,7 @@ namespace GreenQloud.Repository.Remote
                 physicalController.CreateFolder(item);
             }else{
                 GetObjectResponse response = null;
-                try {
+
                     string sourcekey = item.AbsolutePath;
                    
                     Logger.LogInfo ("Connection", "Download the file " + sourcekey + ".");
@@ -68,16 +68,6 @@ namespace GreenQloud.Repository.Remote
                         response.WriteResponseStreamToFile(item.FullLocalName);
                     }
                     CurrentTransfer.EndTime = GlobalDateTime.Now;
-                }catch(System.Threading.ThreadInterruptedException){
-                }
-                catch (Exception e) {
-                    Logger.LogInfo ("Error", e);
-                    CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
-                    CurrentTransfer.EndTime = GlobalDateTime.Now;
-                } finally {
-                    if (response!=null) response.Dispose();
-                }
-
             }
             return CurrentTransfer;
         }
@@ -88,56 +78,35 @@ namespace GreenQloud.Repository.Remote
                 return CreateFolder (item);
             }else{
                 CurrentTransfer = new Transfer (item, TransferType.UPLOAD);
-                if (!physicalController.Exists(item))
+
+                /*if (!physicalController.Exists(item))
                 {
                     CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
                     Logger.LogInfo ("Upload", string.Format("Could not upload {0} because it does not exist in local repository.", item.AbsolutePath));
                     return CurrentTransfer; 
-                }
-                if (ExistsCopies (item)){
-                    RepositoryItem copy = GetCopys(item).First();
-                    Copy (copy, item);
-                }else{
-                    GenericUpload ( item.RelativePathInBucket,  item.Name,  item.FullLocalName);
-                }
+                }*/
+
+                GenericUpload ( item.RelativePathInBucket,  item.Name,  item.FullLocalName);
             }
+            return CurrentTransfer;
+        }
+
+        public override Transfer Move (RepositoryItem item)
+        {
+            CurrentTransfer = new Transfer (item, TransferType.REMOTE_MOVE); 
+
+            GenericCopy (RuntimeSettings.DefaultBucketName, item.AbsolutePath, RuntimeSettings.DefaultBucketName, item.ResultObject);
+            Delete (item);
+            CurrentTransfer.EndTime = GlobalDateTime.Now;
+
             return CurrentTransfer;
         }
 
         public override Transfer MoveToTrash (RepositoryItem item)
         {
-            CurrentTransfer = new Transfer (item, TransferType.REMOTE_REMOVE); 
-
-            if (IsNotEmptyFolder(item)){
-                List<RepositoryItem> filesInFolder = FilesInFolder (item);
-
-                foreach (RepositoryItem internalFile in filesInFolder)
-                {
-                    MoveToTrash (internalFile);
-                }
-                return MoveToTrash (item);
-            }
-            else{
-                CurrentTransfer = new Transfer (item, TransferType.REMOTE_REMOVE); 
-
-                string destinationName;
-
-                if(item.IsAFolder){
-                    destinationName = item.Name;
-                }
-                else
-                    destinationName = item.Name;
-                
-                //UpdateTrashFolder (item);            
-                
-                GenericCopy (RuntimeSettings.DefaultBucketName, item.AbsolutePath, item.TrashRelativePath, destinationName);
-                string key = item.AbsolutePath;
-                if (!GetS3Objects().Any(s=> s.Key == item.AbsolutePath))
-                    key+="/";
-                GenericDelete (key);
-                CurrentTransfer.EndTime = GlobalDateTime.Now;
-                return CurrentTransfer;
-            }
+            item.ResultObject = item.TrashAbsolutePath;
+            item.ResultObject = item.ResultObject +"("+GlobalDateTime.NowUniversalString+")";
+            return  Move (item);
         }
 
         public override Transfer Delete (RepositoryItem item)
@@ -195,7 +164,7 @@ namespace GreenQloud.Repository.Remote
 
         public override bool ExistsCopies (GreenQloud.Model.RepositoryItem item)
         {
-            return AllItems.Any(rf => rf.RemoteETAG == item.RemoteETAG && rf.AbsolutePath != item.AbsolutePath && !rf.IsAFolder && rf.Size>0);
+            return AllItems.Any(rf => rf.RemoteETAG == item.RemoteETAG && rf.AbsolutePath != item.AbsolutePath);
         }
 
         public override string GetRemoteMD5 (string path)
@@ -242,62 +211,43 @@ namespace GreenQloud.Repository.Remote
         #region Generic
         private void GenericCopy (string sourceBucket, string sourceKey, string destinationBucket, string destinationKey)
         {
-            try {
-                CurrentTransfer.InitialTime = GlobalDateTime.Now;
-                CopyObjectRequest request = new CopyObjectRequest (){
-                    DestinationBucket = destinationBucket,
-                    DestinationKey = destinationKey,
-                    SourceBucket = sourceBucket,
-                    SourceKey = sourceKey
-                };
-                
-                using (CopyObjectResponse cor = Connect ().CopyObject (request)){}
-                CurrentTransfer.EndTime = GlobalDateTime.Now;
-            } 
-            //TODO Understand why System.InvalidOperationException is catched, and the file is copied
-            catch{
-                
-            }
+            CurrentTransfer.InitialTime = GlobalDateTime.Now;
+            CopyObjectRequest request = new CopyObjectRequest (){
+                DestinationBucket = destinationBucket,
+                DestinationKey = destinationKey,
+                SourceBucket = sourceBucket,
+                SourceKey = sourceKey
+            };
+            
+            using (CopyObjectResponse cor = Connect ().CopyObject (request)){}
+            CurrentTransfer.EndTime = GlobalDateTime.Now;
         }
 
         public void GenericDelete (string key)
         {
-            try {
-                if (key == "")
-                    return;
-                
-                DeleteObjectRequest request = new DeleteObjectRequest (){
-                    BucketName = RuntimeSettings.DefaultBucketName,
-                    Key = key
-                };
-                AmazonS3Client connection = Connect();
-                
-                if(key!=Constant.CLOCK_TIME)  
-                CurrentTransfer.InitialTime = GlobalDateTime.Now;
+            if (key == "")
+                return;
+            
+            DeleteObjectRequest request = new DeleteObjectRequest (){
+                BucketName = RuntimeSettings.DefaultBucketName,
+                Key = key
+            };
+            AmazonS3Client connection = Connect();
+            
+            if(key!=Constant.CLOCK_TIME)  
+            CurrentTransfer.InitialTime = GlobalDateTime.Now;
 
-                using (DeleteObjectResponse response = connection.DeleteObject (request)) {
+            using (DeleteObjectResponse response = connection.DeleteObject (request)) {
 
-                }
-
-                if(key!=Constant.CLOCK_TIME)  {              
-                    Logger.LogInfo ("Connection", string.Format("{0} was deleted in bucket.", key));
-
-                    CurrentTransfer.EndTime = GlobalDateTime.Now;
-                    CurrentTransfer.Status = TransferStatus.DONE;
-                }
-            } catch (AmazonS3Exception) {
-                if(InitializeBucket())
-                    GenericDelete (key);
-                else{
-                    CurrentTransfer.EndTime = GlobalDateTime.Now;
-                    Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
-                    CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
-                }
-            }catch (Exception e){
-                CurrentTransfer.EndTime = GlobalDateTime.Now;
-                CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
-                Logger.LogInfo ("Connection", e);
             }
+
+            if(key!=Constant.CLOCK_TIME)  {              
+                Logger.LogInfo ("Connection", string.Format("{0} was deleted in bucket.", key));
+
+                CurrentTransfer.EndTime = GlobalDateTime.Now;
+                CurrentTransfer.Status = TransferStatus.DONE;
+            }
+
         }
 
         bool GetValidationCallBack (object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
@@ -323,47 +273,26 @@ namespace GreenQloud.Repository.Remote
         {
             S3Response response = new S3Response();
             AmazonS3Client upconnection;
-            try {
-                AmazonS3Config config = CreateConfig ();
-                upconnection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
-                
-                PutObjectRequest putObject = new PutObjectRequest ()
-                {
-                    BucketName = bucketName,
-                    FilePath = filepath,
-                    Key = key, 
-                    Timeout = GlobalSettings.UploadTimeout
-                };                
-                CurrentTransfer.InitialTime = GlobalDateTime.Now;
-                using (response = upconnection.PutObject (putObject)) {
 
-                }
-                CurrentTransfer.EndTime = GlobalDateTime.Now;
-                Logger.LogInfo ("Connection", string.Format ("{0} was uploaded.", filepath));
-                CurrentTransfer.Status = TransferStatus.DONE;
-                UpdateStorageQloud();
-
-
-
-            } catch (ObjectDisposedException) {
-                Logger.LogInfo ("Connection", "An exception occurred, the file will be resend.");
-                GenericUpload (bucketName, key, filepath);
-            } catch (AmazonS3Exception) {
-                
-                if (InitializeBucket ())
-                    GenericUpload (bucketName, key, filepath);
-                else{
-                    Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
-                    CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
-                }
-            } catch (Exception e) {
-                Logger.LogInfo ("Connection", e);
-                CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
-            } finally {
-                response.Dispose();
-                upconnection.Dispose();
-            }
+            AmazonS3Config config = CreateConfig ();
+            upconnection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
             
+            PutObjectRequest putObject = new PutObjectRequest ()
+            {
+                BucketName = bucketName,
+                FilePath = filepath,
+                Key = key, 
+                Timeout = GlobalSettings.UploadTimeout
+            };                
+            CurrentTransfer.InitialTime = GlobalDateTime.Now;
+            using (response = upconnection.PutObject (putObject)) {
+
+            }
+            CurrentTransfer.EndTime = GlobalDateTime.Now;
+            Logger.LogInfo ("Connection", string.Format ("{0} was uploaded.", filepath));
+            CurrentTransfer.Status = TransferStatus.DONE;
+            UpdateStorageQloud();
+
         }
         #endregion
 
@@ -393,52 +322,30 @@ namespace GreenQloud.Repository.Remote
             using (client = Amazon.AWSClientFactory.CreateAmazonS3Client(
                 Credential.PublicKey, Credential.SecretKey, CreateConfig()))
             {
-                 try
+                ++Controller.Contador;
+                ListObjectsRequest request = new ListObjectsRequest();
+                request = new ListObjectsRequest();
+                request.BucketName = RuntimeSettings.DefaultBucketName;
+                List<S3Object> list;
+                do
                 {
-                    ++Controller.Contador;
-                    ListObjectsRequest request = new ListObjectsRequest();
-                    request = new ListObjectsRequest();
-                    request.BucketName = RuntimeSettings.DefaultBucketName;
-                    List<S3Object> list;
-                    do
-                    {
-                        ListObjectsResponse response = client.ListObjects(request);
-                       
-                        list = response.S3Objects;
-                       
-                        // If response is truncated, set the marker to get the next 
-                        // set of keys.
-                        if (response.IsTruncated)
-                        {                           
-                            request.Marker = response.NextMarker;
-                        }
-                        else
-                        {
-                            request = null;
-                        }
-                    } while (request != null);
-
-                    return list;
-                }
-                catch (System.Net.WebException e){
-                    if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout || e.Status == WebExceptionStatus.ConnectFailure || e.Status == WebExceptionStatus.SendFailure){
-                        throw new DisconnectionException();
-                    }else{
-
-                        if (((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.Unauthorized)
-                        {
-                            throw new AccessDeniedException(); 
-                        }
+                    ListObjectsResponse response = client.ListObjects(request);
+                   
+                    list = response.S3Objects;
+                   
+                    // If response is truncated, set the marker to get the next 
+                    // set of keys.
+                    if (response.IsTruncated)
+                    {                           
+                        request.Marker = response.NextMarker;
                     }
-                }catch(AmazonS3Exception s3e)
-                {
-                    if (s3e.StatusCode == HttpStatusCode.Forbidden)
-                        throw new AccessDeniedException(); 
-                }
-                catch (Exception e){
-                    Console.WriteLine (e.StackTrace);
-                }
-                return null;
+                    else
+                    {
+                        request = null;
+                    }
+                } while (request != null);
+
+                return list;
             }
         }
 
@@ -487,26 +394,10 @@ namespace GreenQloud.Repository.Remote
             if (connection != null) {
                 return connection;
             }
-            try { 
-                AmazonS3Config config = CreateConfig ();
-                connection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
-                Logger.LogInfo("Connection", "Start a new connection"); 
-                return connection;
-            }catch (System.Net.WebException e){
-                if (e.Status == WebExceptionStatus.NameResolutionFailure || e.Status == WebExceptionStatus.Timeout){
-                    throw new DisconnectionException();
-                }else{                    
-                    if (((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new AccessDeniedException(); 
-                    }
-                }
-            }catch(AmazonS3Exception s3e)
-            {
-                if (s3e.StatusCode == HttpStatusCode.Forbidden)
-                    throw new AccessDeniedException(); 
-            }
-            return null;
+            AmazonS3Config config = CreateConfig ();
+            connection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
+            Logger.LogInfo("Connection", "Start a new connection"); 
+            return connection;
         }
 
         public AmazonS3Client Reconnect ()
@@ -534,40 +425,34 @@ namespace GreenQloud.Repository.Remote
         TimeSpan diff = new TimeSpan();
         public TimeSpan CalculateDiffClocks ()
         {
-            try {
-                if (GlobalDateTime.Now.Subtract(lastDiffClock).TotalMinutes>30){
-                    
-                    RepositoryItem clockFile = new RepositoryItem ();
-                    clockFile.Name = Constant.CLOCK_TIME;
-                    clockFile.RelativePath = string.Empty;
-                    clockFile.Repository = new LocalRepository (RuntimeSettings.HomePath);
-                   
-                    PutObjectRequest putObject = new PutObjectRequest ()
-                    {
-                        BucketName = DefaultBucketName,
-                        Key = clockFile.Name,
-                        ContentBody = string.Empty
-                    };
-                    
-                    DateTime localClock;
-                    using (S3Response response = Connect ().PutObject (putObject)){
-                        localClock = GlobalDateTime.Now;
-                    }
-                    ListObjectsResponse files = Connect ().ListObjects (new ListObjectsRequest ().WithBucketName (DefaultBucketName));
-                    S3Object remotefile = files.S3Objects.Where (o => o.Key == clockFile.Name).FirstOrDefault();
-                    string sRemoteclock = remotefile.LastModified;
-                    GenericDelete (clockFile.AbsolutePath);
-                    DateTime remoteClock = Convert.ToDateTime (sRemoteclock);
-                    diff = localClock.Subtract(remoteClock);
-                    lastDiffClock = localClock;
+            if (GlobalDateTime.Now.Subtract(lastDiffClock).TotalMinutes>30){
+                
+                RepositoryItem clockFile = new RepositoryItem ();
+                clockFile.Name = Constant.CLOCK_TIME;
+                clockFile.RelativePath = string.Empty;
+                clockFile.Repository = new LocalRepository (RuntimeSettings.HomePath);
+               
+                PutObjectRequest putObject = new PutObjectRequest ()
+                {
+                    BucketName = DefaultBucketName,
+                    Key = clockFile.Name,
+                    ContentBody = string.Empty
+                };
+                
+                DateTime localClock;
+                using (S3Response response = Connect ().PutObject (putObject)){
+                    localClock = GlobalDateTime.Now;
                 }
-                return diff;
-                
-            } catch(Exception e) {
-                Logger.LogInfo ("Connection","Fail to determinate a remote clock: "+e.Message +" \n");
-                
-                return new TimeSpan (0);
+                ListObjectsResponse files = Connect ().ListObjects (new ListObjectsRequest ().WithBucketName (DefaultBucketName));
+                S3Object remotefile = files.S3Objects.Where (o => o.Key == clockFile.Name).FirstOrDefault();
+                string sRemoteclock = remotefile.LastModified;
+                GenericDelete (clockFile.AbsolutePath);
+                DateTime remoteClock = Convert.ToDateTime (sRemoteclock);
+                diff = localClock.Subtract(remoteClock);
+                lastDiffClock = localClock;
             }
+            return diff;
+
         }
 
         public bool IsNotEmptyFolder (RepositoryItem item)
@@ -623,45 +508,25 @@ namespace GreenQloud.Repository.Remote
         
         private bool CreateFolder (string name, string relativePath)
         {
-            S3Response response; 
-            try {
-                Logger.LogInfo ("Connection","Creating folder "+name+".");
-                if (!name.EndsWith("/"))
-                    name+="/";
-                PutObjectRequest putObject = new PutObjectRequest (){
-                    BucketName = relativePath,
-                    Key = name,
-                    ContentBody = string.Empty
-                };
-                CurrentTransfer.InitialTime = GlobalDateTime.Now;
-                using (response = Connect ().PutObject (putObject))
-                {
-                    
-                }
+            S3Response response;
+            Logger.LogInfo ("Connection","Creating folder "+name+".");
+            if (!name.EndsWith("/"))
+                name+="/";
+            PutObjectRequest putObject = new PutObjectRequest (){
+                BucketName = relativePath,
+                Key = name,
+                ContentBody = string.Empty
+            };
+            CurrentTransfer.InitialTime = GlobalDateTime.Now;
+            using (response = Connect ().PutObject (putObject))
+            {
                 
-                CurrentTransfer.EndTime = GlobalDateTime.Now;
-                UpdateStorageQloud();
-                Logger.LogInfo ("Connection", "Folder "+name+" created");
-            }catch (AmazonS3Exception) {
-                if(InitializeBucket())
-                    return  CreateFolder (name, relativePath);
-                else{
-                    Logger.LogInfo ("Connection", "There is a problem of comunication and the file will be sent back.");
-                    CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
-                    CurrentTransfer.EndTime = GlobalDateTime.Now;
-                    return false;
-                }
             }
-            catch(Exception e) {
-                Logger.LogInfo ("Connection","Fail to upload "+e.Message);
-                CurrentTransfer.Status = TransferStatus.DONE_WITH_ERROR;
-                CurrentTransfer.EndTime = GlobalDateTime.Now;
-                return false;
-            }
-
+            
+            CurrentTransfer.EndTime = GlobalDateTime.Now;
+            UpdateStorageQloud();
+            Logger.LogInfo ("Connection", "Folder "+name+" created");
             return true;
-            
-            
         }
 
         public bool ExistsBucket 
@@ -673,16 +538,12 @@ namespace GreenQloud.Repository.Remote
 
         public bool CreateBucket ()
         {   
-            try {
-                PutBucketRequest request = new PutBucketRequest ();
-                request.BucketName = RuntimeSettings.DefaultBucketName;
-                Connect ().PutBucket (request);
-                Logger.LogInfo("Connection", "Bucket "+RuntimeSettings.DefaultBucketName+" was created.");
-                return true;
-            } catch (Exception e) {
-                Logger.LogInfo ("Connection",e);
-                return false;
-            }
+            PutBucketRequest request = new PutBucketRequest ();
+            request.BucketName = RuntimeSettings.DefaultBucketName;
+            Connect ().PutBucket (request);
+            Logger.LogInfo("Connection", "Bucket "+RuntimeSettings.DefaultBucketName+" was created.");
+            return true;
+       
         }
 
 
@@ -730,19 +591,18 @@ namespace GreenQloud.Repository.Remote
         public void UpdateStorageQloud ()
         {
             S3Response response = new S3Response ();
-            try {
-                PutObjectRequest putObject = new PutObjectRequest ()
-                {
-                    BucketName = DefaultBucketName,
-                    Key = Constant.CLOCK_TIME,
-                    ContentBody = string.Empty
-                };
-                using (response = Connect ().PutObject (putObject)) {
 
-                }
-                GenericDelete (Constant.CLOCK_TIME);
-            } catch {
+            PutObjectRequest putObject = new PutObjectRequest ()
+            {
+                BucketName = DefaultBucketName,
+                Key = Constant.CLOCK_TIME,
+                ContentBody = string.Empty
+            };
+            using (response = Connect ().PutObject (putObject)) {
+
             }
+            GenericDelete (Constant.CLOCK_TIME);
+
         }
 
         void CreateFolderInTrash (RepositoryItem item)
