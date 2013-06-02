@@ -30,7 +30,7 @@ namespace GreenQloud.Synchrony
         }
 
         public void Synchronize (Event e){           
-            eventDAO.Create (GetEventType (e));
+            eventDAO.Create (LoadEvent (e));
             creatingEvent = true;
         }
 
@@ -46,13 +46,53 @@ namespace GreenQloud.Synchrony
             }
         }
 
-
-
-        public Event GetEventType (Event e)
+        bool isCopy (RepositoryItem item)
         {
-            bool exists = physicalLocalRepository.Exists (e.Item);
-            if (exists){
-                if (remoteRepository.ExistsCopies (e.Item)){
+            if (!physicalLocalRepository.Exists (item))
+                return false;
+
+            List<RepositoryItem> copys = remoteRepository.GetCopys (item);
+
+            if (copys.Count == 0)
+                return false;
+
+            foreach(RepositoryItem i in copys){
+                if(!physicalLocalRepository.Exists (i))
+                    return false;
+            }
+
+            return true;
+        }
+
+        bool isMove (RepositoryItem item)
+        {
+            if (!physicalLocalRepository.Exists (item))
+                return false;
+
+            List<RepositoryItem> copys = remoteRepository.GetCopys (item);
+
+            if (copys.Count == 0)
+                return false;
+
+            foreach(RepositoryItem i in copys){
+                if(!physicalLocalRepository.Exists (i))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public Event LoadEvent (Event e)
+        {
+
+
+            if (isCopy(e.Item)) {
+                e.EventType = EventType.COPY;
+            } else if (isMove(e.Item)) {
+                e.EventType = EventType.MOVE;
+            }
+            /*
+                if (){
                        e.EventType = EventType.MOVE;
                 }
                 else{
@@ -66,7 +106,7 @@ namespace GreenQloud.Synchrony
                 }
             }else{
                 e.EventType = EventType.DELETE;
-            }
+            }*/
             e.User = Credential.Username;
             e.Application = GlobalSettings.FullApplicationName;
             e.ApplicationVersion = GlobalSettings.RunningVersion;
