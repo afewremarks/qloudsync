@@ -7,16 +7,17 @@ using Amazon.S3.Model;
 using System.Security.Cryptography;
 using System.Linq;
 using System.Text.RegularExpressions;
+using GreenQloud.Persistence;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Model
 {
     public class RepositoryItem
     {
-       
-
+        private static SQLiteRepositoryItemDAO dao =  new SQLiteRepositoryItemDAO ();
         public RepositoryItem ()
         {
-           
+
         }
 
         public static RepositoryItem CreateInstance (LocalRepository repo, string fullPath, bool isFolder, long size, string lastModified){
@@ -58,13 +59,18 @@ namespace GreenQloud.Model
         }
 
         public static RepositoryItem CreateInstance  (LocalRepository repo, string name, string path, bool isFolder, long size, string lastModified){
-            RepositoryItem item = new RepositoryItem();
+            RepositoryItem item;
+            item = new RepositoryItem();
             item.Repository = repo;
             item.Name = name;
             item.RelativePath = path;
             item.IsAFolder = isFolder;
             item.Size = size;
             item.TimeOfLastChange = lastModified;
+
+            if(dao.Exists(item)){
+                item = dao.GetFomDatabase (item);
+            }
             return item;
         }
 
@@ -84,11 +90,25 @@ namespace GreenQloud.Model
             }
         }
 
+        public string ResultObjectFolder {
+            get{
+                int i = ResultObject.LastIndexOf (Path.DirectorySeparatorChar);
+                return ResultObject.Substring (0, i);
+            }
+        }
+        public string ResultObjectName {
+            get{
+                int i = ResultObject.LastIndexOf (Path.DirectorySeparatorChar);
+                return ResultObject.Substring (i+1);
+            }
+        }
+
+        /*
         public string FullResultObjectName {
             get{
                 return Path.Combine(RelativePath, ResultObject);
             }
-        }
+        }*/
         public string FullLocalResultObject{
             get {
                 string s = Path.Combine(Repository.Path, ResultObject);
