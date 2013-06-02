@@ -58,6 +58,12 @@ namespace GreenQloud.Persistence.SQLite
             return Select(sql).Count != 0 ;
         }
 
+        public RepositoryItem GetFomDatabase (RepositoryItem item)
+        {
+            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE NAME = \"{0}\"  AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name, item.RelativePath, item.Repository.Path);
+
+            return Select(sql).Last();
+        }
 
         public void Remove (RepositoryItem item)
         {
