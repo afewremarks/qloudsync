@@ -75,7 +75,7 @@ namespace GreenQloud.Synchrony
                         string relativePath = (string)jsonObject["object"];
                         e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
 
-                        e.Item.ResultObject = (string)jsonObject["resultObject"];
+                        e.Item.ResultObjectRelativePath = (string)jsonObject["resultObject"];
                         e.Item.RemoteETAG = (string)jsonObject["hash"];
 
                         e.Synchronized = false;

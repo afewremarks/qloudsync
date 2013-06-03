@@ -102,7 +102,6 @@
     <Compile Include="Controller\Controller.cs" />
     <Compile Include="Controller\IconController.cs" />
     <Compile Include="Controller\SparkleSetupController.cs" />
-    <Compile Include="IO\OSXFileSystemWatcher.cs" />
     <Compile Include="UI\AboutWindow.cs" />
     <Compile Include="UI\HyperLink.cs" />
     <Compile Include="UI\SparkleSetup.cs" />
@@ -136,7 +135,6 @@
     <Compile Include="Persistence\RepositoryDAO.cs" />
     <Compile Include="Persistence\SQLite\SQLiteDataBase.cs" />
     <Compile Include="Persistence\SQLite\SQLiteRepositoryDAO.cs" />
-    <Compile Include="Persistence\SQLite\SQLiteRepositoryItemDAO.cs" />
     <Compile Include="Persistence\SQLite\SQLiteTransferDAO.cs" />
     <Compile Include="Util\Constant.cs" />
     <Compile Include="Repository\IRepositoryController.cs" />
@@ -157,6 +155,11 @@
     <Compile Include="Exception\ConfigurationException.cs" />
     <Compile Include="Util\GlobalDateTime.cs" />
     <Compile Include="Synchrony\SynchronizerResolver.cs" />
+    <Compile Include="IO\QloudSyncFileSystemWatcher.cs" />
+    <Compile Include="Repository\Remote\SQLiteRepositoryItemDAO.cs">
+      <DependentUpon>RemoteRepositoryController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Exception\VerificationException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">

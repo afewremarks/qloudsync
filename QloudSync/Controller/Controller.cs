@@ -84,14 +84,7 @@ namespace GreenQloud {
             
             timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e)=>{
                 try{
-                    backlogSynchronizer.Start();
-                    // have to wait the synchronize finish
-                    while(backlogSynchronizer.Working);
-                    
-                    timer.Stop();
-                    localSynchronizer.Start();
-                    remoteSynchronizer.Start();
-                    synchronizerResolver.Start();
+                    InitializeSynchronizers();
                 }catch{
                     
                 }
@@ -140,7 +133,6 @@ namespace GreenQloud {
 
                     UpdateConfigFile ();
                 } else {
-                    backlogSynchronizer.Start();
                     InitializeSynchronizers();
                 }
             }
@@ -202,7 +194,7 @@ namespace GreenQloud {
 
         private void InitializeSynchronizers ()
         {
-
+            backlogSynchronizer.Start();
             localSynchronizer.Start();
             remoteSynchronizer.Start();
             synchronizerResolver.Start();

@@ -7,19 +7,21 @@ using MonoMac.Foundation;
 using System.Threading;
 using System.Text;
 using System.Collections.Concurrent;
+using GreenQloud.Model;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud
 {
-    public class OSXFileSystemWatcher
+    public class QloudSyncFileSystemWatcher
     {
-
-        private ConcurrentBag<string> ignoreBag;
+        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+        private ConcurrentDictionary<string, bool> ignoreBag;
         private FSEventStreamCallback callback;
         Thread runLoop;
         IntPtr stream;
-        public OSXFileSystemWatcher(string pathwatcher)
+        public QloudSyncFileSystemWatcher(string pathwatcher)
         {
-            ignoreBag = new ConcurrentBag<string>();
+            ignoreBag = new ConcurrentDictionary<string, bool>();
             string watchedFolder = pathwatcher   ;
             this.callback = this.Callback;
 
@@ -40,7 +42,7 @@ namespace GreenQloud
             runLoop.Start ();
         }
         
-        public delegate void ChangedEventHandler (string path);
+        public delegate void ChangedEventHandler (Event e);
         public event ChangedEventHandler Changed;
 
         public void Stop ()
@@ -50,18 +52,19 @@ namespace GreenQloud
         }
 
         public void Block(string path){
-            ignoreBag.Add (path);
+            ignoreBag.TryAdd (path, true);
         }
 
         public void Unblock(string path){
-            ignoreBag.TryTake(out path);
+            bool ret;
+            ignoreBag.TryRemove(path, out ret);
         }
 
         private void Callback (IntPtr streamRef, IntPtr clientCallBackInfo, int numEvents, IntPtr eventPaths, IntPtr eventFlags, IntPtr eventIds)
         {
 
             string[] paths = new string[numEvents];
-            UInt32[] flags = new UInt32[numEvents];
+            FSEventStreamEventFlagItem[] flags = new FSEventStreamEventFlagItem[numEvents];
             UInt64[] ids = new UInt64[numEvents];
             unsafe {
                 char** eventPathsPointer = (char**)eventPaths.ToPointer ();
@@ -69,21 +72,53 @@ namespace GreenQloud
                 ulong* eventIdsPointer = (ulong*)eventIds.ToPointer ();
                 for (int i = 0; i < numEvents; i++) {
                     paths [i] = Marshal.PtrToStringAuto (new IntPtr (eventPathsPointer [i]));
-                    flags [i] = eventFlagsPointer [i];
+                    flags [i] = (FSEventStreamEventFlagItem)eventFlagsPointer [i];
                     ids [i] = eventIdsPointer [i];
                 }
             }
             ChangedEventHandler handler = Changed;
 
-            for (int i = 0; i < numEvents; i++) {
+            for (int i = 0; i < numEvents; i++)
+            {
+                if(!paths[i].Substring(paths[i].LastIndexOf(Path.DirectorySeparatorChar)+1).StartsWith(".")){
 
-                string pcatched = paths[i];
+                    bool val = false;
+                    string search = paths [i];
+                    if(flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir))
+                        search += Path.DirectorySeparatorChar;
+                    ignoreBag.TryGetValue (search, out val);
 
-                //TODO Put the list in file configuration
-                if(!pcatched.EndsWith (".DS_Store") && !pcatched.Contains(".sb-") && !pcatched.Contains("untitled folder")){
-                        string peek;
-                    if(!ignoreBag.TryPeek(out peek)){
-                        handler(pcatched);
+                    if (!val) {
+                        if (!flags [i].HasFlag (FSEventStreamEventFlagItem.InodeMetaMod)) {
+                            Event e = new Event ();
+                            LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (paths[i]);
+                            e.Item = RepositoryItem.CreateInstance (repo, paths [i], flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir), 0, GlobalDateTime.NowUniversalString);
+
+                            if (flags [i].HasFlag (FSEventStreamEventFlagItem.Created)) {
+                                e.EventType = EventType.CREATE;
+                            } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Removed)) {
+                                e.EventType = EventType.DELETE;
+                            }
+                            if (flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) {
+                                e.EventType = EventType.UPDATE;
+                            } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Renamed)) {
+                                if ((i + 1) < numEvents && (ids [i] == ids [i+1] - 1)) {
+                                    e.EventType = EventType.MOVE;
+                                    i++;
+                                    e.Item.ResultObjectRelativePath = paths [i].Replace (e.Item.Repository.Path + Path.DirectorySeparatorChar, "");
+                                } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !Directory.Exists (paths[i])) {
+                                    e.EventType = EventType.DELETE;
+                                } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile) && !File.Exists (paths[i])) {
+                                    e.EventType = EventType.DELETE;
+                                } else {
+                                    if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile)) {
+                                        e.EventType = EventType.UPDATE;
+                                    }
+                                }
+                            }
+
+                            handler (e);
+                        }
                     }
                 }
             }

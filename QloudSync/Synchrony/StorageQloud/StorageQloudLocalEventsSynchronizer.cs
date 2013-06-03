@@ -14,7 +14,7 @@ namespace GreenQloud.Synchrony
     {
         static StorageQloudLocalEventsSynchronizer instance;
 
-        Dictionary<string, OSXFileSystemWatcher> watchers;
+        Dictionary<string, QloudSyncFileSystemWatcher> watchers;
         SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
         SQLiteEventDAO eventDAO = new SQLiteEventDAO();
         Thread watchersThread;
@@ -39,15 +39,16 @@ namespace GreenQloud.Synchrony
             r.Repository = new LocalRepository (string.Empty);
             LastLocalEvent.Item = r;
             watchersThread = new Thread(()=>{
-                watchers = new Dictionary<string, OSXFileSystemWatcher>();
+                watchers = new Dictionary<string, QloudSyncFileSystemWatcher>();
                 foreach (LocalRepository repo in repositoryDAO.All){ 
-                    OSXFileSystemWatcher watcher = new OSXFileSystemWatcher(repo.Path);
-                    watcher.Changed += delegate(string path) {
-                        Logger.LogInfo("Event found",path);
+                    QloudSyncFileSystemWatcher watcher = new QloudSyncFileSystemWatcher(repo.Path);
+                    watcher.Changed += delegate(Event e) {
+                        Logger.LogEvent("EVENT FOUND", e);
+
                         if(Working) 
                         {
                             try{
-                                CreateEvent (path);
+                                CreateEvent (e);
                             }catch (DisconnectionException)
                             {
                                 //SyncStatus = SyncStatus.IDLE;
@@ -72,36 +73,18 @@ namespace GreenQloud.Synchrony
             return instance;
         }
 
-        public OSXFileSystemWatcher GetWatcher(string path){
-            OSXFileSystemWatcher watcher;
+        public QloudSyncFileSystemWatcher GetWatcher(string path){
+            QloudSyncFileSystemWatcher watcher;
             watchers.TryGetValue (path, out watcher);
             return watcher;
         }
 
-        void CreateEvent (string path)
+        void CreateEvent (Event e)
         {
-            RepositoryItem item;
-            LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (path);
+            Create(e);
 
-            if (Directory.Exists(path)){
-                item = RepositoryItem.CreateInstance (repo, path, true, 0, GlobalDateTime.NowUniversalString);
-            }
-            else if (File.Exists (path)){
-                item = RepositoryItem.CreateInstance (repo, path, false, 0, GlobalDateTime.NowUniversalString);
-            }else{
-                item = RepositoryItem.CreateInstance (repo, path, false, 0, GlobalDateTime.NowUniversalString);
-                item.IsAFolder = new SQLiteRepositoryItemDAO().IsFolder(item);
-            }
-
-            if(!item.IsIgnoreFile){
-                Event e = new Event();
-                e.Item = item;
-                e.RepositoryType = RepositoryType.LOCAL;
-                Synchronize(e);
-
-                LastLocalEvent = e;
-                LastTimeSync = GlobalDateTime.Now;
-            }
+            LastLocalEvent = e;
+            LastTimeSync = GlobalDateTime.Now;
         }
 
         public new void Start ()
@@ -124,7 +107,7 @@ namespace GreenQloud.Synchrony
         {
             Working = false;
             watchersThread.Join();
-            foreach (OSXFileSystemWatcher watcher in watchers.Values)
+            foreach (QloudSyncFileSystemWatcher watcher in watchers.Values)
                 watcher.Stop();
             base.Stop();
         }

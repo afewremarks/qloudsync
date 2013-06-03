@@ -79,27 +79,38 @@ namespace GreenQloud.Model
         }
 
         private string resultObject = null;
-        public string ResultObject {
+        public string ResultObjectRelativePath {
             set{
                 resultObject = value;
             }
             get {
-                if (resultObject == null)
+                if (resultObject == null || resultObject == "")
                     return "";
+                return ToPathSting(resultObject);
+            }
+        }
+
+        public string ResultObjectKey {
+            get {
+                if (resultObject == null || resultObject == ""){
+                    return "";
+                }else if (resultObject.EndsWith(Path.DirectorySeparatorChar.ToString())){
+                    resultObject = resultObject.Substring (0, resultObject.Length - 1);
+                }
                 return resultObject;
             }
         }
 
         public string ResultObjectFolder {
             get{
-                int i = ResultObject.LastIndexOf (Path.DirectorySeparatorChar);
-                return ResultObject.Substring (0, i);
+                int i = ResultObjectRelativePath.LastIndexOf (Path.DirectorySeparatorChar);
+                return ResultObjectRelativePath.Substring (0, i+1);
             }
         }
         public string ResultObjectName {
             get{
-                int i = ResultObject.LastIndexOf (Path.DirectorySeparatorChar);
-                return ResultObject.Substring (i+1);
+                int i = ResultObjectRelativePath.LastIndexOf (Path.DirectorySeparatorChar);
+                return ResultObjectRelativePath.Substring (i+1);
             }
         }
 
@@ -111,20 +122,46 @@ namespace GreenQloud.Model
         }*/
         public string FullLocalResultObject{
             get {
-                string s = Path.Combine(Repository.Path, ResultObject);
-                return s;
+                return ToPathSting(Path.Combine(Repository.Path, ResultObjectRelativePath));
             }
         }
 
         public string Name { get; set;}
 
+        private string relativePath;
         public string RelativePath{ 
-            get; set;
+            get{
+                return relativePath;
+            } 
+            set{
+                if (value.StartsWith (Path.VolumeSeparatorChar.ToString())) {
+                    relativePath = value.Substring (1);
+                } else {
+                    relativePath = value;
+                }
+            }
+        }
+
+        private string ToPathSting(string path){
+            if (IsAFolder && !path.EndsWith(Path.DirectorySeparatorChar.ToString())) {
+                path += Path.DirectorySeparatorChar;
+            }
+            return path;
         }
 
         public string AbsolutePath{
             get {
-                return Path.Combine(RelativePath, Name);
+                return ToPathSting(Path.Combine(RelativePath, Name));
+            }
+        }
+
+        public string Key{
+            get {
+                if(AbsolutePath.EndsWith(Path.VolumeSeparatorChar.ToString())){
+                    return AbsolutePath.Substring(0, AbsolutePath.Length - 1);
+                } else {
+                    return AbsolutePath;
+                }
             }
         }
 
@@ -134,39 +171,38 @@ namespace GreenQloud.Model
                 fullLocalName = value;
             }
             get {
-                return Path.Combine(Repository.Path, AbsolutePath);
+                return ToPathSting( Path.Combine(Repository.Path, AbsolutePath));
             }
         }
         
         public string FullRemoteName {
             get {
-                
-                return Path.Combine(RuntimeSettings.DefaultBucketName, AbsolutePath);
+                return ToPathSting( Path.Combine(RuntimeSettings.DefaultBucketName, AbsolutePath));
             }
         }
         
         public string RelativePathInBucket {
             get {
                
-                return Path.Combine (RuntimeSettings.DefaultBucketName,RelativePath);
+                return ToPathSting( Path.Combine (RuntimeSettings.DefaultBucketName,RelativePath));
             }
         }
         
         public string TrashFullName {
             get {
-                return Path.Combine (TrashRelativePath , Name);
+                return ToPathSting( Path.Combine (TrashRelativePath , Name));
             }
         }
         
         public string TrashRelativePath{
             get{
-                return Path.Combine (RuntimeSettings.DefaultBucketName,Constant.TRASH)+RelativePath;
+                return ToPathSting( Path.Combine (RuntimeSettings.DefaultBucketName,Constant.TRASH)+RelativePath);
             }
         }
         
         public string TrashAbsolutePath {
             get {
-                return Path.Combine (Constant.TRASH,AbsolutePath);
+                return ToPathSting( Path.Combine (Constant.TRASH,AbsolutePath));
             }
         }
 
@@ -181,7 +217,20 @@ namespace GreenQloud.Model
             }set{
                 remotehash = value;
             }
-        }   
+        }
+
+        string localhash = string.Empty;
+        public string LocalETAG {
+            get{
+                if (localhash == "") {
+                    return new Crypto().md5hash(FullLocalName);
+                } else {
+                    return localhash;
+                }
+            }set{
+                localhash = value;
+            }
+        }
 
         public string TimeOfLastChange{
             set;
