@@ -25,7 +25,7 @@ namespace GreenQloud.Repository.Remote
 
         public override List<GreenQloud.Model.RepositoryItem> GetCopys (GreenQloud.Model.RepositoryItem item)
         {
-            return AllItems.Where (rf => rf.RemoteETAG == item.RemoteETAG && rf.AbsolutePath != item.AbsolutePath).ToList<RepositoryItem> ();
+            return AllItems.Where (rf => rf.RemoteETAG == item.LocalETAG && rf.AbsolutePath != item.AbsolutePath).ToList<RepositoryItem> ();
         }
 
         public override bool ExistsVersion (GreenQloud.Model.RepositoryItem item)
@@ -95,7 +95,7 @@ namespace GreenQloud.Repository.Remote
         {
             CurrentTransfer = new Transfer (item, TransferType.REMOTE_MOVE); 
 
-            GenericCopy (RuntimeSettings.DefaultBucketName, item.AbsolutePath, RuntimeSettings.DefaultBucketName, item.ResultObject);
+            GenericCopy (RuntimeSettings.DefaultBucketName, item.AbsolutePath, RuntimeSettings.DefaultBucketName + Path.DirectorySeparatorChar + item.ResultObjectFolder, item.ResultObjectName);
             Delete (item);
             CurrentTransfer.EndTime = GlobalDateTime.Now;
 
@@ -104,8 +104,8 @@ namespace GreenQloud.Repository.Remote
 
         public override Transfer MoveToTrash (RepositoryItem item)
         {
-            item.ResultObject = item.TrashAbsolutePath;
-            item.ResultObject = item.ResultObject +"("+GlobalDateTime.NowUniversalString+")";
+            item.ResultObjectRelativePath = item.TrashAbsolutePath;
+            item.ResultObjectRelativePath = item.ResultObjectRelativePath +"("+GlobalDateTime.NowUniversalString+")";
             return  Move (item);
         }
 
@@ -167,9 +167,15 @@ namespace GreenQloud.Repository.Remote
             return AllItems.Any(rf => rf.RemoteETAG == item.RemoteETAG && rf.AbsolutePath != item.AbsolutePath);
         }
 
-        public override string GetRemoteMD5 (string path)
+        public override string RemoteETAG (string path)
         {
-            return GetS3Objects().First(rf => rf.Key != path).ETag;
+            GetObjectMetadataRequest request = new GetObjectMetadataRequest { 
+                BucketName = RuntimeSettings.DefaultBucketName,
+                Key = path
+            };
+            GetObjectMetadataResponse met;
+            using ( met = Connect ().GetObjectMetadata (request)){}
+            return met.ETag;
         }
 
         public override List<GreenQloud.Model.RepositoryItem> AllItems {
@@ -211,16 +217,23 @@ namespace GreenQloud.Repository.Remote
         #region Generic
         private void GenericCopy (string sourceBucket, string sourceKey, string destinationBucket, string destinationKey)
         {
-            CurrentTransfer.InitialTime = GlobalDateTime.Now;
-            CopyObjectRequest request = new CopyObjectRequest (){
-                DestinationBucket = destinationBucket,
-                DestinationKey = destinationKey,
-                SourceBucket = sourceBucket,
-                SourceKey = sourceKey
-            };
-            
-            using (CopyObjectResponse cor = Connect ().CopyObject (request)){}
-            CurrentTransfer.EndTime = GlobalDateTime.Now;
+            try{
+                CurrentTransfer.InitialTime = GlobalDateTime.Now;
+                CopyObjectRequest request = new CopyObjectRequest (){
+                    DestinationBucket = destinationBucket,
+                    DestinationKey = destinationKey,
+                    SourceBucket = sourceBucket,
+                    SourceKey = sourceKey
+                };
+
+                Connect ().CopyObject (request);
+                //using (CopyObjectResponse cor = Connect ().CopyObject (request)){}
+                CurrentTransfer.EndTime = GlobalDateTime.Now;
+
+            //TODO WHY EVER OCCUR THIS ERROR?????
+            } catch {
+                Console.WriteLine ("Expected Error found...");
+            }
         }
 
         public void GenericDelete (string key)

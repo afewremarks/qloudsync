@@ -132,11 +132,7 @@ namespace GreenQloud.Synchrony
             try{
                 BlockWatcher (e);
 
-                string s = String.Format (" {0} {1} {2}",e.EventType, e.RepositoryType, e.Item.FullLocalName);
-                if(e.Item.ResultObject != ""){
-                    s += String.Format ("  Result Object: {0} \n",e.Item.ResultObject);
-                }
-                Logger.LogInfo("Event Synchronizing", s);
+                Logger.LogEvent("Event Synchronizing", e);
 
                 Transfer transfer = null;
                 if (e.RepositoryType == RepositoryType.LOCAL){
@@ -146,19 +142,17 @@ namespace GreenQloud.Synchrony
                     switch (e.EventType){
                         case EventType.CREATE: 
                         case EventType.UPDATE:
-                            SyncStatus = SyncStatus.DOWNLOADING;
                             transfer = remoteRepository.Upload (e.Item);
                             break;
                         case EventType.DELETE:  
-                            e.Item.ResultObject =  e.Item.TrashFullName;
+                            e.Item.ResultObjectRelativePath =  e.Item.TrashAbsolutePath;
                             repositoryItemDAO.Update (e.Item);
-                            transfer = remoteRepository.MoveToTrash (e.Item);
-                            break;
-                        case EventType.MOVE:
                             transfer = remoteRepository.Move (e.Item);
                             break;
                         case EventType.COPY:
-                        break;
+                        case EventType.MOVE:
+                            transfer = remoteRepository.Move (e.Item);
+                            break;
                     }
                 }else{
                     switch (e.EventType){
@@ -196,27 +190,32 @@ namespace GreenQloud.Synchrony
                 //TODO refactor to catch error and treat
                 Logger.LogInfo("ERROR", exc);
             } finally {
+                Thread.Sleep (1000);
                 UnblockWatcher (e);
             }
         }
 
         static void BlockWatcher (Event e)
         {
-            OSXFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (e.Item.Repository.Path);
-            if(watcher != null){
-                watcher.Block (e.Item.FullLocalName);
-                if(e.Item.ResultObject.Length > 0)
-                    watcher.Block (e.Item.FullLocalResultObject);
+            if(e.RepositoryType == RepositoryType.REMOTE){
+                QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (e.Item.Repository.Path);
+                if(watcher != null){
+                    watcher.Block (e.Item.FullLocalName);
+                    if(e.Item.ResultObjectRelativePath.Length > 0)
+                        watcher.Block (e.Item.FullLocalResultObject);
+                }
             }
         }
 
         static void UnblockWatcher (Event e)
         {
-            OSXFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (e.Item.Repository.Path);
-            if(watcher != null){
-                watcher.Unblock (e.Item.FullLocalName);
-                if(e.Item.ResultObject.Length > 0)
-                    watcher.Unblock (e.Item.FullLocalResultObject);
+            if(e.RepositoryType == RepositoryType.REMOTE){
+                QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (e.Item.Repository.Path);
+                if(watcher != null){
+                    watcher.Unblock (e.Item.FullLocalName);
+                    if(e.Item.ResultObjectRelativePath.Length > 0)
+                        watcher.Unblock (e.Item.FullLocalResultObject);
+                }
             }
         }
 
@@ -267,13 +266,22 @@ namespace GreenQloud.Synchrony
         }
 
 
+        //TODO VERIFY!
         void UpdateeTag (Event e)
         {
-            if(e.Item.ResultObject.Length > 0)
-                e.Item.RemoteETAG = remoteRepository.GetRemoteMD5 (e.Item.ResultObject);
-            else
-                e.Item.RemoteETAG = remoteRepository.GetRemoteMD5 (e.Item.AbsolutePath);
-            repositoryItemDAO.Update (e.Item);
+            /*Logger.LogInfo("VERIFYING", "ETag verification...");
+            if (e.Item.ResultObjectRelativePath.Length > 0) {
+                e.Item.RemoteETAG = remoteRepository.RemoteETAG (e.Item.ResultObjectKey);
+                e.Item.LocalETAG = new Crypto ().md5hash (e.Item.FullLocalResultObject);
+            } else {
+                e.Item.RemoteETAG = remoteRepository.RemoteETAG (e.Item.Key);
+                e.Item.LocalETAG = new Crypto ().md5hash (e.Item.AbsolutePath);
+            }
+
+            if (!e.Item.RemoteETAG.Replace("\"", "").Equals (e.Item.LocalETAG))
+                throw new QloudSync.VerificationException ();
+
+            repositoryItemDAO.Update (e.Item);*/
         }
     }
 }

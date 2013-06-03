@@ -15,13 +15,15 @@ namespace GreenQloud.Persistence.SQLite
         SQLiteDatabase database = new SQLiteDatabase();
         public override void Create (RepositoryItem item)
         {
-            database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Name, RelativePath, RepoPath, IsFolder, DELETED, eTag, ResultObject) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",\"{4}\",'{5}', \"{6}\")", item.Name, item.RelativePath, item.Repository.Path, item.IsAFolder, bool.FalseString, item.RemoteETAG, item.ResultObject));
+            database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Name, RelativePath, RepoPath, IsFolder, DELETED, eTag, eTagLocal, ResultObject) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",\"{4}\",'{5}', '{6}', \"{7}\")", item.Name, item.RelativePath, item.Repository.Path, item.IsAFolder, bool.FalseString, item.RemoteETAG, item.LocalETAG, item.ResultObjectRelativePath));
 
         }
         public RepositoryItem Create (Event e)
         {
-            if (!Exists (e.Item)){
+            if (!Exists (e.Item)) {
                 Create (e.Item);
+            } else {
+                Update (e.Item);
             }
 
             e.Item.Id = GetId (e.Item);
@@ -29,9 +31,10 @@ namespace GreenQloud.Persistence.SQLite
         }
 
 
+        //TODO put all fields
         public override void Update (RepositoryItem i)
         {            
-            database.ExecuteNonQuery (string.Format("UPDATE REPOSITORYITEM SET  ResultObject = \"{1}\", eTag = '{2}' WHERE RepositoryItemID =\"{0}\"", i.Id, i.ResultObject, i.RemoteETAG));
+            database.ExecuteNonQuery (string.Format("UPDATE REPOSITORYITEM SET  ResultObject = \"{1}\", eTag = '{2}', eTagLocal = '{3}' WHERE RepositoryItemID =\"{0}\"", i.Id, i.ResultObjectRelativePath, i.RemoteETAG, i.LocalETAG));
         }
 
         public override List<RepositoryItem> All {
@@ -99,8 +102,9 @@ namespace GreenQloud.Persistence.SQLite
                 item.RelativePath = dr[2].ToString();
                 item.Repository = new LocalRepository(dr[3].ToString());
                 item.IsAFolder = bool.Parse (dr[4].ToString());
-                item.ResultObject = dr[6].ToString();
+                item.ResultObjectRelativePath = dr[6].ToString();
                 item.RemoteETAG = dr[7].ToString();
+                item.LocalETAG = dr[8].ToString();
 
                 items.Add (item);
             }

@@ -54,7 +54,7 @@ namespace GreenQloud.Repository.Local
 
         public override void Copy (RepositoryItem item)
         {
-            string path = RuntimeSettings.HomePath +"/"+ item.ResultObject;
+            string path = RuntimeSettings.HomePath +"/"+ item.ResultObjectRelativePath;
             if (path.EndsWith ("/"))
                 path = path.Substring (0, path.Length-1);
 
@@ -81,7 +81,7 @@ namespace GreenQloud.Repository.Local
 
         public override void Move (RepositoryItem item)
         {
-            string path = RuntimeSettings.HomePath +"/"+ item.ResultObject;
+            string path = RuntimeSettings.HomePath +"/"+ item.ResultObjectRelativePath;
             if (path.EndsWith ("/"))
                 path = path.Substring (0, path.Length-1);
 

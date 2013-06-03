@@ -29,7 +29,7 @@ namespace GreenQloud.Synchrony
            
         }
 
-        public void Synchronize (Event e){           
+        public void Create (Event e){           
             eventDAO.Create (LoadEvent (e));
             creatingEvent = true;
         }
@@ -84,29 +84,7 @@ namespace GreenQloud.Synchrony
 
         public Event LoadEvent (Event e)
         {
-
-
-            if (isCopy(e.Item)) {
-                e.EventType = EventType.COPY;
-            } else if (isMove(e.Item)) {
-                e.EventType = EventType.MOVE;
-            }
-            /*
-                if (){
-                       e.EventType = EventType.MOVE;
-                }
-                else{
-                    if (remoteRepository.Exists (e.Item)){
-                        e.EventType = EventType.UPDATE;
-                    }
-                    else{
-                        e.EventType = EventType.CREATE;
-                        CreateSubEvents(e);
-                    }
-                }
-            }else{
-                e.EventType = EventType.DELETE;
-            }*/
+            e.RepositoryType = RepositoryType.LOCAL;
             e.User = Credential.Username;
             e.Application = GlobalSettings.FullApplicationName;
             e.ApplicationVersion = GlobalSettings.RunningVersion;
