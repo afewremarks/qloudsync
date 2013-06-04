@@ -54,7 +54,11 @@ namespace GreenQloud.Synchrony
                 SyncStatusChanged(status);
             }
         }
-        
+
+        private int eventsToSync;
+        public int EventsToSync{
+            get { return eventsToSync; }
+        }
         public bool Done {
             set; get;
         }
@@ -114,6 +118,8 @@ namespace GreenQloud.Synchrony
             while (Working){
 
                 List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
+
+                eventsToSync = eventsNotSynchronized.Count;
                 while (eventsNotSynchronized.Count>0 && Working){
                     Synchronize (eventsNotSynchronized[0]);
                     eventsNotSynchronized = eventDAO.EventsNotSynchronized;
