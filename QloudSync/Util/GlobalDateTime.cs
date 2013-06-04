@@ -28,7 +28,7 @@ namespace GreenQloud
                     DateTime date = (DateTime) Newtonsoft.Json.Linq.JObject.Parse(receiveContent)["serverTime"];
                     return date;
                 } catch (Exception e){
-                    Logger.LogInfo("ERROR", "Cannot find global time on server, using local time.");
+                    Logger.LogInfo("ERROR", "Cannot find global time on server.");
                     Logger.LogInfo("ERROR", e);
                     throw new DisconnectionException ();
                 }
