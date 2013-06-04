@@ -13,6 +13,7 @@ using GreenQloud.Repository.Local;
 {
     public abstract class AbstractBacklogSynchronizer : AbstractSynchronizer
     {
+        private bool eventsCreated = false; 
 
         protected AbstractBacklogSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
@@ -42,7 +43,14 @@ using GreenQloud.Repository.Local;
                 
             }
             //base.Synchronize();
+            eventsCreated = true;
             Pause();
+        }
+
+        public bool FinishLoad{
+            get {
+                return eventsCreated;
+            }
         }
 
         public Event GetEvent (RepositoryItem item, RepositoryType type){

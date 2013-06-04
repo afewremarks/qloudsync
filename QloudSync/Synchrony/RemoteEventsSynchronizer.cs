@@ -90,6 +90,11 @@ namespace GreenQloud.Synchrony
             ready = true;
         }
 
+        public bool HasInit {
+            get {
+                return eventsCreated;
+            }
+        }
 
         public double InitFirstLoad ()
         {

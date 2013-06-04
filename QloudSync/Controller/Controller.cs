@@ -24,6 +24,9 @@ namespace GreenQloud {
         public static int Contador{
             set; get;
         }
+        public new event ProgressChangedEventHandler ProgressChanged = delegate { };
+        public new delegate void ProgressChangedEventHandler (double percentage, double time);
+
 
         public IconController StatusIcon;
         private StorageQloudLocalEventsSynchronizer localSynchronizer;
@@ -195,11 +198,16 @@ namespace GreenQloud {
         private void InitializeSynchronizers ()
         {
             backlogSynchronizer.Start();
+            while(!backlogSynchronizer.FinishLoad)
+                Thread.Sleep (1000);
+            backlogSynchronizer.Stop();
+
+
             localSynchronizer.Start();
             remoteSynchronizer.Start();
             synchronizerResolver.Start();
                         
-            remoteSynchronizer.ProgressChanged += delegate (double percentage, double speed) {
+            ProgressChanged += delegate (double percentage, double speed) {
                 ProgressPercentage = percentage;
                 ProgressSpeed      = speed.ToString();
                 
@@ -240,11 +248,33 @@ namespace GreenQloud {
                 SyncStop();
             };
             
-            remoteSynchronizer.ProgressChanged += delegate (double percentage, double time) {
+            ProgressChanged += delegate (double percentage, double time) {
                 FolderFetching (percentage, time);
             };
-            remoteSynchronizer.FirstLoad();
+            FirstLoad();
             FinishFetcher();
+        }
+
+        public void FirstLoad()
+        {
+            try {
+                InitializeSynchronizers();
+                Thread.Sleep (1000);
+
+                int eventsToSync = synchronizerResolver.EventsToSync;
+                int totalEventsToSync = eventsToSync;
+
+                while(eventsToSync > 0){
+
+                    double percent = 100 - (100*eventsToSync/totalEventsToSync);
+
+                    ProgressChanged (percent , 0.0);
+                    eventsToSync = synchronizerResolver.EventsToSync;
+                    Thread.Sleep (1000);
+                }
+            }catch (Exception e) {                
+                Logger.LogInfo ("Initial Sync Error", e.Message+"\n "+e.StackTrace);
+            }
         }
 
         public void SyncStop ()
@@ -258,7 +288,7 @@ namespace GreenQloud {
             Logger.LogInfo ("Controller", "First load sucessfully");
             FolderFetched (localSynchronizer.Warnings);
             new Thread (() => CreateStartupItem ()).Start ();
-            InitializeSynchronizers ();
+            //InitializeSynchronizers ();
         }
 
         public void CreateStartupItem ()
