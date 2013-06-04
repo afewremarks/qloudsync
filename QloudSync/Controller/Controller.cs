@@ -197,12 +197,6 @@ namespace GreenQloud {
 
         private void InitializeSynchronizers ()
         {
-            backlogSynchronizer.Start();
-            while(!backlogSynchronizer.FinishLoad)
-                Thread.Sleep (1000);
-            backlogSynchronizer.Stop();
-
-
             localSynchronizer.Start();
             remoteSynchronizer.Start();
             synchronizerResolver.Start();
@@ -258,6 +252,12 @@ namespace GreenQloud {
         public void FirstLoad()
         {
             try {
+                backlogSynchronizer.Start();
+                while(!backlogSynchronizer.FinishLoad)
+                    Thread.Sleep (1000);
+                backlogSynchronizer.Stop();
+
+
                 InitializeSynchronizers();
                 Thread.Sleep (1000);
 

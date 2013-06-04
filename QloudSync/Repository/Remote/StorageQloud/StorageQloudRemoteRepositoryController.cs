@@ -231,7 +231,8 @@ namespace GreenQloud.Repository.Remote
                 CurrentTransfer.EndTime = GlobalDateTime.Now;
 
             //TODO WHY EVER OCCUR THIS ERROR?????
-            } catch {
+            } catch (Exception e){
+                Console.WriteLine (e.StackTrace);
                 Console.WriteLine ("Expected Error found...");
             }
         }
