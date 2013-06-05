@@ -232,8 +232,7 @@ namespace GreenQloud.Repository.Remote
 
             //TODO WHY EVER OCCUR THIS ERROR?????
             } catch (Exception e){
-                Console.WriteLine (e.StackTrace);
-                Console.WriteLine ("Expected Error found...");
+                Logger.LogInfo ("Expected Error found...", e.StackTrace);
             }
         }
 
