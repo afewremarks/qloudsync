@@ -14,6 +14,7 @@ namespace GreenQloud.Repository.Local
         #region RepositoryController implementation
 
         public abstract bool Exists (RepositoryItem repoObject);
+        public abstract bool Exists (string repoObject);
 
 
         public abstract List<RepositoryItem> Items {

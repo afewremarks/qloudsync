@@ -77,7 +77,7 @@ namespace GreenQloud.Persistence.SQLite{
                         // Ignore Null fields.
                         if (reader.IsDBNull(i)) continue;
 
-                        if (reader.GetFieldType(i) == typeof(String))
+                         if (reader.GetFieldType(i) == typeof(String))
                         {
                             row[dt.Columns[i].ColumnName] = reader.GetString(i);
                         }
