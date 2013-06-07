@@ -268,6 +268,7 @@ namespace GreenQloud.Repository.Remote
 
             using (DeleteObjectResponse response = connection.DeleteObject (request)) {
 
+                response.Dispose ();
             }
 
             if(key!=Constant.CLOCK_TIME)  {              
