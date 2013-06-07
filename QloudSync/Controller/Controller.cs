@@ -453,11 +453,11 @@ namespace GreenQloud {
 
 
         public void HandleDisconnection(){
-            ErrorType = ERROR_TYPE.DISCONNECTION;
+            /*ErrorType = ERROR_TYPE.DISCONNECTION;
             OnError ();
             localSynchronizer.Stop ();
             remoteSynchronizer.Stop ();
-            timer.Start ();
+            timer.Start ();*/
         }
 
         public void HandleAccessDenied ()
