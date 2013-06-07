@@ -93,7 +93,7 @@ namespace GreenQloud.Model
         public string RelativeResultObjectPathInBucket {
             get {
 
-                return ToPathSting( Path.Combine (RuntimeSettings.DefaultBucketName,ResultObjectRelativePath));
+                return ToPathSting( Path.Combine (RuntimeSettings.DefaultBucketName,ResultObjectFolder));
             }
         }
 
