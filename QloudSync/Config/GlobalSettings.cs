@@ -1,5 +1,6 @@
+
 using System;
-using System.Configuration;
+//using System.Configuration;
 
 namespace GreenQloud
 {
@@ -7,16 +8,34 @@ namespace GreenQloud
     {
         private static string trash = null;
 
+        public static string MachineName {
+            get{
+                return System.Environment.MachineName;
+            }
+        }
+
+        public static string DeviceIdHash {
+            get {
+                return new Crypto ().md5hash(MachineName+Credential.Username);
+            }
+        }
+
+        public static string OSVersion {
+            get{
+                return System.Environment.OSVersion.ToString();
+            }
+        }
+
         public static string RunningVersion {
             get {
-                return ConfigurationManager.AppSettings ["RunningVersion"];
+                return ConfigFile.Read ("RunningVersion");
             }
         }
 
         public static int IntervalBetweenChecksStatistics{
             get{
                 try{
-                    return int.Parse(ConfigurationManager.AppSettings ["IntervalBetweenChecksStatistics"]);
+                    return int.Parse(ConfigFile.Read("IntervalBetweenChecksStatistics"));
                 }
                 catch{
                     Logger.LogInfo ("GlobalSettings", "Invalid IntervalBetweenChecksStatistics value");
@@ -27,38 +46,49 @@ namespace GreenQloud
 
         public static string ApplicationName {
             get {
-                return ConfigurationManager.AppSettings ["ApplicationName"];
+                return "QloudSync";
+            }
+        }
+        public static string FullApplicationName {
+            get {
+                return ApplicationName + "; InstanceID: "+ConfigFile.Read("InstanceID");
             }
         }
 
         public static string HomeFolderName {
             get {
-                return ConfigurationManager.AppSettings ["HomeFolderName"];
+                return ConfigFile.Read("HomeFolderName");
             }
         }
 
         public static string SuffixNameBucket {
             get{
-                return ConfigurationManager.AppSettings ["SuffixNameBucket"];
+                return ConfigFile.Read ("SuffixNameBucket");
+            }
+        }
+
+        public static string AvailableOSXVersion {
+            get{
+                return ConfigFile.Read ("AvailableOSXVersion");
             }
         }
         
         public static string StorageURL {
             get {
-                return ConfigurationManager.AppSettings ["StorageURL"];
+                return ConfigFile.Read ("StorageURL");
             }
         }
         
         public static string AuthenticationURL {
             get {
-                return ConfigurationManager.AppSettings ["AuthenticationURL"];
+                return ConfigFile.Read ("AuthenticationURL");
             }
         }
         
         public static string Trash {
             get {
                 if (trash == null)
-                    trash = ConfigurationManager.AppSettings ["Trash"];
+                    trash = ConfigFile.Read ("Trash");
                 return trash;
             }
         }
@@ -66,7 +96,7 @@ namespace GreenQloud
         public static int UploadTimeout {
             get {
                 try{
-                return int.Parse(ConfigurationManager.AppSettings ["UploadTimeout"]);
+                return int.Parse(ConfigFile.Read ("UploadTimeout"));
                 }
                 catch{
                     Logger.LogInfo ("GlobalSettings", "Invalid UploadTimeout value");
@@ -79,7 +109,7 @@ namespace GreenQloud
         public static int IntervalBetweenChecksRemoteRepository {
             get {
                 try{
-                    return int.Parse(ConfigurationManager.AppSettings ["IntervalBetweenChecksRemoteRepository"]);
+                    return int.Parse(ConfigFile.Read ("IntervalBetweenChecksRemoteRepository"));
                 }
                 catch{
                     Logger.LogInfo ("GlobalSettings", "Invalid IntervalBetweenChecksRemoteRepository value");
@@ -87,6 +117,8 @@ namespace GreenQloud
                 }
             }
         }
+
+
     }
 }
 

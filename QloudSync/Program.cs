@@ -26,14 +26,14 @@ namespace GreenQloud {
                 Environment.Exit (-1);
             }
             try {
-
                 Controller = new Controller ();
                 Controller.Initialize ();
                
                 UI = new SparkleUI ();
-                UI.Run ();  
+                UI.Run (); 
             } catch (Exception e){
                 Logger.LogInfo ("Init", e);
+                Console.WriteLine (e.StackTrace);
                 Environment.Exit (-1);
             }
             #if !__MonoCS__

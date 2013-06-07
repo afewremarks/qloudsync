@@ -1,5 +1,5 @@
 using System;
-using System.Configuration;
+//using System.Configuration;
 
 namespace GreenQloud
 {
@@ -7,7 +7,7 @@ namespace GreenQloud
     {
         public static bool NotificationsEnabled {
             get {
-                return bool.Parse (ConfigurationManager.AppSettings ["NotificationsEnabled"]);
+                return bool.Parse (ConfigFile.Read ("NotificationsEnabled"));
             }
             set
             {
