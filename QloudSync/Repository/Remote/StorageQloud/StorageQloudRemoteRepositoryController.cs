@@ -67,7 +67,7 @@ namespace GreenQloud.Repository.Remote
                         
                         response.WriteResponseStreamToFile(item.FullLocalName);
                     }
-                    Connect ().Dispose ();
+                    response.Dispose ();
                     CurrentTransfer.EndTime = GlobalDateTime.Now;
             }
             return CurrentTransfer;
@@ -102,23 +102,23 @@ namespace GreenQloud.Repository.Remote
             CurrentTransfer.EndTime = GlobalDateTime.Now;*/
 
             CurrentTransfer = new Transfer (item, TransferType.LOCAL_MOVE);
-            GenericUpload (item.RelativePathInBucket,  item.ResultObjectKey,  item.FullLocalResultObject);
+            GenericUpload (item.RelativeResultObjectPathInBucket,  item.ResultObjectName,  item.FullLocalResultObject);
             CurrentTransfer = Delete(item);
 
             return CurrentTransfer;
         }
 
+        //TODO refactor after move works
         public override Transfer MoveToTrash (RepositoryItem item)
         {
             CurrentTransfer = new Transfer (item, TransferType.LOCAL_REMOVE);
 
-            string pathTrash = item.TrashAbsolutePath + "("+GlobalDateTime.NowUniversalString+")";
-            GenericUpload (item.RelativePathInBucket, item.FullLocalName ,  pathTrash);
+            //string pathTrash = item.TrashAbsolutePath + "("+GlobalDateTime.NowUniversalString+")";
+            //GenericUpload (item.RelativePathInBucket, item.FullLocalName ,  pathTrash);
             CurrentTransfer = Delete(item);
             return CurrentTransfer;
 
-            /*TODO refactor after move works
-            item.ResultObjectRelativePath = item.TrashAbsolutePath;
+            /*item.ResultObjectRelativePath = item.TrashAbsolutePath;
             item.ResultObjectRelativePath = item.ResultObjectRelativePath +"("+GlobalDateTime.NowUniversalString+")";
             return  Move (item);*/
         }
@@ -189,7 +189,7 @@ namespace GreenQloud.Repository.Remote
             };
             GetObjectMetadataResponse met;
             using ( met = Connect ().GetObjectMetadata (request)){}
-            Connect ().Dispose ();
+            met.Dispose ();
             return met.ETag;
         }
 
@@ -241,8 +241,9 @@ namespace GreenQloud.Repository.Remote
                     SourceKey = sourceKey
                 };
 
-                using (CopyObjectResponse cor = Connect ().CopyObject (request)){}
-                Connect ().Dispose ();
+                using (CopyObjectResponse cor = Connect ().CopyObject (request)){
+                    cor.Dispose ();
+                }
                 CurrentTransfer.EndTime = GlobalDateTime.Now;
 
             //TODO WHY EVER OCCUR THIS ERROR?????
@@ -480,7 +481,7 @@ namespace GreenQloud.Repository.Remote
                 DateTime remoteClock = Convert.ToDateTime (sRemoteclock);
                 diff = localClock.Subtract(remoteClock);
                 lastDiffClock = localClock;
-                Connect ().Dispose ();
+                files.Dispose ();
             }
             return diff;
 
@@ -553,7 +554,7 @@ namespace GreenQloud.Repository.Remote
             {
                 
             }
-            Connect ().Dispose ();
+            response.Dispose ();
             CurrentTransfer.EndTime = GlobalDateTime.Now;
             UpdateStorageQloud();
             Logger.LogInfo ("Connection", "Folder "+name+" created");
@@ -572,7 +573,6 @@ namespace GreenQloud.Repository.Remote
             PutBucketRequest request = new PutBucketRequest ();
             request.BucketName = RuntimeSettings.DefaultBucketName;
             Connect ().PutBucket (request);
-            Connect ().Dispose ();
             Logger.LogInfo("Connection", "Bucket "+RuntimeSettings.DefaultBucketName+" was created.");
             return true;
        
@@ -633,7 +633,7 @@ namespace GreenQloud.Repository.Remote
             using (response = Connect ().PutObject (putObject)) {
 
             }
-            Connect ().Dispose ();
+            response.Dispose ();
             GenericDelete (Constant.CLOCK_TIME);
 
         }

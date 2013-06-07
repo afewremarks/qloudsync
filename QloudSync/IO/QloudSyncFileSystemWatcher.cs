@@ -96,9 +96,10 @@ namespace GreenQloud
                         ignore =  ignoreBag.Contains (search);
                     }
 
+                    Console.WriteLine (flags[i].ToString());
+
                     if (!ignore) {
                         if (//ignore
-                            !flags [i].HasFlag (FSEventStreamEventFlagItem.InodeMetaMod) && //after create the event lister throw a chmod event
                             !(flags [i].HasFlag (FSEventStreamEventFlagItem.Created) && flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) //after create the event lister throw a create with update event
                         ) {
                             Event e = new Event ();
@@ -128,7 +129,6 @@ namespace GreenQloud
                                     }
                                 }
                             }
-                            Console.WriteLine (flags[i].ToString());
                             handler (e);
                         }
                     }
