@@ -1,6 +1,8 @@
 using System;
 using System.Text;
 using System.Security.Cryptography;
+using GreenQloud.Model;
+using System.IO;
 
 namespace GreenQloud
 {
@@ -17,9 +19,30 @@ namespace GreenQloud
             b64 = Convert.ToBase64String(hashValue);
             
             if (urlEncode)            
-                return Uri.EscapeUriString(b64);
+                return new UrlEncode().Encode(b64);
             else                            
                 return b64;
+        }
+
+        public static string Getbase64(string value)
+        {
+            byte[] key = new Byte[64];
+            key = Encoding.UTF8.GetBytes(value);
+            return Convert.ToBase64String(key);
+        }
+
+       public string md5hash (string input)
+        {
+            string md5hash;
+            try {
+                FileStream fs = System.IO.File.Open (input, FileMode.Open);
+                md5hash = BitConverter.ToString (new MD5CryptoServiceProvider().ComputeHash (fs)).Replace ("-", string.Empty).ToLower ();
+                fs.Close ();
+            }
+            catch (Exception e){
+                md5hash = string.Empty;
+            }
+            return md5hash;
         }
     }
 }

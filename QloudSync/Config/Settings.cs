@@ -16,7 +16,7 @@
 
 
 using System;
-using System.Configuration;
+//using System.Configuration;
 using System.IO;
 
 
@@ -30,16 +30,7 @@ namespace GreenQloud {
 
         protected static void AppSettingsUpdate (string name, string value)
         {
-            System.Configuration.Configuration config = ConfigurationManager.OpenExeConfiguration (ConfigurationUserLevel.None);
-
-            if (ConfigurationManager.AppSettings [name] != null) {
-                config.AppSettings.Settings [name].Value = value;     
-            } else {
-                config.AppSettings.Settings.Add (name, value);
-            }
-            config.Save (ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection ("appSettings");
-
+            ConfigFile.Write(name,  value);     
         }
     }
 }

@@ -17,6 +17,7 @@
 
 using System;
 using System.IO;
+using GreenQloud.Model;
 
 namespace GreenQloud {
     
@@ -27,7 +28,7 @@ namespace GreenQloud {
 
         public static void LogInfo (string type, string message)
         {
-            string timestamp = DateTime.Now.ToString ("HH:mm:ss");
+            string timestamp = GlobalDateTime.Now.ToString ("HH:mm:ss");
             string line      = timestamp + " | " + type + " | " + message;
 
 #if DEBUG
@@ -46,12 +47,18 @@ namespace GreenQloud {
                 }
             }
         }
-
+        public static void LogEvent (string type, Event e ){
+            string s = String.Format (" {0} {1} {2}",e.EventType, e.RepositoryType, e.Item.FullLocalName);
+            if(e.Item.ResultObjectRelativePath != ""){
+                s += String.Format ("  Result Object: {0} \n",e.Item.ResultObjectRelativePath);
+            }
+            Logger.LogInfo(type, s);
+        }
         public static void LogInfo (string type, Exception e ){
             string message = string.Format("{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.Message, e.StackTrace, e.GetBaseException());
             if(e.InnerException != null)
                 message+= e.InnerException.Message;
-            LogInfo (type, "");
+            LogInfo(type, message);
         }
     }
 }
