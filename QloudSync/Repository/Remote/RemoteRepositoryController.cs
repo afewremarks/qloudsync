@@ -61,6 +61,8 @@ namespace GreenQloud.Repository.Remote
             }
         }
 
+        public abstract Transfer Move (RepositoryItem item);
+        public abstract string RemoteETAG (string path);
         public abstract bool ExistsVersion (RepositoryItem file);
         public abstract Transfer Download (RepositoryItem request);
         public abstract Transfer Upload (RepositoryItem request);

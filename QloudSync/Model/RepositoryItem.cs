@@ -6,20 +6,21 @@ using System.Dynamic.Utils;
 using Amazon.S3.Model;
 using System.Security.Cryptography;
 using System.Linq;
+using System.Text.RegularExpressions;
+using GreenQloud.Persistence;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Model
 {
     public class RepositoryItem
     {
-       
-
+        private static SQLiteRepositoryItemDAO dao =  new SQLiteRepositoryItemDAO ();
         public RepositoryItem ()
         {
-           
+
         }
 
-        public static RepositoryItem CreateInstance (LocalRepository repo, string fullPath, bool isFolder, long size, DateTime lastModified){
-
+        public static RepositoryItem CreateInstance (LocalRepository repo, string fullPath, bool isFolder, long size, string lastModified){
             if (fullPath.EndsWith ("/")){
                 fullPath = fullPath.Substring (0, fullPath.Length-1);
                 isFolder = true;
@@ -38,8 +39,15 @@ namespace GreenQloud.Model
 
             if (!repoPath.EndsWith ("/"))
                 repoPath += "/";
-
-            string relativePath = fullPath.Replace (repoPath, string.Empty).Replace(name, string.Empty);
+            string relativePath = "";
+            if (name == string.Empty)
+            {
+                //TODO
+            }else if(repoPath == string.Empty){
+                relativePath = fullPath.Replace (RuntimeSettings.HomePath, string.Empty).Replace(name, string.Empty);
+            }else {
+                relativePath = fullPath.Replace (repoPath, string.Empty).Replace(name, string.Empty);
+            }
             if (relativePath == "/")
                 relativePath = "";
             if (relativePath.StartsWith ("/"))
@@ -50,14 +58,18 @@ namespace GreenQloud.Model
             return CreateInstance (repo, name, relativePath, isFolder, size, lastModified);
         }
 
-        public static RepositoryItem CreateInstance  (LocalRepository repo, string name, string path, bool isFolder, long size, DateTime lastModified){
-            RepositoryItem item = new RepositoryItem();
+        public static RepositoryItem CreateInstance  (LocalRepository repo, string name, string path, bool isFolder, long size, string lastModified){
+            RepositoryItem item;
+            item = new RepositoryItem();
             item.Repository = repo;
             item.Name = name;
             item.RelativePath = path;
             item.IsAFolder = isFolder;
             item.Size = size;
             item.TimeOfLastChange = lastModified;
+            if(dao.Exists(item)){
+                item = dao.GetFomDatabase (item);
+            }
             return item;
         }
 
@@ -65,15 +77,97 @@ namespace GreenQloud.Model
             set; get;
         }
 
+        private string resultObject = null;
+        public string ResultObjectRelativePath {
+            set{
+                resultObject = value;
+            }
+            get {
+                if (resultObject == null || resultObject == "")
+                    return "";
+                return ToPathSting(resultObject);
+            }
+        }
+
+        public string RelativeResultObjectPathInBucket {
+            get {
+
+                return ToPathSting( Path.Combine (RuntimeSettings.DefaultBucketName,ResultObjectFolder));
+            }
+        }
+
+        public string ResultObjectKey {
+            get {
+                if (resultObject == null || resultObject == ""){
+                    return "";
+                }else if (resultObject.EndsWith(Path.DirectorySeparatorChar.ToString())){
+                    resultObject = resultObject.Substring (0, resultObject.Length - 1);
+                }
+                return resultObject;
+            }
+        }
+
+        public string ResultObjectFolder {
+            get{
+                int i = ResultObjectRelativePath.LastIndexOf (Path.DirectorySeparatorChar);
+                return ResultObjectRelativePath.Substring (0, i+1);
+            }
+        }
+        public string ResultObjectName {
+            get{
+                int i = ResultObjectRelativePath.LastIndexOf (Path.DirectorySeparatorChar);
+                return ResultObjectRelativePath.Substring (i+1);
+            }
+        }
+
+        /*
+        public string FullResultObjectName {
+            get{
+                return Path.Combine(RelativePath, ResultObject);
+            }
+        }*/
+        public string FullLocalResultObject{
+            get {
+                return ToPathSting(Path.Combine(Repository.Path, ResultObjectRelativePath));
+            }
+        }
+
         public string Name { get; set;}
 
+        private string relativePath;
         public string RelativePath{ 
-            get; set;
+            get{
+                return relativePath;
+            } 
+            set{
+                if (value.StartsWith (Path.VolumeSeparatorChar.ToString())) {
+                    relativePath = value.Substring (1);
+                } else {
+                    relativePath = value;
+                }
+            }
+        }
+
+        private string ToPathSting(string path){
+            if (IsAFolder && !path.EndsWith(Path.DirectorySeparatorChar.ToString())) {
+                path += Path.DirectorySeparatorChar;
+            }
+            return path;
         }
 
         public string AbsolutePath{
             get {
-                return Path.Combine(RelativePath, Name);
+                return ToPathSting(Path.Combine(RelativePath, Name));
+            }
+        }
+
+        public string Key{
+            get {
+                if(AbsolutePath.EndsWith(Path.VolumeSeparatorChar.ToString())){
+                    return AbsolutePath.Substring(0, AbsolutePath.Length - 1);
+                } else {
+                    return AbsolutePath;
+                }
             }
         }
 
@@ -83,46 +177,37 @@ namespace GreenQloud.Model
                 fullLocalName = value;
             }
             get {
-                if(fullLocalName == null){                    
-
-                    fullLocalName = Path.Combine(Repository.Path, AbsolutePath);
-
-                }
-                
-
-                return fullLocalName;
+                return ToPathSting( Path.Combine(Repository.Path, AbsolutePath));
             }
         }
         
         public string FullRemoteName {
             get {
-                
-                return Path.Combine(RuntimeSettings.DefaultBucketName, AbsolutePath);
+                return ToPathSting( Path.Combine(RuntimeSettings.DefaultBucketName, AbsolutePath));
             }
         }
         
         public string RelativePathInBucket {
             get {
-               
-                return Path.Combine (RuntimeSettings.DefaultBucketName,RelativePath);
+               return ToPathSting( Path.Combine (RuntimeSettings.DefaultBucketName,RelativePath));
             }
         }
         
         public string TrashFullName {
             get {
-                return Path.Combine (TrashRelativePath , Name);
+                return ToPathSting( Path.Combine (TrashRelativePath , Name));
             }
         }
         
         public string TrashRelativePath{
             get{
-                return Path.Combine (RuntimeSettings.DefaultBucketName,Constant.TRASH)+RelativePath;
+                return ToPathSting( Path.Combine (RuntimeSettings.DefaultBucketName,Constant.TRASH)+RelativePath);
             }
         }
         
         public string TrashAbsolutePath {
             get {
-                return Path.Combine (Constant.TRASH,AbsolutePath);
+                return ToPathSting( Path.Combine (Constant.TRASH,AbsolutePath));
             }
         }
 
@@ -131,25 +216,28 @@ namespace GreenQloud.Model
             get;
         }
         string remotehash = string.Empty;
-        public string RemoteMD5Hash {
+        public string RemoteETAG {
             get{
                 return remotehash;
             }set{
                 remotehash = value;
             }
-        }   
+        }
 
         string localhash = string.Empty;
-        public string LocalMD5Hash {
+        public string LocalETAG {
             get{
-                return localhash;
+                if (localhash == "") {
+                    return new Crypto().md5hash(FullLocalName);
+                } else {
+                    return localhash;
+                }
             }set{
                 localhash = value;
             }
         }
 
-
-        public DateTime TimeOfLastChange{
+        public string TimeOfLastChange{
             set;
             get;
         }
@@ -174,7 +262,7 @@ namespace GreenQloud.Model
                     FullLocalName.Contains(".app/") || Name.EndsWith(".app") || Name=="untitled folder";
                 if(File.Exists(FullLocalName))
                 {
-                    ignored |= (File.GetAttributes(fullLocalName) & FileAttributes.Hidden) == FileAttributes.Hidden;
+                    ignored |= (File.GetAttributes(FullLocalName) & FileAttributes.Hidden) == FileAttributes.Hidden;
                 }
                 else if (Directory.Exists(FullLocalName)){
                     DirectoryInfo d = new DirectoryInfo(FullLocalName);

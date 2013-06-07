@@ -25,10 +25,15 @@ namespace GreenQloud {
             set; get;
         }
 
+        public new event ProgressChangedEventHandler ProgressChanged = delegate { };
+        public new delegate void ProgressChangedEventHandler (double percentage, double time);
+
+
         public IconController StatusIcon;
-        StorageQloudLocalEventsSynchronizer localSynchronizer;
-        StorageQloudRemoteEventsSynchronizer remoteSynchronizer;
-        StorageQloudBacklogSynchronizer backlogSynchronizer;
+        private StorageQloudLocalEventsSynchronizer localSynchronizer;
+        private StorageQloudRemoteEventsSynchronizer remoteSynchronizer;
+        private StorageQloudBacklogSynchronizer backlogSynchronizer;
+        private SynchronizerResolver synchronizerResolver;
 
         public double ProgressPercentage = 0.0;
         public string ProgressSpeed      = "";
@@ -73,27 +78,24 @@ namespace GreenQloud {
             localSynchronizer = StorageQloudLocalEventsSynchronizer.GetInstance();
             remoteSynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
             backlogSynchronizer = StorageQloudBacklogSynchronizer.GetInstance();
+            synchronizerResolver = SynchronizerResolver.GetInstance();
 
-            localSynchronizer.SyncStatusChanged += HandleSyncStatusChanged;
-            remoteSynchronizer.SyncStatusChanged += HandleSyncStatusChanged;
-            backlogSynchronizer.SyncStatusChanged +=HandleSyncStatusChanged;
+            synchronizerResolver.SyncStatusChanged +=HandleSyncStatusChanged;
             
             this.timer = new System.Timers.Timer (){
-                Interval = 60000
+                Interval = 10000
             };
             
             timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e)=>{
                 try{
-                    backlogSynchronizer.Synchronize();
-                    timer.Stop();
-                    localSynchronizer.Start();
-                    remoteSynchronizer.Start ();
+                    InitializeSynchronizers();
                 }catch{
                     
                 }
             };
 
             CreateConfigFolder();
+            UpdateConfigFile ();
 
             if (CreateHomeFolder ())
                 AddToBookmarks ();
@@ -105,29 +107,102 @@ namespace GreenQloud {
                 if (!Directory.Exists(RuntimeSettings.DatabaseFolder))
                     Directory.CreateDirectory (RuntimeSettings.DatabaseFolder);
                 new Persistence.SQLite.SQLiteDatabase().CreateDataBase();
+                File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
+            } else {
+                if (!File.Exists (RuntimeSettings.DatabaseInfoFile)){
+                    File.Delete(RuntimeSettings.DatabaseFile);
+                }else{
+                    string version = File.OpenText(RuntimeSettings.DatabaseInfoFile).ReadLine();
+                    if(Double.Parse(version) <  Double.Parse(RuntimeSettings.DatabaseVersion)){
+                        //TODO run migrations
+                        File.Delete(RuntimeSettings.DatabaseInfoFile);
+                        File.Delete(RuntimeSettings.DatabaseFile);
+                    } 
+                }
+                if(!File.Exists (RuntimeSettings.DatabaseFile)){
+                    new Persistence.SQLite.SQLiteDatabase().CreateDataBase();
+                    File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
+                }
             }
-
+            
             if (File.Exists (RuntimeSettings.BacklogFile))
                 File.Delete(RuntimeSettings.BacklogFile);
+            
+            bool available = double.Parse(InitOSInfoString()) >= double.Parse(GlobalSettings.AvailableOSXVersion);
+            if(available){
+                if (FirstRun) {
+                    ShowSetupWindow (PageType.Login);
+                    foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
+                        File.Delete (f);
 
-            if (FirstRun) {
-                ShowSetupWindow (PageType.Login);
-                foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
-                    File.Delete (f);
-            } else {
-                backlogSynchronizer.Start();
-                InitializeSynchronizers();
+                    UpdateConfigFile ();
+                } else {
+                    InitializeSynchronizers();
+                }
+            }
+            else{
+                var alert = new NSAlert {
+                    MessageText = "QloudSync is only available to OSX Mountain Lion.",
+                    AlertStyle = NSAlertStyle.Informational
+                };
+                
+                alert.AddButton ("OK");
+                
+                var returnValue = alert.RunModal();
+                Quit ();
+            }
+            verifyConfigRequirements ();
+        }
+
+        void verifyConfigRequirements ()
+        {
+            try{
+                ConfigFile.Read("InstanceID");
+            }catch(ConfigurationException e){
+                string id = Crypto.Getbase64(ConfigFile.Read("ApplicationName") + Credential.Username + GlobalDateTime.NowUniversalString);
+                ConfigFile.Write ("InstanceID", id); 
+                ConfigFile.Read("InstanceID");
+                Logger.LogInfo ("INFO", "Generated InstanceID: " + id);
             }
         }
-       
+        
+        [System.Runtime.InteropServices.DllImport("/System/Library/Frameworks/CoreServices.framework/CoreServices")]
+        internal static extern short Gestalt(int selector, ref int response);
+        static string m_OSInfoString = null;
+        static string InitOSInfoString()
+        {
+            try{
+                //const int gestaltSystemVersion = 0x73797376;
+                const int gestaltSystemVersionMajor = 0x73797331;
+                const int gestaltSystemVersionMinor = 0x73797332;
+                const int gestaltSystemVersionBugFix = 0x73797333;
+                
+                int major = 0;
+                int minor = 0;
+                int bugFix = 0;
+                
+                Gestalt(gestaltSystemVersionMajor, ref major);
+                Gestalt(gestaltSystemVersionMinor, ref minor);
+                Gestalt(gestaltSystemVersionBugFix, ref bugFix);
+                
+                
+                
+                Console.WriteLine("Mac OS X/{0}.{1}.{2}", major, minor, bugFix);
+                return string.Format ("{0}.{1}", major, minor);}
+            catch (Exception e){
+                Console.WriteLine (e.Message);
+            }
+            return "";
+        }
+
 
         private void InitializeSynchronizers ()
         {
-
             localSynchronizer.Start();
             remoteSynchronizer.Start();
+            synchronizerResolver.Start();
                         
-            remoteSynchronizer.ProgressChanged += delegate (double percentage, double speed) {
+            ProgressChanged += delegate (double percentage, double speed) {
                 ProgressPercentage = percentage;
                 ProgressSpeed      = speed.ToString();
                 
@@ -150,9 +225,7 @@ namespace GreenQloud {
         // Fires events for the current syncing state
         private void UpdateState ()
         {
-            if (localSynchronizer.SyncStatus == SyncStatus.DOWNLOADING || localSynchronizer.SyncStatus == SyncStatus.UPLOADING ||
-                remoteSynchronizer.SyncStatus == SyncStatus.DOWNLOADING || remoteSynchronizer.SyncStatus == SyncStatus.UPLOADING  
-                ) {
+            if (synchronizerResolver.SyncStatus == SyncStatus.DOWNLOADING || synchronizerResolver.SyncStatus == SyncStatus.UPLOADING) {
                 OnSyncing ();
             } else {
                 OnIdle ();
@@ -170,11 +243,39 @@ namespace GreenQloud {
                 SyncStop();
             };
             
-            remoteSynchronizer.ProgressChanged += delegate (double percentage, double time) {
+            ProgressChanged += delegate (double percentage, double time) {
                 FolderFetching (percentage, time);
             };
-            remoteSynchronizer.FirstLoad();
+            FirstLoad();
             FinishFetcher();
+        }
+
+        public void FirstLoad()
+        {
+            try {
+                backlogSynchronizer.Start();
+                while(!backlogSynchronizer.FinishLoad)
+                    Thread.Sleep (1000);
+                backlogSynchronizer.Stop();
+
+
+                InitializeSynchronizers();
+                Thread.Sleep (1000);
+
+                int eventsToSync = synchronizerResolver.EventsToSync;
+                int totalEventsToSync = eventsToSync;
+
+                while(eventsToSync > 0){
+
+                    double percent = 100 - (100*eventsToSync/totalEventsToSync);
+
+                    ProgressChanged (percent , 0.0);
+                    eventsToSync = synchronizerResolver.EventsToSync;
+                    Thread.Sleep (1000);
+                }
+            }catch (Exception e) {                
+                Logger.LogInfo ("Initial Sync Error", e.Message+"\n "+e.StackTrace);
+            }
         }
 
         public void SyncStop ()
@@ -189,7 +290,7 @@ namespace GreenQloud {
             FolderFetched (localSynchronizer.Warnings);
             new Persistence.SQLite.SQLiteRepositoryDAO().Create (new GreenQloud.Model.LocalRepository(RuntimeSettings.HomePath));
             new Thread (() => CreateStartupItem ()).Start ();
-            InitializeSynchronizers ();
+            //InitializeSynchronizers ();
         }
 
         public void CreateStartupItem ()
@@ -327,6 +428,11 @@ namespace GreenQloud {
                 return false;
             }
 		}
+
+        void UpdateConfigFile ()
+        {
+            ConfigFile.UpdateConfigFile ();
+        }
 
         void CreateConfigFolder ()
         {

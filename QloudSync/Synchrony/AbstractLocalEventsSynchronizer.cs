@@ -20,8 +20,8 @@ namespace GreenQloud.Synchrony
         bool creatingEvent;
 
         protected AbstractLocalEventsSynchronizer 
-            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
-             base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
+            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
+                base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO, repositoryItemDAO)
         {
             threadSync = new Thread(() =>{
                 Synchronize ();
@@ -29,8 +29,8 @@ namespace GreenQloud.Synchrony
            
         }
 
-        public void Synchronize (Event e){           
-            eventDAO.SetEventType (GetEventType (e));
+        public void Create (Event e){           
+            eventDAO.Create (LoadEvent (e));
             creatingEvent = true;
         }
 
@@ -38,35 +38,59 @@ namespace GreenQloud.Synchrony
             while (Working){
                 if (creatingEvent){
                     creatingEvent = false;
-                    if(SyncStatus == SyncStatus.IDLE){
-                        base.Synchronize ();
-                    }
+                    //if(SyncStatus == SyncStatus.IDLE){
+                        //base.Synchronize ();
+                    //}
                 }
                 Thread.Sleep (500);
             }
         }
 
-
-
-        public Event GetEventType (Event e)
+        bool isCopy (RepositoryItem item)
         {
-            bool exists = physicalLocalRepository.Exists (e.Item);
-            if (exists){
-                if (remoteRepository.ExistsCopies (e.Item)){
-                       e.EventType = EventType.MOVE_OR_RENAME;
-                }
-                else{
-                    if (remoteRepository.Exists (e.Item)){
-                        e.EventType = EventType.UPDATE;
-                    }
-                    else{
-                        e.EventType = EventType.CREATE;
-                        CreateSubEvents(e);
-                    }
-                }
-            }else{
-                e.EventType = EventType.DELETE;
+            if (!physicalLocalRepository.Exists (item))
+                return false;
+
+            List<RepositoryItem> copys = remoteRepository.GetCopys (item);
+
+            if (copys.Count == 0)
+                return false;
+
+            foreach(RepositoryItem i in copys){
+                if(!physicalLocalRepository.Exists (i))
+                    return false;
             }
+
+            return true;
+        }
+
+        bool isMove (RepositoryItem item)
+        {
+            if (!physicalLocalRepository.Exists (item))
+                return false;
+
+            List<RepositoryItem> copys = remoteRepository.GetCopys (item);
+
+            if (copys.Count == 0)
+                return false;
+
+            foreach(RepositoryItem i in copys){
+                if(!physicalLocalRepository.Exists (i))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public Event LoadEvent (Event e)
+        {
+            e.RepositoryType = RepositoryType.LOCAL;
+            e.User = Credential.Username;
+            e.Application = GlobalSettings.FullApplicationName;
+            e.ApplicationVersion = GlobalSettings.RunningVersion;
+            e.DeviceId = GlobalSettings.MachineName;
+            e.OS = GlobalSettings.OSVersion;
+            e.Bucket = RuntimeSettings.DefaultBucketName;
             return e;
             
         }

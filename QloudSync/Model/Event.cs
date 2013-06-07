@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
  namespace GreenQloud.Model
 {
@@ -6,7 +7,7 @@ using System;
         CREATE,
         UPDATE,
         DELETE,
-        MOVE_OR_RENAME,
+        MOVE,
         COPY,
         NULL
     }
@@ -38,7 +39,7 @@ using System;
             set; get;
         }
 
-        public DateTime InsertTime {
+        public string InsertTime {
             get;
             set;
         }
@@ -46,6 +47,31 @@ using System;
 		public string User {
 			set; get;
 		}
+
+        public string Application {
+            get;
+            set;
+        }
+
+        public string ApplicationVersion {
+            get;
+            set;
+        }
+
+        public string DeviceId {
+            get;
+            set;
+        }
+
+        public string OS {
+            get;
+            set;
+        }
+
+        public string Bucket {
+            get;
+            set;
+        }
 	}
 }
 

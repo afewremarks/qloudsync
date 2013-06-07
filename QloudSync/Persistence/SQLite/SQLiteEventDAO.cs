@@ -27,8 +27,19 @@ namespace GreenQloud.Persistence.SQLite
             bool noConflicts = !ExistsConflict(e);
 
            if (noConflicts){
-                string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\")", e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, DateTime.Now.ToString());
-                database.ExecuteNonQuery (sql);
+                try{
+                    string dateOfEvent =  e.InsertTime;
+                    if(dateOfEvent==null){
+                        dateOfEvent = GlobalDateTime.NowUniversalString;
+                    }
+
+                    string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
+                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
+
+                    database.ExecuteNonQuery (sql);
+                }catch(Exception err){
+                    Logger.LogInfo("ERROR", err);
+                }
             }
         }
 
@@ -45,20 +56,12 @@ namespace GreenQloud.Persistence.SQLite
             database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\" WHERE ITEMID =\"{1}\"", bool.TrueString, id));
         }
 
- 
+
         public override List<Event> EventsNotSynchronized {
             get {
                 List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\"", bool.FalseString));
 
                 return list;
-            }
-        }
-
-        public override void CreateWithoutType (Event e){
-            e.Item = repositoryItemDAO.Create (e);
-            if (!ExistsConflict(e)){
-                string sql = string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME) VALUES (\"{0}\", \"NULL\", \"{1}\", \"{2}\", \"{3}\")", e.Item.Id, e.RepositoryType.ToString(), bool.FalseString, DateTime.Now.ToString());
-                database.ExecuteNonQuery (sql);
             }
         }
 
@@ -77,13 +80,35 @@ namespace GreenQloud.Persistence.SQLite
             }
         }
 
+        
+        public override string LastSyncTime{
+            get{
+                List<Event> events = Select("SELECT * FROM EVENT WHERE REPOSITORY = \"REMOTE\" ORDER BY INSERTTIME DESC LIMIT 1");
+                if(events.Count == 0)
+                    return string.Empty;
+
+                string time = events[0].InsertTime;
+                if(time == null)
+                    return string.Empty;
+                try{
+
+                    DateTime dtime =  Convert.ToDateTime(time);// DateTime.ParseExact(time, "dd/MM/yyyy hh:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                    return dtime.AddSeconds(1).ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                }catch(Exception e )
+                {
+                    Logger.LogInfo("ERROR", e.Message);
+                }
+                return DateTime.MaxValue.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");;
+            }
+        }
+
         #endregion
 
         public bool ExistsConflict (Event e)
         {
             string query = "SELECT * FROM EVENT WHERE REPOSITORY= \"{0}\" AND ITEMID = \"{1}\"";
             string sql ="";
-            DateTime limitDate = DateTime.Now.Subtract(new TimeSpan(0,0,60));
+            DateTime limitDate = GlobalDateTime.Now.Subtract(new TimeSpan(0,0,60));
             if (e.RepositoryType == RepositoryType.LOCAL)
             {
                 sql = string.Format (query, RepositoryType.REMOTE, e.Item.Id);
@@ -94,12 +119,23 @@ namespace GreenQloud.Persistence.SQLite
 
             List<Event> list = Select (sql);
 
-            if(list.Any(ev=>ev.InsertTime >  limitDate || !ev.Synchronized)){
-                return true;
+            foreach (Event ev in list)
+            {
+               if (!ev.Synchronized)
+                    return true;
+                if (e.InsertTime != null){
+                    try{
+
+                        if(Convert.ToDateTime(e.InsertTime)  >limitDate){
+                            return true;
+                        }
+                    }catch{}
+                }
             }
 
             return false;
         }
+
         
         public bool Exists (Event e)
         {
@@ -116,8 +152,13 @@ namespace GreenQloud.Persistence.SQLite
                 e.EventType = (EventType) Enum.Parse(typeof(EventType), dr[2].ToString());
                 e.RepositoryType = (RepositoryType) Enum.Parse(typeof(RepositoryType),dr[3].ToString());
                 e.Synchronized = bool.Parse (dr[4].ToString());
-                e.InsertTime = Convert.ToDateTime (dr[5].ToString());
-                
+                e.InsertTime = dr[5].ToString();
+                e.User = dr[6].ToString();
+                e.Application = dr[7].ToString();
+                e.ApplicationVersion = dr[8].ToString();
+                e.DeviceId = dr[9].ToString();
+                e.OS = dr[10].ToString();
+                e.Bucket = dr[11].ToString();
                 events.Add (e);
             }
             return events;

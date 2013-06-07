@@ -6,6 +6,9 @@ using GreenQloud.Persistence;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
+using System.Globalization;
+using System.Runtime.CompilerServices;
+using Newtonsoft.Json.Linq;
 
 namespace GreenQloud.Synchrony
 {
@@ -14,110 +17,83 @@ namespace GreenQloud.Synchrony
         Thread threadSync;
         bool eventsCreated;
 
-        DateTime LastSyncTime;
-
         public RemoteEventsSynchronizer  
-            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
-            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
+            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
+                base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO, repositoryItemDAO)
         {
             threadSync = new Thread(() =>{
                 Synchronize ();
             });
-            LastSyncTime = new DateTime();
         }
 
 
 
         public new void Synchronize(){
             while (Working){
+                Thread.Sleep (20000);
                 if (eventsCreated){
                     eventsCreated = false;
-                    if(SyncStatus == SyncStatus.IDLE){
-                        base.Synchronize ();
-                    }
+                    //if(SyncStatus == SyncStatus.IDLE){
+                        //base.Synchronize ();
+                    //}
                 }
-                Thread.Sleep (500);
             }
         }
 
         bool ready=true;
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void AddEvents ()
         {
+            try{
+                if (!ready)
+                    return;
+                //if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
+                //    return;
+                ready = false;
+                string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
+                string time = eventDAO.LastSyncTime;
+                Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
 
-            if (!ready)
-                return;
-            if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
-                return;
-            ready = false;
-            if (LastSyncTime == new DateTime())
-                LastSyncTime = DateTime.Now.Subtract(new TimeSpan (0,0,30));
-            DateTime time = LastSyncTime;
-            LastSyncTime = DateTime.Now;
-            foreach (RepositoryItem remoteItem in remoteRepository.RecentChangedItems (time)){
-                    bool exists = physicalLocalRepository.Exists (remoteItem);
+                UrlEncode encoder = new UrlEncode();
+                string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", encoder.Encode (RuntimeSettings.DefaultBucketName), encoder.Encode (Credential.Username), encoder.Encode (hash), encoder.Encode (time));
 
-                    if (exists){
-                        if (!physicalLocalRepository.IsSync (remoteItem))
-                        {
-                            Event e = new Event(){
-                                EventType = EventType.UPDATE,
-                                RepositoryType = RepositoryType.REMOTE,
-                                Item = remoteItem,
-                                Synchronized = false
-                            };
-                            eventDAO.Create (e);
-                        }
-                    }
-                    else {
-                        RepositoryItem copy = physicalLocalRepository.GetCopy (remoteItem);
-                        if (copy != null){
-                            if (!remoteRepository.Exists (copy)){
-                                Event e = new Event(){
-                                    EventType = EventType.MOVE_OR_RENAME,
-                                    RepositoryType = RepositoryType.REMOTE,
-                                    Item = remoteItem,
-                                    Synchronized = false
-                                };
-                                eventDAO.Create (e);
-                            }
-                            else{
-                                Event e = new Event(){
-                                    EventType = EventType.COPY,
-                                    RepositoryType = RepositoryType.REMOTE,
-                                    Item = remoteItem,
-                                    Synchronized = false
-                                };
-                                eventDAO.Create (e);
-                            }
-                        }
-                        else{
-                            Event e = new Event(){
-                                EventType = EventType.CREATE,
-                                RepositoryType = RepositoryType.REMOTE,
-                                Item = remoteItem,
-                                Synchronized = false
-                            };
-                            eventDAO.Create (e);
-                        }
+                JArray jsonObjects = JSONHelper.GetInfoArray(uri);
+                foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
+                    if(!((string)jsonObject["application"]).Equals(GlobalSettings.FullApplicationName)){
+                        Event e = new Event();
+                        e.RepositoryType = RepositoryType.REMOTE;
+                        e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
+                        e.User = (string)jsonObject["username"];
+                        e.Application = (string)jsonObject["application"];
+                        e.ApplicationVersion = (string)jsonObject["applicationVersion"];
+                        e.DeviceId = (string)jsonObject["deviceId"];
+                        e.OS = (string)jsonObject["os"];
+                        e.Bucket = (string)jsonObject["bucket"];
+
+                        e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+
+                        string relativePath = (string)jsonObject["object"];
+                        e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
+
+                        e.Item.ResultObjectRelativePath = (string)jsonObject["resultObject"];
+                        e.Item.RemoteETAG = (string)jsonObject["hash"];
+
+                        e.Synchronized = false;
+                        eventDAO.Create(e);
+                        repositoryItemDAO.Update(e.Item);
                     }
                 }
-           foreach (RepositoryItem localItem in physicalLocalRepository.Items) {
-
-                if (!remoteRepository.Exists(localItem)){
-
-                    Event e = new Event ();
-
-                    e.Item = localItem;
-                    e.EventType = EventType.DELETE;
-                    e.RepositoryType = RepositoryType.REMOTE;
-                    e.Synchronized = false;
-                    eventDAO.Create (e);
-                }
-            }  
-            eventsCreated = true;
-
+                eventsCreated = true;
+            } catch (Exception e){
+                Logger.LogInfo("ERROR", e);
+            }
             ready = true;
+        }
+
+        public bool HasInit {
+            get {
+                return eventsCreated;
+            }
         }
 
         public double InitFirstLoad ()
@@ -163,7 +139,7 @@ namespace GreenQloud.Synchrony
         #endregion  
 
         public void GenericSynchronize(){
-            base.Synchronize();
+            //base.Synchronize();
         }
     }
 }
