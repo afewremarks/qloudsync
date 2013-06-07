@@ -14,6 +14,7 @@ namespace GreenQloud.Repository.Local
         #region RepositoryController implementation
 
         public abstract bool Exists (RepositoryItem repoObject);
+        public abstract bool Exists (string repoObject);
 
 
         public abstract List<RepositoryItem> Items {
@@ -22,7 +23,11 @@ namespace GreenQloud.Repository.Local
 
         #endregion
 
+        public abstract void Copy (RepositoryItem item);
+
         public abstract void Delete (RepositoryItem  item);
+
+        public abstract void Move (RepositoryItem item);
 
         public abstract RepositoryItem GetCopy (RepositoryItem remoteItem);
 

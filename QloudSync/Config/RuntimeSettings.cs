@@ -1,5 +1,5 @@
 using System;
-using System.Configuration;
+//using System.Configuration;
 using System.IO;
 
 namespace GreenQloud
@@ -42,7 +42,7 @@ namespace GreenQloud
         
         public static string TmpPath {
             get {
-                return Path.Combine(HomePath, ConfigurationManager.AppSettings ["Tmp"]);
+                return Path.Combine(HomePath, ConfigFile.Read ("Tmp"));
             }
         }
         
@@ -60,7 +60,7 @@ namespace GreenQloud
         public static string BacklogFile {
             get {
                 if (backlogFile == null)            
-                    backlogFile = Path.Combine (ConfigPath, ConfigurationManager.AppSettings ["BacklogFile"]);
+                    backlogFile = Path.Combine (ConfigPath, ConfigFile.Read ("BacklogFile"));
                 return backlogFile;
             }
         }
@@ -68,7 +68,7 @@ namespace GreenQloud
         public static string LogFilePath {
             get {
                 if (logfilepath == null){
-                    logfilepath = Path.Combine (ConfigPath, ConfigurationManager.AppSettings ["LogFile"]);
+                    logfilepath = Path.Combine (ConfigPath, ConfigFile.Read ("LogFile"));
                 }
                 return logfilepath;
             }
@@ -85,13 +85,24 @@ namespace GreenQloud
 
         public static string DatabaseFolder {
             get{
-                return Path.Combine (ConfigPath, ConfigurationManager.AppSettings ["DatabaseFolder"]);
+                return Path.Combine (ConfigPath, ConfigFile.Read ("DatabaseFolder"));
             }
         }
 
         public static string DatabaseFile {
             get{
-                return Path.Combine (DatabaseFolder, ConfigurationManager.AppSettings ["DatabaseFile"]);
+                return Path.Combine (DatabaseFolder, ConfigFile.Read ("DatabaseFile"));
+            }
+        }
+
+        public static string DatabaseVersion {
+            get{
+                return ConfigFile.Read("DatabaseVersion");
+            }
+        }
+        public static string DatabaseInfoFile {
+            get{
+                return Path.Combine (DatabaseFolder, ConfigFile.Read("DatabaseInfoFile"));
             }
         }
     }

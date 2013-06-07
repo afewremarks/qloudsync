@@ -13,11 +13,12 @@ using GreenQloud.Repository.Local;
 {
     public abstract class AbstractBacklogSynchronizer : AbstractSynchronizer
     {
+        private bool eventsCreated = false; 
 
         protected AbstractBacklogSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
-             RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO) :
-            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO)
+             RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
+            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO, repositoryItemDAO)
         {
 
         }
@@ -41,8 +42,15 @@ using GreenQloud.Repository.Local;
                 eventDAO.Create (GetEvent (localItem, RepositoryType.LOCAL));
                 
             }
-            base.Synchronize();
+            //base.Synchronize();
+            eventsCreated = true;
             Pause();
+        }
+
+        public bool FinishLoad{
+            get {
+                return eventsCreated;
+            }
         }
 
         public Event GetEvent (RepositoryItem item, RepositoryType type){
@@ -105,13 +113,13 @@ using GreenQloud.Repository.Local;
 
             RepositoryItem physicalObjectVersion = physicalLocalRepository.CreateItemInstance (remoteObj.FullLocalName);
 
-            if(physicalObjectVersion.TimeOfLastChange==new DateTime())
+           // if(physicalObjectVersion.TimeOfLastChange==new DateTime())
                 return RepositoryType.REMOTE;
 
-            DateTime referencialClock = physicalObjectVersion.TimeOfLastChange.Subtract (diffClocks);
+           // DateTime referencialClock = physicalObjectVersion.TimeOfLastChange.Subtract (diffClocks);
 
-            if (referencialClock.Subtract (Convert.ToDateTime (remoteObj.TimeOfLastChange)).TotalSeconds > -1) 
-                return RepositoryType.LOCAL;
+            //if (referencialClock.Subtract (Convert.ToDateTime (remoteObj.TimeOfLastChange)).TotalSeconds > -1) 
+              //  return RepositoryType.LOCAL;
 
             return RepositoryType.REMOTE;
         }

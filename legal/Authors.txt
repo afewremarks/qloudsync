@@ -12,20 +12,18 @@ Producer:
 	
 Code:
 	Carlos Maia <carlos@greenqloud.com> - co-producer, project manager
-	Angelo Ribeiro <angelo@greenqloud.com> - lead developer
-	Þórhallur Helgason <laddi@greenqloud.com> - StorageQloud integration 
-	Paula Gould <paul@greenqloud.com>
-
+	Gustavo Sizílio <gustavo@greenqloud.com> - lead QloudSync developer
+	Angelo Ribeiro - QloudSync developer
+	Þórhallur Helgason <laddi@greenqloud.com> - StorageQloud API and QloudSync integration
+	Kristján Mikaelsson <kristjan@greenqloud.com> - StorageQloud API
 	
-	Parts of QloudSync were inspired by the Sparkleshare project. 
+	The humble beginnings of QloudSync were inspired by the Sparkleshare project. 
 	https://github.com/hbons/SparkleShare
 
 Other contributors:
-	
 		
 Artwork:
 	Hrafn Áki Hrafnsson <rave3000@mac.com>
 
-© GreenQloud all rights reserved. http://greenqloud.com
-© GreenQloud all rights reserved. http://greenqloud.com
 
+© GreenQloud all rights reserved. http://greenqloud.com

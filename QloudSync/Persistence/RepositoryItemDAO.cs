@@ -9,6 +9,7 @@ namespace GreenQloud.Persistence
 {
     public abstract class RepositoryItemDAO
     {
+        public abstract void Update (RepositoryItem i);
         public abstract void Create (RepositoryItem e);
         public abstract List<RepositoryItem> All{
             get;

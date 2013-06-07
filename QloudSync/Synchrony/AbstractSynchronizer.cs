@@ -20,35 +20,15 @@ using GreenQloud.Repository.Remote;
 namespace GreenQloud.Synchrony
 {
     
-    public enum SyncStatus{
-        IDLE,
-        UPLOADING,
-        DOWNLOADING,
-        VERIFING
-    }
-
     public abstract class AbstractSynchronizer
     {
 
         protected TransferDAO transferDAO;
         protected EventDAO eventDAO;
+        protected RepositoryItemDAO repositoryItemDAO;
         protected LogicalRepositoryController logicalLocalRepository;
         protected PhysicalRepositoryController physicalLocalRepository;
         protected RemoteRepositoryController remoteRepository;
-
-        private SyncStatus status;
-        public delegate void SyncStatusChangedHandler (SyncStatus status);
-        public event SyncStatusChangedHandler SyncStatusChanged = delegate {};
-        
-        public SyncStatus SyncStatus {
-            get {
-                return status;
-            }
-            set {
-                status = value;
-                SyncStatusChanged(status);
-            }
-        }
         
         public bool Done {
             set; get;
@@ -60,14 +40,14 @@ namespace GreenQloud.Synchrony
         
         protected AbstractSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
-             RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO)
+             RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO)
         {
-            SyncStatus = SyncStatus.IDLE;
             this.transferDAO = transferDAO;
             this.eventDAO = eventDAO;
             this.logicalLocalRepository = logicalLocalRepository;
             this.physicalLocalRepository = physicalLocalRepository;
             this.remoteRepository = remoteRepository;
+            this.repositoryItemDAO = repositoryItemDAO;
         }
 
         #region Abstract Methods
@@ -78,65 +58,5 @@ namespace GreenQloud.Synchrony
 
         #endregion
 
-        #region Implemented Methods
-
-        public void Synchronize(){
-            List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
-            while (eventsNotSynchronized.Count>0 && Working){
-                Synchronize (eventsNotSynchronized[0]);
-                eventsNotSynchronized = eventDAO.EventsNotSynchronized;
-            }
-            SyncStatus = SyncStatus.IDLE;
-            Done = true;
-        }
-
-
-        void Synchronize(Event e){
-            Console.WriteLine ("\nSynchronizing: {0} {1} {2}\n",e.EventType, e.RepositoryType, e.Item.FullLocalName);
-
-            Transfer transfer = null;
-            if (e.RepositoryType == RepositoryType.LOCAL){
-                
-                SyncStatus = SyncStatus.UPLOADING;
-                
-                if (e.EventType == EventType.DELETE)
-                    transfer = remoteRepository.MoveToTrash (e.Item);
-                else
-                    transfer = remoteRepository.Upload (e.Item);
-                
-            }else{
-                switch (e.EventType){
-                case EventType.CREATE: 
-                case EventType.UPDATE:
-                case EventType.COPY:
-                    SyncStatus = SyncStatus.DOWNLOADING;
-                    transfer = remoteRepository.Download (e.Item);
-                    break;
-                case EventType.DELETE:
-                    SyncStatus = SyncStatus.UPLOADING;
-                    transfer = remoteRepository.SendLocalVersionToTrash (e.Item);
-                    physicalLocalRepository.Delete (e.Item);
-                    break;
-                }                
-            }
-            
-            if (transfer != null)
-                transferDAO.Create (transfer);
-            logicalLocalRepository.Solve (e.Item);
-            eventDAO.UpdateToSynchronized(e);
-        }
-
-
-
-        int countOperation = 0;
-
-        protected void ShowDoneMessage (string action)
-        {
-            if (countOperation == 0)
-                Logger.LogInfo (action, "Files up to date.\n");
-            else
-                Logger.LogInfo(action, string.Format("Successful: {0} files.\n",countOperation));
-        }   
-        #endregion
     }
 }

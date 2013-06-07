@@ -24,9 +24,10 @@ namespace GreenQloud.Persistence.SQLite{
         
         public void CreateDataBase(){
             ExecuteNonQuery("CREATE TABLE Repository (RepositoryID INTEGER PRIMARY KEY AUTOINCREMENT , Path ntext)");
-            ExecuteNonQuery ("CREATE TABLE RepositoryItem (RepositoryItemID INTEGER PRIMARY KEY AUTOINCREMENT , Name ntext, RelativePath ntext, RepoPath ntext, IsFolder ntext, Deleted ntext)");
-            ExecuteNonQuery ("CREATE TABLE EVENT (EventID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId ntext, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext)");
+            ExecuteNonQuery ("CREATE TABLE RepositoryItem (RepositoryItemID INTEGER PRIMARY KEY AUTOINCREMENT , Name ntext, RelativePath ntext, RepoPath ntext, IsFolder ntext, Deleted ntext, ResultObject ntext, eTag ntext, eTagLocal ntext)");
+            ExecuteNonQuery ("CREATE TABLE EVENT (EventID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId ntext, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext, USER ntext, APPLICATION ntext, APPLICATION_VERSION ntext, DEVICE_ID ntext, OS ntext, BUCKET ntext)");
             ExecuteNonQuery ("CREATE TABLE TRANSFER (TransferID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId INTEGER, INITIALTIME ntext, ENDTIME ntext, TYPE ntext, STATUS ntext)");
+            ExecuteNonQuery (string.Format("INSERT INTO Repository (Path) VALUES (\"{0}\")", RuntimeSettings.HomePath));
         }
 
 
@@ -68,7 +69,6 @@ namespace GreenQloud.Persistence.SQLite{
                     col.ColumnName = reader.GetName(i);
                     dt.Columns.Add(col);
                 }
-                
                 while (reader.Read())
                 {
                     DataRow row = dt.NewRow();
@@ -130,15 +130,11 @@ namespace GreenQloud.Persistence.SQLite{
                     dt.Rows.Add(row);
                 }
                 
-                reader.Close();
-                reader = null;
-                mycommand.Dispose();
-                mycommand = null;
-                cnn.Close();
-                cnn = null;
+                close(ref reader, ref cnn, ref mycommand);
             }
             catch (Exception e)
             {
+                Console.WriteLine (e.StackTrace);
                 throw new Exception(e.Message);
             }
             return dt;
@@ -156,7 +152,8 @@ namespace GreenQloud.Persistence.SQLite{
             SqliteCommand mycommand = new SqliteCommand(cnn);
             mycommand.CommandText = sql;
             int rowsUpdated = mycommand.ExecuteNonQuery();
-            cnn.Close();
+  
+            close(ref cnn, ref mycommand);
             return rowsUpdated;
         }
         
@@ -177,6 +174,9 @@ namespace GreenQloud.Persistence.SQLite{
             {
                 return value.ToString();
             }
+
+            close(ref cnn, ref mycommand);
+
             return "";
         }
         
@@ -301,6 +301,21 @@ namespace GreenQloud.Persistence.SQLite{
                 return false;
             }
         }       
+
+        private void close (ref SqliteConnection cnn, ref SqliteCommand mycommand)
+        {
+            mycommand.Dispose ();
+            mycommand = null;
+            cnn.Close ();
+            cnn = null;
+        }
+
+        private void close (ref SqliteDataReader reader, ref SqliteConnection cnn, ref SqliteCommand mycommand)
+        {
+            reader.Close ();
+            reader = null;
+            close(ref cnn, ref mycommand);
+        }
     }
 }
 
