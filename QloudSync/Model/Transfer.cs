@@ -9,6 +9,7 @@ namespace GreenQloud.Model
     }
 
     public enum TransferType{
+        LOCAL_MOVE,
         REMOTE_MOVE,
         DOWNLOAD,
         UPLOAD,

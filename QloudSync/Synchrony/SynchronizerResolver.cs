@@ -136,8 +136,6 @@ namespace GreenQloud.Synchrony
 
         void Synchronize(Event e){
             try{
-                BlockWatcher (e);
-
                 Logger.LogEvent("Event Synchronizing", e);
 
                 Transfer transfer = null;
@@ -151,9 +149,10 @@ namespace GreenQloud.Synchrony
                             transfer = remoteRepository.Upload (e.Item);
                             break;
                         case EventType.DELETE:  
-                            e.Item.ResultObjectRelativePath =  e.Item.TrashAbsolutePath;
-                            repositoryItemDAO.Update (e.Item);
-                            transfer = remoteRepository.Move (e.Item);
+                            //TODO refactor after api move works
+                            //e.Item.ResultObjectRelativePath =  e.Item.TrashAbsolutePath;
+                            //repositoryItemDAO.Update (e.Item);
+                            transfer = remoteRepository.MoveToTrash (e.Item);
                             break;
                         case EventType.COPY:
                         case EventType.MOVE:
@@ -192,36 +191,18 @@ namespace GreenQloud.Synchrony
                 if(e.RepositoryType == RepositoryType.LOCAL){
                     new JSONHelper().postJSON (e);
                 }
+
+                Logger.LogEvent("DONE Event Synchronizing", e);
+            } catch (AbortedOperationException abort){
+                Logger.LogInfo("WARNING", "Operation abortet! \nCause: "+abort.Message);
+                //TODO put  error flag on event
+                eventDAO.UpdateToSynchronized(e);
+
             } catch (Exception exc){
                 //TODO refactor to catch error and treat
                 Logger.LogInfo("ERROR", exc);
             } finally {
                 Thread.Sleep (1000);
-                UnblockWatcher (e);
-            }
-        }
-
-        static void BlockWatcher (Event e)
-        {
-            if(e.RepositoryType == RepositoryType.REMOTE){
-                QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (e.Item.Repository.Path);
-                if(watcher != null){
-                    watcher.Block (e.Item.FullLocalName);
-                    if(e.Item.ResultObjectRelativePath.Length > 0)
-                        watcher.Block (e.Item.FullLocalResultObject);
-                }
-            }
-        }
-
-        static void UnblockWatcher (Event e)
-        {
-            if(e.RepositoryType == RepositoryType.REMOTE){
-                QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (e.Item.Repository.Path);
-                if(watcher != null){
-                    watcher.Unblock (e.Item.FullLocalName);
-                    if(e.Item.ResultObjectRelativePath.Length > 0)
-                        watcher.Unblock (e.Item.FullLocalResultObject);
-                }
             }
         }
 

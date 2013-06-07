@@ -9,19 +9,21 @@ using System.Text;
 using System.Collections.Concurrent;
 using GreenQloud.Model;
 using GreenQloud.Persistence.SQLite;
+using System.Collections;
 
 namespace GreenQloud
 {
     public class QloudSyncFileSystemWatcher
     {
         private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
-        private ConcurrentDictionary<string, bool> ignoreBag;
+        private ArrayList ignoreBag;
+        private object _bagLock = new object();
         private FSEventStreamCallback callback;
         Thread runLoop;
         IntPtr stream;
         public QloudSyncFileSystemWatcher(string pathwatcher)
         {
-            ignoreBag = new ConcurrentDictionary<string, bool>();
+            ignoreBag = new ArrayList();
             string watchedFolder = pathwatcher   ;
             this.callback = this.Callback;
 
@@ -52,12 +54,15 @@ namespace GreenQloud
         }
 
         public void Block(string path){
-            ignoreBag.TryAdd (path, true);
+            lock(_bagLock){
+                ignoreBag.Add (path);
+            }
         }
 
         public void Unblock(string path){
-            bool ret;
-            ignoreBag.TryRemove(path, out ret);
+            lock(_bagLock){
+                ignoreBag.Remove(path);
+            }
         }
 
         private void Callback (IntPtr streamRef, IntPtr clientCallBackInfo, int numEvents, IntPtr eventPaths, IntPtr eventFlags, IntPtr eventIds)
@@ -82,14 +87,20 @@ namespace GreenQloud
             {
                 if(!paths[i].Substring(paths[i].LastIndexOf(Path.DirectorySeparatorChar)+1).StartsWith(".")){
 
-                    bool val = false;
                     string search = paths [i];
                     if(flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir))
                         search += Path.DirectorySeparatorChar;
-                    ignoreBag.TryGetValue (search, out val);
 
-                    if (!val) {
-                        if (!flags [i].HasFlag (FSEventStreamEventFlagItem.InodeMetaMod)) {
+                    bool ignore = false;
+                    lock(_bagLock){
+                        ignore =  ignoreBag.Contains (search);
+                    }
+
+                    if (!ignore) {
+                        if (//ignore
+                            !flags [i].HasFlag (FSEventStreamEventFlagItem.InodeMetaMod) && //after create the event lister throw a chmod event
+                            !(flags [i].HasFlag (FSEventStreamEventFlagItem.Created) && flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) //after create the event lister throw a create with update event
+                        ) {
                             Event e = new Event ();
                             LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (paths[i]);
                             e.Item = RepositoryItem.CreateInstance (repo, paths [i], flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir), 0, GlobalDateTime.NowUniversalString);
@@ -112,11 +123,12 @@ namespace GreenQloud
                                     e.EventType = EventType.DELETE;
                                 } else {
                                     if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile)) {
+                                        Console.WriteLine (flags [i].ToString());
                                         e.EventType = EventType.UPDATE;
                                     }
                                 }
                             }
-
+                            Console.WriteLine (flags[i].ToString());
                             handler (e);
                         }
                     }

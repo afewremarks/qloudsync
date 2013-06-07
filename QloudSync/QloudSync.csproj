@@ -160,6 +160,7 @@
       <DependentUpon>RemoteRepositoryController.cs</DependentUpon>
     </Compile>
     <Compile Include="Exception\VerificationException.cs" />
+    <Compile Include="Exception\AbortedOperationException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">

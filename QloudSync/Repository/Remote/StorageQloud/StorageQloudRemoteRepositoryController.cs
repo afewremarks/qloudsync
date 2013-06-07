@@ -67,6 +67,7 @@ namespace GreenQloud.Repository.Remote
                         
                         response.WriteResponseStreamToFile(item.FullLocalName);
                     }
+                    Connect ().Dispose ();
                     CurrentTransfer.EndTime = GlobalDateTime.Now;
             }
             return CurrentTransfer;
@@ -93,20 +94,33 @@ namespace GreenQloud.Repository.Remote
 
         public override Transfer Move (RepositoryItem item)
         {
+            /*TODO after api move works
             CurrentTransfer = new Transfer (item, TransferType.REMOTE_MOVE); 
 
             GenericCopy (RuntimeSettings.DefaultBucketName, item.AbsolutePath, RuntimeSettings.DefaultBucketName + Path.DirectorySeparatorChar + item.ResultObjectFolder, item.ResultObjectName);
             Delete (item);
-            CurrentTransfer.EndTime = GlobalDateTime.Now;
+            CurrentTransfer.EndTime = GlobalDateTime.Now;*/
+
+            CurrentTransfer = new Transfer (item, TransferType.LOCAL_MOVE);
+            GenericUpload (item.RelativePathInBucket,  item.ResultObjectKey,  item.FullLocalResultObject);
+            CurrentTransfer = Delete(item);
 
             return CurrentTransfer;
         }
 
         public override Transfer MoveToTrash (RepositoryItem item)
         {
+            CurrentTransfer = new Transfer (item, TransferType.LOCAL_REMOVE);
+
+            string pathTrash = item.TrashAbsolutePath + "("+GlobalDateTime.NowUniversalString+")";
+            GenericUpload (item.RelativePathInBucket, item.FullLocalName ,  pathTrash);
+            CurrentTransfer = Delete(item);
+            return CurrentTransfer;
+
+            /*TODO refactor after move works
             item.ResultObjectRelativePath = item.TrashAbsolutePath;
             item.ResultObjectRelativePath = item.ResultObjectRelativePath +"("+GlobalDateTime.NowUniversalString+")";
-            return  Move (item);
+            return  Move (item);*/
         }
 
         public override Transfer Delete (RepositoryItem item)
@@ -175,6 +189,7 @@ namespace GreenQloud.Repository.Remote
             };
             GetObjectMetadataResponse met;
             using ( met = Connect ().GetObjectMetadata (request)){}
+            Connect ().Dispose ();
             return met.ETag;
         }
 
@@ -226,8 +241,8 @@ namespace GreenQloud.Repository.Remote
                     SourceKey = sourceKey
                 };
 
-                Connect ().CopyObject (request);
-                //using (CopyObjectResponse cor = Connect ().CopyObject (request)){}
+                using (CopyObjectResponse cor = Connect ().CopyObject (request)){}
+                Connect ().Dispose ();
                 CurrentTransfer.EndTime = GlobalDateTime.Now;
 
             //TODO WHY EVER OCCUR THIS ERROR?????
@@ -284,28 +299,30 @@ namespace GreenQloud.Repository.Remote
         
         private void GenericUpload (string bucketName, string key, string filepath)
         {
-            S3Response response = new S3Response();
-            AmazonS3Client upconnection;
+            if (physicalController.Exists(filepath)) {
+                S3Response response = new S3Response ();
+                AmazonS3Client upconnection;
 
-            AmazonS3Config config = CreateConfig ();
-            upconnection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
-            
-            PutObjectRequest putObject = new PutObjectRequest ()
-            {
-                BucketName = bucketName,
-                FilePath = filepath,
-                Key = key, 
-                Timeout = GlobalSettings.UploadTimeout
-            };                
-            CurrentTransfer.InitialTime = GlobalDateTime.Now;
-            using (response = upconnection.PutObject (putObject)) {
+                AmazonS3Config config = CreateConfig ();
+                upconnection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
+                
+                PutObjectRequest putObject = new PutObjectRequest () {
+                    BucketName = bucketName,
+                    FilePath = filepath,
+                    Key = key, 
+                    Timeout = GlobalSettings.UploadTimeout
+                };                
+                CurrentTransfer.InitialTime = GlobalDateTime.Now;
+                using (response = upconnection.PutObject (putObject)) {
 
+                }
+                CurrentTransfer.EndTime = GlobalDateTime.Now;
+                Logger.LogInfo ("Connection", string.Format ("{0} was uploaded.", filepath));
+                CurrentTransfer.Status = TransferStatus.DONE;
+                UpdateStorageQloud ();
+            } else {
+                throw new AbortedOperationException ("File doesn't exists. "+filepath);
             }
-            CurrentTransfer.EndTime = GlobalDateTime.Now;
-            Logger.LogInfo ("Connection", string.Format ("{0} was uploaded.", filepath));
-            CurrentTransfer.Status = TransferStatus.DONE;
-            UpdateStorageQloud();
-
         }
         #endregion
 
@@ -463,6 +480,7 @@ namespace GreenQloud.Repository.Remote
                 DateTime remoteClock = Convert.ToDateTime (sRemoteclock);
                 diff = localClock.Subtract(remoteClock);
                 lastDiffClock = localClock;
+                Connect ().Dispose ();
             }
             return diff;
 
@@ -535,7 +553,7 @@ namespace GreenQloud.Repository.Remote
             {
                 
             }
-            
+            Connect ().Dispose ();
             CurrentTransfer.EndTime = GlobalDateTime.Now;
             UpdateStorageQloud();
             Logger.LogInfo ("Connection", "Folder "+name+" created");
@@ -554,6 +572,7 @@ namespace GreenQloud.Repository.Remote
             PutBucketRequest request = new PutBucketRequest ();
             request.BucketName = RuntimeSettings.DefaultBucketName;
             Connect ().PutBucket (request);
+            Connect ().Dispose ();
             Logger.LogInfo("Connection", "Bucket "+RuntimeSettings.DefaultBucketName+" was created.");
             return true;
        
@@ -614,6 +633,7 @@ namespace GreenQloud.Repository.Remote
             using (response = Connect ().PutObject (putObject)) {
 
             }
+            Connect ().Dispose ();
             GenericDelete (Constant.CLOCK_TIME);
 
         }

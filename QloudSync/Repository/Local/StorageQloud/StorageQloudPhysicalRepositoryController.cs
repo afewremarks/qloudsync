@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using GreenQloud.Model;
 using System.Linq;
 using GreenQloud.Persistence.SQLite;
+using GreenQloud.Synchrony;
+using System.Threading;
 
 namespace GreenQloud.Repository.Local
 {
@@ -16,8 +18,6 @@ namespace GreenQloud.Repository.Local
 
         }
 
-        #region implemented abstract members of PhysicalRepositoryController
-
         //TODO understand and refactor
         public override bool IsSync(RepositoryItem item){
             if(item.IsAFolder)
@@ -28,12 +28,16 @@ namespace GreenQloud.Repository.Local
             //return item.RemoteMD5Hash == item.LocalMD5Hash;
             return true;
         }
+        
+
 
         public override bool Exists (RepositoryItem item)
         {
-            bool exists = File.Exists (item.FullLocalName) || Directory.Exists (item.FullLocalName);
-
-            return exists;
+            return Exists(item.FullLocalName);
+        }
+        public override bool Exists (string path)
+        {
+            return File.Exists (path) || Directory.Exists (path);
         }
 
         public override void Delete (RepositoryItem item)
@@ -43,20 +47,13 @@ namespace GreenQloud.Repository.Local
                 DeleteDir (dir);
             }
             if(File.Exists(item.FullLocalName)){
-                File.Delete (item.FullLocalName);
+                DeleteFile(item.FullLocalName);
             }
-        }
-        private void DeleteDir(DirectoryInfo dir){
-            dir.GetDirectories().ToList().ForEach(directory=>DeleteDir(directory));
-            dir.GetFiles("*", SearchOption.AllDirectories).ToList().ForEach(file=>file.Delete());
-            Directory.Delete (dir.FullName);     
         }
 
         public override void Copy (RepositoryItem item)
         {
-            string path = RuntimeSettings.HomePath +"/"+ item.ResultObjectRelativePath;
-            if (path.EndsWith ("/"))
-                path = path.Substring (0, path.Length-1);
+            string path = RuntimeSettings.HomePath +Path.DirectorySeparatorChar+ item.ResultObjectRelativePath;
 
             if (!Exists(item))
                 return;
@@ -67,31 +64,21 @@ namespace GreenQloud.Repository.Local
                     CopyDir (dir, path);
                 }
             }else{
-                File.Copy(item.FullLocalName, path);
+                CopyFile(item.FullLocalName, path);
             }
-        }
-
-        private void CopyDir(DirectoryInfo dir, string to){
-            if(!Directory.Exists(to)){
-                Directory.CreateDirectory (to);
-            }
-            dir.GetDirectories().ToList().ForEach(directory=>CopyDir(directory, to+"/"+directory.Name));
-            dir.GetFiles("*", SearchOption.AllDirectories).ToList().ForEach(file=>file.CopyTo(to+"/"+file.Name));
         }
 
         public override void Move (RepositoryItem item)
         {
-            string path = RuntimeSettings.HomePath +"/"+ item.ResultObjectRelativePath;
-            if (path.EndsWith ("/"))
-                path = path.Substring (0, path.Length-1);
+            string path = RuntimeSettings.HomePath +Path.VolumeSeparatorChar+ item.ResultObjectRelativePath;
 
             if (!Exists(item))
                 return;
             if (item.IsAFolder)
             {
-                Directory.Move (item.FullLocalName, path);
+                MoveDir(item.FullLocalName, path);
             }else{
-                File.Move(item.FullLocalName, path);
+                MoveFile(item.FullLocalName, path);
             }
         }
 
@@ -161,38 +148,117 @@ namespace GreenQloud.Repository.Local
             return list;
         }
 
-        #endregion
-
-        public void CreateFolder(RepositoryItem item){
-            if (!Exists(item)){
-                CreatePath (item.FullLocalName);
-                Directory.CreateDirectory (item.FullLocalName);
-            }
-        }
-
-        void CreatePath (string path)
-        {
-            string parent = path.Substring (0,path.LastIndexOf("/"));
-            
-            if (path.EndsWith ("/")) {
-                parent = parent.Substring (0, parent.LastIndexOf("/"));
-            }
-            if (parent == string.Empty)
-                return;
-            
-            CreatePath(parent);
-            
-            if(!Directory.Exists(parent))
-                Directory.CreateDirectory(parent);
-        }
-
-
-
         public string CalculateMD5Hash (RepositoryItem item)
         {
             var md5hash = new Crypto().md5hash(item.FullLocalName);
             return md5hash;
         }
+
+
+
+
+        #region Core Management
+
+        public void CreateFolder(RepositoryItem item){
+            if (!Exists(item)){
+                CreatePath (item.FullLocalName);
+
+                BlockWatcher (item.FullLocalName);
+                DirectoryInfo di = Directory.CreateDirectory (item.FullLocalName);
+                UnblockWatcher (item.FullLocalName);   
+            }
+        }
+        
+        void CreatePath (string path)
+        {
+            string parent = path.Substring (0,path.LastIndexOf("/"));
+            
+            if (parent == string.Empty)
+                return;
+            
+            CreatePath(parent);
+
+            if (!path.EndsWith (Path.VolumeSeparatorChar.ToString()))
+                path += Path.VolumeSeparatorChar;
+
+            if(!Directory.Exists(path)){
+                BlockWatcher (path);
+                DirectoryInfo di = Directory.CreateDirectory(path);
+                UnblockWatcher (path);
+            }
+        }
+
+        private void MoveFile(string path, string toPath){
+            BlockWatcher (path);
+            BlockWatcher (toPath);
+            File.Move(path, toPath);
+            UnblockWatcher (path);
+            UnblockWatcher (toPath);
+        }
+        private void MoveDir(string path, string toPath){
+            BlockWatcher (path);
+            BlockWatcher (toPath);
+            Directory.Move(path, toPath);
+            UnblockWatcher (path);
+            UnblockWatcher (toPath);
+        }
+
+        private void CopyFile(string path, string toPath){
+            BlockWatcher (toPath);
+            File.Copy(path, toPath);
+            UnblockWatcher (toPath);
+        }
+        private void CopyDir(DirectoryInfo dir, string to){
+            if(!Directory.Exists(to)){
+                BlockWatcher (to);
+                DirectoryInfo di = Directory.CreateDirectory (to);
+                UnblockWatcher (to);
+            }
+            dir.GetDirectories().ToList().ForEach(directory=>CopyDir(directory, to+"/"+directory.Name));
+
+            List<FileInfo> files = dir.GetFiles ("*", SearchOption.AllDirectories).ToList ();
+            foreach (FileInfo file in files) {
+                CopyFile(file.FullName, to+"/"+file.Name);
+            }
+        }
+
+        private void DeleteFile(string path){
+            BlockWatcher (path);
+            File.Delete (path);
+            UnblockWatcher (path);
+        }
+        private void DeleteDir(DirectoryInfo dir){
+            dir.GetDirectories().ToList().ForEach(directory=>DeleteDir(directory));
+
+            List<FileInfo> files = dir.GetFiles ("*", SearchOption.AllDirectories).ToList ();
+            foreach (FileInfo file in files) {
+                DeleteFile (file.FullName);
+            }
+
+            BlockWatcher (dir.FullName);
+            Directory.Delete (dir.FullName);
+            UnblockWatcher (dir.FullName);
+        }
+
+        private static void BlockWatcher (string path)
+        {
+            QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (path);
+            if(watcher != null){
+                watcher.Block (path);
+            }
+
+        }
+
+        private static void UnblockWatcher (string path)
+        {
+            QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (path);
+            if(watcher != null){
+                Thread.Sleep (500);
+                watcher.Unblock (path);
+            }
+
+        }
+        #endregion
     }
 }
 
