@@ -1,12 +1,12 @@
 using System;
 using GreenQloud.Repository.Local;
-using GreenQloud.Repository.Remote;
 using GreenQloud.Persistence;
 using GreenQloud.Model;
 using System.Threading;
 using GreenQloud.Persistence.SQLite;
 using System.Collections.Generic;
 using System.IO;
+using GreenQloud.Repository;
 
 namespace GreenQloud.Synchrony
 {
@@ -66,7 +66,7 @@ namespace GreenQloud.Synchrony
             if (instance == null)
                 instance = new StorageQloudLocalEventsSynchronizer (new StorageQloudLogicalRepositoryController(), 
                                                                     new StorageQloudPhysicalRepositoryController(),
-                                                                    new StorageQloudRemoteRepositoryController(),
+                                                                    new RemoteRepositoryController(),
                                                                     new SQLiteTransferDAO (),
                                                                     new SQLiteEventDAO (),
                                                                     new SQLiteRepositoryItemDAO());

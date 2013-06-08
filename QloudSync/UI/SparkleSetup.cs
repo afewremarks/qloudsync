@@ -11,7 +11,7 @@ using MonoMac.WebKit;
 
 using Mono.Unix;
 using GreenQloud.Repository;
-using GreenQloud.Repository.Remote;
+using QloudSync.Repository;
 
 namespace GreenQloud {
 
@@ -174,7 +174,7 @@ namespace GreenQloud {
 
                 ContinueButton.Activated += delegate {
                     try{
-                        StorageQloudRemoteRepositoryController.Authenticate (FullNameTextField.StringValue, PasswordTextField.StringValue);
+                        S3Connection.Authenticate (FullNameTextField.StringValue, PasswordTextField.StringValue);
                         Credential.Username = FullNameTextField.StringValue;
                         Controller.AddPageCompleted (FullNameTextField.StringValue, PasswordTextField.StringValue);
                     }

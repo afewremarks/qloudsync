@@ -1,5 +1,4 @@
 using System;
-using GreenQloud.Repository.Remote;
 using GreenQloud.Repository;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;

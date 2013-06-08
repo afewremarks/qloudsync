@@ -4,7 +4,6 @@ using GreenQloud.Repository;
 using System.Linq;
 using System.Xml;
 using System.Threading;
-using GreenQloud.Repository.Remote;
 using GreenQloud.Model;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
@@ -109,8 +108,6 @@ using GreenQloud.Repository.Local;
 
         RepositoryType CalculateLastestVersion (RepositoryItem remoteObj)
         {
-            TimeSpan diffClocks = remoteRepository.DiffClocks;
-
             RepositoryItem physicalObjectVersion = physicalLocalRepository.CreateItemInstance (remoteObj.FullLocalName);
 
            // if(physicalObjectVersion.TimeOfLastChange==new DateTime())

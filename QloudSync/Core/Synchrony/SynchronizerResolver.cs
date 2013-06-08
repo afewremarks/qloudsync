@@ -15,7 +15,6 @@ using GreenQloud.Repository;
 using GreenQloud.Util;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
-using GreenQloud.Repository.Remote;
 using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Synchrony
@@ -87,7 +86,7 @@ namespace GreenQloud.Synchrony
             if (instance == null)
                 instance = new SynchronizerResolver (new StorageQloudLogicalRepositoryController(), 
                                                                 new StorageQloudPhysicalRepositoryController(),
-                                                                new StorageQloudRemoteRepositoryController(),
+                                                                new RemoteRepositoryController(),
                                                                 new SQLiteTransferDAO (),
                                                                 new SQLiteEventDAO (),
                                                                 new SQLiteRepositoryItemDAO());
@@ -146,17 +145,16 @@ namespace GreenQloud.Synchrony
                     switch (e.EventType){
                         case EventType.CREATE: 
                         case EventType.UPDATE:
-                            transfer = remoteRepository.Upload (e.Item);
+                            remoteRepository.Upload (e.Item);
                             break;
-                        case EventType.DELETE:  
-                            //TODO refactor after api move works
-                            //e.Item.ResultObjectRelativePath =  e.Item.TrashAbsolutePath;
-                            //repositoryItemDAO.Update (e.Item);
-                            transfer = remoteRepository.MoveToTrash (e.Item);
+                        case EventType.DELETE:
+                            remoteRepository.Move (e.Item);
                             break;
                         case EventType.COPY:
+                            remoteRepository.Copy (e.Item);
+                            break;
                         case EventType.MOVE:
-                            transfer = remoteRepository.Move (e.Item);
+                            remoteRepository.Move (e.Item);
                             break;
                     }
                 }else{
@@ -167,7 +165,7 @@ namespace GreenQloud.Synchrony
                     case EventType.CREATE: 
                     case EventType.UPDATE:
                         SyncStatus = SyncStatus.DOWNLOADING;
-                        transfer = remoteRepository.Download (e.Item);
+                        remoteRepository.Download (e.Item);
                         break;
                     case EventType.COPY:
                         SyncStatus = SyncStatus.DOWNLOADING;
