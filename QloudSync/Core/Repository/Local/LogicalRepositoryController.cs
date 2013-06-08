@@ -8,7 +8,7 @@ using GreenQloud.Model;
 
 namespace GreenQloud.Repository.Local
 {
-	public abstract class LogicalRepositoryController : IRepositoryController
+	public abstract class LogicalRepositoryController 
 	{
         #region RepositoryController implementation
 
