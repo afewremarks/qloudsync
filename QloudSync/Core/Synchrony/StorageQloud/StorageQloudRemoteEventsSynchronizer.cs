@@ -17,8 +17,8 @@ namespace GreenQloud.Synchrony
 
 
         public StorageQloudRemoteEventsSynchronizer (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
-                                                     RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
-            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO, repositoryItemDAO)
+                                                     RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
+            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
         {
             threadTimer = new Thread( ()=>{
                 try{
@@ -41,7 +41,6 @@ namespace GreenQloud.Synchrony
                 instance = new StorageQloudRemoteEventsSynchronizer (new StorageQloudLogicalRepositoryController(), 
                                                                     new StorageQloudPhysicalRepositoryController(),
                                                                     new RemoteRepositoryController(),
-                                                                    new SQLiteTransferDAO (),
                                                                     new SQLiteEventDAO (),
                                                                     new SQLiteRepositoryItemDAO());
             return instance;
@@ -81,10 +80,6 @@ namespace GreenQloud.Synchrony
             }
         }
     
-        protected GreenQloud.Model.Transfer OldCurrentTransfer{
-            set; get;
-        }
-
         protected double Percent {
             set; get;
         }

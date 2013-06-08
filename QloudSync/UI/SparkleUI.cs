@@ -32,8 +32,7 @@ namespace GreenQloud {
 
         public SparkleSetup Setup;
         public AboutWindow About;
-        public TransferWindow Transfer;
-		public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
+        public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
 			"Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
 		
         public static NSFont BoldFont = NSFontManager.SharedFontManager.FontWithFamily (
@@ -52,7 +51,6 @@ namespace GreenQloud {
                 Setup      = new SparkleSetup ();
                 About      = new AboutWindow ();
                 StatusIcon = new IconController ();
-                Transfer = new TransferWindow();
                 Program.Controller.UIHasLoaded ();
             }
         }

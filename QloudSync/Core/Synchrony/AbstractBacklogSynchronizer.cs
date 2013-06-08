@@ -16,8 +16,8 @@ using GreenQloud.Repository.Local;
 
         protected AbstractBacklogSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
-             RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
-            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO, repositoryItemDAO)
+             RemoteRepositoryController remoteRepository,  EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
+            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
         {
 
         }

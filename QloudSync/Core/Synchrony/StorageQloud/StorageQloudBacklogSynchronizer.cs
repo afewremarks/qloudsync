@@ -13,8 +13,8 @@ namespace GreenQloud.Synchrony
         static StorageQloudBacklogSynchronizer instance;
 
         public StorageQloudBacklogSynchronizer (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
-                                                RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO ) :
-            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, transferDAO, eventDAO, repositoryItemDAO)
+                                                RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO ) :
+            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
         {
             threadSync = new Thread( ()=>{
                 while (Working){
@@ -33,7 +33,6 @@ namespace GreenQloud.Synchrony
                 instance = new StorageQloudBacklogSynchronizer (new StorageQloudLogicalRepositoryController(), 
                                                                     new StorageQloudPhysicalRepositoryController(),
                                                                     new RemoteRepositoryController(),
-                                                                    new SQLiteTransferDAO (),
                                                                     new SQLiteEventDAO (),
                                                                     new SQLiteRepositoryItemDAO());
             return instance;
