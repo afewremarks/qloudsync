@@ -9,7 +9,6 @@ using GreenQloud.Util;
 using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Repository.Local;
-using GreenQloud.Repository.Remote;
 using GreenQloud.Persistence;
 
 namespace GreenQloud.Synchrony

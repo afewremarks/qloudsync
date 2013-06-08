@@ -1,7 +1,6 @@
 using System;
 using GreenQloud.Model;
 using GreenQloud.Repository.Local;
-using GreenQloud.Repository.Remote;
 using GreenQloud.Persistence;
 using System.Collections.Generic;
 using System.Threading;
@@ -9,6 +8,7 @@ using System.Linq;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json.Linq;
+using GreenQloud.Repository;
 
 namespace GreenQloud.Synchrony
 {

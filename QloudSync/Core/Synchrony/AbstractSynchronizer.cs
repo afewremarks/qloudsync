@@ -15,7 +15,6 @@ using GreenQloud.Repository;
 using GreenQloud.Util;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
-using GreenQloud.Repository.Remote;
 
 namespace GreenQloud.Synchrony
 {

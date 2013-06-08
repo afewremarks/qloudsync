@@ -1,6 +1,5 @@
 using System;
 using GreenQloud.Repository.Local;
-using GreenQloud.Repository.Remote;
 using GreenQloud.Persistence;
 using GreenQloud.Model;
 using System.Threading;
