@@ -72,11 +72,10 @@ namespace GreenQloud.Synchrony
 
                         e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 
-                        string relativePath = (string)jsonObject["object"];
-                        e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), relativePath, false, 0, e.InsertTime);
-
-                        e.Item.ResultObjectRelativePath = (string)jsonObject["resultObject"];
-                        e.Item.RemoteETAG = (string)jsonObject["hash"];
+                        string key = (string)jsonObject["object"];
+                        e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), key);
+                        e.Item.BuildResultItem((string)jsonObject["resultObject"]);
+                        e.Item.ETag = (string)jsonObject["hash"];
 
                         e.Synchronized = false;
                         eventDAO.Create(e);
@@ -102,7 +101,7 @@ namespace GreenQloud.Synchrony
             Start();
            
             foreach (RepositoryItem i in remoteRepository.Items){
-                size+= i.Size;
+                size += 0;//i.Size;
 
                 eventDAO.Create ( new Event(){
                     EventType = EventType.CREATE,

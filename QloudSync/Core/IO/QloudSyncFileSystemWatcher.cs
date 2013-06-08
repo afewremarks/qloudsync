@@ -104,7 +104,8 @@ namespace GreenQloud
                         ) {
                             Event e = new Event ();
                             LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (paths[i]);
-                            e.Item = RepositoryItem.CreateInstance (repo, paths [i], flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir), 0, GlobalDateTime.NowUniversalString);
+                            string key = paths [i].Substring (repo.Path.Length); 
+                            e.Item = RepositoryItem.CreateInstance (repo, key);
 
                             if (flags [i].HasFlag (FSEventStreamEventFlagItem.Created)) {
                                 e.EventType = EventType.CREATE;
@@ -117,7 +118,8 @@ namespace GreenQloud
                                 if ((i + 1) < numEvents && (ids [i] == ids [i+1] - 1)) {
                                     e.EventType = EventType.MOVE;
                                     i++;
-                                    e.Item.ResultObjectRelativePath = paths [i].Replace (e.Item.Repository.Path + Path.DirectorySeparatorChar, "");
+                                    string key2 = paths [i].Substring (repo.Path.Length);
+                                    e.Item.BuildResultItem (key2);
                                 } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !Directory.Exists (paths[i])) {
                                     e.EventType = EventType.DELETE;
                                 } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile) && !File.Exists (paths[i])) {

@@ -34,8 +34,6 @@ namespace GreenQloud.Synchrony
         {
 
             RepositoryItem r = new RepositoryItem();
-            r.Name = string.Empty;
-            r.RelativePath = string.Empty;
             r.Repository = new LocalRepository (string.Empty);
             LastLocalEvent.Item = r;
             watchersThread = new Thread(()=>{

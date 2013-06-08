@@ -28,12 +28,8 @@ using GreenQloud.Repository.Local;
             eventDAO.RemoveAllUnsynchronized();
             
             foreach (RepositoryItem remoteItem in itensInRemoteRepository) {
-               
-                if (remoteItem.IsIgnoreFile)
-                    continue; 
                 eventDAO.Create (GetEvent (remoteItem, RepositoryType.REMOTE));
-                
-                filesInPhysicalLocalRepository.RemoveAll (i=> i.FullLocalName == remoteItem.FullLocalName);
+                filesInPhysicalLocalRepository.RemoveAll (i=> i.LocalAbsolutePath == remoteItem.LocalAbsolutePath);
             }
             
             foreach (RepositoryItem localItem in filesInPhysicalLocalRepository)
@@ -108,7 +104,7 @@ using GreenQloud.Repository.Local;
 
         RepositoryType CalculateLastestVersion (RepositoryItem remoteObj)
         {
-            RepositoryItem physicalObjectVersion = physicalLocalRepository.CreateItemInstance (remoteObj.FullLocalName);
+            RepositoryItem physicalObjectVersion = physicalLocalRepository.CreateItemInstance (remoteObj.LocalAbsolutePath);
 
            // if(physicalObjectVersion.TimeOfLastChange==new DateTime())
                 return RepositoryType.REMOTE;
