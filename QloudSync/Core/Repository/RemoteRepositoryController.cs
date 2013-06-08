@@ -11,6 +11,7 @@ using System.Net;
 using System.IO;
 using System.Text;
 using QloudSync.Repository;
+using System.Threading;
 
 namespace GreenQloud.Repository
 {
@@ -82,10 +83,9 @@ namespace GreenQloud.Repository
             Delete (item);
         }
 
-        //TODO REFACTOR AFTER RESULT OBJECT!!!!!!
         public void Copy (RepositoryItem item)
         {
-            //GenericCopy (RuntimeSettings.DefaultBucketName, source.TrashAbsolutePath, destination.RelativePathInBucket, destination.Name);
+            GenericCopy (item.Key, item.ResultItem.Key);
         }
 
         public void Delete (RepositoryItem item)
@@ -113,12 +113,13 @@ namespace GreenQloud.Repository
                 Key = key
             };
             GetObjectMetadataResponse response;
-            using (AmazonS3Client con = connection.Connect ()) {
+            AmazonS3Client con;
+            using (con = connection.Connect ()) {
                 using (response = con.GetObjectMetadata (request)) {
-                    response.Dispose ();
                 }
-                con.Dispose ();
             }
+            response.Dispose ();
+            con.Dispose ();
             return response;
         }
 
@@ -131,12 +132,14 @@ namespace GreenQloud.Repository
                 SourceBucket = RuntimeSettings.DefaultBucketName,
                 SourceKey = sourceKey
             };
-            using (AmazonS3Client con = connection.Connect ()) {   
-                using (CopyObjectResponse cor = con.CopyObject (request)){
-                    cor.Dispose ();
+            AmazonS3Client con;
+            S3Response cor;
+            using (con = connection.Connect ()) {   
+                using (cor = con.CopyObject (request)){
                 }
-                con.Dispose ();
             }
+            cor.Dispose ();
+            con.Dispose ();
         }
 
         public void GenericDelete (string key)
@@ -145,12 +148,14 @@ namespace GreenQloud.Repository
                 BucketName = RuntimeSettings.DefaultBucketName,
                 Key = key
             };
-            using (AmazonS3Client con = connection.Connect()) {
-                using (DeleteObjectResponse response = con.DeleteObject (request)) {
-                    response.Dispose ();
+            AmazonS3Client con;
+            DeleteObjectResponse response;
+            using (con = connection.Connect()) {
+                using (response = con.DeleteObject (request)) {
                 }
-                con.Dispose ();
             }
+            response.Dispose ();
+            con.Dispose ();
         }
 
         void GenericDownload (string key, string localAbsolutePath)
@@ -160,30 +165,32 @@ namespace GreenQloud.Repository
                 BucketName = RuntimeSettings.DefaultBucketName,
                 Key = key
             };
-            using (AmazonS3Client con = connection.Connect ()) {
+            AmazonS3Client con;
+            using (con = connection.Connect ()) {
                 using (response = con.GetObject (objectRequest)) {
                     response.WriteResponseStreamToFile (localAbsolutePath);
-                    response.Dispose ();
                 }
-                con.Dispose ();
             }
+            response.Dispose ();
+            con.Dispose ();
         }
 
         private void GenericUpload (string key, string filepath)
         {
-            PutObjectResponse response;
             PutObjectRequest putObject = new PutObjectRequest () {
                 BucketName = RuntimeSettings.DefaultBucketName,
                 FilePath = filepath,
                 Key = key, 
                 Timeout = GlobalSettings.UploadTimeout
             };
-            using (AmazonS3Client con = connection.Connect()){
+            AmazonS3Client con;
+            PutObjectResponse response;
+            using (con = connection.Connect()){
                 using(response = con.PutObject (putObject)) {
-                    response.Dispose ();
                 }
-                con.Dispose ();
             }
+            response.Dispose ();
+            con.Dispose ();
         }
 
         private void CreateFolder (string key)
@@ -194,14 +201,15 @@ namespace GreenQloud.Repository
                 Key = key,
                 ContentBody = string.Empty
             };
-            using (AmazonS3Client con = connection.Connect())
+            AmazonS3Client con;
+            using (con = connection.Connect())
             {
                 using(response = con.PutObject (putObject))
                 {
-                    response.Dispose();
                 }
-                con.Dispose();
             }
+            response.Dispose();
+            con.Dispose();
         }
         #endregion
 
@@ -214,9 +222,11 @@ namespace GreenQloud.Repository
             };
             List<S3Object> list;
 
-            using (AmazonS3Client con = connection.Connect())
+            AmazonS3Client con;
+            ListObjectsResponse response;
+            using (con = connection.Connect())
             {
-                using(ListObjectsResponse response = con.ListObjects(request)){
+                using(response = con.ListObjects(request)){
                     do{
                         list = response.S3Objects;
 
@@ -227,10 +237,10 @@ namespace GreenQloud.Repository
                             request.Marker = response.NextMarker;
                         }
                     } while (response.IsTruncated);
-                    response.Dispose ();
                 } 
-                con.Dispose ();
             }
+            response.Dispose ();
+            con.Dispose ();
             return list;
         }
 
