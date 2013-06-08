@@ -105,6 +105,7 @@ namespace GreenQloud.Persistence.SQLite
                 RepositoryItem item = new RepositoryItem ();
                 item.Id = int.Parse(dr[0].ToString());
                 item.Key = dr[1].ToString();
+                if(dr[2].ToString().Length > 0)
                 item.Repository = LocalRepository.CreateInstance(int.Parse(dr[2].ToString()));
                 item.IsFolder = bool.Parse (dr[3].ToString());
                 if(dr[4].ToString().Length > 0)

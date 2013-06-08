@@ -119,6 +119,8 @@ namespace GreenQloud.Repository.Local
                 
                 foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
                     string key = fileInfo.FullName.Substring(repo.Path.Length);
+                    if (!key.EndsWith (Path.DirectorySeparatorChar.ToString()))
+                        key += Path.DirectorySeparatorChar;
                     RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
                     list.Add (localFile);
                 }
@@ -253,8 +255,8 @@ namespace GreenQloud.Repository.Local
         private static void UnblockWatcher (string path)
         {
             QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (path);
-            if(watcher != null){
-                Thread.Sleep (500);
+            if (watcher != null) {
+                Thread.Sleep (1000);
                 watcher.Unblock (path);
             }
 

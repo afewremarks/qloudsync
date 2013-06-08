@@ -110,7 +110,7 @@ namespace GreenQloud.Synchrony
             threadSync.Join();
         }
 
-        public void Synchronize(){//TODO REFATORAR!!!!!!
+        public void Synchronize(){//TODO REFACTOR!!!!!!
             while (Working){
 
                 List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
@@ -143,7 +143,7 @@ namespace GreenQloud.Synchrony
                             remoteRepository.Upload (e.Item);
                             break;
                         case EventType.DELETE:
-                            remoteRepository.Move (e.Item);
+                            remoteRepository.Delete (e.Item);
                             break;
                         case EventType.COPY:
                             remoteRepository.Copy (e.Item);
