@@ -20,9 +20,9 @@ namespace GreenQloud.Repository.Local
 
         //TODO understand and refactor
         public override bool IsSync(RepositoryItem item){
-            if(item.IsAFolder)
+            if(item.IsFolder)
                 return true;
-            if(item.RemoteETAG == string.Empty)
+            if(item.ETag == string.Empty)
                 throw new Exception ("Remote Hash not exists");
             //item.LocalMD5Hash = CalculateMD5Hash(item);
             //return item.RemoteMD5Hash == item.LocalMD5Hash;
@@ -33,7 +33,7 @@ namespace GreenQloud.Repository.Local
 
         public override bool Exists (RepositoryItem item)
         {
-            return Exists(item.FullLocalName);
+            return Exists(item.LocalAbsolutePath);
         }
         public override bool Exists (string path)
         {
@@ -42,54 +42,54 @@ namespace GreenQloud.Repository.Local
 
         public override void Delete (RepositoryItem item)
         {
-            if(Directory.Exists(item.FullLocalName)){
-                var dir = new DirectoryInfo(item.FullLocalName);
+            if(Directory.Exists(item.LocalAbsolutePath)){
+                var dir = new DirectoryInfo(item.LocalAbsolutePath);
                 DeleteDir (dir);
             }
-            if(File.Exists(item.FullLocalName)){
-                DeleteFile(item.FullLocalName);
+            if(File.Exists(item.LocalAbsolutePath)){
+                DeleteFile(item.LocalAbsolutePath);
             }
         }
 
         public override void Copy (RepositoryItem item)
         {
-            string path = RuntimeSettings.HomePath +Path.DirectorySeparatorChar+ item.ResultObjectRelativePath;
+            string path = item.ResultItem.LocalAbsolutePath;
 
             if (!Exists(item))
                 return;
-            if (item.IsAFolder)
+            if (item.IsFolder)
             {
                 if(!Directory.Exists(path)){
-                    var dir = new DirectoryInfo(item.FullLocalName);
+                    var dir = new DirectoryInfo(item.LocalAbsolutePath);
                     CopyDir (dir, path);
                 }
             }else{
-                CopyFile(item.FullLocalName, path);
+                CopyFile(item.LocalAbsolutePath, path);
             }
         }
 
         public override void Move (RepositoryItem item)
         {
-            string path = RuntimeSettings.HomePath +Path.VolumeSeparatorChar+ item.ResultObjectRelativePath;
+            string path = item.ResultItem.LocalAbsolutePath;
 
             if (!Exists(item))
                 return;
-            if (item.IsAFolder)
+            if (item.IsFolder)
             {
-                MoveDir(item.FullLocalName, path);
+                MoveDir(item.LocalAbsolutePath, path);
             }else{
-                MoveFile(item.FullLocalName, path);
+                MoveFile(item.LocalAbsolutePath, path);
             }
         }
 
         public override RepositoryItem GetCopy (RepositoryItem item)
         {
-            if (item.IsAFolder)
+            if (item.IsFolder)
                 return null;
 
-            if (Items.Any (i=> i.FullLocalName != item.FullLocalName && i.RemoteETAG == item.RemoteETAG))
+            if (Items.Any (i=> i.LocalAbsolutePath != item.LocalAbsolutePath && i.ETag == item.LocalETag))
             {
-                return Items.First (i=> i.FullLocalName != item.FullLocalName && i.RemoteETAG == item.RemoteETAG);
+                return Items.First (i=> i.LocalAbsolutePath != item.LocalAbsolutePath && i.ETag == item.LocalETag);
             }
             else
                 return null;
@@ -112,15 +112,14 @@ namespace GreenQloud.Repository.Local
             List<RepositoryItem> list = new List<RepositoryItem>();
             if(dir.Exists){
                 foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ()) {
-                    RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName(fileInfo.FullName), fileInfo.FullName, false, fileInfo.Length, fileInfo.LastWriteTime.ToString());
-                    if(!localFile.IsIgnoreFile)
-                        list.Add (localFile);
+                    string key = fileInfo.FullName.Substring(repo.Path.Length);
+                    RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
+                    list.Add (localFile);
                 }
                 
                 foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
-                    if (fileInfo.Name.Contains ("untitled folder")) 
-                        continue;
-                    RepositoryItem localFile = RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fileInfo.FullName), fileInfo.FullName, true, 0, GlobalDateTime.NowUniversalString);
+                    string key = fileInfo.FullName.Substring(repo.Path.Length);
+                    RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
                     list.Add (localFile);
                 }
             }
@@ -131,17 +130,19 @@ namespace GreenQloud.Repository.Local
         {
             FileInfo file = new FileInfo (fullLocalName);
             if (file.Exists){
-                return RepositoryItem.CreateInstance (repoDAO.GetRepositoryByItemFullName (fullLocalName), fullLocalName, false, file.Length, file.LastWriteTime.ToString());
+                LocalRepository repo = repoDAO.GetRepositoryByItemFullName (fullLocalName);
+                string key = fullLocalName.Substring (repo.Path.Length);
+                return RepositoryItem.CreateInstance(repo, key);
             }
-            throw new NotImplementedException ();
+            return null;
         }
 
         public override List<RepositoryItem> GetSubRepositoyItems (RepositoryItem item)
         {
             List<RepositoryItem> list = new List<RepositoryItem>();
-            if (item.IsAFolder){
-                if (Directory.Exists (item.FullLocalName)){
-                    LocalRepository repo = new LocalRepository (item.FullLocalName);
+            if (item.IsFolder){
+                if (Directory.Exists (item.LocalAbsolutePath)){
+                    LocalRepository repo = new LocalRepository (item.LocalAbsolutePath);
                     list = GetItens (repo);
                 }
             }
@@ -150,7 +151,7 @@ namespace GreenQloud.Repository.Local
 
         public string CalculateMD5Hash (RepositoryItem item)
         {
-            var md5hash = new Crypto().md5hash(item.FullLocalName);
+            var md5hash = new Crypto().md5hash(item.LocalAbsolutePath);
             return md5hash;
         }
 
@@ -161,11 +162,11 @@ namespace GreenQloud.Repository.Local
 
         public void CreateFolder(RepositoryItem item){
             if (!Exists(item)){
-                CreatePath (item.FullLocalName);
+                CreatePath (item.LocalAbsolutePath);
 
-                BlockWatcher (item.FullLocalName);
-                DirectoryInfo di = Directory.CreateDirectory (item.FullLocalName);
-                UnblockWatcher (item.FullLocalName);   
+                BlockWatcher (item.LocalAbsolutePath);
+                Directory.CreateDirectory (item.LocalAbsolutePath);
+                UnblockWatcher (item.LocalAbsolutePath);   
             }
         }
         

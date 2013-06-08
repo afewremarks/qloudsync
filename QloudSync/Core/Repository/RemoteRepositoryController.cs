@@ -44,7 +44,7 @@ namespace GreenQloud.Repository
 
         public List<GreenQloud.Model.RepositoryItem> GetCopys (RepositoryItem item)
         {
-            return AllItems.Where (rf => rf.RemoteETAG == item.LocalETAG && rf.AbsolutePath != item.AbsolutePath).ToList<RepositoryItem> ();
+            return AllItems.Where (rf => rf.ETag == item.LocalETag && rf.Key != item.Key).ToList<RepositoryItem> ();
         }
 
         public bool ExistsCopies (RepositoryItem item)
@@ -54,32 +54,32 @@ namespace GreenQloud.Repository
 
         public bool Exists (RepositoryItem item)
         {
-            return Items.Any (rf => rf.AbsolutePath == item.AbsolutePath);
+            return Items.Any (rf => rf.Key == item.Key);
         }
 
         #region Manage Itens
         public void Download (RepositoryItem item)
         {
-            if (item.IsAFolder) {
+            if (item.IsFolder) {
                 physicalController.CreateFolder(item);
             } else {
-                GenericDownload (item.AbsolutePath, item.FullLocalName);
+                GenericDownload (item.Key, item.LocalAbsolutePath);
             }
         }
 
         public void Upload (RepositoryItem item)
         {
-            if(item.IsAFolder){
+            if(item.IsFolder){
                 CreateFolder (item);
             }else{
-                GenericUpload (item.AbsolutePath,  item.FullLocalName);
+                GenericUpload (item.Key,  item.LocalAbsolutePath);
             }
         }
 
         //TODO REFACTOR TODO REFACTOR AFTER RESULT OBJECT!!!!!!
         public void Move (RepositoryItem item)
         {
-            GenericCopy (item.AbsolutePath, item.ResultObjectKey);
+            GenericCopy (item.Key, item.ResultItem.Key);
             Delete (item);
         }
 
@@ -91,17 +91,17 @@ namespace GreenQloud.Repository
 
         public void Delete (RepositoryItem item)
         {
-            GenericDelete (item.AbsolutePath);
+            GenericDelete (item.Key);
         }
 
         public void CreateFolder (RepositoryItem item)
         {
-            CreateFolder (item.AbsolutePath);
+            CreateFolder (item.Key);
         }
 
         public string RemoteETAG (RepositoryItem item)
         {
-            return GetMetadata(item.AbsolutePath).ETag;
+            return GetMetadata(item.Key).ETag;
         }
         #endregion
      
@@ -273,9 +273,7 @@ namespace GreenQloud.Repository
             else{
                 repo = new LocalRepository(RuntimeSettings.HomePath);
             }
-            RepositoryItem item = RepositoryItem.CreateInstance (repo, s3item.Key, false, s3item.Size, s3item.LastModified);
-            item.RemoteETAG = s3item.ETag;
-            item.InTrash = s3item.Key.Contains (Constant.TRASH);
+            RepositoryItem item = RepositoryItem.CreateInstance (repo, s3item);
             return item;
         }
         #endregion

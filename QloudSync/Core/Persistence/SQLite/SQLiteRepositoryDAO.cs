@@ -31,7 +31,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public LocalRepository GetRepositoryByItemFullName (string itemFullName)
         {
-            LocalRepository repo = All.First (r=> itemFullName.Contains(r.Path));
+            LocalRepository repo = All.First (r=> itemFullName.StartsWith(r.Path));
 
             if (repo == null)
                 return new LocalRepository (RuntimeSettings.HomePath);

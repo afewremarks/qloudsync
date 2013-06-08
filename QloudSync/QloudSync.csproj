@@ -141,11 +141,9 @@
     <Compile Include="Core\Util\UrlEncode.cs" />
     <Compile Include="Core\Util\GlobalDateTime.cs" />
     <Compile Include="Core\Repository\RemoteRepositoryController.cs" />
-    <Compile Include="Core\Repository\SQLiteRepositoryItemDAO.cs">
-      <DependentUpon>..\..\Repository\Remote\RemoteRepositoryController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Core\Repository\IRemoteRepositoryController.cs" />
     <Compile Include="Core\Repository\Connection\S3Connection.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryItemDAO.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">

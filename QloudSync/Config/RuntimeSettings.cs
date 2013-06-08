@@ -36,6 +36,8 @@ namespace GreenQloud
                     else
                         homePath = Path.Combine(Environment.GetFolderPath (Environment.SpecialFolder.Personal), GlobalSettings.HomeFolderName);
                 }
+                if (!homePath.EndsWith (Path.DirectorySeparatorChar.ToString()))
+                    homePath += Path.DirectorySeparatorChar;
                 return homePath;
             }
         }

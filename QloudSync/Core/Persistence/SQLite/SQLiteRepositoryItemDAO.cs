@@ -15,8 +15,7 @@ namespace GreenQloud.Persistence.SQLite
         SQLiteDatabase database = new SQLiteDatabase();
         public override void Create (RepositoryItem item)
         {
-            database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Name, RelativePath, RepoPath, IsFolder, DELETED, eTag, eTagLocal, ResultObject) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",\"{4}\",'{5}', '{6}', \"{7}\")", item.Name, item.RelativePath, item.Repository.Path, item.IsAFolder, bool.FalseString, item.RemoteETAG, item.LocalETAG, item.ResultObjectRelativePath));
-
+            database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Key, RepositoryId, IsFolder, ResultItemId, eTag, eTagLocal) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",'{4}','{5}')", item.Key, item.Repository.Id, item.IsFolder, ((item.ResultItem == null) ? "" : item.ResultItem.Id.ToString()), item.ETag, item.LocalETag));
         }
         public RepositoryItem Create (Event e)
         {
@@ -31,10 +30,9 @@ namespace GreenQloud.Persistence.SQLite
         }
 
 
-        //TODO put all fields
         public override void Update (RepositoryItem i)
         {            
-            database.ExecuteNonQuery (string.Format("UPDATE REPOSITORYITEM SET  ResultObject = \"{1}\", eTag = '{2}', eTagLocal = '{3}' WHERE RepositoryItemID =\"{0}\"", i.Id, i.ResultObjectRelativePath, i.RemoteETAG, i.LocalETAG));
+            database.ExecuteNonQuery (string.Format("UPDATE REPOSITORYITEM SET  Key='{1}', RepositoryId='{2}', IsFolder='{3}', ResultItemId = '{4}', eTag = '{5}', eTagLocal = '{6}' WHERE RepositoryItemID =\"{0}\"", i.Id, i.Key, i.Repository.Id, i.IsFolder, ((i.ResultItem == null) ? "" : i.ResultItem.Id.ToString()), i.ETag, i.LocalETag));
         }
 
         public override List<RepositoryItem> All {
@@ -48,40 +46,40 @@ namespace GreenQloud.Persistence.SQLite
         {
             if (Exists(item))
             {
-                string ID =  GetId (item);
-                return GetById (int.Parse(ID)).IsAFolder;
+                int ID =  GetId (item);
+                return GetById (ID).IsFolder;
             }
             return true;
         }
 
         public bool Exists (RepositoryItem item)
         {
-            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE NAME = \"{0}\"  AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name, item.RelativePath, item.Repository.Path);
-           
+            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE Key = \"{0}\" AND REPOPATH = \"{1}\"", item.Key, item.Repository.Path);
             return Select(sql).Count != 0 ;
         }
 
+
+        //TODO FIND By KEy e Repo
         public RepositoryItem GetFomDatabase (RepositoryItem item)
         {
-            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE NAME = \"{0}\"  AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name, item.RelativePath, item.Repository.Path);
+            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE Key = \"{0}\" AND REPOPATH = \"{1}\"", item.Key, item.Repository.Path);
 
             return Select(sql).Last();
         }
 
+        //TODO DONT NEED
         public void Remove (RepositoryItem item)
         {
-
-            string sql = string.Format("UPDATE REPOSITORYITEM SET DELETED = \"{0}\" WHERE NAME = \"{1}\" AND RELATIVEPATH = \"{2}\" AND REPOPATH = \"{3}\"", bool.TrueString, item.Name, item.RelativePath, item.Repository.Path);
-            database.ExecuteNonQuery (sql);
+            //string sql = string.Format("UPDATE REPOSITORYITEM SET DELETED = \"{0}\" WHERE NAME = \"{1}\" AND RELATIVEPATH = \"{2}\" AND REPOPATH = \"{3}\"", bool.TrueString, item.Name, item.RelativePath, item.Repository.Path);
+            //database.ExecuteNonQuery (sql);
         }
 
-        public string GetId (RepositoryItem item)
+        public int GetId (RepositoryItem item)
         {
-
             if (Exists (item)){
-                return Select(string.Format("SELECT * FROM REPOSITORYITEM WHERE  NAME = \"{0}\" AND RELATIVEPATH = \"{1}\" AND REPOPATH = \"{2}\"", item.Name,  item.RelativePath, item.Repository.Path))[0].Id;
+                return Select(string.Format("SELECT * FROM REPOSITORYITEM WHERE  Key = \"{0}\" AND REPOPATH = \"{1}\"", item.Key, item.Repository.Path))[0].Id;
             }
-            return "";
+            return 0;
         }
 
         public RepositoryItem GetById (int id)
@@ -97,14 +95,13 @@ namespace GreenQloud.Persistence.SQLite
             DataTable dt = database.GetDataTable(sql);
             foreach(DataRow dr in dt.Rows){
                 RepositoryItem item = new RepositoryItem ();
-                item.Id = dr[0].ToString();
-                item.Name = dr[1].ToString();
-                item.RelativePath = dr[2].ToString();
-                item.Repository = new LocalRepository(dr[3].ToString());
-                item.IsAFolder = bool.Parse (dr[4].ToString());
-                item.ResultObjectRelativePath = dr[6].ToString();
-                item.RemoteETAG = dr[7].ToString();
-                item.LocalETAG = dr[8].ToString();
+                item.Id = int.Parse(dr[0].ToString());
+                item.Key = dr[1].ToString();
+                item.Repository = LocalRepository.CreateInstance(int.Parse(dr[2].ToString()));
+                item.IsFolder = bool.Parse (dr[3].ToString());
+                item.ResultItem = RepositoryItem.CreateInstance(int.Parse(dr[4].ToString()));
+                item.ETag = dr[5].ToString();
+                item.LocalETag = dr[6].ToString();
 
                 items.Add (item);
             }
