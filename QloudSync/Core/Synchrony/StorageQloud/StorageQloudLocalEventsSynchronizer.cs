@@ -32,10 +32,6 @@ namespace GreenQloud.Synchrony
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
                 base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
         {
-
-            RepositoryItem r = new RepositoryItem();
-            r.Repository = new LocalRepository (string.Empty);
-            LastLocalEvent.Item = r;
             watchersThread = new Thread(()=>{
                 watchers = new Dictionary<string, QloudSyncFileSystemWatcher>();
                 foreach (LocalRepository repo in repositoryDAO.All){ 

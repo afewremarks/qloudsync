@@ -2,10 +2,7 @@ using System;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using Amazon.S3.Model;
-
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Net;
@@ -80,7 +77,7 @@ namespace GreenQloud
 
 
                 json = "{\"action\":\""+e.EventType+"\"," +
-                    "\"application\":\""+GlobalSettings.FullApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\""+GlobalSettings.DeviceIdHash+"\"," + "\"hash\":\""+e.Item.ETag+"\"," + "\"object\":\"" + e.Item.Key +"\"," + "\"os\":\""+GlobalSettings.OSVersion+"\"," + "\"resultObject\":\""+e.Item.ResultItem.Key+"\"," + "\"username\":\""+Credential.Username+"\"}";
+                    "\"application\":\""+GlobalSettings.FullApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\""+GlobalSettings.DeviceIdHash+"\"," + "\"hash\":\""+e.Item.ETag+"\"," + "\"object\":\"" + e.Item.Key +"\"," + "\"os\":\""+GlobalSettings.OSVersion+"\"," + "\"resultObject\":\""+( e.Item.ResultItem != null ? e.Item.ResultItem.Key : "")+"\"," + "\"username\":\""+Credential.Username+"\"}";
 
                 streamWriter.Write(json);
                 streamWriter.Flush();
