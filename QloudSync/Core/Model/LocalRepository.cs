@@ -1,20 +1,17 @@
 using System;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Model
 {
     public class LocalRepository
     {
-        public LocalRepository (string path)
-        {
-            Path = path;
-        }
-
+        private static readonly SQLiteRepositoryDAO dao =  new SQLiteRepositoryDAO ();
         public static LocalRepository CreateInstance (int id)
         {
-            throw new NotImplementedException ();
+            return dao.GetById (id);
         }
 
-        public string Id {
+        public int Id {
             get;
             set;
         }

@@ -31,22 +31,26 @@ namespace GreenQloud.Persistence.SQLite
 
         public LocalRepository GetRepositoryByItemFullName (string itemFullName)
         {
-            LocalRepository repo = All.First (r=> itemFullName.StartsWith(r.Path));
-
-            if (repo == null)
-                return new LocalRepository (RuntimeSettings.HomePath);
-            else
-                return repo;
+            return All.First (r=> itemFullName.StartsWith(r.Path));
         }
 
-        public LocalRepository GetRepositoryByRootName (string root)
+        public LocalRepository FindOrCreateByRootName (string root)
         {
-            List<LocalRepository> repos = Select(string.Format("SELECT * FROM REPOSITORY WHERE PATH LIKE '%{0}'", root));
+            List<LocalRepository> repos = Select(string.Format("SELECT * FROM REPOSITORY WHERE PATH == '{0}'", root));
+            LocalRepository repo = repos.First ();
+            if (repo == null){
+                repo = new LocalRepository ();
+                repo.Path = root;
+                Create (repo);
+                return FindOrCreateByRootName (root);
+            }
+            return repos.First();
+        }
 
-            if (repos.Count == 0)
-                return new LocalRepository (RuntimeSettings.HomePath);
-            else
-                return repos.First();
+        public LocalRepository GetById (int id)
+        {
+            List<LocalRepository> repos = Select(string.Format("SELECT * FROM REPOSITORY WHERE RepositoryID = '{0}'", id));
+            return repos.First();
         }
 
 
@@ -54,7 +58,10 @@ namespace GreenQloud.Persistence.SQLite
             List<LocalRepository> repos = new List<LocalRepository>();
             DataTable dt = database.GetDataTable(sql);
             foreach(DataRow dr in dt.Rows){
-                repos.Add (new LocalRepository(dr[1].ToString()));
+                LocalRepository r = new LocalRepository ();
+                r.Id = int.Parse (dr[0].ToString());
+                r.Path = dr [1].ToString ();
+                repos.Add (r);
             }
             return repos;
         }

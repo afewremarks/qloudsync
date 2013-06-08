@@ -139,6 +139,7 @@ namespace GreenQloud.Persistence.SQLite{
             }
             return dt;
         }
+
         
         /// <summary>
         ///     Allows the programmer to interact with the database for purposes other than a query.
@@ -147,14 +148,25 @@ namespace GreenQloud.Persistence.SQLite{
         /// <returns>An Integer containing the number of rows updated.</returns>
         public int ExecuteNonQuery(string sql)
         {
+            return ExecuteNonQuery (sql, false);
+        }
+        public int ExecuteNonQuery(string sql, bool returnId)
+        {
             SqliteConnection cnn = new SqliteConnection(ConnectionString);
             cnn.Open();
             SqliteCommand mycommand = new SqliteCommand(cnn);
             mycommand.CommandText = sql;
-            int rowsUpdated = mycommand.ExecuteNonQuery();
+            int result = mycommand.ExecuteNonQuery();
   
+            if (returnId) {
+                string last_insert_rowid = @"select last_insert_rowid()";
+                mycommand.CommandText = last_insert_rowid; 
+                System.Object temp = mycommand.ExecuteScalar();
+                return int.Parse (temp.ToString());
+            }
+
             close(ref cnn, ref mycommand);
-            return rowsUpdated;
+            return result;
         }
         
         /// <summary>

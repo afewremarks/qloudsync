@@ -76,7 +76,6 @@ namespace GreenQloud.Repository
             }
         }
 
-        //TODO REFACTOR TODO REFACTOR AFTER RESULT OBJECT!!!!!!
         public void Move (RepositoryItem item)
         {
             GenericCopy (item.Key, item.ResultItem.Key);
@@ -234,6 +233,7 @@ namespace GreenQloud.Repository
             }
             return list;
         }
+
         protected List<RepositoryItem> GetInstancesOfItems (List<S3Object> s3items)
         {
             List <RepositoryItem> remoteItems = new List <RepositoryItem> ();
@@ -247,32 +247,10 @@ namespace GreenQloud.Repository
             return remoteItems;
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //TODO REFACTOR AFTER REPOSITORY ITEM REFACTOR
         public RepositoryItem CreateObjectInstance (S3Object s3item)
         {
             LocalRepository repo;
-            if (s3item.Key.Contains ("/")){
-                string root = s3item.Key.Substring(0, s3item.Key.IndexOf ("/"));
-                repo =  new Persistence.SQLite.SQLiteRepositoryDAO().GetRepositoryByRootName (string.Format("/{0}/",root));
-            }
-            else{
-                repo = new LocalRepository(RuntimeSettings.HomePath);
-            }
+            repo = new Persistence.SQLite.SQLiteRepositoryDAO().FindOrCreateByRootName (RuntimeSettings.HomePath);
             RepositoryItem item = RepositoryItem.CreateInstance (repo, s3item);
             return item;
         }

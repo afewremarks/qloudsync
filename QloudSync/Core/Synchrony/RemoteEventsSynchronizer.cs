@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json.Linq;
 using GreenQloud.Repository;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Synchrony
 {
@@ -16,6 +17,8 @@ namespace GreenQloud.Synchrony
     {
         Thread threadSync;
         bool eventsCreated;
+
+        SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
 
         public RemoteEventsSynchronizer  
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
@@ -47,8 +50,6 @@ namespace GreenQloud.Synchrony
             try{
                 if (!ready)
                     return;
-                //if (SyncStatus == SyncStatus.DOWNLOADING || SyncStatus == SyncStatus.UPLOADING)
-                //    return;
                 ready = false;
                 string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
                 string time = eventDAO.LastSyncTime;
@@ -73,7 +74,7 @@ namespace GreenQloud.Synchrony
                         e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 
                         string key = (string)jsonObject["object"];
-                        e.Item = RepositoryItem.CreateInstance (new LocalRepository(RuntimeSettings.HomePath), key);
+                        e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), key);
                         e.Item.BuildResultItem((string)jsonObject["resultObject"]);
                         e.Item.ETag = (string)jsonObject["hash"];
 

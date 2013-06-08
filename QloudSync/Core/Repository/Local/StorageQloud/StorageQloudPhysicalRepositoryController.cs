@@ -142,7 +142,7 @@ namespace GreenQloud.Repository.Local
             List<RepositoryItem> list = new List<RepositoryItem>();
             if (item.IsFolder){
                 if (Directory.Exists (item.LocalAbsolutePath)){
-                    LocalRepository repo = new LocalRepository (item.LocalAbsolutePath);
+                    LocalRepository repo = item.Repository;
                     list = GetItens (repo);
                 }
             }

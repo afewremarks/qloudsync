@@ -96,7 +96,9 @@ namespace GreenQloud
                         ignore =  ignoreBag.Contains (search);
                     }
 
+                    #if DEBUG
                     Console.WriteLine (flags[i].ToString());
+                    #endif
 
                     if (!ignore) {
                         if (//ignore
@@ -104,7 +106,9 @@ namespace GreenQloud
                         ) {
                             Event e = new Event ();
                             LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (paths[i]);
-                            string key = paths [i].Substring (repo.Path.Length); 
+                            string key = paths [i].Substring (repo.Path.Length);
+                            if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key.EndsWith (Path.DirectorySeparatorChar.ToString()))
+                                key += Path.DirectorySeparatorChar;
                             e.Item = RepositoryItem.CreateInstance (repo, key);
 
                             if (flags [i].HasFlag (FSEventStreamEventFlagItem.Created)) {
@@ -119,6 +123,8 @@ namespace GreenQloud
                                     e.EventType = EventType.MOVE;
                                     i++;
                                     string key2 = paths [i].Substring (repo.Path.Length);
+                                    if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key2.EndsWith (Path.DirectorySeparatorChar.ToString()))
+                                        key2 += Path.DirectorySeparatorChar;
                                     e.Item.BuildResultItem (key2);
                                 } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !Directory.Exists (paths[i])) {
                                     e.EventType = EventType.DELETE;
@@ -126,7 +132,6 @@ namespace GreenQloud
                                     e.EventType = EventType.DELETE;
                                 } else {
                                     if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile)) {
-                                        Console.WriteLine (flags [i].ToString());
                                         e.EventType = EventType.UPDATE;
                                     }
                                 }

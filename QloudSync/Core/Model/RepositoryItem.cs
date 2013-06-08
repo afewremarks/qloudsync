@@ -14,7 +14,7 @@ namespace GreenQloud.Model
 {
     public class RepositoryItem
     {
-        private static SQLiteRepositoryItemDAO dao =  new SQLiteRepositoryItemDAO ();
+        private static readonly SQLiteRepositoryItemDAO dao =  new SQLiteRepositoryItemDAO ();
 
         public RepositoryItem ()
         {}
@@ -81,24 +81,28 @@ namespace GreenQloud.Model
             set; get;
         }
 
-        private string localAbsolutePath = null;
         public string LocalAbsolutePath {
-            set{
-                localAbsolutePath = value;
-            }
             get {
-                return Path.Combine(Repository.Path, Key);
+                return ToPathString(Path.Combine(Repository.Path, Key));
             }
         }
 
         public string TrashRelativePath {
             get {
-                return Path.Combine (Constant.TRASH, Key);
+                return ToPathString(Path.Combine (Constant.TRASH, Key));
             }
         }
 
         public void BuildResultItem(string key){
             ResultItem = CreateInstance (this.Repository, key, this.ETag, this.LocalETag);
+        }
+
+        private string ToPathString (string path)
+        {
+            if (IsFolder && !path.EndsWith(Path.DirectorySeparatorChar.ToString())) {
+                path += Path.DirectorySeparatorChar;
+            }
+            return path;
         }
     }
 }
