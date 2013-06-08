@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace GreenQloud.Repository.Local
 {
-    public abstract class PhysicalRepositoryController : IRepositoryController
+    public abstract class PhysicalRepositoryController
     {
 
         public PhysicalRepositoryController (){
