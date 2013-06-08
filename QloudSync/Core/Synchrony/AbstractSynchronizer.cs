@@ -22,7 +22,6 @@ namespace GreenQloud.Synchrony
     public abstract class AbstractSynchronizer
     {
 
-        protected TransferDAO transferDAO;
         protected EventDAO eventDAO;
         protected RepositoryItemDAO repositoryItemDAO;
         protected LogicalRepositoryController logicalLocalRepository;
@@ -39,9 +38,8 @@ namespace GreenQloud.Synchrony
         
         protected AbstractSynchronizer 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
-             RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO)
+             RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO)
         {
-            this.transferDAO = transferDAO;
             this.eventDAO = eventDAO;
             this.logicalLocalRepository = logicalLocalRepository;
             this.physicalLocalRepository = physicalLocalRepository;

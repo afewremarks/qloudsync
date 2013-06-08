@@ -96,7 +96,6 @@
     <Compile Include="UI\HyperLink.cs" />
     <Compile Include="UI\SparkleSetup.cs" />
     <Compile Include="UI\SparkleSetupWindow.cs" />
-    <Compile Include="UI\TransferWindow.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="MainMenu.xib.designer.cs">
       <DependentUpon>MainMenu.xib</DependentUpon>
@@ -115,15 +114,12 @@
     <Compile Include="Core\Model\LocalRepository.cs" />
     <Compile Include="Core\Model\Event.cs" />
     <Compile Include="Core\Model\RepositoryItem.cs" />
-    <Compile Include="Core\Model\Transfer.cs" />
     <Compile Include="Core\Model\CO2Savings.cs" />
-    <Compile Include="Core\Persistence\TransferDAO.cs" />
     <Compile Include="Core\Persistence\EventDAO.cs" />
     <Compile Include="Core\Persistence\RepositoryItemDAO.cs" />
     <Compile Include="Core\Persistence\RepositoryDAO.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryDAO.cs" />
-    <Compile Include="Core\Persistence\SQLite\SQLiteTransferDAO.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteEventDAO.cs" />
     <Compile Include="Core\Repository\Local\LogicalRepositoryController.cs" />
     <Compile Include="Core\Repository\Local\PhysicalRepositoryController.cs" />

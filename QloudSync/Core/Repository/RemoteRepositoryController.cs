@@ -234,7 +234,18 @@ namespace GreenQloud.Repository
             }
             return list;
         }
-
+        protected List<RepositoryItem> GetInstancesOfItems (List<S3Object> s3items)
+        {
+            List <RepositoryItem> remoteItems = new List <RepositoryItem> ();
+            foreach (S3Object s3item in s3items) {
+                if (!s3item.Key.StartsWith(Constant.TRASH))
+                {    
+                    remoteItems.Add ( CreateObjectInstance (s3item));
+                    //add folders that have items to persist too                   
+                }
+            }
+            return remoteItems;
+        }
 
 
 
@@ -266,21 +277,6 @@ namespace GreenQloud.Repository
             item.RemoteETAG = s3item.ETag;
             item.InTrash = s3item.Key.Contains (Constant.TRASH);
             return item;
-        }
-
-
-
-        protected List<RepositoryItem> GetInstancesOfItems (List<S3Object> s3items)
-        {
-            List <RepositoryItem> remoteItems = new List <RepositoryItem> ();
-            foreach (S3Object s3item in s3items) {
-                if (!s3item.Key.StartsWith(Constant.TRASH))
-                {    
-                    remoteItems.Add ( CreateObjectInstance (s3item));
-                    //add folders that have items to persist too                   
-                }
-            }
-            return remoteItems;
         }
         #endregion
 

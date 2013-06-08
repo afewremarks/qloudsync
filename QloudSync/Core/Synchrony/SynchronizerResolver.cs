@@ -33,7 +33,6 @@ namespace GreenQloud.Synchrony
         private SyncStatus status;
         private Thread threadSync;
 
-        protected TransferDAO transferDAO;
         protected EventDAO eventDAO;
         protected RepositoryItemDAO repositoryItemDAO;
         protected LogicalRepositoryController logicalLocalRepository;
@@ -68,10 +67,9 @@ namespace GreenQloud.Synchrony
         
         private SynchronizerResolver 
             (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
-             RemoteRepositoryController remoteRepository, TransferDAO transferDAO, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO)
+             RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO)
         {
             SyncStatus = SyncStatus.IDLE;
-            this.transferDAO = transferDAO;
             this.eventDAO = eventDAO;
             this.repositoryItemDAO = repositoryItemDAO;
             this.logicalLocalRepository = logicalLocalRepository;
@@ -87,7 +85,6 @@ namespace GreenQloud.Synchrony
                 instance = new SynchronizerResolver (new StorageQloudLogicalRepositoryController(), 
                                                                 new StorageQloudPhysicalRepositoryController(),
                                                                 new RemoteRepositoryController(),
-                                                                new SQLiteTransferDAO (),
                                                                 new SQLiteEventDAO (),
                                                                 new SQLiteRepositoryItemDAO());
             return instance;
@@ -136,8 +133,6 @@ namespace GreenQloud.Synchrony
         void Synchronize(Event e){
             try{
                 Logger.LogEvent("Event Synchronizing", e);
-
-                Transfer transfer = null;
                 if (e.RepositoryType == RepositoryType.LOCAL){
                     
                     SyncStatus = SyncStatus.UPLOADING;
@@ -178,8 +173,6 @@ namespace GreenQloud.Synchrony
                     }                
                 }
                 
-                if (transfer != null)
-                    transferDAO.Create (transfer);
                 logicalLocalRepository.Solve (e.Item);
 
                 VerifySucess(e);
