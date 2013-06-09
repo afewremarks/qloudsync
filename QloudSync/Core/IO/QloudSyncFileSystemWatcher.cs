@@ -93,8 +93,11 @@ namespace GreenQloud
 
                     bool ignore = false;
                     lock(_bagLock){
-                        ignore =  ignoreBag.Contains (search);
+                        //TODO create ignore file list
+                        if (ignoreBag.Contains (search) || search.StartsWith ("."))
+                            ignore = true;
                     }
+
 
                     #if DEBUG
                     Console.WriteLine (flags[i].ToString());
