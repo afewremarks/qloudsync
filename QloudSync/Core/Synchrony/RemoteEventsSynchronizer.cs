@@ -34,7 +34,7 @@ namespace GreenQloud.Synchrony
 
         public void Synchronize(){
             while (Working){
-                Thread.Sleep (20000);
+                Thread.Sleep (5000);
                 if (eventsCreated){
                     eventsCreated = false;
                     //if(SyncStatus == SyncStatus.IDLE){
@@ -75,7 +75,13 @@ namespace GreenQloud.Synchrony
                         e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 
                         string key = (string)jsonObject["object"];
-                        bool isFolder = remoteController.GetMetadata(key).ContentLength==0;
+                        bool isFolder;
+                        if((string)jsonObject["resultObject"] == string.Empty){
+                            isFolder = remoteController.GetMetadata(key).ContentLength==0;
+                        } else {
+                            isFolder = remoteController.GetMetadata((string)jsonObject["resultObject"]).ContentLength==0;
+                        }
+
                         e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), isFolder, key);
                         e.Item.BuildResultItem((string)jsonObject["resultObject"]);
                         e.Item.ETag = (string)jsonObject["hash"];

@@ -18,11 +18,9 @@ namespace GreenQloud.Repository
     {
         private StorageQloudPhysicalRepositoryController physicalController;
         private S3Connection connection;
-        private string DefaultBucketName;
         public RemoteRepositoryController (){
             connection = new S3Connection ();
             physicalController = new StorageQloudPhysicalRepositoryController ();
-            DefaultBucketName = "gsn";
         }
 
         public List<GreenQloud.Model.RepositoryItem> Items {
@@ -53,6 +51,7 @@ namespace GreenQloud.Repository
             return GetCopys(item).Count > 0;
         }
 
+        //TODO REFACTOR (make a query) 
         public bool Exists (RepositoryItem item)
         {
             return Items.Any (rf => rf.Key == item.Key);
@@ -63,7 +62,7 @@ namespace GreenQloud.Repository
         {
             if (item.IsFolder) {
                 physicalController.CreateFolder(item);
-                DownloadEntry(connection.Connect ().ListObjects (DefaultBucketName, item.Key), item);
+                DownloadEntry(connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, item.Key), item);
             } else {
                 GenericDownload (item.Key, item.LocalAbsolutePath);
             }
@@ -71,7 +70,7 @@ namespace GreenQloud.Repository
 
         private void DownloadEntry(IEnumerable<ListEntry> entries, RepositoryItem father){
             foreach(ListEntry entry in entries ){
-                if(entry.Name != string.Empty){
+                if(Key(entry) != string.Empty){
                     RepositoryItem item = CreateObjectInstance (entry);
                     if(item.Key != father.Key){
                         Download (item);
@@ -83,31 +82,72 @@ namespace GreenQloud.Repository
         public void Upload (RepositoryItem item)
         {
             if(item.IsFolder){
-                UploadFolder (item);
+                GenericUploadFolder (item.Key);
+                UploadEntry(connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, item.Key), item);
             }else{
                 GenericUpload (item.Key,  item.LocalAbsolutePath);
             }
         }
 
+        private void UploadEntry(IEnumerable<ListEntry> entries, RepositoryItem father){
+            foreach(ListEntry entry in entries ){
+                if(Key(entry) != string.Empty){
+                    RepositoryItem item = CreateObjectInstance (entry);
+                    if(item.Key != father.Key){
+                        Upload (item);
+                    }
+                }
+            }
+        }
+
         public void Move (RepositoryItem item)
         {
-            GenericCopy (item.Key, item.ResultItem.Key);
+            if(item.IsFolder){
+                GenericCopy (item.Key, item.ResultItem.Key);
+                MoveEntry(connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, item.Key), item);
+            }else{
+                GenericCopy (item.Key, item.ResultItem.Key);
+            }
+
             Delete (item);
+        }
+
+        private void MoveEntry(IEnumerable<ListEntry> entries, RepositoryItem father){
+            foreach(ListEntry entry in entries ){
+                if(Key(entry) != string.Empty){
+                    RepositoryItem item = CreateObjectInstance (entry);
+                    item.BuildResultItem (Path.Combine(father.ResultItem.Key, item.Name));
+                    if(item.Key != father.Key){
+                        Move (item);
+                    }
+                }
+            }
         }
 
         public void Copy (RepositoryItem item)
         {
-            GenericCopy (item.Key, item.ResultItem.Key);
+            if(item.IsFolder){
+                GenericCopy (item.Key, item.ResultItem.Key);
+                CopyEntry(connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, item.Key), item);
+            }else{
+                GenericCopy (item.Key, item.ResultItem.Key);
+            }
+        }
+
+        private void CopyEntry(IEnumerable<ListEntry> entries, RepositoryItem father){
+            foreach(ListEntry entry in entries ){
+                if(Key(entry) != string.Empty){
+                    RepositoryItem item = CreateObjectInstance (entry);
+                    if(item.Key != father.Key){
+                        Copy (item);
+                    }
+                }
+            }
         }
 
         public void Delete (RepositoryItem item)
         {
             GenericDelete (item.Key, item.IsFolder);
-        }
-
-        public void UploadFolder (RepositoryItem item)
-        {
-            UploadFolder (item.Key);
         }
 
         public string RemoteETAG (RepositoryItem item)
@@ -118,10 +158,10 @@ namespace GreenQloud.Repository
         public GetObjectResponse GetMetadata (string key)
         {
             S3Service service = connection.Connect ();
-            var metadataOnly = true;
-            var request = new LitS3.GetObjectRequest(service, DefaultBucketName, key, metadataOnly);
-            using (LitS3.GetObjectResponse response = request.GetResponse())
-                return response; 
+
+            var request = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, key, true);
+            using (GetObjectResponse response = request.GetResponse())
+                return response;
         }
         #endregion
      
@@ -129,21 +169,21 @@ namespace GreenQloud.Repository
         #region Generic
         private void GenericCopy (string sourceKey, string destinationKey)
         {
-            connection.Connect ().CopyObject (DefaultBucketName, sourceKey, destinationKey);
+            connection.Connect ().CopyObject (RuntimeSettings.DefaultBucketName, sourceKey, destinationKey);
         }
 
         private void GenericDelete (string key, bool keyAsPrefix = false)
         {
             if (keyAsPrefix) {
-                connection.Connect ().ForEachObject (DefaultBucketName, key, DeleteEntry);
+                connection.Connect ().ForEachObject (RuntimeSettings.DefaultBucketName, key, DeleteEntry);
                 GenericDelete (key);
             } else {
-                connection.Connect ().DeleteObject (DefaultBucketName, key);
+                connection.Connect ().DeleteObject (RuntimeSettings.DefaultBucketName, key);
             }
         }
         private void DeleteEntry(ListEntry entry){
-            if(entry.Name != string.Empty){
-                connection.Connect ().DeleteObject (DefaultBucketName, Key(entry));
+            if(Key(entry) != string.Empty){
+                connection.Connect ().DeleteObject (RuntimeSettings.DefaultBucketName, Key(entry));
             }
         }
 
@@ -151,19 +191,19 @@ namespace GreenQloud.Repository
         private void GenericDownload (string key, string localAbsolutePath)
         {
             BlockWatcher (localAbsolutePath);
-            connection.Connect().GetObject(DefaultBucketName, key, localAbsolutePath);
+            connection.Connect().GetObject(RuntimeSettings.DefaultBucketName, key, localAbsolutePath);
             UnblockWatcher (localAbsolutePath);
         }
 
         private void GenericUpload (string key, string filepath)
         {
-            connection.Connect().AddObject(filepath, DefaultBucketName, key);
+            connection.Connect().AddObject(filepath, RuntimeSettings.DefaultBucketName, key);
         }
 
-        private void UploadFolder (string key)
+        private void GenericUploadFolder (string key)
         {
             string objectContents = string.Empty;
-            connection.Connect ().AddObject (DefaultBucketName, key, 0, stream =>
+            connection.Connect ().AddObject (RuntimeSettings.DefaultBucketName, key, 0, stream =>
                                                 {
                                                     var writer = new StreamWriter(stream, Encoding.ASCII);
                                                     writer.Write(objectContents);
@@ -181,7 +221,7 @@ namespace GreenQloud.Repository
         #region Handle S3Objects
         public IEnumerable<ListEntry> GetS3Objects ()
         {
-            return connection.Connect ().ListAllObjects (DefaultBucketName);
+            return connection.Connect ().ListAllObjects (RuntimeSettings.DefaultBucketName);
         }
 
         protected List<RepositoryItem> GetInstancesOfItems (IEnumerable<ListEntry> s3items)
@@ -199,9 +239,9 @@ namespace GreenQloud.Repository
 
         public RepositoryItem CreateObjectInstance (ListEntry s3item)
         {
-            if (s3item.Name != string.Empty) {
+            string key = Key (s3item);
+            if (key != string.Empty) {
                 LocalRepository repo;
-                string key = Key (s3item);
                 repo = new Persistence.SQLite.SQLiteRepositoryDAO ().FindOrCreateByRootName (RuntimeSettings.HomePath);
                 RepositoryItem item = RepositoryItem.CreateInstance (repo, GetMetadata (key).ContentLength == 0, s3item);
                 return item;

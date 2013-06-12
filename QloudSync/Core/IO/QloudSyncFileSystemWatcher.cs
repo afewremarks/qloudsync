@@ -93,54 +93,51 @@ namespace GreenQloud
 
                     bool ignore = false;
                     lock(_bagLock){
-                        //TODO create ignore file list
                         if (ignoreBag.Contains (search))
                             ignore = true;
                     }
 
 
                     #if DEBUG
-                    Console.WriteLine (flags[i].ToString());
+                    Console.WriteLine ("Flags on watcher: " + flags[i].ToString());
                     #endif
 
                     if (!ignore) {
-                        if (//ignore
-                            !(flags [i].HasFlag (FSEventStreamEventFlagItem.Created) && flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) //after create the event lister throw a create with update event
-                        ) {
-                            Event e = new Event ();
-                            LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (paths[i]);
-                            string key = paths [i].Substring (repo.Path.Length);
-                            if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key.EndsWith (Path.DirectorySeparatorChar.ToString()))
-                                key += Path.DirectorySeparatorChar;
-                            e.Item = RepositoryItem.CreateInstance (repo, flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir), key);
 
-                            if (flags [i].HasFlag (FSEventStreamEventFlagItem.Created)) {
-                                e.EventType = EventType.CREATE;
-                            } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Removed)) {
+                        Event e = new Event ();
+                        LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (paths[i]);
+                        string key = paths [i].Substring (repo.Path.Length);
+                        if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key.EndsWith (Path.DirectorySeparatorChar.ToString()))
+                            key += Path.DirectorySeparatorChar;
+                        e.Item = RepositoryItem.CreateInstance (repo, flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir), key);
+
+                        if (flags [i].HasFlag (FSEventStreamEventFlagItem.Created)) {
+                            e.EventType = EventType.CREATE;
+                        } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Removed)) {
+                            e.EventType = EventType.DELETE;
+                        }
+                        if (flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) {
+                            e.EventType = EventType.UPDATE;
+                        } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Renamed)) {
+                            if ((i + 1) < numEvents && (ids [i] == ids [i+1] - 1)) {
+                                e.EventType = EventType.MOVE;
+                                i++;
+                                string key2 = paths [i].Substring (repo.Path.Length);
+                                if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key2.EndsWith (Path.DirectorySeparatorChar.ToString()))
+                                    key2 += Path.DirectorySeparatorChar;
+                                e.Item.BuildResultItem (key2);
+                            } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !Directory.Exists (paths[i])) {
                                 e.EventType = EventType.DELETE;
-                            }
-                            if (flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) {
-                                e.EventType = EventType.UPDATE;
-                            } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Renamed)) {
-                                if ((i + 1) < numEvents && (ids [i] == ids [i+1] - 1)) {
-                                    e.EventType = EventType.MOVE;
-                                    i++;
-                                    string key2 = paths [i].Substring (repo.Path.Length);
-                                    if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key2.EndsWith (Path.DirectorySeparatorChar.ToString()))
-                                        key2 += Path.DirectorySeparatorChar;
-                                    e.Item.BuildResultItem (key2);
-                                } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !Directory.Exists (paths[i])) {
-                                    e.EventType = EventType.DELETE;
-                                } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile) && !File.Exists (paths[i])) {
-                                    e.EventType = EventType.DELETE;
-                                } else {
-                                    if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile)) {
-                                        e.EventType = EventType.UPDATE;
-                                    }
+                            } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile) && !File.Exists (paths[i])) {
+                                e.EventType = EventType.DELETE;
+                            } else {
+                                if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile)) {
+                                    e.EventType = EventType.UPDATE;
                                 }
                             }
-                            handler (e);
                         }
+                        handler (e);
+
                     }
                 }
             }
