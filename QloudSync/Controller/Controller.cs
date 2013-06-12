@@ -74,12 +74,15 @@ namespace GreenQloud {
 
         public void Initialize ()
         {
-            localSynchronizer = StorageQloudLocalEventsSynchronizer.GetInstance();
+            CreateConfigFolder();
+            UpdateConfigFile ();
+           
+            synchronizerResolver = SynchronizerResolver.GetInstance();
             remoteSynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
             backlogSynchronizer = StorageQloudBacklogSynchronizer.GetInstance();
-            synchronizerResolver = SynchronizerResolver.GetInstance();
-
+            localSynchronizer = StorageQloudLocalEventsSynchronizer.GetInstance();
             synchronizerResolver.SyncStatusChanged +=HandleSyncStatusChanged;
+
             
             this.timer = new System.Timers.Timer (){
                 Interval = 10000
@@ -93,8 +96,7 @@ namespace GreenQloud {
                 }
             };
 
-            CreateConfigFolder();
-            UpdateConfigFile ();
+
 
             if (CreateHomeFolder ())
                 AddToBookmarks ();

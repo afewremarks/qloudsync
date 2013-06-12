@@ -16,6 +16,7 @@ namespace GreenQloud.Repository.Local
         private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
         private StorageQloudPhysicalRepositoryController physicalController = new StorageQloudPhysicalRepositoryController();
         public StorageQloudLogicalRepositoryController (){
+
         }
         
         #region implemented abstract members of LogicalRepositoryController

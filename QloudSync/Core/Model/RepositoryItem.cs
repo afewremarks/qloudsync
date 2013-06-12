@@ -66,6 +66,12 @@ namespace GreenQloud.Model
             set; get;
         }
 
+        public string Name{
+            get {
+               return Key.Substring (Key.LastIndexOf(Path.DirectorySeparatorChar.ToString())+1);
+            }
+        }
+
         public string ETag{
             set; get;
         }
