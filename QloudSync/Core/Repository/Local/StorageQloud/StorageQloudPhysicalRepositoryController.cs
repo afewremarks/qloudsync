@@ -10,7 +10,7 @@ using System.Threading;
 namespace GreenQloud.Repository.Local
 {
     //TODO Refactor... only create folders if dir doesnt exists
-    public class StorageQloudPhysicalRepositoryController : PhysicalRepositoryController
+    public class StorageQloudPhysicalRepositoryController : AbstractController, IPhysicalRepositoryController
     {
         SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO();
         public StorageQloudPhysicalRepositoryController () : base ()
@@ -19,11 +19,11 @@ namespace GreenQloud.Repository.Local
         }
 
         //TODO understand and refactor
-        public override bool IsSync(RepositoryItem item){
-            if(item.IsFolder)
-                return true;
-            if(item.ETag == string.Empty)
-                throw new Exception ("Remote Hash not exists");
+        public bool IsSync(RepositoryItem item){
+            //if(item.IsFolder)
+            //    return true;
+            //if(item.ETag == string.Empty)
+            //    throw new Exception ("Remote Hash not exists");
             //item.LocalMD5Hash = CalculateMD5Hash(item);
             //return item.RemoteMD5Hash == item.LocalMD5Hash;
             return true;
@@ -31,16 +31,16 @@ namespace GreenQloud.Repository.Local
         
 
 
-        public override bool Exists (RepositoryItem item)
+        public bool Exists (RepositoryItem item)
         {
             return Exists(item.LocalAbsolutePath);
         }
-        public override bool Exists (string path)
+        public bool Exists (string path)
         {
             return File.Exists (path) || Directory.Exists (path);
         }
 
-        public override void Delete (RepositoryItem item)
+        public void Delete (RepositoryItem item)
         {
             if(Directory.Exists(item.LocalAbsolutePath)){
                 var dir = new DirectoryInfo(item.LocalAbsolutePath);
@@ -51,7 +51,7 @@ namespace GreenQloud.Repository.Local
             }
         }
 
-        public override void Copy (RepositoryItem item)
+        public void Copy (RepositoryItem item)
         {
             string path = item.ResultItem.LocalAbsolutePath;
 
@@ -68,7 +68,7 @@ namespace GreenQloud.Repository.Local
             }
         }
 
-        public override void Move (RepositoryItem item)
+        public void Move (RepositoryItem item)
         {
             string path = item.ResultItem.LocalAbsolutePath;
 
@@ -82,7 +82,7 @@ namespace GreenQloud.Repository.Local
             }
         }
 
-        public override RepositoryItem GetCopy (RepositoryItem item)
+        public RepositoryItem GetCopy (RepositoryItem item)
         {
             if (item.IsFolder)
                 return null;
@@ -95,7 +95,7 @@ namespace GreenQloud.Repository.Local
                 return null;
         }
 
-        public override List<RepositoryItem> Items {
+        public List<RepositoryItem> Items {
             get {
                 List<RepositoryItem> items = new List<RepositoryItem>();
                 foreach (LocalRepository repo in repoDAO.All)
@@ -113,7 +113,7 @@ namespace GreenQloud.Repository.Local
             if(dir.Exists){
                 foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ()) {
                     string key = fileInfo.FullName.Substring(repo.Path.Length);
-                    RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
+                    RepositoryItem localFile = RepositoryItem.CreateInstance (repo, false, key);
                     list.Add (localFile);
                 }
                 
@@ -121,25 +121,25 @@ namespace GreenQloud.Repository.Local
                     string key = fileInfo.FullName.Substring(repo.Path.Length);
                     if (!key.EndsWith (Path.DirectorySeparatorChar.ToString()))
                         key += Path.DirectorySeparatorChar;
-                    RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
+                    RepositoryItem localFile = RepositoryItem.CreateInstance (repo, true, key);
                     list.Add (localFile);
                 }
             }
             return list;
         }
 
-        public override RepositoryItem CreateItemInstance (string fullLocalName)
+        public RepositoryItem CreateItemInstance (string fullLocalName)
         {
             FileInfo file = new FileInfo (fullLocalName);
             if (file.Exists){
                 LocalRepository repo = repoDAO.GetRepositoryByItemFullName (fullLocalName);
                 string key = fullLocalName.Substring (repo.Path.Length);
-                return RepositoryItem.CreateInstance(repo, key);
+                return RepositoryItem.CreateInstance(repo,false, key);
             }
             return null;
         }
 
-        public override List<RepositoryItem> GetSubRepositoyItems (RepositoryItem item)
+        public List<RepositoryItem> GetSubRepositoyItems (RepositoryItem item)
         {
             List<RepositoryItem> list = new List<RepositoryItem>();
             if (item.IsFolder){
@@ -241,25 +241,6 @@ namespace GreenQloud.Repository.Local
             BlockWatcher (dir.FullName);
             Directory.Delete (dir.FullName);
             UnblockWatcher (dir.FullName);
-        }
-
-        private static void BlockWatcher (string path)
-        {
-            QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (path);
-            if(watcher != null){
-                watcher.Block (path);
-            }
-
-        }
-
-        private static void UnblockWatcher (string path)
-        {
-            QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (path);
-            if (watcher != null) {
-                Thread.Sleep (1000);
-                watcher.Unblock (path);
-            }
-
         }
         #endregion
     }

@@ -1,7 +1,6 @@
 using System;
 using Newtonsoft.Json.Linq;
 using System.IO;
-using Amazon.S3.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;

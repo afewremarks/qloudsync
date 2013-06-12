@@ -2,6 +2,7 @@ using System;
 using GreenQloud.Repository.Local;
 using GreenQloud.Model;
 using System.Collections.Generic;
+using LitS3;
 
 namespace GreenQloud.Repository
 {
@@ -27,10 +28,11 @@ namespace GreenQloud.Repository
         void Download (RepositoryItem request);
         void Upload (RepositoryItem request);
         void Delete(RepositoryItem request);
-        void CreateFolder (RepositoryItem request);
+        void UploadFolder (RepositoryItem request);
         void Copy (RepositoryItem item);
         bool Exists (RepositoryItem sqObject);
         bool ExistsCopies (RepositoryItem item);
+        GetObjectResponse GetMetadata (string key);
     }
 }
 

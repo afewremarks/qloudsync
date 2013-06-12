@@ -15,14 +15,14 @@ using GreenQloud.Repository.Local;
         private bool eventsCreated = false; 
 
         protected AbstractBacklogSynchronizer 
-            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
+            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, 
              RemoteRepositoryController remoteRepository,  EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
             base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
         {
 
         }
 
-        public new void Synchronize (){
+        public void Synchronize (){
             List<RepositoryItem> itensInRemoteRepository = remoteRepository.Items;
             List<RepositoryItem> filesInPhysicalLocalRepository = physicalLocalRepository.Items;
             eventDAO.RemoveAllUnsynchronized();

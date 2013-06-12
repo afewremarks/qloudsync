@@ -29,7 +29,7 @@ namespace GreenQloud.Synchrony
         private Event LastLocalEvent = new Event();
         private DateTime LastTimeSync = new DateTime();
         private StorageQloudLocalEventsSynchronizer 
-            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
+            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
                 base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
         {
             watchersThread = new Thread(()=>{

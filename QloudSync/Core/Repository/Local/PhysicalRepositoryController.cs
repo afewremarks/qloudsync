@@ -5,37 +5,30 @@ using System.Collections.Generic;
 
 namespace GreenQloud.Repository.Local
 {
-    public abstract class PhysicalRepositoryController
+    public interface IPhysicalRepositoryController
     {
 
-        public PhysicalRepositoryController (){
-        }
 
-        #region RepositoryController implementation
+        bool Exists (RepositoryItem repoObject);
+        bool Exists (string repoObject);
 
-        public abstract bool Exists (RepositoryItem repoObject);
-        public abstract bool Exists (string repoObject);
-
-
-        public abstract List<RepositoryItem> Items {
+        List<RepositoryItem> Items {
             get ;
         }
 
-        #endregion
+        void Copy (RepositoryItem item);
 
-        public abstract void Copy (RepositoryItem item);
+        void Delete (RepositoryItem  item);
 
-        public abstract void Delete (RepositoryItem  item);
+        void Move (RepositoryItem item);
 
-        public abstract void Move (RepositoryItem item);
+        RepositoryItem GetCopy (RepositoryItem remoteItem);
 
-        public abstract RepositoryItem GetCopy (RepositoryItem remoteItem);
+        bool IsSync (RepositoryItem item);
 
-        public abstract bool IsSync (RepositoryItem item);
+        RepositoryItem CreateItemInstance (string fullLocalName);
 
-        public abstract RepositoryItem CreateItemInstance (string fullLocalName);
-
-        public abstract List<RepositoryItem> GetSubRepositoyItems (RepositoryItem item);
+        List<RepositoryItem> GetSubRepositoyItems (RepositoryItem item);
     }
 }
 

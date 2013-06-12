@@ -10,18 +10,19 @@ using System.Runtime.CompilerServices;
 using Newtonsoft.Json.Linq;
 using GreenQloud.Repository;
 using GreenQloud.Persistence.SQLite;
+using System.IO;
 
 namespace GreenQloud.Synchrony
 {
     public class RemoteEventsSynchronizer : AbstractSynchronizer
     {
-        Thread threadSync;
-        bool eventsCreated;
-
-        SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+        private Thread threadSync;
+        private bool eventsCreated;
+        private IRemoteRepositoryController remoteController = new RemoteRepositoryController ();
+        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
 
         public RemoteEventsSynchronizer  
-            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
+            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
                 base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
         {
             threadSync = new Thread(() =>{
@@ -31,7 +32,7 @@ namespace GreenQloud.Synchrony
 
 
 
-        public new void Synchronize(){
+        public void Synchronize(){
             while (Working){
                 Thread.Sleep (20000);
                 if (eventsCreated){
@@ -74,7 +75,8 @@ namespace GreenQloud.Synchrony
                         e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 
                         string key = (string)jsonObject["object"];
-                        e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), key);
+                        bool isFolder = remoteController.GetMetadata(key).ContentLength==0;
+                        e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), isFolder, key);
                         e.Item.BuildResultItem((string)jsonObject["resultObject"]);
                         e.Item.ETag = (string)jsonObject["hash"];
 

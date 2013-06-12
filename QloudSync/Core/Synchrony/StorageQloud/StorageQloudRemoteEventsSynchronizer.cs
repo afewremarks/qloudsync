@@ -16,7 +16,7 @@ namespace GreenQloud.Synchrony
         System.Timers.Timer remote_timer;
 
 
-        public StorageQloudRemoteEventsSynchronizer (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
+        public StorageQloudRemoteEventsSynchronizer (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, 
                                                      RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
             base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
         {

@@ -1,5 +1,3 @@
-using Amazon.S3.Model;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,7 +23,7 @@ namespace GreenQloud.Synchrony
         protected EventDAO eventDAO;
         protected RepositoryItemDAO repositoryItemDAO;
         protected LogicalRepositoryController logicalLocalRepository;
-        protected PhysicalRepositoryController physicalLocalRepository;
+        protected IPhysicalRepositoryController physicalLocalRepository;
         protected RemoteRepositoryController remoteRepository;
         
         public bool Done {
@@ -37,7 +35,7 @@ namespace GreenQloud.Synchrony
         }
         
         protected AbstractSynchronizer 
-            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
+            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, 
              RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO)
         {
             this.eventDAO = eventDAO;
