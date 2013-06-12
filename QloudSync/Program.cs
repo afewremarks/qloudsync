@@ -3,9 +3,6 @@ using System.Threading;
 using System.IO;
 using GreenQloud.Repository;
 using System.Linq;
-using Amazon.S3;
-using Amazon.S3.Model;
-
 
 namespace GreenQloud {
 

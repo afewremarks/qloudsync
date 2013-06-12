@@ -153,7 +153,7 @@ namespace GreenQloud {
 
                 this.folder_image       = NSImage.ImageNamed ("NSFolder");
                 this.caution_image      = NSImage.ImageNamed ("NSCaution");
-                this.sparkleshare_image = NSImage.ImageNamed ("qloudsync-folder");
+                this.sparkleshare_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "qloudsync-folder.icns"));
 
                 CreateMenu ();
             }
