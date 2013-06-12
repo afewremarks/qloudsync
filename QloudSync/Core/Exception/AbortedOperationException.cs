@@ -1,8 +1,6 @@
 using System;
 using GreenQloud.Model;
 using System.Collections.Generic;
-using Amazon.S3.Model;
-using Amazon.S3;
 using System.Net;
 using System.IO;
 using System.Text;

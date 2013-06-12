@@ -1,33 +1,33 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Amazon.S3.Model;
 using GreenQloud.Util;
 using GreenQloud.Model;
 using GreenQloud.Repository.Local;
-using Amazon.S3;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
 using System.IO;
 using System.Text;
 using QloudSync.Repository;
 using System.Threading;
+using LitS3;
 
 namespace GreenQloud.Repository
 {
-    public class RemoteRepositoryController : IRemoteRepositoryController
+    public class RemoteRepositoryController : AbstractController, IRemoteRepositoryController
     {
         private StorageQloudPhysicalRepositoryController physicalController;
         private S3Connection connection;
-
+        private string DefaultBucketName;
         public RemoteRepositoryController (){
             connection = new S3Connection ();
             physicalController = new StorageQloudPhysicalRepositoryController ();
+            DefaultBucketName = "gsn";
         }
 
         public List<GreenQloud.Model.RepositoryItem> Items {
             get {
-                return GetInstancesOfItems (GetS3Objects().Where(i => !i.Key.StartsWith(Constant.TRASH)).ToList());
+                return GetInstancesOfItems (GetS3Objects().Where(i => !i.Name.StartsWith(".")).ToList());
             }
         }
 
@@ -39,7 +39,7 @@ namespace GreenQloud.Repository
 
         public List<GreenQloud.Model.RepositoryItem> TrashItems {
             get {
-                return GetInstancesOfItems (GetS3Objects().Where(i => i.Key.StartsWith(Constant.TRASH)).ToList());
+                return GetInstancesOfItems (GetS3Objects().Where(i => i.Name.StartsWith(Constant.TRASH)).ToList());
             }
         }
 
@@ -63,15 +63,27 @@ namespace GreenQloud.Repository
         {
             if (item.IsFolder) {
                 physicalController.CreateFolder(item);
+                DownloadEntry(connection.Connect ().ListObjects (DefaultBucketName, item.Key), item);
             } else {
                 GenericDownload (item.Key, item.LocalAbsolutePath);
+            }
+        }
+
+        private void DownloadEntry(IEnumerable<ListEntry> entries, RepositoryItem father){
+            foreach(ListEntry entry in entries ){
+                if(entry.Name != string.Empty){
+                    RepositoryItem item = CreateObjectInstance (entry);
+                    if(item.Key != father.Key){
+                        Download (item);
+                    }
+                }
             }
         }
 
         public void Upload (RepositoryItem item)
         {
             if(item.IsFolder){
-                CreateFolder (item);
+                UploadFolder (item);
             }else{
                 GenericUpload (item.Key,  item.LocalAbsolutePath);
             }
@@ -90,165 +102,93 @@ namespace GreenQloud.Repository
 
         public void Delete (RepositoryItem item)
         {
-            GenericDelete (item.Key);
+            GenericDelete (item.Key, item.IsFolder);
         }
 
-        public void CreateFolder (RepositoryItem item)
+        public void UploadFolder (RepositoryItem item)
         {
-            CreateFolder (item.Key);
+            UploadFolder (item.Key);
         }
 
         public string RemoteETAG (RepositoryItem item)
         {
             return GetMetadata(item.Key).ETag;
         }
+
+        public GetObjectResponse GetMetadata (string key)
+        {
+            S3Service service = connection.Connect ();
+            var metadataOnly = true;
+            var request = new LitS3.GetObjectRequest(service, DefaultBucketName, key, metadataOnly);
+            using (LitS3.GetObjectResponse response = request.GetResponse())
+                return response; 
+        }
         #endregion
      
 
         #region Generic
-        private GetObjectMetadataResponse GetMetadata (string key)
-        {
-            GetObjectMetadataRequest request = new GetObjectMetadataRequest {
-                BucketName = RuntimeSettings.DefaultBucketName,
-                Key = key
-            };
-            GetObjectMetadataResponse response;
-            AmazonS3Client con;
-            using (con = connection.Connect ()) {
-                using (response = con.GetObjectMetadata (request)) {
-                }
-            }
-            response.Dispose ();
-            con.Dispose ();
-            return response;
-        }
-
-
         private void GenericCopy (string sourceKey, string destinationKey)
         {
-            CopyObjectRequest request = new CopyObjectRequest (){
-                DestinationBucket = RuntimeSettings.DefaultBucketName,
-                DestinationKey = destinationKey,
-                SourceBucket = RuntimeSettings.DefaultBucketName,
-                SourceKey = sourceKey
-            };
-            AmazonS3Client con;
-            S3Response cor;
-            using (con = connection.Connect ()) {   
-                using (cor = con.CopyObject (request)){
-                }
-            }
-            cor.Dispose ();
-            con.Dispose ();
+            connection.Connect ().CopyObject (DefaultBucketName, sourceKey, destinationKey);
         }
 
-        public void GenericDelete (string key)
+        private void GenericDelete (string key, bool keyAsPrefix = false)
         {
-            DeleteObjectRequest request = new DeleteObjectRequest (){
-                BucketName = RuntimeSettings.DefaultBucketName,
-                Key = key
-            };
-            AmazonS3Client con;
-            DeleteObjectResponse response;
-            using (con = connection.Connect()) {
-                using (response = con.DeleteObject (request)) {
-                }
+            if (keyAsPrefix) {
+                connection.Connect ().ForEachObject (DefaultBucketName, key, DeleteEntry);
+                GenericDelete (key);
+            } else {
+                connection.Connect ().DeleteObject (DefaultBucketName, key);
             }
-            response.Dispose ();
-            con.Dispose ();
+        }
+        private void DeleteEntry(ListEntry entry){
+            if(entry.Name != string.Empty){
+                connection.Connect ().DeleteObject (DefaultBucketName, Key(entry));
+            }
         }
 
-        void GenericDownload (string key, string localAbsolutePath)
+
+        private void GenericDownload (string key, string localAbsolutePath)
         {
-            GetObjectResponse response = null;
-            GetObjectRequest objectRequest = new GetObjectRequest () {
-                BucketName = RuntimeSettings.DefaultBucketName,
-                Key = key
-            };
-            AmazonS3Client con;
-            using (con = connection.Connect ()) {
-                using (response = con.GetObject (objectRequest)) {
-                    response.WriteResponseStreamToFile (localAbsolutePath);
-                }
-            }
-            response.Dispose ();
-            con.Dispose ();
+            BlockWatcher (localAbsolutePath);
+            connection.Connect().GetObject(DefaultBucketName, key, localAbsolutePath);
+            UnblockWatcher (localAbsolutePath);
         }
 
         private void GenericUpload (string key, string filepath)
         {
-            PutObjectRequest putObject = new PutObjectRequest () {
-                BucketName = RuntimeSettings.DefaultBucketName,
-                FilePath = filepath,
-                Key = key, 
-                Timeout = GlobalSettings.UploadTimeout
-            };
-            AmazonS3Client con;
-            PutObjectResponse response;
-            using (con = connection.Connect()){
-                using(response = con.PutObject (putObject)) {
-                }
-            }
-            response.Dispose ();
-            con.Dispose ();
+            connection.Connect().AddObject(filepath, DefaultBucketName, key);
         }
 
-        private void CreateFolder (string key)
+        private void UploadFolder (string key)
         {
-            PutObjectResponse response;
-            PutObjectRequest putObject = new PutObjectRequest (){
-                BucketName = RuntimeSettings.DefaultBucketName,
-                Key = key,
-                ContentBody = string.Empty
-            };
-            AmazonS3Client con;
-            using (con = connection.Connect())
-            {
-                using(response = con.PutObject (putObject))
-                {
-                }
-            }
-            response.Dispose();
-            con.Dispose();
+            string objectContents = string.Empty;
+            connection.Connect ().AddObject (DefaultBucketName, key, 0, stream =>
+                                                {
+                                                    var writer = new StreamWriter(stream, Encoding.ASCII);
+                                                    writer.Write(objectContents);
+                                                    writer.Flush();
+                                                });
         }
+
+        private void DeleteFolder (string key){
+            GenericDelete (key, true);
+        }
+
         #endregion
 
 
         #region Handle S3Objects
-        public List<S3Object> GetS3Objects ()
+        public IEnumerable<ListEntry> GetS3Objects ()
         {
-            ListObjectsRequest request = new ListObjectsRequest () {
-                BucketName = RuntimeSettings.DefaultBucketName
-            };
-            List<S3Object> list;
-
-            AmazonS3Client con;
-            ListObjectsResponse response;
-            using (con = connection.Connect())
-            {
-                using(response = con.ListObjects(request)){
-                    do{
-                        list = response.S3Objects;
-
-                        // If response is truncated, set the marker to get the next 
-                        // set of keys.
-                        if (response.IsTruncated)
-                        {                           
-                            request.Marker = response.NextMarker;
-                        }
-                    } while (response.IsTruncated);
-                } 
-            }
-            response.Dispose ();
-            con.Dispose ();
-            return list;
+            return connection.Connect ().ListAllObjects (DefaultBucketName);
         }
 
-        protected List<RepositoryItem> GetInstancesOfItems (List<S3Object> s3items)
+        protected List<RepositoryItem> GetInstancesOfItems (IEnumerable<ListEntry> s3items)
         {
             List <RepositoryItem> remoteItems = new List <RepositoryItem> ();
-            foreach (S3Object s3item in s3items) {
-                if (!s3item.Key.StartsWith(Constant.TRASH))
+            foreach (ListEntry s3item in s3items) {
+                if (!s3item.Name.Contains(Constant.TRASH))
                 {    
                     remoteItems.Add ( CreateObjectInstance (s3item));
                     //add folders that have items to persist too                   
@@ -257,12 +197,26 @@ namespace GreenQloud.Repository
             return remoteItems;
         }
 
-        public RepositoryItem CreateObjectInstance (S3Object s3item)
+        public RepositoryItem CreateObjectInstance (ListEntry s3item)
         {
-            LocalRepository repo;
-            repo = new Persistence.SQLite.SQLiteRepositoryDAO().FindOrCreateByRootName (RuntimeSettings.HomePath);
-            RepositoryItem item = RepositoryItem.CreateInstance (repo, s3item);
-            return item;
+            if (s3item.Name != string.Empty) {
+                LocalRepository repo;
+                string key = Key (s3item);
+                repo = new Persistence.SQLite.SQLiteRepositoryDAO ().FindOrCreateByRootName (RuntimeSettings.HomePath);
+                RepositoryItem item = RepositoryItem.CreateInstance (repo, GetMetadata (key).ContentLength == 0, s3item);
+                return item;
+            }
+            return null;
+        }
+
+        private string Key(ListEntry s3item){
+            string key = string.Empty;
+            if (s3item is CommonPrefix) {
+                key = ((CommonPrefix)s3item).Prefix;
+            } else {
+                key = ((ObjectEntry)s3item).Key;
+            }
+            return key;
         }
         #endregion
 

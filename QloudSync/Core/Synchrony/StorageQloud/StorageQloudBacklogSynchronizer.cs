@@ -12,7 +12,7 @@ namespace GreenQloud.Synchrony
         Thread threadSync;
         static StorageQloudBacklogSynchronizer instance;
 
-        public StorageQloudBacklogSynchronizer (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
+        public StorageQloudBacklogSynchronizer (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, 
                                                 RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO ) :
             base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
         {

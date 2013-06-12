@@ -1,9 +1,9 @@
 using System;
-using Amazon.S3;
 using GreenQloud;
 using System.Net;
 using System.IO;
 using System.Text;
+using LitS3;
 
 namespace QloudSync.Repository
 {
@@ -34,14 +34,24 @@ namespace QloudSync.Repository
             Logger.LogInfo ("Authetication", "Keys loaded");
         } 
 
-        public AmazonS3Client Connect ()
+        public S3Service Connect ()
         {
-            AmazonS3Config config = CreateConfig ();
-            AmazonS3Client connection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (Credential.PublicKey, Credential.SecretKey, config);
-            return connection;
+            /*AmazonS3Config config = CreateConfig ();
+            AmazonS3Client connection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (, , config);
+            return connection;*/
+
+            var s3 = new S3Service
+            {
+                Host = GlobalSettings.StorageHost,
+                AccessKeyID = Credential.PublicKey,
+                SecretAccessKey = Credential.SecretKey,
+                CustomPort = int.Parse(GlobalSettings.StoragePort),
+                UseSsl = true
+            };
+            return s3;
         }
 
-        public AmazonS3Client Reconnect ()
+        public S3Service Reconnect ()
         {
             if (Credential.PublicKey == null || Credential.SecretKey == null) {
                 if (Credential.Username == null || Credential.Password == null){
@@ -52,12 +62,12 @@ namespace QloudSync.Repository
             return Connect();
         }
 
-        public AmazonS3Config CreateConfig()
+        /*public AmazonS3Config CreateConfig()
         {
             AmazonS3Config conf = new AmazonS3Config();
             conf.ServiceURL =  new Uri(GlobalSettings.StorageURL).Host;
             return conf;
-        }
+        }*/
     }
 
 }

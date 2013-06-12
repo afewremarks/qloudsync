@@ -73,9 +73,15 @@ namespace GreenQloud
             }
         }
         
-        public static string StorageURL {
+        public static string StorageHost {
             get {
-                return ConfigFile.Read ("StorageURL");
+                return ConfigFile.Read ("StorageHost");
+            }
+        }
+
+        public static string StoragePort {
+            get {
+                return ConfigFile.Read ("StoragePort");
             }
         }
         

@@ -64,14 +64,14 @@
     </Reference>
     <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="System.Data" />
-    <Reference Include="AWSSDK">
-      <HintPath>lib\AWSSDK.dll</HintPath>
-    </Reference>
     <Reference Include="MonoMac">
       <HintPath>lib\MonoMac.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="LitS3">
+      <HintPath>lib\LitS3.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -144,6 +144,7 @@
     <Compile Include="Core\Repository\IRemoteRepositoryController.cs" />
     <Compile Include="Core\Repository\Connection\S3Connection.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryItemDAO.cs" />
+    <Compile Include="Core\Repository\AbstractController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">

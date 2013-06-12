@@ -94,7 +94,7 @@ namespace GreenQloud
                     bool ignore = false;
                     lock(_bagLock){
                         //TODO create ignore file list
-                        if (ignoreBag.Contains (search) || search.StartsWith ("."))
+                        if (ignoreBag.Contains (search))
                             ignore = true;
                     }
 
@@ -112,7 +112,7 @@ namespace GreenQloud
                             string key = paths [i].Substring (repo.Path.Length);
                             if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key.EndsWith (Path.DirectorySeparatorChar.ToString()))
                                 key += Path.DirectorySeparatorChar;
-                            e.Item = RepositoryItem.CreateInstance (repo, key);
+                            e.Item = RepositoryItem.CreateInstance (repo, flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir), key);
 
                             if (flags [i].HasFlag (FSEventStreamEventFlagItem.Created)) {
                                 e.EventType = EventType.CREATE;

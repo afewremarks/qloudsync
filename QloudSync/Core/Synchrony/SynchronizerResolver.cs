@@ -1,5 +1,3 @@
-using Amazon.S3.Model;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,7 +34,7 @@ namespace GreenQloud.Synchrony
         protected EventDAO eventDAO;
         protected RepositoryItemDAO repositoryItemDAO;
         protected LogicalRepositoryController logicalLocalRepository;
-        protected PhysicalRepositoryController physicalLocalRepository;
+        protected IPhysicalRepositoryController physicalLocalRepository;
         protected RemoteRepositoryController remoteRepository;
 
 
@@ -66,7 +64,7 @@ namespace GreenQloud.Synchrony
         }
         
         private SynchronizerResolver 
-            (LogicalRepositoryController logicalLocalRepository, PhysicalRepositoryController physicalLocalRepository, 
+            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, 
              RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO)
         {
             SyncStatus = SyncStatus.IDLE;
@@ -130,7 +128,40 @@ namespace GreenQloud.Synchrony
         }
 
 
+        //TODO refactor ignores
+        private bool VerifyIgnoreRemote (Event remoteEvent)
+        {
+            return false;
+        }
+        private bool VerifyIgnoreLocal (Event remoteEvent)
+        {
+            if(remoteEvent.Item.ResultItem == null){
+                if (!remoteEvent.Item.IsFolder) {
+                    FileInfo fi = new FileInfo (remoteEvent.Item.LocalAbsolutePath);
+                    if (fi.Length == 0)
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        private bool VerifyIgnore (Event e)
+        {
+            if(e.RepositoryType == RepositoryType.REMOTE)
+               return VerifyIgnoreRemote (e);
+            if(e.RepositoryType == RepositoryType.LOCAL)
+                return VerifyIgnoreLocal (e);
+
+            return false;
+        }
+
         void Synchronize(Event e){
+            if (VerifyIgnore (e)) {
+                eventDAO.UpdateToSynchronized(e);
+                Logger.LogInfo ("EVENT IGNORE", "Ignore event on " + e.Item.LocalAbsolutePath);
+                return;
+            }
+
             try{
                 Logger.LogEvent("Event Synchronizing", e);
                 if (e.RepositoryType == RepositoryType.LOCAL){

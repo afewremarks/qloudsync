@@ -1,6 +1,3 @@
-using Amazon.S3;
-using Amazon.S3.Model;
-
 using System;
 using System.Net;
 using System.Configuration;

@@ -5,7 +5,7 @@ using System;
 	public static class Constant
 	{
 		public const string DEFAULT = "-default";
-		public const string TRASH = ".trash/";
+		public const string TRASH = ".trash";
 
         public const string TEMP = "/.tmp";
 
