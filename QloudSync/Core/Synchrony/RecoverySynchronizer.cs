@@ -7,17 +7,22 @@ using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
+using GreenQloud.Persistence.SQLite;
+using GreenQloud.Persistence.SQLite;
 
  namespace GreenQloud.Synchrony
 {
     public abstract class AbstractBacklogSynchronizer : AbstractSynchronizer
     {
         private bool eventsCreated = false; 
+        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
+        private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
+        private IPhysicalRepositoryController physicalLocalRepository = new StorageQloudPhysicalRepositoryController ();
+        private LogicalRepositoryController logicalLocalRepository = new StorageQloudLogicalRepositoryController ();
 
         protected AbstractBacklogSynchronizer 
-            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, 
-             RemoteRepositoryController remoteRepository,  EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
-            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
+            () :
+            base ()
         {
 
         }
@@ -39,7 +44,7 @@ using GreenQloud.Repository.Local;
             }
             //base.Synchronize();
             eventsCreated = true;
-            Pause();
+            Abort();
         }
 
         public bool FinishLoad{
