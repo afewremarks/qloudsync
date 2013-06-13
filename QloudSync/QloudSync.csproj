@@ -122,14 +122,11 @@
     <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryDAO.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteEventDAO.cs" />
     <Compile Include="Core\Repository\Local\LogicalRepositoryController.cs" />
-    <Compile Include="Core\Repository\Local\PhysicalRepositoryController.cs" />
     <Compile Include="Core\Repository\Local\StorageQloud\StorageQloudLogicalRepositoryController.cs" />
     <Compile Include="Core\Repository\Local\StorageQloud\StorageQloudPhysicalRepositoryController.cs" />
     <Compile Include="Core\Synchrony\RemoteEventsSynchronizer.cs" />
     <Compile Include="Core\Synchrony\AbstractSynchronizer.cs" />
-    <Compile Include="Core\Synchrony\AbstractBacklogSynchronizer.cs" />
     <Compile Include="Core\Synchrony\AbstractLocalEventsSynchronizer.cs" />
-    <Compile Include="Core\Synchrony\StorageQloud\StorageQloudBacklogSynchronizer.cs" />
     <Compile Include="Core\Synchrony\StorageQloud\StorageQloudLocalEventsSynchronizer.cs" />
     <Compile Include="Core\Synchrony\StorageQloud\StorageQloudRemoteEventsSynchronizer.cs" />
     <Compile Include="Core\Synchrony\SynchronizerResolver.cs" />
@@ -145,6 +142,8 @@
     <Compile Include="Core\Repository\Connection\S3Connection.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryItemDAO.cs" />
     <Compile Include="Core\Repository\AbstractController.cs" />
+    <Compile Include="Core\Repository\Local\IPhysicalRepositoryController.cs" />
+    <Compile Include="Core\Synchrony\RecoverySynchronizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\side-splash.png">

@@ -10,21 +10,21 @@ using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Repository.Local;
 using GreenQloud.Persistence;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Synchrony
 {
-    public abstract class AbstractLocalEventsSynchronizer : AbstractSynchronizer
+    public abstract class AbstractLocalEventsSynchronizer : AbstractSynchronizer<AbstractLocalEventsSynchronizer>
     {
-        Thread threadSync;
         bool creatingEvent;
+        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
+        private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
+        private IPhysicalRepositoryController physicalLocalRepository = new StorageQloudPhysicalRepositoryController ();
 
         protected AbstractLocalEventsSynchronizer 
-            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
-                base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
+            () :
+                base ()
         {
-            threadSync = new Thread(() =>{
-                Synchronize ();
-            });
            
         }
 
@@ -33,8 +33,8 @@ namespace GreenQloud.Synchrony
             creatingEvent = true;
         }
 
-        public new void Synchronize(){
-            while (Working){
+        public override void Run(){
+            while (true){
                 if (creatingEvent){
                     creatingEvent = false;
                     //if(SyncStatus == SyncStatus.IDLE){
@@ -104,27 +104,6 @@ namespace GreenQloud.Synchrony
                 });            }
         }
 
-        #region implemented abstract members of Synchronizer
-        public override void Start ()
-        {
-            Working = true;
-            try{
-                threadSync.Start();
-            }catch{
-                // do nothing
-            }
-        }
-        public override void Pause ()
-        {
-            Working = false;
-        }
-
-        public override void Stop ()
-        {
-            Working = false;
-            threadSync.Join();
-        }
-        #endregion
     }
 
 }

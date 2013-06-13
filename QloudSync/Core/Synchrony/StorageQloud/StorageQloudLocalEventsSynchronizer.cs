@@ -28,9 +28,7 @@ namespace GreenQloud.Synchrony
 
         private Event LastLocalEvent = new Event();
         private DateTime LastTimeSync = new DateTime();
-        private StorageQloudLocalEventsSynchronizer 
-            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
-                base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
+        private StorageQloudLocalEventsSynchronizer () : base ()
         {
             watchersThread = new Thread(()=>{
                 watchers = new Dictionary<string, QloudSyncFileSystemWatcher>();
@@ -38,16 +36,11 @@ namespace GreenQloud.Synchrony
                     QloudSyncFileSystemWatcher watcher = new QloudSyncFileSystemWatcher(repo.Path);
                     watcher.Changed += delegate(Event e) {
                         Logger.LogEvent("EVENT FOUND", e);
-
-                        if(Working) 
-                        {
-                            try{
-                                CreateEvent (e);
-                            }catch (DisconnectionException)
-                            {
-                                //SyncStatus = SyncStatus.IDLE;
-                                Program.Controller.HandleDisconnection();
-                            }
+                        try{
+                            CreateEvent (e);
+                        } catch (DisconnectionException) {
+                            //SyncStatus = SyncStatus.IDLE;
+                            Program.Controller.HandleDisconnection();
                         }
                     };
                     watchers.Add (repo.Path, watcher);
@@ -58,11 +51,7 @@ namespace GreenQloud.Synchrony
 
         public static StorageQloudLocalEventsSynchronizer GetInstance(){
             if (instance == null)
-                instance = new StorageQloudLocalEventsSynchronizer (new StorageQloudLogicalRepositoryController(), 
-                                                                    new StorageQloudPhysicalRepositoryController(),
-                                                                    new RemoteRepositoryController(),
-                                                                    new SQLiteEventDAO (),
-                                                                    new SQLiteRepositoryItemDAO());
+                instance = new StorageQloudLocalEventsSynchronizer ();
             return instance;
         }
 
@@ -83,32 +72,6 @@ namespace GreenQloud.Synchrony
 
             LastLocalEvent = e;
             LastTimeSync = GlobalDateTime.Now;
-        }
-
-        public new void Start ()
-        {
-            try{
-                watchersThread.Start();
-                base.Start();
-            }catch{
-                // do nothing
-            }
-            Working = true;
-        }
-
-        public override void Pause ()
-        {
-            Working = false;
-        }
-
-        public new void Stop ()
-        {
-            Working = false;
-            if(watchersThread.IsAlive)
-                watchersThread.Join();
-            foreach (QloudSyncFileSystemWatcher watcher in watchers.Values)
-                watcher.Stop();
-            base.Stop();
         }
 
         public ThreadState ControllerStatus{
