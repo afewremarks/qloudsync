@@ -17,40 +17,31 @@ using GreenQloud.Repository.Local;
 namespace GreenQloud.Synchrony
 {
     
-    public abstract class AbstractSynchronizer
+    public abstract class AbstractSynchronizer<T>
     {
+        private Thread _thread;
+        static T instance;
 
-        protected EventDAO eventDAO;
-        protected RepositoryItemDAO repositoryItemDAO;
-        protected LogicalRepositoryController logicalLocalRepository;
-        protected IPhysicalRepositoryController physicalLocalRepository;
-        protected RemoteRepositoryController remoteRepository;
-        
-        public bool Done {
-            set; get;
+        public AbstractSynchronizer() { _thread = new Thread(new ThreadStart(this.GenericRun)); }
+
+        public static T GetInstance(){
+            if (instance == null)
+                instance = Activator.CreateInstance<T> ();
+            return instance;
         }
 
-        public bool Working{
-            set; get;
-        }
-        
-        protected AbstractSynchronizer 
-            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, 
-             RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO)
+        public void Start() { _thread.Start(); }
+        public void Join() { _thread.Join(); }
+        public bool IsAlive { get { return _thread.IsAlive; } }
+        public void Abort () { _thread.Abort (); }
+
+        void GenericRun ()
         {
-            this.eventDAO = eventDAO;
-            this.logicalLocalRepository = logicalLocalRepository;
-            this.physicalLocalRepository = physicalLocalRepository;
-            this.remoteRepository = remoteRepository;
-            this.repositoryItemDAO = repositoryItemDAO;
+            Run();
         }
 
         #region Abstract Methods
-
-        public abstract void Start ();
-        public abstract void Pause ();
-        public abstract void Stop ();
-
+        public abstract void Run();
         #endregion
     }
 }

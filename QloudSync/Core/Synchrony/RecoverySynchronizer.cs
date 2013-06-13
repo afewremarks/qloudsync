@@ -8,50 +8,55 @@ using GreenQloud.Model;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
 using GreenQloud.Persistence.SQLite;
-using GreenQloud.Persistence.SQLite;
 
  namespace GreenQloud.Synchrony
 {
-    public abstract class AbstractBacklogSynchronizer : AbstractSynchronizer
+    public abstract class RecoverySynchronizer : AbstractSynchronizer<RecoverySynchronizer>
     {
-        private bool eventsCreated = false; 
-        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
-        private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
-        private IPhysicalRepositoryController physicalLocalRepository = new StorageQloudPhysicalRepositoryController ();
-        private LogicalRepositoryController logicalLocalRepository = new StorageQloudLogicalRepositoryController ();
+        //NEW
+        protected RecoverySynchronizer () : base () { }
 
-        protected AbstractBacklogSynchronizer 
-            () :
-            base ()
-        {
-
+        public override void Run() {
+            while (true) {
+                Synchronize ();
+            }
         }
 
         public void Synchronize (){
             List<RepositoryItem> itensInRemoteRepository = remoteRepository.Items;
             List<RepositoryItem> filesInPhysicalLocalRepository = physicalLocalRepository.Items;
             eventDAO.RemoveAllUnsynchronized();
-            
+
             foreach (RepositoryItem remoteItem in itensInRemoteRepository) {
                 eventDAO.Create (GetEvent (remoteItem, RepositoryType.REMOTE));
                 filesInPhysicalLocalRepository.RemoveAll (i=> i.LocalAbsolutePath == remoteItem.LocalAbsolutePath);
             }
-            
+
             foreach (RepositoryItem localItem in filesInPhysicalLocalRepository)
             {
                 eventDAO.Create (GetEvent (localItem, RepositoryType.LOCAL));
-                
+
             }
             //base.Synchronize();
-            eventsCreated = true;
             Abort();
         }
 
-        public bool FinishLoad{
-            get {
-                return eventsCreated;
-            }
-        }
+
+
+
+
+
+
+
+
+        //OLD
+        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
+        private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
+        private IPhysicalRepositoryController physicalLocalRepository = new StorageQloudPhysicalRepositoryController ();
+        private LogicalRepositoryController logicalLocalRepository = new StorageQloudLogicalRepositoryController ();
+
+
+
 
         public Event GetEvent (RepositoryItem item, RepositoryType type){
 

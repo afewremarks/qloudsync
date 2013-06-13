@@ -62,18 +62,7 @@ namespace GreenQloud.Synchrony
             }           
         }
         
-        public override void Pause ()
-        {
-            remote_timer.Stop();
-        }
-        
-        public new void Stop ()
-        {
-            remote_timer.Stop();
-            base.Stop();
-            threadTimer.Join();
-        }
-        
+
         public ThreadState ControllerStatus{
             get{
                 return threadTimer.ThreadState;

@@ -14,26 +14,25 @@ using System.IO;
 
 namespace GreenQloud.Synchrony
 {
-    public class RemoteEventsSynchronizer : AbstractSynchronizer
+    public class RemoteEventsSynchronizer : AbstractSynchronizer<RemoteEventsSynchronizer>
     {
-        private Thread threadSync;
         private bool eventsCreated;
         private IRemoteRepositoryController remoteController = new RemoteRepositoryController ();
         private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
+        private RepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO();
+        private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
+
 
         public RemoteEventsSynchronizer  
             (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
-                base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
+                base ()
         {
-            threadSync = new Thread(() =>{
-                Synchronize ();
-            });
+
         }
 
-
-
-        public void Synchronize(){
-            while (Working){
+        public override void Run(){
+            while (true){
                 Thread.Sleep (5000);
                 if (eventsCreated){
                     eventsCreated = false;
@@ -122,29 +121,6 @@ namespace GreenQloud.Synchrony
             eventsCreated = true;
             return size;
         }
-
-
-        #region implemented abstract members of Synchronizer
-        public override void Start ()
-        {
-            Working = true;
-            try{
-                threadSync.Start();
-            }catch{
-                // do nothing
-            }
-        }
-        public override void Pause ()
-        {
-            Working = false;
-        }
-        
-        public override void Stop ()
-        {
-            Working = false;
-            threadSync.Join();
-        }
-        #endregion  
 
         public void GenericSynchronize(){
             //base.Synchronize();
