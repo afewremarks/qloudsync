@@ -31,15 +31,20 @@ namespace GreenQloud
             return Convert.ToBase64String(key);
         }
 
-       public string md5hash (string input)
+        public string md5hash (RepositoryItem item) {
+            if (item.IsFolder) {
+                return "d41d8cd98f00b204e9800998ecf8427e";//default folder etag for zero bytes inode generated from s3.
+            } 
+            return md5hash (item.LocalAbsolutePath);
+        }
+        public string md5hash (string input)
         {
             string md5hash;
             try {
                 FileStream fs = System.IO.File.Open (input, FileMode.Open);
                 md5hash = BitConverter.ToString (new MD5CryptoServiceProvider().ComputeHash (fs)).Replace ("-", string.Empty).ToLower ();
                 fs.Close ();
-            }
-            catch (Exception e){
+            } catch {
                 md5hash = string.Empty;
             }
             return md5hash;

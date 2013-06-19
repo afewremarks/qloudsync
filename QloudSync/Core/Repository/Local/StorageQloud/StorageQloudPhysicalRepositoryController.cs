@@ -9,9 +9,57 @@ using System.Threading;
 
 namespace GreenQloud.Repository.Local
 {
-    //TODO Refactor... only create folders if dir doesnt exists
     public class StorageQloudPhysicalRepositoryController : AbstractController, IPhysicalRepositoryController
     {
+        //NEW
+        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+
+        public List<RepositoryItem> Items {
+            get {
+                LocalRepository repo = repositoryDAO.FindOrCreateByRootName (RuntimeSettings.HomePath);
+                DirectoryInfo dir = new System.IO.DirectoryInfo (repo.Path);
+                List<RepositoryItem> list = new List<RepositoryItem>();
+                if(dir.Exists){
+                    list.AddRange (GetItems (dir));
+                }
+                return list;
+            }
+        }
+
+        private List<RepositoryItem> GetItems (DirectoryInfo dir) {
+            LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (dir.FullName);
+            List<RepositoryItem> list = new List<RepositoryItem>();
+            foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.TopDirectoryOnly).ToList ()) {
+                string key = fileInfo.FullName.Substring(repo.Path.Length);
+                RepositoryItem localFile = RepositoryItem.CreateInstance (repo, false, key);
+                list.Add (localFile);
+            }
+
+            foreach (DirectoryInfo dirInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
+                string key = dirInfo.FullName.Substring(repo.Path.Length);
+                if (!key.EndsWith (Path.DirectorySeparatorChar.ToString()))
+                    key += Path.DirectorySeparatorChar;
+                RepositoryItem localFile = RepositoryItem.CreateInstance (repo, true, key);
+                list.Add (localFile);
+                list.AddRange (GetItems (dirInfo));
+            }
+            return list;
+        } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //OLD
         SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO();
         public StorageQloudPhysicalRepositoryController () : base ()
         {
@@ -95,39 +143,6 @@ namespace GreenQloud.Repository.Local
                 return null;
         }
 
-        public List<RepositoryItem> Items {
-            get {
-                List<RepositoryItem> items = new List<RepositoryItem>();
-                foreach (LocalRepository repo in repoDAO.All)
-                {
-                    items.AddRange (GetItens (repo));
-                }
-                return items;
-            }
-        }
-
-        public List<RepositoryItem> GetItens (LocalRepository repo)
-        {              
-            System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo (repo.Path);
-            List<RepositoryItem> list = new List<RepositoryItem>();
-            if(dir.Exists){
-                foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.AllDirectories).ToList ()) {
-                    string key = fileInfo.FullName.Substring(repo.Path.Length);
-                    RepositoryItem localFile = RepositoryItem.CreateInstance (repo, false, key);
-                    list.Add (localFile);
-                }
-                
-                foreach (DirectoryInfo fileInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
-                    string key = fileInfo.FullName.Substring(repo.Path.Length);
-                    if (!key.EndsWith (Path.DirectorySeparatorChar.ToString()))
-                        key += Path.DirectorySeparatorChar;
-                    RepositoryItem localFile = RepositoryItem.CreateInstance (repo, true, key);
-                    list.Add (localFile);
-                }
-            }
-            return list;
-        }
-
         public RepositoryItem CreateItemInstance (string fullLocalName)
         {
             FileInfo file = new FileInfo (fullLocalName);
@@ -139,17 +154,7 @@ namespace GreenQloud.Repository.Local
             return null;
         }
 
-        public List<RepositoryItem> GetSubRepositoyItems (RepositoryItem item)
-        {
-            List<RepositoryItem> list = new List<RepositoryItem>();
-            if (item.IsFolder){
-                if (Directory.Exists (item.LocalAbsolutePath)){
-                    LocalRepository repo = item.Repository;
-                    list = GetItens (repo);
-                }
-            }
-            return list;
-        }
+       
 
         public string CalculateMD5Hash (RepositoryItem item)
         {

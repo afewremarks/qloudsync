@@ -14,10 +14,6 @@ namespace GreenQloud.Repository
             get;
         }
 
-        List<RepositoryItem> AllItems {
-            get;
-        }
-
         List<RepositoryItem> TrashItems {
             get;
         }

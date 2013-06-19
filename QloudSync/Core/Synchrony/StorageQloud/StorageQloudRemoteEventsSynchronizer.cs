@@ -16,9 +16,7 @@ namespace GreenQloud.Synchrony
         System.Timers.Timer remote_timer;
 
 
-        public StorageQloudRemoteEventsSynchronizer (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, 
-                                                     RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
-            base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
+        public StorageQloudRemoteEventsSynchronizer () : base ()
         {
             threadTimer = new Thread( ()=>{
                 try{
@@ -38,11 +36,7 @@ namespace GreenQloud.Synchrony
 
         public static StorageQloudRemoteEventsSynchronizer GetInstance(){
             if (instance == null)
-                instance = new StorageQloudRemoteEventsSynchronizer (new StorageQloudLogicalRepositoryController(), 
-                                                                    new StorageQloudPhysicalRepositoryController(),
-                                                                    new RemoteRepositoryController(),
-                                                                    new SQLiteEventDAO (),
-                                                                    new SQLiteRepositoryItemDAO());
+                instance = new StorageQloudRemoteEventsSynchronizer ();
             return instance;
         }
 
@@ -62,18 +56,7 @@ namespace GreenQloud.Synchrony
             }           
         }
         
-        public override void Pause ()
-        {
-            remote_timer.Stop();
-        }
-        
-        public new void Stop ()
-        {
-            remote_timer.Stop();
-            base.Stop();
-            threadTimer.Join();
-        }
-        
+
         public ThreadState ControllerStatus{
             get{
                 return threadTimer.ThreadState;

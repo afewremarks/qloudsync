@@ -75,7 +75,7 @@ namespace GreenQloud.Persistence.SQLite
             List<Event> list = EventsNotSynchronized;
             foreach (Event e in list)
             {
-                UpdateToSynchronized (e);
+                UpdateToSynchronized (e); // TODO create status!
             }
         }
 

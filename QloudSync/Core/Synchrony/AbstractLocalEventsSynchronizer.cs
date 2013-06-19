@@ -10,31 +10,32 @@ using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Repository.Local;
 using GreenQloud.Persistence;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Synchrony
 {
-    public abstract class AbstractLocalEventsSynchronizer : AbstractSynchronizer
+    public abstract class AbstractLocalEventsSynchronizer : AbstractSynchronizer<AbstractLocalEventsSynchronizer>
     {
-        Thread threadSync;
         bool creatingEvent;
+        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
+        private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
+        private IPhysicalRepositoryController physicalLocalRepository = new StorageQloudPhysicalRepositoryController ();
 
         protected AbstractLocalEventsSynchronizer 
-            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
-                base (logicalLocalRepository, physicalLocalRepository, remoteRepository, eventDAO, repositoryItemDAO)
+            () :
+                base ()
         {
-            threadSync = new Thread(() =>{
-                Synchronize ();
-            });
            
         }
 
-        public void Create (Event e){           
-            eventDAO.Create (LoadEvent (e));
+        public void Create (Event e){       
+            e.RepositoryType = RepositoryType.LOCAL;
+            eventDAO.Create (e);
             creatingEvent = true;
         }
 
-        public new void Synchronize(){
-            while (Working){
+        public override void Run(){
+            while (true){
                 if (creatingEvent){
                     creatingEvent = false;
                     //if(SyncStatus == SyncStatus.IDLE){
@@ -81,50 +82,6 @@ namespace GreenQloud.Synchrony
             return false;
         }
 
-        public Event LoadEvent (Event e)
-        {
-            e.RepositoryType = RepositoryType.LOCAL;
-            e.User = Credential.Username;
-            e.Application = GlobalSettings.FullApplicationName;
-            e.ApplicationVersion = GlobalSettings.RunningVersion;
-            e.DeviceId = GlobalSettings.MachineName;
-            e.OS = GlobalSettings.OSVersion;
-            e.Bucket = RuntimeSettings.DefaultBucketName;
-            return e;
-            
-        }
-
-        void CreateSubEvents (Event e)
-        {
-            foreach(RepositoryItem item in physicalLocalRepository.GetSubRepositoyItems(e.Item)){
-                eventDAO.Create (new Event(){
-                    Item = item,
-                    EventType = e.EventType,
-                    RepositoryType = e.RepositoryType
-                });            }
-        }
-
-        #region implemented abstract members of Synchronizer
-        public override void Start ()
-        {
-            Working = true;
-            try{
-                threadSync.Start();
-            }catch{
-                // do nothing
-            }
-        }
-        public override void Pause ()
-        {
-            Working = false;
-        }
-
-        public override void Stop ()
-        {
-            Working = false;
-            threadSync.Join();
-        }
-        #endregion
     }
 
 }

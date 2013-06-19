@@ -32,7 +32,7 @@ namespace GreenQloud {
         public IconController StatusIcon;
         private StorageQloudLocalEventsSynchronizer localSynchronizer;
         private StorageQloudRemoteEventsSynchronizer remoteSynchronizer;
-        private StorageQloudBacklogSynchronizer backlogSynchronizer;
+        private AbstractSynchronizer<RecoverySynchronizer> recoverySynchronizer;
         private SynchronizerResolver synchronizerResolver;
 
         public double ProgressPercentage = 0.0;
@@ -78,27 +78,6 @@ namespace GreenQloud {
             CreateConfigFolder();
             UpdateConfigFile ();
            
-            synchronizerResolver = SynchronizerResolver.GetInstance();
-            remoteSynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
-            backlogSynchronizer = StorageQloudBacklogSynchronizer.GetInstance();
-            localSynchronizer = StorageQloudLocalEventsSynchronizer.GetInstance();
-            synchronizerResolver.SyncStatusChanged +=HandleSyncStatusChanged;
-
-            
-            this.timer = new System.Timers.Timer (){
-                Interval = 10000
-            };
-            
-            timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e)=>{
-                try{
-                    InitializeSynchronizers();
-                }catch{
-                    
-                }
-            };
-
-
-
             if (CreateHomeFolder ())
                 AddToBookmarks ();
          }
@@ -116,7 +95,6 @@ namespace GreenQloud {
                 }else{
                     string version = File.OpenText(RuntimeSettings.DatabaseInfoFile).ReadLine();
                     if(Double.Parse(version) <  Double.Parse(RuntimeSettings.DatabaseVersion)){
-                        //TODO run migrations
                         File.Delete(RuntimeSettings.DatabaseInfoFile);
                         File.Delete(RuntimeSettings.DatabaseFile);
                     } 
@@ -126,7 +104,7 @@ namespace GreenQloud {
                     File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
                 }
             }
-            
+
             if (File.Exists (RuntimeSettings.BacklogFile))
                 File.Delete(RuntimeSettings.BacklogFile);
             
@@ -200,6 +178,15 @@ namespace GreenQloud {
 
         private void InitializeSynchronizers ()
         {
+            synchronizerResolver = SynchronizerResolver.GetInstance();
+            recoverySynchronizer = RecoverySynchronizer.GetInstance();
+            remoteSynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
+            localSynchronizer = StorageQloudLocalEventsSynchronizer.GetInstance();
+
+           recoverySynchronizer.Start();
+           while(recoverySynchronizer.IsAlive)
+                Thread.Sleep (1000);
+
             localSynchronizer.Start();
             remoteSynchronizer.Start();
             synchronizerResolver.Start();
@@ -238,16 +225,6 @@ namespace GreenQloud {
 
         public void SyncStart ()
         {
-
-            localSynchronizer.Finished += () => FinishFetcher();
-            localSynchronizer.Failed += delegate {
-                FolderFetchError (localSynchronizer.Errors);
-                SyncStop();
-            };
-            
-            ProgressChanged += delegate (double percentage, double time) {
-                FolderFetching (percentage, time);
-            };
             FirstLoad();
             FinishFetcher();
         }
@@ -255,13 +232,9 @@ namespace GreenQloud {
         public void FirstLoad()
         {
             try {
-                backlogSynchronizer.Start();
-                while(!backlogSynchronizer.FinishLoad)
-                    Thread.Sleep (1000);
-                backlogSynchronizer.Stop();
-
-
                 InitializeSynchronizers();
+
+
                 Thread.Sleep (1000);
 
                 int eventsToSync = synchronizerResolver.EventsToSync;
@@ -282,7 +255,7 @@ namespace GreenQloud {
 
         public void SyncStop ()
         {
-            localSynchronizer.Stop ();
+            localSynchronizer.Abort ();
         }        
         
 
@@ -468,8 +441,8 @@ namespace GreenQloud {
         {
             ErrorType = ERROR_TYPE.ACCESS_DENIED;
             OnError ();
-            localSynchronizer.Stop ();
-            remoteSynchronizer.Stop ();
+            localSynchronizer.Abort ();
+            remoteSynchronizer.Abort ();
         }
 
         public ERROR_TYPE ErrorType {

@@ -34,7 +34,7 @@ namespace GreenQloud.Model
             item.LocalETag = localETag;
             item.IsFolder = key.EndsWith(Path.DirectorySeparatorChar.ToString());
 
-            if(dao.Exists(item)){
+            if(dao.ExistsUnmoved(item)){
                 item = dao.GetFomDatabase (item);
             }
             return item;
@@ -51,9 +51,9 @@ namespace GreenQloud.Model
             }
             item.Key = key;
             item.LocalETag = null;
-            item.IsFolder = isFolder; //entry.Name.EndsWith (Path.DirectorySeparatorChar.ToString());
+            item.IsFolder = isFolder;
 
-            if(dao.Exists(item)){
+            if(dao.ExistsUnmoved(item)){
                 item = dao.GetFomDatabase (item);
             }
             return item;
@@ -66,14 +66,27 @@ namespace GreenQloud.Model
             set; get;
         }
 
+        public bool Moved {
+            get;
+            set;
+        }
+
         public string Name{
             get {
                return Key.Substring (Key.LastIndexOf(Path.DirectorySeparatorChar.ToString())+1);
             }
         }
 
+        private string etag;
         public string ETag{
-            set; get;
+            set{
+                etag = value;
+            } 
+            get{
+                if (etag == null)
+                    return null;
+                return etag.Replace ("\"", "");
+            }
         }
 
         public string LocalETag{

@@ -31,11 +31,10 @@ namespace GreenQloud.Synchrony
         private SyncStatus status;
         private Thread threadSync;
 
-        protected EventDAO eventDAO;
-        protected RepositoryItemDAO repositoryItemDAO;
-        protected LogicalRepositoryController logicalLocalRepository;
-        protected IPhysicalRepositoryController physicalLocalRepository;
-        protected RemoteRepositoryController remoteRepository;
+        protected EventDAO eventDAO = new SQLiteEventDAO();
+        protected RepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO ();
+        protected IPhysicalRepositoryController physicalLocalRepository = new StorageQloudPhysicalRepositoryController ();
+        protected RemoteRepositoryController remoteRepository = new RemoteRepositoryController();
 
 
         public delegate void SyncStatusChangedHandler (SyncStatus status);
@@ -63,16 +62,9 @@ namespace GreenQloud.Synchrony
             set; get;
         }
         
-        private SynchronizerResolver 
-            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, 
-             RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO)
+        private SynchronizerResolver () : base ()
         {
             SyncStatus = SyncStatus.IDLE;
-            this.eventDAO = eventDAO;
-            this.repositoryItemDAO = repositoryItemDAO;
-            this.logicalLocalRepository = logicalLocalRepository;
-            this.physicalLocalRepository = physicalLocalRepository;
-            this.remoteRepository = remoteRepository;
             threadSync = new Thread(() =>{
                 Synchronize ();
             });
@@ -80,11 +72,7 @@ namespace GreenQloud.Synchrony
 
         public static SynchronizerResolver GetInstance(){
             if (instance == null)
-                instance = new SynchronizerResolver (new StorageQloudLogicalRepositoryController(), 
-                                                                new StorageQloudPhysicalRepositoryController(),
-                                                                new RemoteRepositoryController(),
-                                                                new SQLiteEventDAO (),
-                                                                new SQLiteRepositoryItemDAO());
+                instance = new SynchronizerResolver ();
             return instance;
         }
 
@@ -110,35 +98,40 @@ namespace GreenQloud.Synchrony
 
         public void Synchronize(){//TODO REFACTOR!!!!!!
             while (Working){
-
-                List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
-
-                eventsToSync = eventsNotSynchronized.Count;
-                while (eventsNotSynchronized.Count>0 && Working){
-                    Synchronize (eventsNotSynchronized[0]);
-                    eventsNotSynchronized = eventDAO.EventsNotSynchronized;
-                }
-                SyncStatus = SyncStatus.IDLE;
-                Done = true;
-
-                Thread.Sleep (1000);
-
+                SolveAll ();
             }
-
         }
 
+        public void SolveAll ()
+        {
+            List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
+            eventsToSync = eventsNotSynchronized.Count;
+            while (eventsNotSynchronized.Count > 0) {
+                Synchronize (eventsNotSynchronized [0]);
+                eventsNotSynchronized = eventDAO.EventsNotSynchronized;
+            }
+            SyncStatus = SyncStatus.IDLE;
+            Done = true;
+            Thread.Sleep (1000);
+        }
 
         //TODO refactor ignores
         private bool VerifyIgnoreRemote (Event remoteEvent)
         {
-            return false;
-        }
-        private bool VerifyIgnoreLocal (Event remoteEvent)
-        {
             if(remoteEvent.Item.ResultItem == null){
                 if (!remoteEvent.Item.IsFolder) {
-                    FileInfo fi = new FileInfo (remoteEvent.Item.LocalAbsolutePath);
-                    if (fi.Length == 0)
+                    if (remoteRepository.Exists(remoteEvent.Item) && remoteRepository.GetMetadata(remoteEvent.Item.Key).ContentLength == 0)
+                        return true;
+                }
+            }
+            return false;
+        }
+        private bool VerifyIgnoreLocal (Event localEvent)
+        {
+            if(localEvent.Item.ResultItem == null){
+                if (!localEvent.Item.IsFolder) {
+                    FileInfo fi = new FileInfo (localEvent.Item.LocalAbsolutePath);
+                    if (fi.Exists && fi.Length == 0)
                         return true;
                 }
             }
@@ -204,8 +197,6 @@ namespace GreenQloud.Synchrony
                     }                
                 }
                 
-                logicalLocalRepository.Solve (e.Item);
-
                 VerifySucess(e);
 
                 eventDAO.UpdateToSynchronized(e);
@@ -232,43 +223,46 @@ namespace GreenQloud.Synchrony
         {
             SyncStatus = SyncStatus.VERIFING;
 
-            //VerifyLocalChanges;
-            //VerifyRemoteChanges
-            //TODO atualizar item
-
-            //REMOVE THIS ABOVE
             if (e.RepositoryType == RepositoryType.LOCAL){
                 switch (e.EventType){
                     case EventType.MOVE:
-                        UpdateeTag (e);
+                        UpdateETag (e);
+                        e.Item.Moved = true;
+                        repositoryItemDAO.Update (e.Item);
                         break;
                     case EventType.CREATE:
-                        UpdateeTag (e);
+                        UpdateETag (e);
                         break;
                     case EventType.UPDATE:
-                        UpdateeTag (e);
+                        UpdateETag (e);
                         break;
                     case EventType.COPY:
-                        UpdateeTag (e);
+                        UpdateETag (e);
                         break;
                     case EventType.DELETE:
+                        e.Item.Moved = true;
+                        repositoryItemDAO.Update (e.Item);
                     break;
                 }
             }else{
                 switch (e.EventType){
                     case EventType.MOVE:
-                        UpdateeTag (e);
+                        UpdateETag (e);
+                        e.Item.Moved = true;
+                        repositoryItemDAO.Update (e.Item);
                         break;
                     case EventType.CREATE:
-                        UpdateeTag (e);
+                        UpdateETag (e);
                         break;
                     case EventType.UPDATE:
-                        UpdateeTag (e);
+                        UpdateETag (e);
                         break;
                     case EventType.COPY:
-                        UpdateeTag (e);
+                        UpdateETag (e);
                         break;
                     case EventType.DELETE:
+                        e.Item.Moved = true;
+                        repositoryItemDAO.Update (e.Item);
                     break;
                 }                
             }
@@ -276,21 +270,21 @@ namespace GreenQloud.Synchrony
 
 
         //TODO VERIFY!
-        void UpdateeTag (Event e)
+        void UpdateETag (Event e)
         {
-            /*Logger.LogInfo("VERIFYING", "ETag verification...");
-            if (e.Item.ResultObjectRelativePath.Length > 0) {
-                e.Item.RemoteETAG = remoteRepository.RemoteETAG (e.Item.ResultObjectKey);
-                e.Item.LocalETAG = new Crypto ().md5hash (e.Item.FullLocalResultObject);
+            if (e.Item.ResultItem != null) {
+                e.Item.ResultItem.ETag = remoteRepository.RemoteETAG (e.Item.ResultItem);
+                e.Item.ResultItem.LocalETag = new Crypto ().md5hash (e.Item.ResultItem);
+                if (!e.Item.ResultItem.ETag.Equals (e.Item.ResultItem.LocalETag))
+                    throw new QloudSync.VerificationException ();
             } else {
-                e.Item.RemoteETAG = remoteRepository.RemoteETAG (e.Item.Key);
-                e.Item.LocalETAG = new Crypto ().md5hash (e.Item.AbsolutePath);
+                e.Item.ETag = remoteRepository.RemoteETAG (e.Item);
+                e.Item.LocalETag = new Crypto ().md5hash (e.Item);
+                if (!e.Item.ETag.Equals (e.Item.LocalETag))
+                    throw new QloudSync.VerificationException ();
             }
 
-            if (!e.Item.RemoteETAG.Replace("\"", "").Equals (e.Item.LocalETAG))
-                throw new QloudSync.VerificationException ();
-
-            repositoryItemDAO.Update (e.Item);*/
+            repositoryItemDAO.Update (e.Item);
         }
     }
 }
