@@ -25,25 +25,19 @@ namespace GreenQloud.Repository
 
         public List<GreenQloud.Model.RepositoryItem> Items {
             get {
-                return GetInstancesOfItems (GetS3Objects().Where(i => !i.Name.StartsWith(".")).ToList());
-            }
-        }
-
-        public List<GreenQloud.Model.RepositoryItem> AllItems {
-            get {
-                return GetInstancesOfItems (GetS3Objects());
+                return GetInstancesOfItems (GetS3Objects().Where(i => !Key(i).StartsWith(".")).ToList());
             }
         }
 
         public List<GreenQloud.Model.RepositoryItem> TrashItems {
             get {
-                return GetInstancesOfItems (GetS3Objects().Where(i => i.Name.StartsWith(Constant.TRASH)).ToList());
+                return GetInstancesOfItems (GetS3Objects().Where(i => Key(i).StartsWith(Constant.TRASH)).ToList());
             }
         }
 
         public List<GreenQloud.Model.RepositoryItem> GetCopys (RepositoryItem item)
         {
-            return AllItems.Where (rf => rf.ETag == item.LocalETag && rf.Key != item.Key).ToList<RepositoryItem> ();
+            return Items.Where (rf => rf.ETag == item.LocalETag && rf.Key != item.Key).ToList<RepositoryItem> ();
         }
 
         public bool ExistsCopies (RepositoryItem item)
@@ -152,7 +146,7 @@ namespace GreenQloud.Repository
 
         public string RemoteETAG (RepositoryItem item)
         {
-            return GetMetadata(item.Key).ETag;
+            return GetMetadata(item.Key).ETag.Replace("\"", "");
         }
 
         public GetObjectResponse GetMetadata (string key)
@@ -163,6 +157,7 @@ namespace GreenQloud.Repository
             using (GetObjectResponse response = request.GetResponse())
                 return response;
         }
+
         #endregion
      
 
@@ -221,18 +216,40 @@ namespace GreenQloud.Repository
         #region Handle S3Objects
         public IEnumerable<ListEntry> GetS3Objects ()
         {
-            return connection.Connect ().ListAllObjects (RuntimeSettings.DefaultBucketName);
+            List<ListEntry> entries = new List<ListEntry> ();
+            List<ListEntry> subEntries = new List<ListEntry> ();
+            entries = connection.Connect ().ListAllObjects (RuntimeSettings.DefaultBucketName).ToList();
+            foreach (ListEntry entry in entries) {
+                if (entry is CommonPrefix) {
+                    subEntries.AddRange(GetSubS3Objects ((CommonPrefix) entry));
+                }
+            }
+            entries.AddRange (subEntries);
+
+            return entries;
+        }
+
+        private IEnumerable<ListEntry> GetSubS3Objects (CommonPrefix prefix)
+        {
+            IEnumerable<ListEntry> subEntries = connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, prefix.Prefix).ToList();
+            List<ListEntry> entries = new List<ListEntry> ();
+            foreach (ListEntry entry in subEntries) {
+                if (Key (entry) != string.Empty && Key (entry) != Key (prefix)) {
+                    entries.Add (entry);
+                }
+
+                if (entry is CommonPrefix) {
+                    entries.AddRange (GetSubS3Objects((CommonPrefix) entry));
+                }
+            }
+            return entries;
         }
 
         protected List<RepositoryItem> GetInstancesOfItems (IEnumerable<ListEntry> s3items)
         {
             List <RepositoryItem> remoteItems = new List <RepositoryItem> ();
             foreach (ListEntry s3item in s3items) {
-                if (!s3item.Name.Contains(Constant.TRASH))
-                {    
-                    remoteItems.Add ( CreateObjectInstance (s3item));
-                    //add folders that have items to persist too                   
-                }
+                remoteItems.Add ( CreateObjectInstance (s3item));  
             }
             return remoteItems;
         }

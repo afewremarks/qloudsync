@@ -28,8 +28,9 @@ namespace GreenQloud.Synchrony
            
         }
 
-        public void Create (Event e){           
-            eventDAO.Create (LoadEvent (e));
+        public void Create (Event e){       
+            e.RepositoryType = RepositoryType.LOCAL;
+            eventDAO.Create (e);
             creatingEvent = true;
         }
 
@@ -79,29 +80,6 @@ namespace GreenQloud.Synchrony
             }
 
             return false;
-        }
-
-        public Event LoadEvent (Event e)
-        {
-            e.RepositoryType = RepositoryType.LOCAL;
-            e.User = Credential.Username;
-            e.Application = GlobalSettings.FullApplicationName;
-            e.ApplicationVersion = GlobalSettings.RunningVersion;
-            e.DeviceId = GlobalSettings.MachineName;
-            e.OS = GlobalSettings.OSVersion;
-            e.Bucket = RuntimeSettings.DefaultBucketName;
-            return e;
-            
-        }
-
-        void CreateSubEvents (Event e)
-        {
-            foreach(RepositoryItem item in physicalLocalRepository.GetSubRepositoyItems(e.Item)){
-                eventDAO.Create (new Event(){
-                    Item = item,
-                    EventType = e.EventType,
-                    RepositoryType = e.RepositoryType
-                });            }
         }
 
     }

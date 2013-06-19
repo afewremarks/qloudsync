@@ -56,14 +56,17 @@ namespace GreenQloud.Synchrony
         }
 
         public QloudSyncFileSystemWatcher GetWatcher(string path){
-            QloudSyncFileSystemWatcher watcher = null;
-            foreach(string watcherKey in watchers.Keys){
-                if (path.StartsWith (watcherKey)) {
-                    watchers.TryGetValue (watcherKey, out watcher);
-                    return watcher;
+            if(watchers != null){
+                QloudSyncFileSystemWatcher watcher = null;
+                foreach(string watcherKey in watchers.Keys){
+                    if (path.StartsWith (watcherKey)) {
+                        watchers.TryGetValue (watcherKey, out watcher);
+                        return watcher;
+                    }
                 }
+                return watcher;
             }
-            return watcher;
+            return null;
         }
 
         void CreateEvent (Event e)

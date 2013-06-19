@@ -11,10 +11,13 @@ using GreenQloud.Persistence.SQLite;
 
  namespace GreenQloud.Synchrony
 {
-    public abstract class RecoverySynchronizer : AbstractSynchronizer<RecoverySynchronizer>
+    public class RecoverySynchronizer : AbstractSynchronizer<RecoverySynchronizer>
     {
-        //NEW
-        protected RecoverySynchronizer () : base () { }
+        private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
+        private IPhysicalRepositoryController localRepository = new StorageQloudPhysicalRepositoryController ();
+        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
+
+        public RecoverySynchronizer () : base () { }
 
         public override void Run() {
             while (true) {
@@ -23,108 +26,88 @@ using GreenQloud.Persistence.SQLite;
         }
 
         public void Synchronize (){
-            List<RepositoryItem> itensInRemoteRepository = remoteRepository.Items;
-            List<RepositoryItem> filesInPhysicalLocalRepository = physicalLocalRepository.Items;
             eventDAO.RemoveAllUnsynchronized();
 
-            foreach (RepositoryItem remoteItem in itensInRemoteRepository) {
-                eventDAO.Create (GetEvent (remoteItem, RepositoryType.REMOTE));
-                filesInPhysicalLocalRepository.RemoveAll (i=> i.LocalAbsolutePath == remoteItem.LocalAbsolutePath);
+            List<RepositoryItem> localItems = localRepository.Items;
+            List<RepositoryItem> remoteItems = remoteRepository.Items;
+            SolveItems (localItems, remoteItems);
+
+            Abort();//TODO remove this...
+        }
+
+        void SolveItems (List<RepositoryItem> localItems, List<RepositoryItem> remoteItems)
+        {
+            //items exists on remote...
+            foreach (RepositoryItem item in remoteItems) {
+                Event e = SolveFromRemote (item);
+                localItems.RemoveAll( i => i.Key == item.Key);
+                if (e != null) {
+                    eventDAO.Create (e);
+                }
             }
 
-            foreach (RepositoryItem localItem in filesInPhysicalLocalRepository)
-            {
-                eventDAO.Create (GetEvent (localItem, RepositoryType.LOCAL));
-
+            //Items here is not on remote.... so, it only can be created or removed remote
+            foreach (RepositoryItem item in localItems) {
+                Event e = SolveFromLocal (item);
+                if (e != null) {
+                    eventDAO.Create (e);
+                }
             }
-            //base.Synchronize();
-            Abort();
+
+            SynchronizerResolver.GetInstance ().SolveAll ();
         }
 
 
-
-
-
-
-
-
-
-        //OLD
-        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
-        private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
-        private IPhysicalRepositoryController physicalLocalRepository = new StorageQloudPhysicalRepositoryController ();
-        private LogicalRepositoryController logicalLocalRepository = new StorageQloudLogicalRepositoryController ();
-
-
-
-
-        public Event GetEvent (RepositoryItem item, RepositoryType type){
-
-            if (type == RepositoryType.LOCAL)
-                return GetLocalEvent (item);
-            else
-                return GetRemoteEvent (item);
-        }
-
-        Event GetLocalEvent (RepositoryItem item)
+        private Event SolveFromRemote (RepositoryItem item)
         {
             Event e = new Event ();
             e.Item = item;
-           
-            if (logicalLocalRepository.Exists (item)){
-                e.EventType = EventType.DELETE;
-                e.RepositoryType = RepositoryType.REMOTE;
-            }else{
-                e.EventType = EventType.CREATE;
-                e.RepositoryType = RepositoryType.LOCAL;
+            if (localRepository.Exists (e.Item)) {
+                string actualRemoteEtag = remoteRepository.RemoteETAG (e.Item);
+                string actualLocalEtag = new Crypto().md5hash (e.Item);
+                string savedEtag = e.Item.ETag;
+
+                if (actualRemoteEtag != actualLocalEtag) {
+                    if (savedEtag != actualRemoteEtag && savedEtag == actualLocalEtag) {//changed remote but still the same on local....
+                        e.RepositoryType = RepositoryType.REMOTE;
+                        e.EventType = EventType.UPDATE;
+                    } else if (savedEtag == actualRemoteEtag && savedEtag != actualLocalEtag) {//changed local but still the same on remote....
+                        e.RepositoryType = RepositoryType.LOCAL;
+                        e.EventType = EventType.UPDATE;
+                    } else {
+                        Logger.LogInfo ("WARNING", "Recovery Synchronizer found both update local and remote on " + item.Key + " and cannot merge this."); //TODO MAKE A MANUAL MERGE DECISION
+                        return null;
+                    }
+                    return e;
+                }
+            } else {
+                if(e.Item.Id != 0 && e.Item.Moved == false){
+                    e.RepositoryType = RepositoryType.LOCAL;
+                    e.EventType = EventType.DELETE;
+                } else {
+                    e.RepositoryType = RepositoryType.REMOTE;
+                    e.EventType = EventType.CREATE;
+                }
+                return e;
             }
-            return e;
+            return null;
         }
 
-        Event GetRemoteEvent (RepositoryItem item)
+        private Event SolveFromLocal (RepositoryItem item)
         {
             Event e = new Event ();
-            e.Item = item; 
-
-            if (physicalLocalRepository.Exists (item)) {
-                if (!physicalLocalRepository.IsSync(item)) {
-                    if (CalculateLastestVersion (item) == RepositoryType.LOCAL) {
-                        e.EventType = EventType.UPDATE;
-                        e.RepositoryType = RepositoryType.LOCAL;
-                    }
-                    else {
-                        e.EventType = EventType.UPDATE;
-                        e.RepositoryType = RepositoryType.REMOTE;
-                    }
-                }
-                return null;
-            }
-            else{               
-                if (logicalLocalRepository.Exists (item)){
-                    e.EventType = EventType.DELETE;
+            e.Item = item;
+            if (localRepository.Exists (e.Item)) {
+                if (e.Item.Id == 0) {
                     e.RepositoryType = RepositoryType.LOCAL;
-                }
-                else{
                     e.EventType = EventType.CREATE;
+                } else {
                     e.RepositoryType = RepositoryType.REMOTE;
+                    e.EventType = EventType.DELETE;
                 }
+                return e;
             }
-            return e;
-        }
-
-        RepositoryType CalculateLastestVersion (RepositoryItem remoteObj)
-        {
-            RepositoryItem physicalObjectVersion = physicalLocalRepository.CreateItemInstance (remoteObj.LocalAbsolutePath);
-
-           // if(physicalObjectVersion.TimeOfLastChange==new DateTime())
-                return RepositoryType.REMOTE;
-
-           // DateTime referencialClock = physicalObjectVersion.TimeOfLastChange.Subtract (diffClocks);
-
-            //if (referencialClock.Subtract (Convert.ToDateTime (remoteObj.TimeOfLastChange)).TotalSeconds > -1) 
-              //  return RepositoryType.LOCAL;
-
-            return RepositoryType.REMOTE;
+            return null;
         }
     }
 }

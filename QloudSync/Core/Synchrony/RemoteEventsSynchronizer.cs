@@ -24,9 +24,7 @@ namespace GreenQloud.Synchrony
         private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
 
 
-        public RemoteEventsSynchronizer  
-            (LogicalRepositoryController logicalLocalRepository, IPhysicalRepositoryController physicalLocalRepository, RemoteRepositoryController remoteRepository, EventDAO eventDAO, RepositoryItemDAO repositoryItemDAO) :
-                base ()
+        public RemoteEventsSynchronizer () : base ()
         {
 
         }
