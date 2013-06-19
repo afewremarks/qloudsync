@@ -206,11 +206,6 @@ namespace GreenQloud.Synchrony
                 }
 
                 Logger.LogEvent("DONE Event Synchronizing", e);
-            } catch (AbortedOperationException abort){
-                Logger.LogInfo("WARNING", "Operation abortet! \nCause: "+abort.Message);
-                //TODO put  error flag on event
-                eventDAO.UpdateToSynchronized(e);
-
             } catch (Exception exc){
                 //TODO refactor to catch error and treat
                 Logger.LogInfo("ERROR", exc);
