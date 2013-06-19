@@ -121,8 +121,6 @@
     <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryDAO.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteEventDAO.cs" />
-    <Compile Include="Core\Repository\Local\LogicalRepositoryController.cs" />
-    <Compile Include="Core\Repository\Local\StorageQloud\StorageQloudLogicalRepositoryController.cs" />
     <Compile Include="Core\Repository\Local\StorageQloud\StorageQloudPhysicalRepositoryController.cs" />
     <Compile Include="Core\Synchrony\RemoteEventsSynchronizer.cs" />
     <Compile Include="Core\Synchrony\AbstractSynchronizer.cs" />
