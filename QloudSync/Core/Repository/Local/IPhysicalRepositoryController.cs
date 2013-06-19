@@ -17,18 +17,11 @@ namespace GreenQloud.Repository.Local
         }
 
         void Copy (RepositoryItem item);
-
         void Delete (RepositoryItem  item);
-
         void Move (RepositoryItem item);
-
         RepositoryItem GetCopy (RepositoryItem remoteItem);
-
         bool IsSync (RepositoryItem item);
-
         RepositoryItem CreateItemInstance (string fullLocalName);
-
-        List<RepositoryItem> GetSubRepositoyItems (RepositoryItem item);
     }
 }
 

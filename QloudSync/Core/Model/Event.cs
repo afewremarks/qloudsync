@@ -21,6 +21,12 @@ using System.IO;
 	{
 		public Event ()
 		{
+            User = Credential.Username;
+            Application = GlobalSettings.FullApplicationName;
+            ApplicationVersion = GlobalSettings.RunningVersion;
+            DeviceId = GlobalSettings.MachineName;
+            OS = GlobalSettings.OSVersion;
+            Bucket = RuntimeSettings.DefaultBucketName;
 		}
 
         public RepositoryItem Item{
