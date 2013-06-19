@@ -36,10 +36,6 @@ namespace QloudSync.Repository
 
         public S3Service Connect ()
         {
-            /*AmazonS3Config config = CreateConfig ();
-            AmazonS3Client connection = (AmazonS3Client)Amazon.AWSClientFactory.CreateAmazonS3Client (, , config);
-            return connection;*/
-
             var s3 = new S3Service
             {
                 Host = GlobalSettings.StorageHost,
@@ -61,13 +57,6 @@ namespace QloudSync.Repository
             }           
             return Connect();
         }
-
-        /*public AmazonS3Config CreateConfig()
-        {
-            AmazonS3Config conf = new AmazonS3Config();
-            conf.ServiceURL =  new Uri(GlobalSettings.StorageURL).Host;
-            return conf;
-        }*/
     }
 
 }
