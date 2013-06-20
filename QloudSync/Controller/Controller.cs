@@ -30,7 +30,7 @@ namespace GreenQloud {
 
         public IconController StatusIcon;
         private StorageQloudLocalEventsSynchronizer localSynchronizer;
-        private StorageQloudRemoteEventsSynchronizer remoteSynchronizer;
+        private AbstractSynchronizer<RemoteEventsSynchronizer> remoteSynchronizer;
         private AbstractSynchronizer<RecoverySynchronizer> recoverySynchronizer;
         private SynchronizerResolver synchronizerResolver;
 
@@ -179,7 +179,7 @@ namespace GreenQloud {
         {
             synchronizerResolver = SynchronizerResolver.GetInstance();
             recoverySynchronizer = RecoverySynchronizer.GetInstance();
-            remoteSynchronizer = StorageQloudRemoteEventsSynchronizer.GetInstance();
+            remoteSynchronizer = RemoteEventsSynchronizer.GetInstance();
             localSynchronizer = StorageQloudLocalEventsSynchronizer.GetInstance();
 
            recoverySynchronizer.Start();
