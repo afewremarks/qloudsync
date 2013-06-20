@@ -26,29 +26,19 @@ namespace GreenQloud.Synchrony
 
         public RemoteEventsSynchronizer () : base ()
         {
-
         }
 
         public override void Run(){
             while (true){
                 Thread.Sleep (5000);
-                if (eventsCreated){
-                    eventsCreated = false;
-                    //if(SyncStatus == SyncStatus.IDLE){
-                        //base.Synchronize ();
-                    //}
-                }
+                AddEvents();
             }
         }
 
-        bool ready=true;
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void AddEvents ()
         {
             try{
-                if (!ready)
-                    return;
-                ready = false;
                 string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
                 string time = eventDAO.LastSyncTime;
                 Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
@@ -92,7 +82,6 @@ namespace GreenQloud.Synchrony
             } catch (Exception e){
                 Logger.LogInfo("ERROR", e);
             }
-            ready = true;
         }
 
         public bool HasInit {
@@ -120,9 +109,6 @@ namespace GreenQloud.Synchrony
             return size;
         }
 
-        public void GenericSynchronize(){
-            //base.Synchronize();
-        }
     }
 }
 

@@ -271,7 +271,7 @@ namespace GreenQloud {
 
         public void SyncingCancelled ()
         {
-            StorageQloudLocalEventsSynchronizer.GetInstance().Abort();
+            LocalEventsSynchronizer.GetInstance().Abort();
             string credential_path = Path.Combine(RuntimeSettings.ConfigPath, "credentials.xml");
             if (System.IO.File.Exists(credential_path))
                 System.IO.File.Delete(credential_path);

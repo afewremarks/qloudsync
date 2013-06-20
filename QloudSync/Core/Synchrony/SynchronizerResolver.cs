@@ -25,12 +25,9 @@ namespace GreenQloud.Synchrony
         VERIFING
     }
 
-    public class SynchronizerResolver
+    public class SynchronizerResolver : AbstractSynchronizer<SynchronizerResolver>
     {
-        private static SynchronizerResolver instance;
         private SyncStatus status;
-        private Thread threadSync;
-
         protected EventDAO eventDAO = new SQLiteEventDAO();
         protected RepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO ();
         protected IPhysicalRepositoryController physicalLocalRepository = new StorageQloudPhysicalRepositoryController ();
@@ -39,7 +36,11 @@ namespace GreenQloud.Synchrony
 
         public delegate void SyncStatusChangedHandler (SyncStatus status);
         public event SyncStatusChangedHandler SyncStatusChanged = delegate {};
-        
+
+        public SynchronizerResolver () : base ()
+        {
+        }
+
         public SyncStatus SyncStatus {
             get {
                 return status;
@@ -58,46 +59,8 @@ namespace GreenQloud.Synchrony
             set; get;
         }
 
-        public bool Working{
-            set; get;
-        }
-        
-        private SynchronizerResolver () : base ()
-        {
-            SyncStatus = SyncStatus.IDLE;
-            threadSync = new Thread(() =>{
-                Synchronize ();
-            });
-        }
-
-        public static SynchronizerResolver GetInstance(){
-            if (instance == null)
-                instance = new SynchronizerResolver ();
-            return instance;
-        }
-
-        public void Start ()
-        {
-            Working = true;
-            try{
-                threadSync.Start();
-            }catch{
-                Logger.LogInfo("ERROR", "Cannot start Synchronizer Resolver Thread");
-            }
-        }
-        public void Pause ()
-        {
-            Working = false;
-        }
-
-        public void Stop ()
-        {
-            Working = false;
-            threadSync.Join();
-        }
-
-        public void Synchronize(){//TODO REFACTOR!!!!!!
-            while (Working){
+        public override void Run(){
+            while (true){
                 SolveAll ();
             }
         }
@@ -137,7 +100,6 @@ namespace GreenQloud.Synchrony
             }
             return false;
         }
-
         private bool VerifyIgnore (Event e)
         {
             if (e.Item.Key.StartsWith ("."))
