@@ -126,7 +126,6 @@
     <Compile Include="Core\Synchrony\AbstractSynchronizer.cs" />
     <Compile Include="Core\Synchrony\AbstractLocalEventsSynchronizer.cs" />
     <Compile Include="Core\Synchrony\StorageQloud\StorageQloudLocalEventsSynchronizer.cs" />
-    <Compile Include="Core\Synchrony\StorageQloud\StorageQloudRemoteEventsSynchronizer.cs" />
     <Compile Include="Core\Synchrony\SynchronizerResolver.cs" />
     <Compile Include="Core\Util\Crypto.cs" />
     <Compile Include="Core\Util\Logger.cs" />
