@@ -29,59 +29,54 @@ namespace GreenQloud.Synchrony
         }
 
         public override void Run(){
-            while (true){
-                Thread.Sleep (5000);
+            while (!_stoped){
                 AddEvents();
+                Thread.Sleep (5000);
             }
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void AddEvents ()
         {
-            try{
-                string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
-                string time = eventDAO.LastSyncTime;
-                Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
+            string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
+            string time = eventDAO.LastSyncTime;
+            Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
 
-                UrlEncode encoder = new UrlEncode();
-                string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", encoder.Encode (RuntimeSettings.DefaultBucketName), encoder.Encode (Credential.Username), encoder.Encode (hash), encoder.Encode (time));
+            UrlEncode encoder = new UrlEncode();
+            string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", encoder.Encode (RuntimeSettings.DefaultBucketName), encoder.Encode (Credential.Username), encoder.Encode (hash), encoder.Encode (time));
 
-                JArray jsonObjects = JSONHelper.GetInfoArray(uri);
-                foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
-                    if(!((string)jsonObject["application"]).Equals(GlobalSettings.FullApplicationName)){
-                        Event e = new Event();
-                        e.RepositoryType = RepositoryType.REMOTE;
-                        e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
-                        e.User = (string)jsonObject["username"];
-                        e.Application = (string)jsonObject["application"];
-                        e.ApplicationVersion = (string)jsonObject["applicationVersion"];
-                        e.DeviceId = (string)jsonObject["deviceId"];
-                        e.OS = (string)jsonObject["os"];
-                        e.Bucket = (string)jsonObject["bucket"];
+            JArray jsonObjects = JSONHelper.GetInfoArray(uri);
+            foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
+                if(!((string)jsonObject["application"]).Equals(GlobalSettings.FullApplicationName)){
+                    Event e = new Event();
+                    e.RepositoryType = RepositoryType.REMOTE;
+                    e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
+                    e.User = (string)jsonObject["username"];
+                    e.Application = (string)jsonObject["application"];
+                    e.ApplicationVersion = (string)jsonObject["applicationVersion"];
+                    e.DeviceId = (string)jsonObject["deviceId"];
+                    e.OS = (string)jsonObject["os"];
+                    e.Bucket = (string)jsonObject["bucket"];
 
-                        e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                    e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 
-                        string key = (string)jsonObject["object"];
-                        bool isFolder;
-                        if((string)jsonObject["resultObject"] == string.Empty){
-                            isFolder = remoteController.GetMetadata(key).ContentLength==0;
-                        } else {
-                            isFolder = remoteController.GetMetadata((string)jsonObject["resultObject"]).ContentLength==0;
-                        }
-
-                        e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), isFolder, key);
-                        e.Item.BuildResultItem((string)jsonObject["resultObject"]);
-                        e.Item.ETag = (string)jsonObject["hash"];
-
-                        e.Synchronized = false;
-                        eventDAO.Create(e);
-                        repositoryItemDAO.Update(e.Item);
+                    string key = (string)jsonObject["object"];
+                    bool isFolder;
+                    if((string)jsonObject["resultObject"] == string.Empty){
+                        isFolder = remoteController.GetMetadata(key).ContentLength==0;
+                    } else {
+                        isFolder = remoteController.GetMetadata((string)jsonObject["resultObject"]).ContentLength==0;
                     }
+
+                    e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), isFolder, key);
+                    e.Item.BuildResultItem((string)jsonObject["resultObject"]);
+                    e.Item.ETag = (string)jsonObject["hash"];
+
+                    e.Synchronized = false;
+                    eventDAO.Create(e);
+                    repositoryItemDAO.Update(e.Item);
                 }
-                eventsCreated = true;
-            } catch (Exception e){
-                Logger.LogInfo("ERROR", e);
             }
+            eventsCreated = true;
         }
 
         public bool HasInit {
@@ -89,26 +84,6 @@ namespace GreenQloud.Synchrony
                 return eventsCreated;
             }
         }
-
-        public double InitFirstLoad ()
-        {
-            double size = 0;
-            Start();
-           
-            foreach (RepositoryItem i in remoteRepository.Items){
-                size += 0;//i.Size;
-
-                eventDAO.Create ( new Event(){
-                    EventType = EventType.CREATE,
-                    RepositoryType = RepositoryType.REMOTE,
-                    Item = i,
-                    Synchronized = false
-                });
-            }
-            eventsCreated = true;
-            return size;
-        }
-
     }
 }
 

@@ -153,18 +153,6 @@ namespace GreenQloud.Repository.Local
             }
             return null;
         }
-
-       
-
-        public string CalculateMD5Hash (RepositoryItem item)
-        {
-            var md5hash = new Crypto().md5hash(item.LocalAbsolutePath);
-            return md5hash;
-        }
-
-
-
-
         #region Core Management
 
         public void CreateFolder(RepositoryItem item){

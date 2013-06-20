@@ -59,13 +59,6 @@ namespace GreenQloud
             }
         }
         
-        public static string BacklogFile {
-            get {
-                if (backlogFile == null)            
-                    backlogFile = Path.Combine (ConfigPath, ConfigFile.Read ("BacklogFile"));
-                return backlogFile;
-            }
-        }
         private static string logfilepath = null;
         public static string LogFilePath {
             get {

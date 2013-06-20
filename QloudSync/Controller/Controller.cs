@@ -8,6 +8,7 @@ using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 using GreenQloud.Synchrony;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 
  
 
@@ -16,7 +17,8 @@ namespace GreenQloud {
     
     public enum ERROR_TYPE{
         DISCONNECTION,
-        ACCESS_DENIED
+        ACCESS_DENIED,
+        FATAL_ERROR
     }
 
 	public class Controller{
@@ -104,40 +106,38 @@ namespace GreenQloud {
                 }
             }
 
-            if (File.Exists (RuntimeSettings.BacklogFile))
-                File.Delete(RuntimeSettings.BacklogFile);
+            CalcTimeDiff ();
+            if (FirstRun) {
+                ShowSetupWindow (PageType.Login);
+                foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
+                    File.Delete (f);
+                UpdateConfigFile ();
+            } else {
+                InitializeSynchronizers();
+            }
             
-            bool available = double.Parse(InitOSInfoString()) >= double.Parse(GlobalSettings.AvailableOSXVersion);
-            if(available){
-                if (FirstRun) {
-                    ShowSetupWindow (PageType.Login);
-                    foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
-                        File.Delete (f);
+            verifyConfigRequirements ();
+        }
 
-                    UpdateConfigFile ();
-                } else {
-                    InitializeSynchronizers();
+        void CalcTimeDiff ()
+        {
+            bool success = false;
+            while(!success){
+                try{
+                    GlobalDateTime.CalcTimeDiff ();
+                    success = true;
+                } catch {
+                    Logger.LogInfo ("ERROR", "Failed to load server time... attempt to try again.");
+                    Thread.Sleep(2000);
                 }
             }
-            else{
-                var alert = new NSAlert {
-                    MessageText = "QloudSync is only available to OSX Mountain Lion.",
-                    AlertStyle = NSAlertStyle.Informational
-                };
-                
-                alert.AddButton ("OK");
-                
-                var returnValue = alert.RunModal();
-                Quit ();
-            }
-            verifyConfigRequirements ();
         }
 
         void verifyConfigRequirements ()
         {
             try{
                 ConfigFile.Read("InstanceID");
-            }catch(ConfigurationException e){
+            }catch {
                 string id = Crypto.Getbase64(ConfigFile.Read("ApplicationName") + Credential.Username + GlobalDateTime.NowUniversalString);
                 ConfigFile.Write ("InstanceID", id); 
                 ConfigFile.Read("InstanceID");
@@ -174,9 +174,18 @@ namespace GreenQloud {
             return "";
         }
 
-
-        private void InitializeSynchronizers ()
+        public void StopSynchronizers () 
         {
+            synchronizerResolver.Kill();
+            recoverySynchronizer.Kill();
+            localSynchronizer.Kill();
+            remoteSynchronizer.Kill();
+            Logger.LogInfo ("INFO", "Synchronizers Stoped!");
+        }
+        public void InitializeSynchronizers ()
+        {
+            Logger.LogInfo ("INFO", "Initializing Synchronizers!");
+
             synchronizerResolver = SynchronizerResolver.GetInstance();
             recoverySynchronizer = RecoverySynchronizer.GetInstance();
             remoteSynchronizer = RemoteEventsSynchronizer.GetInstance();
@@ -192,14 +201,8 @@ namespace GreenQloud {
             localSynchronizer.Start();
             remoteSynchronizer.Start();
 
-                        
-            ProgressChanged += delegate (double percentage, double speed) {
-                ProgressPercentage = percentage;
-                ProgressSpeed      = speed.ToString();
-                
-                UpdateState ();
-            };
 
+            Logger.LogInfo ("INFO", "Synchronizers Ready!");
         }
 
         void HandleSyncStatusChanged (SyncStatus status)
@@ -254,12 +257,6 @@ namespace GreenQloud {
                 Logger.LogInfo ("Initial Sync Error", e.Message+"\n "+e.StackTrace);
             }
         }
-
-        public void SyncStop ()
-        {
-            localSynchronizer.Abort ();
-        }        
-        
 
         public void FinishFetcher ()
         {  
@@ -344,52 +341,6 @@ namespace GreenQloud {
 
 		public void AddToBookmarks ()
         {
-//            NSMutableDictionary sidebar_plist = NSMutableDictionary.FromDictionary (
-//                NSUserDefaults.StandardUserDefaults.PersistentDomainForName ("com.apple.sidebarlists"));
-//
-//            // Go through the sidebar categories
-//            foreach (NSString sidebar_category in sidebar_plist.Keys) {
-//
-//                // Find the favorites
-//                if (sidebar_category.ToString ().Equals ("favorites")) {
-//
-//                    // Get the favorites
-//                    NSMutableDictionary favorites = NSMutableDictionary.FromDictionary(
-//                        (NSDictionary) sidebar_plist.ValueForKey (sidebar_category));
-//
-//                    // Go through the favorites
-//                    foreach (NSString favorite in favorites.Keys) {
-//
-//                        // Find the custom favorites
-//                        if (favorite.ToString ().Equals ("VolumesList")) {
-//
-//                            // Get the custom favorites
-//                            NSMutableArray custom_favorites = (NSMutableArray) favorites.ValueForKey (favorite);
-//
-//                            NSMutableDictionary properties = new NSMutableDictionary ();
-//                            properties.SetValueForKey (new NSString ("1935819892"), new NSString ("com.apple.LSSharedFileList.TemplateSystemSelector"));
-//
-//                            NSMutableDictionary new_favorite = new NSMutableDictionary ();
-//                            new_favorite.SetValueForKey (new NSString (GlobalSettings.ApplicationName),  new NSString ("Name"));
-//
-//                            new_favorite.SetValueForKey (NSData.FromString ("ImgR SYSL fldr"),  new NSString ("Icon"));
-//
-//                            new_favorite.SetValueForKey (NSData.FromString (RuntimeSettings.HomePath),
-//                                new NSString ("Alias"));
-//
-//                            new_favorite.SetValueForKey (properties, new NSString ("CustomItemProperties"));
-//
-//                            // Add to the favorites
-//                            custom_favorites.Add (new_favorite);
-//                            favorites.SetValueForKey ((NSArray) custom_favorites, new NSString (favorite.ToString ()));
-//                            sidebar_plist.SetValueForKey (favorites, new NSString (sidebar_category.ToString ()));
-//                        }
-//                    }
-//
-//                }
-//            }
-//
-//            NSUserDefaults.StandardUserDefaults.SetPersistentDomain (sidebar_plist, "com.apple.sidebarlists");
 		}
 
 
@@ -430,19 +381,38 @@ namespace GreenQloud {
 
 
         public void HandleDisconnection(){
-            /*ErrorType = ERROR_TYPE.DISCONNECTION;
+            ErrorType = ERROR_TYPE.DISCONNECTION;
             OnError ();
-            localSynchronizer.Stop ();
-            remoteSynchronizer.Stop ();
-            timer.Start ();*/
+            remoteSynchronizer.Kill ();
+            synchronizerResolver.Kill ();
+
+            WaitForConnection ();
+
+            remoteSynchronizer.Start ();
+            synchronizerResolver.Start ();
         }
 
-        public void HandleAccessDenied ()
+        private void WaitForConnection ()
         {
-            ErrorType = ERROR_TYPE.ACCESS_DENIED;
+            Thread.Sleep (5000);
+            bool hasConnection = false;
+            while(!hasConnection){
+                try{
+                    Ping pingSender = new Ping ();
+                    if(pingSender.Send(GlobalSettings.StorageHost).Status == IPStatus.Success)//TODO ADD ALL HOSTS TO PING
+                        hasConnection = true;
+                } catch {
+                    
+                }
+            }
+        }
+
+        public void HandleError(){
+            ErrorType = ERROR_TYPE.FATAL_ERROR;
             OnError ();
-            localSynchronizer.Abort ();
-            remoteSynchronizer.Abort ();
+            StopSynchronizers ();
+            Thread.Sleep (5000);
+            InitializeSynchronizers ();
         }
 
         public ERROR_TYPE ErrorType {

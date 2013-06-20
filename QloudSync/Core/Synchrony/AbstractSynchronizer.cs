@@ -13,6 +13,7 @@ using GreenQloud.Repository;
 using GreenQloud.Util;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
+using System.Net.Sockets;
 
 namespace GreenQloud.Synchrony
 {
@@ -20,9 +21,14 @@ namespace GreenQloud.Synchrony
     public abstract class AbstractSynchronizer<T>
     {
         private Thread _thread;
+        protected bool _stoped;
         static T instance;
 
-        public AbstractSynchronizer() { _thread = new Thread(new ThreadStart(this.GenericRun)); }
+        public AbstractSynchronizer() 
+        {
+            _stoped = true;
+            _thread = new Thread(new ThreadStart(this.GenericRun)); 
+        }
 
         public static T GetInstance(){
             if (instance == null)
@@ -30,14 +36,41 @@ namespace GreenQloud.Synchrony
             return instance;
         }
 
-        public void Start() { _thread.Start(); }
+        public void Start() {
+            if(_thread == null)
+                _thread = new Thread(new ThreadStart(this.GenericRun));
+
+            _stoped = false;
+            _thread.IsBackground = true;
+            if(!_thread.IsAlive)
+                _thread.Start();
+        }
         public void Join() { _thread.Join(); }
         public bool IsAlive { get { return _thread.IsAlive; } }
-        public void Abort () { _thread.Abort (); }
+        public void Kill () { 
+            _stoped = true;
+            _thread = null;
+        }
 
         void GenericRun ()
         {
-            Run();
+            try {
+                Run();
+            } catch (WebException webx) {
+                if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
+                    Logger.LogInfo ("LOST CONNECTION", webx);
+                    Program.Controller.HandleDisconnection ();
+                } else {
+                    throw webx;
+                }
+            } catch (SocketException sock) {
+                Logger.LogInfo ("LOST CONNECTION", sock);
+                Program.Controller.HandleDisconnection ();
+            } catch (Exception e) {
+                Logger.LogInfo ("SYNCHRONIZER ERROR", e);
+                Logger.LogInfo ("INFO", "Preparing to run rescue mode...");
+                Program.Controller.HandleError ();
+            }
         }
 
         #region Abstract Methods

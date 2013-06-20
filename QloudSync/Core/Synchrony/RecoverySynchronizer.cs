@@ -42,13 +42,13 @@ using GreenQloud.Persistence.SQLite;
         {
             //items exists on remote...
             for (int i = 0; i < remoteItems.Count; i++) {
-                RepositoryItem item = remoteItems [i];
-                Event e = SolveFromRemote (item);
-                localItems.RemoveAll( it => it.Key == item.Key);
+                RepositoryItem item1 = remoteItems [i];
+                Event e = SolveFromRemote (item1);
+                localItems.RemoveAll( it => it.Key == item1.Key);
                 if (e != null) {
                     if ((e.EventType == EventType.DELETE || e.EventType == EventType.MOVE) && e.Item.IsFolder) {
-                        localItems.RemoveAll( it => it.Key.StartsWith(item.Key));
-                        remoteItems.RemoveAll( it => it.Key.StartsWith(item.Key));
+                        localItems.RemoveAll( it => it.Key.StartsWith(item1.Key));
+                        remoteItems.RemoveAll( it => it.Key.StartsWith(item1.Key));
                     }
                     eventDAO.Create (e);
                 }
@@ -56,12 +56,12 @@ using GreenQloud.Persistence.SQLite;
 
             //Items here is not on remote.... so, it only can be created or removed remote
             for (int i = 0; i < localItems.Count; i++) {
-                RepositoryItem item = localItems [i];
-                Event e = SolveFromLocal (item);
+                RepositoryItem item2 = localItems [i];
+                Event e = SolveFromLocal (item2);
                 if (e != null) {
                     if ((e.EventType == EventType.DELETE || e.EventType == EventType.MOVE) && e.Item.IsFolder) {
-                        localItems.RemoveAll( it => it.Key.StartsWith(item.Key));
-                        remoteItems.RemoveAll( it => it.Key.StartsWith(item.Key));
+                        localItems.RemoveAll( it => it.Key.StartsWith(item2.Key));
+                        remoteItems.RemoveAll( it => it.Key.StartsWith(item2.Key));
                     }
                     eventDAO.Create (e);
                 }
@@ -95,11 +95,12 @@ using GreenQloud.Persistence.SQLite;
                 if(e.Item.Id != 0 && e.Item.Moved == false){
                     e.RepositoryType = RepositoryType.LOCAL;
                     e.EventType = EventType.DELETE;
+                    return e;
                 } else {
                     e.RepositoryType = RepositoryType.REMOTE;
                     e.EventType = EventType.CREATE;
+                    return e;
                 }
-                return e;
             }
             return null;
         }

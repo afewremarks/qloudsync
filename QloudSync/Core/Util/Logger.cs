@@ -28,7 +28,12 @@ namespace GreenQloud {
 
         public static void LogInfo (string type, string message)
         {
-            string timestamp = GlobalDateTime.Now.ToString ("HH:mm:ss");
+            string timestamp;
+            try {
+                timestamp = GlobalDateTime.Now.ToString ("HH:mm:ss");
+            } catch {
+                timestamp = "[CANNOT GET DATE FROM SERVER!]";
+            }
             string line      = timestamp + " | " + type + " | " + message;
 
 #if DEBUG
