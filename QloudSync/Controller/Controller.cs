@@ -29,9 +29,9 @@ namespace GreenQloud {
 
 
         public IconController StatusIcon;
-        private StorageQloudLocalEventsSynchronizer localSynchronizer;
-        private AbstractSynchronizer<RemoteEventsSynchronizer> remoteSynchronizer;
-        private AbstractSynchronizer<RecoverySynchronizer> recoverySynchronizer;
+        private LocalEventsSynchronizer localSynchronizer;
+        private RemoteEventsSynchronizer remoteSynchronizer;
+        private RecoverySynchronizer recoverySynchronizer;
         private SynchronizerResolver synchronizerResolver;
 
         public double ProgressPercentage = 0.0;
@@ -180,7 +180,7 @@ namespace GreenQloud {
             synchronizerResolver = SynchronizerResolver.GetInstance();
             recoverySynchronizer = RecoverySynchronizer.GetInstance();
             remoteSynchronizer = RemoteEventsSynchronizer.GetInstance();
-            localSynchronizer = StorageQloudLocalEventsSynchronizer.GetInstance();
+            localSynchronizer = LocalEventsSynchronizer.GetInstance();
 
            recoverySynchronizer.Start();
            while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync);
@@ -264,9 +264,8 @@ namespace GreenQloud {
         public void FinishFetcher ()
         {  
             Logger.LogInfo ("Controller", "First load sucessfully");
-            FolderFetched (localSynchronizer.Warnings);
+            //FolderFetched (localSynchronizer.Warnings);
             new Thread (() => CreateStartupItem ()).Start ();
-            //InitializeSynchronizers ();
         }
 
         public void CreateStartupItem ()

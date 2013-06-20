@@ -10,49 +10,38 @@ using GreenQloud.Repository;
 
 namespace GreenQloud.Synchrony
 {
-    public class StorageQloudLocalEventsSynchronizer : AbstractLocalEventsSynchronizer
+    public class LocalEventsSynchronizer : AbstractSynchronizer<LocalEventsSynchronizer>
     {
-        static StorageQloudLocalEventsSynchronizer instance;
-
-        Dictionary<string, QloudSyncFileSystemWatcher> watchers;
-        SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
-        SQLiteEventDAO eventDAO = new SQLiteEventDAO();
-        Thread watchersThread;
+        private Dictionary<string, QloudSyncFileSystemWatcher> watchers;
+        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
+        private Thread watcherThread;
 
         
  
         public event Action Failed = delegate { };
-        
         public event FinishedEventHandler Finished = delegate { };
         public delegate void FinishedEventHandler ();
-
         private Event LastLocalEvent = new Event();
         private DateTime LastTimeSync = new DateTime();
-        private StorageQloudLocalEventsSynchronizer () : base ()
+
+        public LocalEventsSynchronizer () : base ()
         {
-            watchersThread = new Thread(()=>{
+            watcherThread = new Thread(()=>{
                 watchers = new Dictionary<string, QloudSyncFileSystemWatcher>();
                 foreach (LocalRepository repo in repositoryDAO.All){ 
                     QloudSyncFileSystemWatcher watcher = new QloudSyncFileSystemWatcher(repo.Path);
                     watcher.Changed += delegate(Event e) {
                         Logger.LogEvent("EVENT FOUND", e);
-                        try{
-                            CreateEvent (e);
-                        } catch (DisconnectionException) {
-                            //SyncStatus = SyncStatus.IDLE;
-                            Program.Controller.HandleDisconnection();
-                        }
+                        CreateEvent (e);
                     };
                     watchers.Add (repo.Path, watcher);
                 }
-            
             });
         }
 
-        public static StorageQloudLocalEventsSynchronizer GetInstance(){
-            if (instance == null)
-                instance = new StorageQloudLocalEventsSynchronizer ();
-            return instance;
+        public override void Run(){
+            watcherThread.Start ();
         }
 
         public QloudSyncFileSystemWatcher GetWatcher(string path){
@@ -69,7 +58,7 @@ namespace GreenQloud.Synchrony
             return null;
         }
 
-        void CreateEvent (Event e)
+        public void CreateEvent (Event e)
         {
             Create(e);
 
@@ -77,25 +66,9 @@ namespace GreenQloud.Synchrony
             LastTimeSync = GlobalDateTime.Now;
         }
 
-        public ThreadState ControllerStatus{
-            get{
-                return watchersThread.ThreadState;
-            }
-        }
-
-        protected List<string> warnings = new List<string> ();
-        protected List<string> errors   = new List<string> ();
-
-        public string [] Warnings {
-            get {
-                return this.warnings.ToArray ();
-            }
-        }
-        
-        public string [] Errors {
-            get {
-                return this.errors.ToArray ();
-            }
+        public void Create (Event e){       
+            e.RepositoryType = RepositoryType.LOCAL;
+            eventDAO.Create (e);
         }
     }
 }

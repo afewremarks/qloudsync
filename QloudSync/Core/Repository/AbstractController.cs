@@ -9,7 +9,7 @@ namespace GreenQloud.Repository
 
             protected static void BlockWatcher (string path)
             {
-                QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (path);
+                QloudSyncFileSystemWatcher watcher = LocalEventsSynchronizer.GetInstance ().GetWatcher (path);
                 if(watcher != null){
                     watcher.Block (path);
                 }
@@ -18,7 +18,7 @@ namespace GreenQloud.Repository
 
             protected static void UnblockWatcher (string path)
             {
-                QloudSyncFileSystemWatcher watcher = StorageQloudLocalEventsSynchronizer.GetInstance ().GetWatcher (path);
+                QloudSyncFileSystemWatcher watcher = LocalEventsSynchronizer.GetInstance ().GetWatcher (path);
                 if (watcher != null) {
                     Thread.Sleep (1000);
                     watcher.Unblock (path);
