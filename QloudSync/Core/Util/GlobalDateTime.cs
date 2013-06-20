@@ -13,30 +13,48 @@ namespace GreenQloud
 	{
         public static DateTime Now {
             get{
-
-                System.Net.WebRequest myReq = System.Net.WebRequest.Create ("https://my.greenqloud.com/qloudsync/servertime");
-                string receiveContent = string.Empty;
-                try {
-                    using (System.Net.WebResponse wr = myReq.GetResponse ()) {
-                        Stream receiveStream = wr.GetResponseStream ();
-                        StreamReader reader = new StreamReader (receiveStream, System.Text.Encoding.UTF8);
-                        receiveContent = reader.ReadToEnd ();
-
-                    }
-
-                    DateTime date = (DateTime) Newtonsoft.Json.Linq.JObject.Parse(receiveContent)["serverTime"];
-                    return date;
-                } catch (Exception e){
-                    Logger.LogInfo("ERROR", "Cannot find global time on server.");
-                    Logger.LogInfo("ERROR", e);
-                    throw new DisconnectionException ();
-                }
+                return NowFromDiff;
             }
         }
+        public static DateTime NowFromDiff {
+            get {
+                SQLiteTimeDiffDAO dao = new SQLiteTimeDiffDAO ();
+                double diff = dao.Last;
+                DateTime local = DateTime.Now;
+                return local.AddMilliseconds(diff);
+            }
+        }
+
+        public static DateTime NowRemote {
+            get{
+                DateTime date;
+                System.Net.WebRequest myReq = System.Net.WebRequest.Create ("https://my.greenqloud.com/qloudsync/servertime");
+                string receiveContent = string.Empty;
+
+                using (System.Net.WebResponse wr = myReq.GetResponse ()) {
+                    Stream receiveStream = wr.GetResponseStream ();
+                    StreamReader reader = new StreamReader (receiveStream, System.Text.Encoding.UTF8);
+                    receiveContent = reader.ReadToEnd ();
+
+                }
+
+                date = (DateTime) Newtonsoft.Json.Linq.JObject.Parse(receiveContent)["serverTime"];
+                return date;
+            }
+        }
+
         public static string NowUniversalString {
             get{
-                return Now.ToUniversalTime ().ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                return Now.ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
             }
+        }
+
+        public static void CalcTimeDiff() {
+            SQLiteTimeDiffDAO dao = new SQLiteTimeDiffDAO ();
+            DateTime remoteDate = GlobalDateTime.NowRemote;
+            DateTime localDate = DateTime.Now;
+            double diff = (remoteDate - localDate).TotalMilliseconds;
+            dao.Create (diff);
         }
 
 	}

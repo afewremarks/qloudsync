@@ -45,19 +45,14 @@ namespace GreenQloud
         {
             System.Net.WebRequest myReq = System.Net.WebRequest.Create (url);
             string receiveContent = string.Empty;
-            try {
-                using (System.Net.WebResponse wr = myReq.GetResponse ()) {
-                    Stream receiveStream = wr.GetResponseStream ();
-                    StreamReader reader = new StreamReader (receiveStream, System.Text.Encoding.UTF8);
-                    receiveContent = reader.ReadToEnd ();
-                    
-                }
+            using (System.Net.WebResponse wr = myReq.GetResponse ()) {
+                Stream receiveStream = wr.GetResponseStream ();
+                StreamReader reader = new StreamReader (receiveStream, System.Text.Encoding.UTF8);
+                receiveContent = reader.ReadToEnd ();
+                
+            }
                 
                 return Newtonsoft.Json.Linq.JArray.Parse(receiveContent);
-            } catch (Exception e){
-                Console.WriteLine(e.Data);
-                throw new DisconnectionException();
-            }
         }
 
 
