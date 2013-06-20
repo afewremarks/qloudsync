@@ -183,12 +183,15 @@ namespace GreenQloud {
             localSynchronizer = StorageQloudLocalEventsSynchronizer.GetInstance();
 
            recoverySynchronizer.Start();
+           while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync);
+           synchronizerResolver.Start (); 
+
            while(recoverySynchronizer.IsAlive)
                 Thread.Sleep (1000);
 
             localSynchronizer.Start();
             remoteSynchronizer.Start();
-            synchronizerResolver.Start();
+
                         
             ProgressChanged += delegate (double percentage, double speed) {
                 ProgressPercentage = percentage;
