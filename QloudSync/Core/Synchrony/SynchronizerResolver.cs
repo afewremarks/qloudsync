@@ -140,6 +140,8 @@ namespace GreenQloud.Synchrony
 
         private bool VerifyIgnore (Event e)
         {
+            if (e.Item.Key.StartsWith ("."))
+                return true;
             if(e.RepositoryType == RepositoryType.REMOTE)
                return VerifyIgnoreRemote (e);
             if(e.RepositoryType == RepositoryType.LOCAL)
@@ -223,7 +225,7 @@ namespace GreenQloud.Synchrony
                     case EventType.MOVE:
                         UpdateETag (e);
                         e.Item.Moved = true;
-                        repositoryItemDAO.Update (e.Item);
+                        repositoryItemDAO.MarkAsMoved (e.Item);
                         break;
                     case EventType.CREATE:
                         UpdateETag (e);
@@ -236,7 +238,7 @@ namespace GreenQloud.Synchrony
                         break;
                     case EventType.DELETE:
                         e.Item.Moved = true;
-                        repositoryItemDAO.Update (e.Item);
+                        repositoryItemDAO.MarkAsMoved (e.Item);
                     break;
                 }
             }else{
@@ -244,7 +246,7 @@ namespace GreenQloud.Synchrony
                     case EventType.MOVE:
                         UpdateETag (e);
                         e.Item.Moved = true;
-                        repositoryItemDAO.Update (e.Item);
+                        repositoryItemDAO.MarkAsMoved (e.Item);
                         break;
                     case EventType.CREATE:
                         UpdateETag (e);
@@ -257,14 +259,13 @@ namespace GreenQloud.Synchrony
                         break;
                     case EventType.DELETE:
                         e.Item.Moved = true;
-                        repositoryItemDAO.Update (e.Item);
+                        repositoryItemDAO.MarkAsMoved (e.Item);
                     break;
                 }                
             }
         }
 
 
-        //TODO VERIFY!
         void UpdateETag (Event e)
         {
             if (e.Item.ResultItem != null) {

@@ -86,10 +86,14 @@ namespace GreenQloud.Persistence.SQLite
             //database.ExecuteNonQuery (sql);
         }
 
-        //TODO DONT NEED
         public override void MarkAsMoved (RepositoryItem item)
         {
-            string sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" ", bool.TrueString, item.Id);
+            item.Moved = true;
+            string sql;
+            if(item.IsFolder)
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" AND Key LIKE '{2}%' ", bool.TrueString, item.Id, item.Key);
+            else
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" ", bool.TrueString, item.Id);
             database.ExecuteNonQuery (sql);
         }
 

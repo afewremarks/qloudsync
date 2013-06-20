@@ -20,41 +20,52 @@ using GreenQloud.Persistence.SQLite;
         public RecoverySynchronizer () : base () { }
 
         public override void Run() {
-            while (true) {
-                Synchronize ();
-            }
+            Synchronize ();
         }
 
+        private bool startedSync = false;
+        public bool StartedSync{
+            get {
+                return startedSync;
+            }
+        }
         public void Synchronize (){
             eventDAO.RemoveAllUnsynchronized();
+            startedSync = true; //only after remove all unsync events.
 
             List<RepositoryItem> localItems = localRepository.Items;
             List<RepositoryItem> remoteItems = remoteRepository.Items;
             SolveItems (localItems, remoteItems);
-
-            Abort();//TODO remove this...
         }
 
         void SolveItems (List<RepositoryItem> localItems, List<RepositoryItem> remoteItems)
         {
             //items exists on remote...
-            foreach (RepositoryItem item in remoteItems) {
+            for (int i = 0; i < remoteItems.Count; i++) {
+                RepositoryItem item = remoteItems [i];
                 Event e = SolveFromRemote (item);
-                localItems.RemoveAll( i => i.Key == item.Key);
+                localItems.RemoveAll( it => it.Key == item.Key);
                 if (e != null) {
+                    if ((e.EventType == EventType.DELETE || e.EventType == EventType.MOVE) && e.Item.IsFolder) {
+                        localItems.RemoveAll( it => it.Key.StartsWith(item.Key));
+                        remoteItems.RemoveAll( it => it.Key.StartsWith(item.Key));
+                    }
                     eventDAO.Create (e);
                 }
             }
 
             //Items here is not on remote.... so, it only can be created or removed remote
-            foreach (RepositoryItem item in localItems) {
+            for (int i = 0; i < localItems.Count; i++) {
+                RepositoryItem item = localItems [i];
                 Event e = SolveFromLocal (item);
                 if (e != null) {
+                    if ((e.EventType == EventType.DELETE || e.EventType == EventType.MOVE) && e.Item.IsFolder) {
+                        localItems.RemoveAll( it => it.Key.StartsWith(item.Key));
+                        remoteItems.RemoveAll( it => it.Key.StartsWith(item.Key));
+                    }
                     eventDAO.Create (e);
                 }
             }
-
-            SynchronizerResolver.GetInstance ().SolveAll ();
         }
 
 
