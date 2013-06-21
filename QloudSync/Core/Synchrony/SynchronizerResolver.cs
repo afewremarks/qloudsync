@@ -68,14 +68,16 @@ namespace GreenQloud.Synchrony
 
         public void SolveAll ()
         {
-            eventsToSync = eventDAO.EventsNotSynchronized.Count;
-            while (eventDAO.EventsNotSynchronized.Count > 0) {
-                Event eventNotSynchronized = eventDAO.EventsNotSynchronized.First();
+            List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
+            eventsToSync = eventsNotSynchronized.Count;
+            while (eventsNotSynchronized.Count > 0) {
+                Event eventNotSynchronized = eventsNotSynchronized.First();
                 Synchronize (eventNotSynchronized);
-                Thread.Sleep (1000);
+                eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
             }
             SyncStatus = SyncStatus.IDLE;
             Done = true;
+            Thread.Sleep (1000);
         }
 
         //TODO refactor ignores
