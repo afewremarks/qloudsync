@@ -28,9 +28,20 @@ using System.IO;
             OS = GlobalSettings.OSVersion;
             Bucket = RuntimeSettings.DefaultBucketName;
 		}
+
         public RepositoryItem Item{
 			set; get;
 		}
+
+        public bool HaveResultItem {
+            get {
+                if (Item != null && Item.ResultItem != null && 
+                    (this.EventType != EventType.CREATE && this.EventType != EventType.UPDATE && this.EventType != EventType.NULL && this.EventType != EventType.DELETE))//TODO MOVE TO TRASH WILL GENERATE RESULT ITEM
+                    return true;
+
+                return false;
+            }
+        }
 
         public EventType EventType{
 			set; get;

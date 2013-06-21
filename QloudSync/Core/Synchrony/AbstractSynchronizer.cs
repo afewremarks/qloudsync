@@ -46,7 +46,7 @@ namespace GreenQloud.Synchrony
                 _thread.Start();
         }
         public void Join() { _thread.Join(); }
-        public bool IsAlive { get { return _thread.IsAlive; } }
+        public bool IsAlive { get { return _thread != null && _thread.IsAlive; } }
         public void Kill () { 
             _stoped = true;
             _thread = null;
@@ -54,14 +54,16 @@ namespace GreenQloud.Synchrony
 
         void GenericRun ()
         {
-            try {
+            //try {
                 Run();
-            } catch (WebException webx) {
+            /*} catch (WebException webx) {
                 if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
                     Logger.LogInfo ("LOST CONNECTION", webx);
                     Program.Controller.HandleDisconnection ();
                 } else {
-                    throw webx;
+                    Logger.LogInfo ("SYNCHRONIZER ERROR", webx);
+                    Logger.LogInfo ("INFO", "Preparing to run rescue mode...");
+                    Program.Controller.HandleError ();
                 }
             } catch (SocketException sock) {
                 Logger.LogInfo ("LOST CONNECTION", sock);
@@ -70,7 +72,7 @@ namespace GreenQloud.Synchrony
                 Logger.LogInfo ("SYNCHRONIZER ERROR", e);
                 Logger.LogInfo ("INFO", "Preparing to run rescue mode...");
                 Program.Controller.HandleError ();
-            }
+            }*/
         }
 
         #region Abstract Methods

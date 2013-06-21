@@ -110,14 +110,15 @@ using GreenQloud.Persistence.SQLite;
             Event e = new Event ();
             e.Item = item;
             if (localRepository.Exists (e.Item)) {
-                if (e.Item.Id == 0) {
+                if (e.Item.UpdatedAt == null) {
                     e.RepositoryType = RepositoryType.LOCAL;
                     e.EventType = EventType.CREATE;
-                } else {
+                    return e;
+                } else if (!remoteRepository.Exists(e.Item)) {
                     e.RepositoryType = RepositoryType.REMOTE;
                     e.EventType = EventType.DELETE;
+                    return e;
                 }
-                return e;
             }
             return null;
         }
