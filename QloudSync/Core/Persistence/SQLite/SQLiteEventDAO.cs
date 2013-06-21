@@ -57,8 +57,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public override List<Event> EventsNotSynchronized {
             get {
-                List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\"", bool.FalseString));
-
+                List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\" ORDER BY EventID ASC", bool.FalseString));
                 return list;
             }
         }

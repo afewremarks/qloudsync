@@ -71,6 +71,11 @@ namespace GreenQloud.Model
             set;
         }
 
+        public string UpdatedAt {
+            get;
+            set;
+        }
+
         public string Name{
             get {
                return Key.Substring (Key.LastIndexOf(Path.DirectorySeparatorChar.ToString())+1);

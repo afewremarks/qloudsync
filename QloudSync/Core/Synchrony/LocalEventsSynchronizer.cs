@@ -16,14 +16,8 @@ namespace GreenQloud.Synchrony
         private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
         private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
         private Thread watcherThread;
-
-        
- 
-        public event Action Failed = delegate { };
-        public event FinishedEventHandler Finished = delegate { };
         public delegate void FinishedEventHandler ();
-        private Event LastLocalEvent = new Event();
-        private DateTime LastTimeSync = new DateTime();
+        object _lock = new object();
 
         public LocalEventsSynchronizer () : base ()
         {
@@ -32,8 +26,10 @@ namespace GreenQloud.Synchrony
                 foreach (LocalRepository repo in repositoryDAO.All){ 
                     QloudSyncFileSystemWatcher watcher = new QloudSyncFileSystemWatcher(repo.Path);
                     watcher.Changed += delegate(Event e) {
-                        Logger.LogEvent("EVENT FOUND", e);
-                        CreateEvent (e);
+                        lock(_lock){
+                            Logger.LogEvent("EVENT FOUND", e);
+                            CreateEvent (e);
+                        }
                     };
                     watchers.Add (repo.Path, watcher);
                 }
@@ -41,7 +37,8 @@ namespace GreenQloud.Synchrony
         }
 
         public override void Run(){
-            watcherThread.Start ();
+            if(!watcherThread.IsAlive)
+                watcherThread.Start ();
         }
 
         public QloudSyncFileSystemWatcher GetWatcher(string path){
@@ -60,10 +57,8 @@ namespace GreenQloud.Synchrony
 
         public void CreateEvent (Event e)
         {
-            Create(e);
-
-            LastLocalEvent = e;
-            LastTimeSync = GlobalDateTime.Now;
+            if(!_stoped)
+                Create(e);
         }
 
         public void Create (Event e){       

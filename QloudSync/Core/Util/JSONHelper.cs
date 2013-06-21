@@ -71,7 +71,7 @@ namespace GreenQloud
 
 
                 json = "{\"action\":\""+e.EventType+"\"," +
-                    "\"application\":\""+GlobalSettings.FullApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\""+GlobalSettings.DeviceIdHash+"\"," + "\"hash\":\""+e.Item.ETag+"\"," + "\"object\":\"" + e.Item.Key +"\"," + "\"os\":\""+GlobalSettings.OSVersion+"\"," + "\"resultObject\":\""+( e.Item.ResultItem != null ? e.Item.ResultItem.Key : "")+"\"," + "\"username\":\""+Credential.Username+"\"}";
+                    "\"application\":\""+GlobalSettings.FullApplicationName+"\"," + "\"applicationVersion\":\""+GlobalSettings.RunningVersion+"\"," + "\"bucket\":\""+Credential.Username+""+GlobalSettings.SuffixNameBucket+"\"," + "\"deviceId\":\""+GlobalSettings.DeviceIdHash+"\"," + "\"hash\":\""+e.Item.ETag+"\"," + "\"object\":\"" + e.Item.Key +"\"," + "\"os\":\""+GlobalSettings.OSVersion+"\"," + "\"resultObject\":\""+( e.HaveResultItem ? e.Item.ResultItem.Key : "")+"\"," + "\"username\":\""+Credential.Username+"\"}";
 
                 streamWriter.Write(json);
                 streamWriter.Flush();

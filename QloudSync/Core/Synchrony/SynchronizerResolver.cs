@@ -14,6 +14,7 @@ using GreenQloud.Util;
 using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
 using GreenQloud.Persistence.SQLite;
+using System.Net.Sockets;
 
 namespace GreenQloud.Synchrony
 {
@@ -67,21 +68,20 @@ namespace GreenQloud.Synchrony
 
         public void SolveAll ()
         {
-            List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized;
-            eventsToSync = eventsNotSynchronized.Count;
-            while (eventsNotSynchronized.Count > 0) {
-                Synchronize (eventsNotSynchronized [0]);
-                eventsNotSynchronized = eventDAO.EventsNotSynchronized;
+            eventsToSync = eventDAO.EventsNotSynchronized.Count;
+            while (eventDAO.EventsNotSynchronized.Count > 0) {
+                Event eventNotSynchronized = eventDAO.EventsNotSynchronized.First();
+                Synchronize (eventNotSynchronized);
+                Thread.Sleep (1000);
             }
             SyncStatus = SyncStatus.IDLE;
             Done = true;
-            Thread.Sleep (1000);
         }
 
         //TODO refactor ignores
         private bool VerifyIgnoreRemote (Event remoteEvent)
         {
-            if(remoteEvent.Item.ResultItem == null){
+            if(!remoteEvent.HaveResultItem){
                 if (!remoteEvent.Item.IsFolder) {
                     if (remoteRepository.Exists(remoteEvent.Item) && remoteRepository.GetMetadata(remoteEvent.Item.Key).ContentLength == 0)
                         return true;
@@ -91,7 +91,7 @@ namespace GreenQloud.Synchrony
         }
         private bool VerifyIgnoreLocal (Event localEvent)
         {
-            if(localEvent.Item.ResultItem == null){
+            if(!localEvent.HaveResultItem){
                 if (!localEvent.Item.IsFolder) {
                     FileInfo fi = new FileInfo (localEvent.Item.LocalAbsolutePath);
                     if (fi.Exists && fi.Length == 0)
@@ -113,8 +113,6 @@ namespace GreenQloud.Synchrony
         }
 
         void Synchronize(Event e){
-            //Log try...
-
             if (VerifyIgnore (e)) {
                 eventDAO.UpdateToSynchronized(e);
                 Logger.LogInfo ("EVENT IGNORE", "Ignore event on " + e.Item.LocalAbsolutePath);
@@ -217,12 +215,19 @@ namespace GreenQloud.Synchrony
                     break;
                 }                
             }
+
+            e.Item.UpdatedAt = GlobalDateTime.NowUniversalString;
+            repositoryItemDAO.Update (e.Item);
+            if(e.HaveResultItem){
+                e.Item.ResultItem.UpdatedAt = GlobalDateTime.NowUniversalString;
+                repositoryItemDAO.Update (e.Item.ResultItem);
+            }
         }
 
 
         void UpdateETag (Event e)
         {
-            if (e.Item.ResultItem != null) {
+            if (e.HaveResultItem) {
                 e.Item.ResultItem.ETag = remoteRepository.RemoteETAG (e.Item.ResultItem);
                 e.Item.ResultItem.LocalETag = new Crypto ().md5hash (e.Item.ResultItem);
                 if (!e.Item.ResultItem.ETag.Equals (e.Item.ResultItem.LocalETag))

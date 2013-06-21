@@ -18,7 +18,7 @@ namespace GreenQloud.Persistence.SQLite
             if (item.ResultItem != null)
                 Create (item.ResultItem);
 
-            item.Id = (int) database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Key, RepositoryId, IsFolder, ResultItemId, eTag, eTagLocal, Moved) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",'{4}','{5}', '{6}')", item.Key, item.Repository.Id, item.IsFolder, ((item.ResultItem == null) ? "" : item.ResultItem.Id.ToString()), item.ETag, item.LocalETag, item.Moved), true);
+            item.Id = (int) database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Key, RepositoryId, IsFolder, ResultItemId, eTag, eTagLocal, Moved, UpdatedAt) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",'{4}','{5}', '{6}', '{7}')", item.Key, item.Repository.Id, item.IsFolder, ((item.ResultItem == null) ? "" : item.ResultItem.Id.ToString()), item.ETag, item.LocalETag, item.Moved, item.UpdatedAt), true);
         }
         public RepositoryItem Create (Event e)
         {
@@ -39,7 +39,7 @@ namespace GreenQloud.Persistence.SQLite
                 Create (i.ResultItem);
             else if(i.ResultItem != null && i.ResultItem.Id != 0)
                  Update (i.ResultItem);
-            database.ExecuteNonQuery (string.Format("UPDATE REPOSITORYITEM SET  Key='{1}', RepositoryId='{2}', IsFolder='{3}', ResultItemId = '{4}', eTag = '{5}', eTagLocal = '{6}', Moved = '{7}' WHERE RepositoryItemID =\"{0}\"", i.Id, i.Key, i.Repository.Id, i.IsFolder, ((i.ResultItem == null) ? "" : i.ResultItem.Id.ToString()), i.ETag, i.LocalETag, i.Moved));
+            database.ExecuteNonQuery (string.Format("UPDATE REPOSITORYITEM SET  Key='{1}', RepositoryId='{2}', IsFolder='{3}', ResultItemId = '{4}', eTag = '{5}', eTagLocal = '{6}', Moved = '{7}', UpdatedAt = '{8}' WHERE RepositoryItemID =\"{0}\"", i.Id, i.Key, i.Repository.Id, i.IsFolder, ((i.ResultItem == null) ? "" : i.ResultItem.Id.ToString()), i.ETag, i.LocalETag, i.Moved, i.UpdatedAt));
         }
 
         public override List<RepositoryItem> All {
@@ -129,6 +129,8 @@ namespace GreenQloud.Persistence.SQLite
                 item.ETag = dr[5].ToString();
                 item.LocalETag = dr[6].ToString();
                 item.Moved = bool.Parse (dr[7].ToString());
+                if(dr[8].ToString().Length > 0)
+                item.UpdatedAt = dr[8].ToString();
 
                 items.Add (item);
             }

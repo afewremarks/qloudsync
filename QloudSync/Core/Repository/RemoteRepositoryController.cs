@@ -45,10 +45,21 @@ namespace GreenQloud.Repository
             return GetCopys(item).Count > 0;
         }
 
-        //TODO REFACTOR (make a query) 
         public bool Exists (RepositoryItem item)
         {
-            return Items.Any (rf => rf.Key == item.Key);
+            try{
+                S3Service service = connection.Connect ();
+
+                var request = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, item.Key, true);
+                using (GetObjectResponse response = request.GetResponse());
+            } catch (WebException webx) {
+                if (((HttpWebResponse)webx.Response).StatusCode == HttpStatusCode.NotFound)
+                    return false;
+                else
+                    throw webx;
+            }
+
+            return true;
         }
 
         #region Manage Itens
@@ -151,11 +162,18 @@ namespace GreenQloud.Repository
 
         public GetObjectResponse GetMetadata (string key)
         {
-            S3Service service = connection.Connect ();
+            try{
+                S3Service service = connection.Connect ();
 
-            var request = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, key, true);
-            using (GetObjectResponse response = request.GetResponse())
+                var request = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, key, true);
+                using (GetObjectResponse response = request.GetResponse())
                 return response;
+            } catch (WebException webx) {
+                if (((HttpWebResponse)webx.Response).StatusCode == HttpStatusCode.NotFound)
+                    return null;
+                else
+                    throw webx;
+            }
         }
 
         #endregion
