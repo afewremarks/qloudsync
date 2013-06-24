@@ -122,8 +122,8 @@ namespace GreenQloud.Synchrony
             }
             Logger.LogEvent("Event Synchronizing", e);
             if (e.RepositoryType == RepositoryType.LOCAL){
-                
                 SyncStatus = SyncStatus.UPLOADING;
+                Program.Controller.HandleSyncStatusChanged ();
 
                 switch (e.EventType){
                     case EventType.CREATE: 
@@ -141,21 +141,21 @@ namespace GreenQloud.Synchrony
                         break;
                 }
             }else{
+                SyncStatus = SyncStatus.DOWNLOADING;
+                Program.Controller.HandleSyncStatusChanged ();
+
                 switch (e.EventType){
                 case EventType.MOVE:
                     physicalLocalRepository.Move(e.Item);
                     break;
                 case EventType.CREATE: 
                 case EventType.UPDATE:
-                    SyncStatus = SyncStatus.DOWNLOADING;
                     remoteRepository.Download (e.Item);
                     break;
                 case EventType.COPY:
-                    SyncStatus = SyncStatus.DOWNLOADING;
                     physicalLocalRepository.Copy (e.Item);
                     break;
                 case EventType.DELETE:
-                    SyncStatus = SyncStatus.DOWNLOADING;
                     physicalLocalRepository.Delete (e.Item);
                     break;
                 }                
@@ -167,6 +167,10 @@ namespace GreenQloud.Synchrony
                 new JSONHelper().postJSON (e);
             }
             eventDAO.UpdateToSynchronized(e);
+
+            SyncStatus = SyncStatus.IDLE;
+            Program.Controller.HandleSyncStatusChanged ();
+
             Logger.LogEvent("DONE Event Synchronizing", e);
         }
 

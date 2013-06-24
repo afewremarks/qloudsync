@@ -205,13 +205,8 @@ namespace GreenQloud {
             Logger.LogInfo ("INFO", "Synchronizers Ready!");
         }
 
-        void HandleSyncStatusChanged (SyncStatus status)
+        public void HandleSyncStatusChanged ()
         {
-            if (status == SyncStatus.IDLE)
-            {
-                ProgressPercentage = 0.0;
-                ProgressSpeed = string.Empty;
-            }
             UpdateState ();
         }
         
