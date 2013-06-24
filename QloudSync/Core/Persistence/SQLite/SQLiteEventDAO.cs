@@ -18,7 +18,7 @@ namespace GreenQloud.Persistence.SQLite
         #region implemented abstract members of EventDAO
         SQLiteDatabase database = new SQLiteDatabase();
 
-        public override void Create (Event e)
+        public override void Create (Event e, bool cascade = true)
         {
             if (e == null)
                 return;
@@ -34,6 +34,9 @@ namespace GreenQloud.Persistence.SQLite
 
                     string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
                                               e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
+
+                    if(cascade)
+                        repositoryItemDAO.Update(e.Item);
 
                     e.Id = (int) database.ExecuteNonQuery (sql, true);
                 }catch(Exception err){
