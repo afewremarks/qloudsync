@@ -21,7 +21,7 @@ namespace GreenQloud.Repository
         List<RepositoryItem> GetCopys (RepositoryItem file);
         void Move (RepositoryItem item);
         string RemoteETAG (RepositoryItem item);
-        void Download (RepositoryItem request);
+        void Download (RepositoryItem request, bool recursive);
         void Upload (RepositoryItem request);
         void Delete(RepositoryItem request);
         void Copy (RepositoryItem item);

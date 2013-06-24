@@ -63,11 +63,12 @@ namespace GreenQloud.Repository
         }
 
         #region Manage Itens
-        public void Download (RepositoryItem item)
+        public void Download (RepositoryItem item, bool recursive = false)
         {
             if (item.IsFolder) {
                 physicalController.CreateFolder(item);
-                DownloadEntry(connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, item.Key), item);
+                if (recursive)
+                    DownloadEntry(connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, item.Key), item);
             } else {
                 GenericDownload (item.Key, item.LocalAbsolutePath);
             }
