@@ -22,7 +22,7 @@ namespace GreenQloud.Persistence.SQLite
         {
             if (e == null)
                 return;
-            e.Item = repositoryItemDAO.Create (e);
+            repositoryItemDAO.Create (e);
             bool noConflicts = !ExistsConflict(e);
 
            if (noConflicts){
@@ -35,7 +35,7 @@ namespace GreenQloud.Persistence.SQLite
                     string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
                                               e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
 
-                    database.ExecuteNonQuery (sql);
+                    e.Id = (int) database.ExecuteNonQuery (sql, true);
                 }catch(Exception err){
                     Logger.LogInfo("ERROR", err);
                 }
@@ -51,8 +51,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public override void UpdateToSynchronized (Event e)
         {            
-            int id = repositoryItemDAO.GetId(e.Item);
-            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\" WHERE ITEMID =\"{1}\"", bool.TrueString, id));
+            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\" WHERE EventID =\"{1}\"", bool.TrueString, e.Id));
         }
 
         public override List<Event> EventsNotSynchronized {
@@ -64,8 +63,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public override void SetEventType (Event e)
         {
-            int itemId = repositoryItemDAO.GetId (e.Item);
-            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  TYPE = \"{0}\" WHERE ITEMID =\"{1}\"", e.EventType, itemId));
+            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  TYPE = \"{0}\" WHERE EventID =\"{1}\"", e.EventType, e.Id));
         }
 
         public override void RemoveAllUnsynchronized ()
@@ -144,8 +142,8 @@ namespace GreenQloud.Persistence.SQLite
             DataTable dt = database.GetDataTable(sql);
             foreach(DataRow dr in dt.Rows){
                 Event e = new Event();
+                e.Id = int.Parse (dr[0].ToString());
                 e.Item = repositoryItemDAO.GetById (int.Parse (dr[1].ToString()));
-
                 e.EventType = (EventType) Enum.Parse(typeof(EventType), dr[2].ToString());
                 e.RepositoryType = (RepositoryType) Enum.Parse(typeof(RepositoryType),dr[3].ToString());
                 e.Synchronized = bool.Parse (dr[4].ToString());

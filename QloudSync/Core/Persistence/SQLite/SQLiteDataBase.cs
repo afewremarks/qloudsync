@@ -162,7 +162,8 @@ namespace GreenQloud.Persistence.SQLite{
                 string last_insert_rowid = @"select last_insert_rowid()";
                 mycommand.CommandText = last_insert_rowid; 
                 System.Object temp = mycommand.ExecuteScalar();
-                return int.Parse (temp.ToString());
+                int id = int.Parse (temp.ToString());
+                return id;
             }
 
             close(ref cnn, ref mycommand);

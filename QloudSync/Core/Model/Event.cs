@@ -29,6 +29,11 @@ using System.IO;
             Bucket = RuntimeSettings.DefaultBucketName;
 		}
 
+        public int Id {
+            get;
+            set;
+        }
+
         public RepositoryItem Item{
 			set; get;
 		}
