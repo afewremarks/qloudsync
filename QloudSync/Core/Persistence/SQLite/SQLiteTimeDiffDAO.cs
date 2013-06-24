@@ -15,7 +15,7 @@ namespace GreenQloud.Persistence.SQLite
         SQLiteDatabase database = new SQLiteDatabase ();
         public override void Create (double e)
         {
-            database.ExecuteNonQuery (string.Format("INSERT INTO TimeDiff (Diff) VALUES (\"{0}\")", e));
+            database.ExecuteNonQuery (string.Format("INSERT INTO TimeDiff (Diff) VALUES ('{0}')", e));
         }
         public override double Last {
             get {        
