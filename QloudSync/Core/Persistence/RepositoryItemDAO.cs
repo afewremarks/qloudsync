@@ -12,6 +12,7 @@ namespace GreenQloud.Persistence
         public abstract void Update (RepositoryItem i);
         public abstract void Create (RepositoryItem e);
         public abstract void MarkAsMoved (RepositoryItem item);
+        public abstract void MarkAsUnmoved (RepositoryItem item);
         public abstract List<RepositoryItem> All{
             get;
         }

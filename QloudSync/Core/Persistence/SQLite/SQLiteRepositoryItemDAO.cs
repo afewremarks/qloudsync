@@ -27,7 +27,6 @@ namespace GreenQloud.Persistence.SQLite
             } else {
                 Update (e.Item);
             }
-
             e.Item.Id = GetId (e.Item);
             return e.Item;
         }
@@ -96,7 +95,16 @@ namespace GreenQloud.Persistence.SQLite
                 sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" ", bool.TrueString, item.Id);
             database.ExecuteNonQuery (sql);
         }
-
+        public override void MarkAsUnmoved (RepositoryItem item)
+        {
+            item.Moved = true;
+            string sql;
+            if(item.IsFolder)
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" AND Key LIKE '{2}%' ", bool.FalseString, item.Id, item.Key);
+            else
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" ", bool.FalseString, item.Id);
+            database.ExecuteNonQuery (sql);
+        }
         public int GetId (RepositoryItem item)
         {
             if (Exists (item)){

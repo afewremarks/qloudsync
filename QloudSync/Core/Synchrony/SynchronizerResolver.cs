@@ -56,6 +56,14 @@ namespace GreenQloud.Synchrony
         public int EventsToSync{
             get { return eventsToSync; }
         }
+
+        //TODO CREATE a query for this
+        public string[] Warnings {
+            get {
+                return new string[0];
+            }
+        }
+
         public bool Done {
             set; get;
         }
@@ -185,7 +193,7 @@ namespace GreenQloud.Synchrony
                         e.Item.Moved = true;
                         repositoryItemDAO.MarkAsMoved (e.Item);
                         break;
-                    case EventType.CREATE:
+                case EventType.CREATE:
                         UpdateETag (e);
                         break;
                     case EventType.UPDATE:

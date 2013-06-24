@@ -235,19 +235,19 @@ namespace GreenQloud {
                 InitializeSynchronizers();
 
 
-                Thread.Sleep (1000);
+                /*Thread.Sleep (1000);
 
                 int eventsToSync = synchronizerResolver.EventsToSync;
                 int totalEventsToSync = eventsToSync;
 
-                while(eventsToSync > 0){
+                while(recoverySynchronizer.IsAlive){
 
                     double percent = 100 - (100*eventsToSync/totalEventsToSync);
 
                     ProgressChanged (percent , 0.0);
                     eventsToSync = synchronizerResolver.EventsToSync;
                     Thread.Sleep (1000);
-                }
+                }*/
             }catch (Exception e) {                
                 Logger.LogInfo ("Initial Sync Error", e.Message+"\n "+e.StackTrace);
             }
@@ -256,7 +256,7 @@ namespace GreenQloud {
         public void FinishFetcher ()
         {  
             Logger.LogInfo ("Controller", "First load sucessfully");
-            //FolderFetched (localSynchronizer.Warnings);
+            FolderFetched (synchronizerResolver.Warnings);
             new Thread (() => CreateStartupItem ()).Start ();
         }
 
