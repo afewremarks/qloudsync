@@ -6,7 +6,7 @@ namespace GreenQloud.Persistence
 {
     public abstract class EventDAO
     {
-        public abstract void Create (Event e);
+        public abstract void Create (Event e, bool cascade);
         public abstract List<Event> All{
             get;
         }
