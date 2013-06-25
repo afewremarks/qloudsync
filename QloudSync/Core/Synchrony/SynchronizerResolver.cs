@@ -231,10 +231,10 @@ namespace GreenQloud.Synchrony
             }
 
             e.Item.UpdatedAt = GlobalDateTime.NowUniversalString;
-            repositoryItemDAO.Update (e.Item);
+            repositoryItemDAO.ActualizeUpdatedAt (e.Item);
             if(e.HaveResultItem){
                 e.Item.ResultItem.UpdatedAt = GlobalDateTime.NowUniversalString;
-                repositoryItemDAO.Update (e.Item.ResultItem);
+                repositoryItemDAO.ActualizeUpdatedAt (e.Item.ResultItem);
             }
         }
 
@@ -253,7 +253,7 @@ namespace GreenQloud.Synchrony
                     throw new QloudSync.VerificationException ();
             }
 
-            repositoryItemDAO.Update (e.Item);
+            repositoryItemDAO.UpdateETAG (e.Item);
         }
     }
 }

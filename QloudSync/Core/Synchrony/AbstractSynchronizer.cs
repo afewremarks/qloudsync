@@ -54,9 +54,9 @@ namespace GreenQloud.Synchrony
 
         void GenericRun ()
         {
-            //try {
+            try {
                 Run();
-            /*} catch (WebException webx) {
+            } catch (WebException webx) {
                 if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
                     Logger.LogInfo ("LOST CONNECTION", webx);
                     Program.Controller.HandleDisconnection ();
@@ -72,7 +72,7 @@ namespace GreenQloud.Synchrony
                 Logger.LogInfo ("SYNCHRONIZER ERROR", e);
                 Logger.LogInfo ("INFO", "Preparing to run rescue mode...");
                 Program.Controller.HandleError ();
-            }*/
+            }
         }
 
         #region Abstract Methods
