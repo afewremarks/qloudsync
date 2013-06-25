@@ -103,8 +103,8 @@ namespace GreenQloud.Repository.Local
         {
             string path = item.ResultItem.LocalAbsolutePath;
 
-            if (!Exists(item))
-                return;
+            if (Exists (item.ResultItem))
+                Delete (item.ResultItem);
             if (item.IsFolder)
             {
                 if(!Directory.Exists(path)){
@@ -120,8 +120,8 @@ namespace GreenQloud.Repository.Local
         {
             string path = item.ResultItem.LocalAbsolutePath;
 
-            if (!Exists(item))
-                return;
+            if (Exists (item.ResultItem))
+                Delete (item.ResultItem);
             if (item.IsFolder)
             {
                 MoveDir(item.LocalAbsolutePath, path);

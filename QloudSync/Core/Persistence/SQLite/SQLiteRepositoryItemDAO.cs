@@ -95,6 +95,15 @@ namespace GreenQloud.Persistence.SQLite
                 sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" ", bool.TrueString, item.Id);
             database.ExecuteNonQuery (sql);
         }
+
+        public override void ActualizeUpdatedAt (RepositoryItem item){
+            string sql = string.Format("UPDATE REPOSITORYITEM SET UpdatedAt = \"{0}\" WHERE RepositoryItemID = \"{1}\" ", item.UpdatedAt, item.Id);
+            database.ExecuteNonQuery (sql);
+        }
+        public override void UpdateETAG (RepositoryItem item){
+            string sql = string.Format("UPDATE REPOSITORYITEM SET  eTag = '{0}', eTagLocal = '{1}' WHERE RepositoryItemID = \"{1}\" ", item.ETag, item.LocalETag, item.Id);
+            database.ExecuteNonQuery (sql);
+        }
         public override void MarkAsUnmoved (RepositoryItem item)
         {
             item.Moved = true;
