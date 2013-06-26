@@ -191,8 +191,8 @@ namespace GreenQloud {
             remoteSynchronizer = RemoteEventsSynchronizer.GetInstance();
             localSynchronizer = LocalEventsSynchronizer.GetInstance();
 
-           //recoverySynchronizer.Start();
-           //while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync);
+           recoverySynchronizer.Start();
+           while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync);
            synchronizerResolver.Start (); 
 
            while(recoverySynchronizer.IsAlive)
