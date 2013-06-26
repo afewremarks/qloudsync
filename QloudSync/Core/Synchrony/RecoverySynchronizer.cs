@@ -29,6 +29,13 @@ using GreenQloud.Persistence.SQLite;
                 return startedSync;
             }
         }
+        
+        private bool finishedSync = false;
+        public bool FinishedSync{
+            get {
+                return finishedSync;
+            }
+        }
         public void Synchronize (){
             eventDAO.RemoveAllUnsynchronized();
             startedSync = true; //only after remove all unsync events.
@@ -36,6 +43,8 @@ using GreenQloud.Persistence.SQLite;
             List<RepositoryItem> localItems = localRepository.Items;
             List<RepositoryItem> remoteItems = remoteRepository.Items;
             SolveItems (localItems, remoteItems);
+
+            finishedSync = true;
         }
 
         void SolveItems (List<RepositoryItem> localItems, List<RepositoryItem> remoteItems)

@@ -184,25 +184,30 @@ namespace GreenQloud {
         }
         public void InitializeSynchronizers ()
         {
-            Logger.LogInfo ("INFO", "Initializing Synchronizers!");
+            try{
+                Logger.LogInfo ("INFO", "Initializing Synchronizers!");
 
-            synchronizerResolver = SynchronizerResolver.GetInstance();
-            recoverySynchronizer = RecoverySynchronizer.GetInstance();
-            remoteSynchronizer = RemoteEventsSynchronizer.GetInstance();
-            localSynchronizer = LocalEventsSynchronizer.GetInstance();
+                synchronizerResolver = SynchronizerResolver.GetInstance();
+                recoverySynchronizer = RecoverySynchronizer.GetInstance();
+                remoteSynchronizer = RemoteEventsSynchronizer.GetInstance();
+                localSynchronizer = LocalEventsSynchronizer.GetInstance();
 
-           recoverySynchronizer.Start();
-           while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync);
-           synchronizerResolver.Start (); 
+               recoverySynchronizer.Start();
+               while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync);
+               synchronizerResolver.Start (); 
 
-           while(recoverySynchronizer.IsAlive)
-                Thread.Sleep (1000);
+                while(!recoverySynchronizer.FinishedSync){
+                    Thread.Sleep (1000);
+                }
 
-            localSynchronizer.Start();
-            remoteSynchronizer.Start();
+                localSynchronizer.Start();
+                remoteSynchronizer.Start();
 
 
-            Logger.LogInfo ("INFO", "Synchronizers Ready!");
+                Logger.LogInfo ("INFO", "Synchronizers Ready!");
+            }catch (Exception e){
+                Console.WriteLine (e.Message);
+            }
         }
 
         public void HandleSyncStatusChanged ()

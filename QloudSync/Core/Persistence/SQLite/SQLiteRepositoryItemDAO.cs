@@ -60,14 +60,16 @@ namespace GreenQloud.Persistence.SQLite
 
         public bool Exists (RepositoryItem item)
         {
-            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\"", item.Key, item.Repository.Id);
-            return Select(sql).Count != 0 ;
+            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\"", item.Key, item.Repository.Id);
+            int i = int.Parse(database.ExecuteScalar (sql));
+            return i > 0;
         }
 
         public bool ExistsUnmoved (RepositoryItem item)
         {
-            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\" AND Moved = '{2}'", item.Key, item.Repository.Id, bool.FalseString);
-            return Select(sql).Count != 0 ;
+            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\" AND Moved = '{2}'", item.Key, item.Repository.Id, bool.FalseString);
+            int i = int.Parse(database.ExecuteScalar (sql));
+            return i > 0;
         }
 
         //TODO FIND By KEy e Repo
