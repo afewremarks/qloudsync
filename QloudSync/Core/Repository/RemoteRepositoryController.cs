@@ -198,7 +198,11 @@ namespace GreenQloud.Repository
         }
         private void DeleteEntry(ListEntry entry){
             if(Key(entry) != string.Empty){
-                connection.Connect ().DeleteObject (RuntimeSettings.DefaultBucketName, Key(entry));
+                if (entry is CommonPrefix) {
+                    GenericDelete (Key(entry), true);
+                } else {
+                    connection.Connect ().DeleteObject (RuntimeSettings.DefaultBucketName, Key(entry));
+                }
             }
         }
 

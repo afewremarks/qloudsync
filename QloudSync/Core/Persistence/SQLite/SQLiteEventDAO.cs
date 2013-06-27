@@ -82,8 +82,8 @@ namespace GreenQloud.Persistence.SQLite
         public override string LastSyncTime{
             get{
                 List<Event> events = Select("SELECT * FROM EVENT WHERE REPOSITORY = \"REMOTE\" ORDER BY INSERTTIME DESC LIMIT 1");
-                if(events.Count == 0)
-                    return string.Empty;
+                if (events.Count == 0)
+                    events = Select("SELECT * FROM EVENT WHERE REPOSITORY = \"LOCAL\" ORDER BY INSERTTIME DESC LIMIT 1");
 
                 string time = events[0].InsertTime;
                 if(time == null)
@@ -96,7 +96,7 @@ namespace GreenQloud.Persistence.SQLite
                 {
                     Logger.LogInfo("ERROR", e.Message);
                 }
-                return DateTime.MaxValue.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");;
+                return DateTime.MaxValue.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
             }
         }
 
