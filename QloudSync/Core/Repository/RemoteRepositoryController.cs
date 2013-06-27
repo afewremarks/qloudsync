@@ -11,6 +11,7 @@ using System.Text;
 using QloudSync.Repository;
 using System.Threading;
 using LitS3;
+using System.Web.Util;
 
 namespace GreenQloud.Repository
 {
@@ -235,6 +236,7 @@ namespace GreenQloud.Repository
         #region Handle S3Objects
         public IEnumerable<ListEntry> GetS3Objects ()
         {
+            HttpEncoder.Current = HttpEncoder.Default;
             List<ListEntry> entries = new List<ListEntry> ();
             List<ListEntry> subEntries = new List<ListEntry> ();
             entries = connection.Connect ().ListAllObjects (RuntimeSettings.DefaultBucketName).ToList();
