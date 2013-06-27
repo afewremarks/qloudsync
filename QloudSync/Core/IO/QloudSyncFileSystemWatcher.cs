@@ -34,14 +34,6 @@ namespace GreenQloud
             
             CFRelease (paths);
             CFRelease (path);
-            
-            runLoop = new Thread (delegate() {
-                FSEventStreamScheduleWithRunLoop (stream, CFRunLoopGetCurrent (), kCFRunLoopDefaultMode);
-                FSEventStreamStart (stream);
-                CFRunLoopRun ();
-            });
-            runLoop.Name = "FSEventStream";
-            runLoop.Start ();
         }
         
         public delegate void ChangedEventHandler (Event e);
@@ -50,6 +42,18 @@ namespace GreenQloud
         public void Stop ()
         {
             runLoop.Abort();
+            runLoop.Join(1000);
+        }
+
+        public void Start ()
+        {
+            runLoop = new Thread (delegate() {
+                FSEventStreamScheduleWithRunLoop (stream, CFRunLoopGetCurrent (), kCFRunLoopDefaultMode);
+                FSEventStreamStart (stream);
+                CFRunLoopRun ();
+            });
+            runLoop.Name = "FSEventStream";
+            runLoop.Start ();
             runLoop.Join(1000);
         }
 

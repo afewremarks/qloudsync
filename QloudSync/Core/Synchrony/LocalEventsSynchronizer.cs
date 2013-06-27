@@ -21,6 +21,9 @@ namespace GreenQloud.Synchrony
 
         public LocalEventsSynchronizer () : base ()
         {
+        }
+
+        public override void Run(){
             watcherThread = new Thread(()=>{
                 watchers = new Dictionary<string, QloudSyncFileSystemWatcher>();
                 foreach (LocalRepository repo in repositoryDAO.All){ 
@@ -32,13 +35,21 @@ namespace GreenQloud.Synchrony
                         }
                     };
                     watchers.Add (repo.Path, watcher);
+                    watcher.Start();
                 }
             });
+
+            if(watcherThread != null){
+                watcherThread.Start ();
+            }
         }
 
-        public override void Run(){
-            if(!watcherThread.IsAlive)
-                watcherThread.Start ();
+        public new void Kill () { 
+            base.Kill ();
+            if(watcherThread != null){
+                watcherThread.Abort ();
+                watcherThread.Join (1000);
+            }
         }
 
         public QloudSyncFileSystemWatcher GetWatcher(string path){
