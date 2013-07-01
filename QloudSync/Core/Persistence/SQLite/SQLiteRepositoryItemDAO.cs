@@ -143,7 +143,7 @@ namespace GreenQloud.Persistence.SQLite
                 if(dr[2].ToString().Length > 0)
                 item.Repository = LocalRepository.CreateInstance(int.Parse(dr[2].ToString()));
                 item.IsFolder = bool.Parse (dr[3].ToString());
-                if(dr[4].ToString().Length > 0)
+                if(dr[4].ToString().Length > 0 &&  int.Parse(dr[4].ToString()) != int.Parse(dr[0].ToString())) //TODO DISCOVER THE BUG THAT MAKE A SELF REFERENCE ON RESULTITEM
                 item.ResultItem = RepositoryItem.CreateInstance(int.Parse(dr[4].ToString()));
                 item.ETag = dr[5].ToString();
                 item.LocalETag = dr[6].ToString();

@@ -200,7 +200,7 @@ namespace GreenQloud {
                 UpdateQuitItemEvent (QuitItemEnabled);
             };
             
-            Program.Controller.OnError += delegate {
+            /*Program.Controller.OnError += delegate {
                 CurrentState = IconState.Error;
                 switch(Program.Controller.ErrorType)
                 {
@@ -219,7 +219,7 @@ namespace GreenQloud {
                 UpdateStatusItemEvent (StateText);
                 UpdateIconEvent (CurrentState);
                 UpdateMenuEvent (CurrentState);
-            };			
+            };*/			
 
             UpdateIconEvent += delegate (IconState state) {
                 using (var a = new NSAutoreleasePool ())
