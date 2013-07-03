@@ -9,6 +9,7 @@ using MonoMac.ObjCRuntime;
 using GreenQloud.Synchrony;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
+using GreenQloud.Persistence.SQLite;
 
  
 
@@ -49,7 +50,7 @@ namespace GreenQloud {
 
         
         public event FolderFetchedEventHandler FolderFetched = delegate { };
-        public delegate void FolderFetchedEventHandler (string [] warnings);
+        public delegate void FolderFetchedEventHandler ();
         
         public event FolderFetchErrorHandler FolderFetchError = delegate { };
         public delegate void FolderFetchErrorHandler (string [] errors);
@@ -83,24 +84,26 @@ namespace GreenQloud {
         {
             checkConnection = new Thread (delegate() {
                 while(true){
-                    bool hasCon = CheckConnection();
-                    if(hasCon){
-                        if(disconected){
-                            if(loadedSynchronizers){
-                                disconected = false;
-                                HandleReconnection();
-                            } else {
-                                disconected = false;
-                                InitializeSynchronizers();
+                    try{
+                        bool hasCon = CheckConnection();
+                        if(hasCon){
+                            if(disconected){
+                                if(loadedSynchronizers){
+                                    disconected = false;
+                                    HandleReconnection();
+                                } else {
+                                    disconected = false;
+                                    InitializeSynchronizers();
+                                }
+                            }
+                        } else {
+                            if(!disconected) {
+                                disconected = true;
+                                HandleDisconnection();
                             }
                         }
-                    } else {
-                        if(!disconected) {
-                            disconected = true;
-                            HandleDisconnection();
-                        }
-                    }
-                    Thread.Sleep (5000);
+                        Thread.Sleep (5000);
+                    } catch { Logger.LogInfo("ERROR", "Failed to check connection"); };
                 }
             });
 
@@ -154,8 +157,14 @@ namespace GreenQloud {
                     GlobalDateTime.CalcTimeDiff ();
                     success = true;
                 } catch {
-                    Logger.LogInfo ("ERROR", "Failed to load server time... attempt to try again.");
-                    Thread.Sleep(2000);
+                    SQLiteTimeDiffDAO dao = new SQLiteTimeDiffDAO ();
+                    if(dao.Count == 0){
+                        Logger.LogInfo ("ERROR", "Failed to load server time... attempt to try again.");
+                        Thread.Sleep(2000);
+                    } else {
+                        Logger.LogInfo ("WARNING", "Failed to load server time... using previous information.");
+                        success = true;
+                    }
                 }
             }
         }
@@ -280,7 +289,7 @@ namespace GreenQloud {
         public void FinishFetcher ()
         {  
             Logger.LogInfo ("Controller", "First load sucessfully");
-            FolderFetched (synchronizerResolver.Warnings);
+            FolderFetched ();
             new Thread (() => CreateStartupItem ()).Start ();
         }
 
@@ -411,9 +420,11 @@ namespace GreenQloud {
             ErrorType = ERROR_TYPE.DISCONNECTION;
             OnError ();
             if(remoteSynchronizer != null)
-            remoteSynchronizer.Stop ();
+                recoverySynchronizer.Stop ();
+            if(remoteSynchronizer != null)
+                remoteSynchronizer.Stop ();
             if(synchronizerResolver != null)
-            synchronizerResolver.Stop ();
+                synchronizerResolver.Stop ();
         }
 
         private bool CheckConnection ()

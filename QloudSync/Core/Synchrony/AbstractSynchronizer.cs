@@ -40,6 +40,8 @@ namespace GreenQloud.Synchrony
         public void Start() {
             lock (lockk) {
                 _stoped = false;
+                if(_thread == null)
+                    _thread = new Thread(new ThreadStart(this.GenericRun)); 
                 _thread.Start ();
             }
         }
@@ -49,6 +51,7 @@ namespace GreenQloud.Synchrony
             lock (lockk) {
                 if (!_stoped) {
                     _stoped = true;
+                    _thread = null;
                 }
             }
         }

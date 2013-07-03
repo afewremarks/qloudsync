@@ -9,6 +9,9 @@ namespace GreenQloud.Persistence
     public abstract class TimeDiffDAO
     {
         public abstract void Create (double diff);
+        public abstract double Count {
+            get;
+        }
         public abstract double Last{
             get;
         }

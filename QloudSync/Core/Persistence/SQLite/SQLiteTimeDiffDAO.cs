@@ -22,6 +22,11 @@ namespace GreenQloud.Persistence.SQLite
                 return Select("SELECT Diff FROM TimeDiff ORDER BY TimeDiffID DESC LIMIT 1");
             }
         }
+        public override double Count {
+            get {        
+                return int.Parse(database.ExecuteScalar("SELECT COUNT(*) FROM TimeDiff"));
+            }
+        }
         #endregion
 
         public double Select (string sql){

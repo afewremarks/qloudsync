@@ -290,7 +290,7 @@ namespace GreenQloud {
                 //Description = string.Format("All your StorageQloud files are ready for you now in your local StorageQloud folder. Anything you put into that folder and any changes you make in it will now be automatically synced to StorageQloud and vice versa. Enjoy and thanks for being truly green!");
 
 
-                if (warnings.Length > 0) {
+                if (warnings != null && warnings.Length > 0) {
                     WarningImage = NSImage.ImageNamed ("NSInfo");
                     WarningImage.Size = new SizeF (24, 24);
 
