@@ -69,9 +69,7 @@ namespace GreenQloud.Synchrony
         }
 
         public override void Run(){
-            while (true){
-                while (_stoped)
-                    Thread.Sleep (1000);
+            while (!_stoped){
                 SolveAll ();
             }
         }

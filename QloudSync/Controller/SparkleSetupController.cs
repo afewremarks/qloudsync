@@ -36,7 +36,7 @@ namespace GreenQloud {
         public event Action HideWindowEvent = delegate { };
 
         public event ChangePageEventHandler ChangePageEvent = delegate { };
-        public delegate void ChangePageEventHandler (PageType page, string [] warnings);
+        public delegate void ChangePageEventHandler (PageType page, string [] warnings = null);
         
         public event UpdateProgressBarEventHandler UpdateProgressBarEvent = delegate { };
         public delegate void UpdateProgressBarEventHandler (double percentage);
@@ -244,9 +244,9 @@ namespace GreenQloud {
         // The following private methods are
         // delegates used by the previous method
 
-        private void AddPageFetchedDelegate (string [] warnings)
+        private void AddPageFetchedDelegate ()
         {
-            ChangePageEvent (PageType.Finished, warnings);
+            ChangePageEvent (PageType.Finished);
 
             Program.Controller.FolderFetched    -= AddPageFetchedDelegate;
             Program.Controller.FolderFetchError -= AddPageFetchErrorDelegate;
