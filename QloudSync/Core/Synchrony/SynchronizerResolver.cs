@@ -69,22 +69,26 @@ namespace GreenQloud.Synchrony
         }
 
         public override void Run(){
-            while (!_stoped){
+            while (true){
+                while (_stoped)
+                    Thread.Sleep (1000);
                 SolveAll ();
             }
         }
 
         public void SolveAll ()
         {
-            List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
-            eventsToSync = eventsNotSynchronized.Count;
-            while (eventsNotSynchronized.Count > 0) {
-                Event eventNotSynchronized = eventsNotSynchronized.First();
-                Synchronize (eventNotSynchronized);
-                eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
+            lock (lockk) {
+                List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
+                eventsToSync = eventsNotSynchronized.Count;
+                while (eventsNotSynchronized.Count > 0) {
+                    Event eventNotSynchronized = eventsNotSynchronized.First();
+                    Synchronize (eventNotSynchronized);
+                    eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
+                }
+                SyncStatus = SyncStatus.IDLE;
+                Done = true;
             }
-            SyncStatus = SyncStatus.IDLE;
-            Done = true;
             Thread.Sleep (1000);
         }
 

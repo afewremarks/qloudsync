@@ -23,6 +23,7 @@ namespace GreenQloud.Synchrony
         private Thread _thread;
         protected bool _stoped;
         static T instance;
+        protected Object lockk = new object();
 
         public AbstractSynchronizer() 
         {
@@ -37,19 +38,19 @@ namespace GreenQloud.Synchrony
         }
 
         public void Start() {
-            if(_thread == null)
-                _thread = new Thread(new ThreadStart(this.GenericRun));
-
-            _stoped = false;
-            _thread.IsBackground = true;
-            if(!_thread.IsAlive)
-                _thread.Start();
+            lock (lockk) {
+                _stoped = false;
+                _thread.Start ();
+            }
         }
         public void Join() { _thread.Join(); }
         public bool IsAlive { get { return _thread != null && _thread.IsAlive; } }
-        public void Kill () { 
-            _stoped = true;
-            _thread = null;
+        public void Stop () { 
+            lock (lockk) {
+                if (!_stoped) {
+                    _stoped = true;
+                }
+            }
         }
 
         void GenericRun ()
@@ -69,7 +70,7 @@ namespace GreenQloud.Synchrony
                 Logger.LogInfo ("LOST CONNECTION", sock);
                 Program.Controller.HandleDisconnection ();
             } catch (Exception e) {
-                Logger.LogInfo ("SYNCHRONIZER ERROR", e);
+                Logger.LogInfo ("ERROR", e);
                 Logger.LogInfo ("INFO", "Preparing to run rescue mode...");
                 Program.Controller.HandleError ();
             }

@@ -53,7 +53,7 @@ namespace GreenQloud {
             }
         }
         public static void LogEvent (string type, Event e ){
-            string s = String.Format (" {0} {1} {2}",e.EventType, e.RepositoryType, e.Item.LocalAbsolutePath);
+            string s = String.Format ("[{3}] {0} {1} {2}",e.EventType, e.RepositoryType, e.Item.LocalAbsolutePath, e.Id);
             if(e.HaveResultItem){
                 s += String.Format ("  Result Object: {0} \n",e.Item.ResultItem.LocalAbsolutePath);
             }
