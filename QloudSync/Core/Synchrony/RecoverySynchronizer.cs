@@ -37,14 +37,16 @@ using GreenQloud.Persistence.SQLite;
             }
         }
         public void Synchronize (){
-            eventDAO.RemoveAllUnsynchronized();
-            startedSync = true; //only after remove all unsync events.
+            lock (lockk) {
+                eventDAO.RemoveAllUnsynchronized();
+                startedSync = true; //only after remove all unsync events.
 
-            List<RepositoryItem> localItems = localRepository.Items;
-            List<RepositoryItem> remoteItems = remoteRepository.Items;
-            SolveItems (localItems, remoteItems);
+                List<RepositoryItem> localItems = localRepository.Items;
+                List<RepositoryItem> remoteItems = remoteRepository.Items;
+                SolveItems (localItems, remoteItems);
 
-            finishedSync = true;
+                finishedSync = true;
+            }
         }
 
         void SolveItems (List<RepositoryItem> localItems, List<RepositoryItem> remoteItems)

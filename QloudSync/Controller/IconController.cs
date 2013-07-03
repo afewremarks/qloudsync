@@ -160,7 +160,7 @@ namespace GreenQloud {
 
             Program.Controller.OnIdle += delegate {
 
-                if (CurrentState != IconState.Error) {
+                if (CurrentState != IconState.Error || Program.Controller.ErrorType == ERROR_TYPE.DISCONNECTION) {
                     CurrentState = IconState.Idle;
                     
                     if (System.IO.Directory.GetDirectories(RuntimeSettings.HomePath).Length == 0 && System.IO.Directory.GetFiles (RuntimeSettings.HomePath).Length < 2)
@@ -200,7 +200,7 @@ namespace GreenQloud {
                 UpdateQuitItemEvent (QuitItemEnabled);
             };
             
-            /*Program.Controller.OnError += delegate {
+            Program.Controller.OnError += delegate {
                 CurrentState = IconState.Error;
                 switch(Program.Controller.ErrorType)
                 {
@@ -215,11 +215,11 @@ namespace GreenQloud {
                         StateText = "Failed to send some changes";
                     break;
                 }
-                UpdateQuitItemEvent (QuitItemEnabled);
+                //UpdateQuitItemEvent (QuitItemEnabled);
                 UpdateStatusItemEvent (StateText);
                 UpdateIconEvent (CurrentState);
                 UpdateMenuEvent (CurrentState);
-            };*/			
+            };			
 
             UpdateIconEvent += delegate (IconState state) {
                 using (var a = new NSAutoreleasePool ())

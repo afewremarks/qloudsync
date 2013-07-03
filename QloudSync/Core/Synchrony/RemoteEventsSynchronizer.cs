@@ -29,7 +29,9 @@ namespace GreenQloud.Synchrony
         }
 
         public override void Run(){
-            while (!_stoped){
+            while (true){
+                while (_stoped)
+                    Thread.Sleep (1000);
                 AddEvents();
                 Thread.Sleep (5000);
             }
@@ -37,46 +39,48 @@ namespace GreenQloud.Synchrony
 
         public void AddEvents ()
         {
-            string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
-            string time = eventDAO.LastSyncTime;
-            Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
+            lock (lockk) {
+                string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
+                string time = eventDAO.LastSyncTime;
+                Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
 
-            UrlEncode encoder = new UrlEncode();
-            string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", encoder.Encode (RuntimeSettings.DefaultBucketName), encoder.Encode (Credential.Username), encoder.Encode (hash), encoder.Encode (time));
+                UrlEncode encoder = new UrlEncode();
+                string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hash={2}&createdDate={3}", encoder.Encode (RuntimeSettings.DefaultBucketName), encoder.Encode (Credential.Username), encoder.Encode (hash), encoder.Encode (time));
 
-            JArray jsonObjects = JSONHelper.GetInfoArray(uri);
-            foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
-                if(!((string)jsonObject["application"]).Equals(GlobalSettings.FullApplicationName)){
-                    Event e = new Event();
-                    e.RepositoryType = RepositoryType.REMOTE;
-                    e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
-                    e.User = (string)jsonObject["username"];
-                    e.Application = (string)jsonObject["application"];
-                    e.ApplicationVersion = (string)jsonObject["applicationVersion"];
-                    e.DeviceId = (string)jsonObject["deviceId"];
-                    e.OS = (string)jsonObject["os"];
-                    e.Bucket = (string)jsonObject["bucket"];
+                JArray jsonObjects = JSONHelper.GetInfoArray(uri);
+                foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
+                    if(!((string)jsonObject["application"]).Equals(GlobalSettings.FullApplicationName)){
+                        Event e = new Event();
+                        e.RepositoryType = RepositoryType.REMOTE;
+                        e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
+                        e.User = (string)jsonObject["username"];
+                        e.Application = (string)jsonObject["application"];
+                        e.ApplicationVersion = (string)jsonObject["applicationVersion"];
+                        e.DeviceId = (string)jsonObject["deviceId"];
+                        e.OS = (string)jsonObject["os"];
+                        e.Bucket = (string)jsonObject["bucket"];
 
-                    e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                        e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 
-                    string key = (string)jsonObject["object"];
-                    bool isFolder;
-                    if((string)jsonObject["resultObject"] == string.Empty){
-                        isFolder = remoteController.GetMetadata(key).ContentLength==0;
-                    } else {
-                        isFolder = remoteController.GetMetadata((string)jsonObject["resultObject"]).ContentLength==0;
+                        string key = (string)jsonObject["object"];
+                        bool isFolder;
+                        if((string)jsonObject["resultObject"] == string.Empty){
+                            isFolder = remoteController.GetMetadata(key).ContentLength==0;
+                        } else {
+                            isFolder = remoteController.GetMetadata((string)jsonObject["resultObject"]).ContentLength==0;
+                        }
+
+                        e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), isFolder, key);
+                        e.Item.BuildResultItem((string)jsonObject["resultObject"]);
+                        e.Item.ETag = (string)jsonObject["hash"];
+
+                        e.Synchronized = false;
+                        eventDAO.Create(e);
+                        repositoryItemDAO.Update(e.Item);
                     }
-
-                    e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), isFolder, key);
-                    e.Item.BuildResultItem((string)jsonObject["resultObject"]);
-                    e.Item.ETag = (string)jsonObject["hash"];
-
-                    e.Synchronized = false;
-                    eventDAO.Create(e);
-                    repositoryItemDAO.Update(e.Item);
                 }
+                eventsCreated = true;
             }
-            eventsCreated = true;
         }
 
         public bool HasInit {

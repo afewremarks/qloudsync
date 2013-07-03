@@ -44,14 +44,6 @@ namespace GreenQloud.Synchrony
             }
         }
 
-        public new void Kill () { 
-            base.Kill ();
-            if(watcherThread != null){
-                watcherThread.Abort ();
-                watcherThread.Join (1000);
-            }
-        }
-
         public QloudSyncFileSystemWatcher GetWatcher(string path){
             if(watchers != null){
                 QloudSyncFileSystemWatcher watcher = null;
@@ -68,8 +60,10 @@ namespace GreenQloud.Synchrony
 
         public void CreateEvent (Event e)
         {
-            if(!_stoped)
-                Create(e);
+            lock (lockk) {
+                if(!_stoped )
+                    Create(e);
+            }
         }
 
         public void Create (Event e){       

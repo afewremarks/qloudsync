@@ -66,6 +66,11 @@ namespace GreenQloud {
         
         private System.Timers.Timer timer;
 
+        private bool disconected = false;
+        private bool loadedSynchronizers = false;
+
+        Thread checkConnection;
+
         bool FirstRun = RuntimeSettings.FirstRun;
 
         public Controller () : base ()
@@ -76,15 +81,38 @@ namespace GreenQloud {
 
         public void Initialize ()
         {
+            checkConnection = new Thread (delegate() {
+                while(true){
+                    bool hasCon = CheckConnection();
+                    if(hasCon){
+                        if(disconected){
+                            if(loadedSynchronizers){
+                                disconected = false;
+                                HandleReconnection();
+                            } else {
+                                disconected = false;
+                                InitializeSynchronizers();
+                            }
+                        }
+                    } else {
+                        if(!disconected) {
+                            disconected = true;
+                            HandleDisconnection();
+                        }
+                    }
+                    Thread.Sleep (5000);
+                }
+            });
+
             CreateConfigFolder();
             UpdateConfigFile ();
-           
             if (CreateHomeFolder ())
                 AddToBookmarks ();
          }
 
         public void UIHasLoaded ()
         {
+            checkConnection.Start ();
             if (!File.Exists (RuntimeSettings.DatabaseFile)){
                 if (!Directory.Exists(RuntimeSettings.DatabaseFolder))
                     Directory.CreateDirectory (RuntimeSettings.DatabaseFolder);
@@ -115,7 +143,6 @@ namespace GreenQloud {
             } else {
                 InitializeSynchronizers();
             }
-            
             verifyConfigRequirements ();
         }
 
@@ -176,38 +203,45 @@ namespace GreenQloud {
 
         public void StopSynchronizers () 
         {
-            synchronizerResolver.Kill();
-            recoverySynchronizer.Kill();
-            localSynchronizer.Kill();
-            remoteSynchronizer.Kill();
+            synchronizerResolver.Stop();
+            recoverySynchronizer.Stop();
+            localSynchronizer.Stop();
+            remoteSynchronizer.Stop();
             Logger.LogInfo ("INFO", "Synchronizers Stoped!");
         }
         public void InitializeSynchronizers ()
         {
-            try{
-                Logger.LogInfo ("INFO", "Initializing Synchronizers!");
+            OnIdle ();
+            Thread startSync;
+            startSync = new Thread (delegate() {
+                try{
+                    Logger.LogInfo ("INFO", "Initializing Synchronizers!");
 
-                synchronizerResolver = SynchronizerResolver.GetInstance();
-                recoverySynchronizer = RecoverySynchronizer.GetInstance();
-                remoteSynchronizer = RemoteEventsSynchronizer.GetInstance();
-                localSynchronizer = LocalEventsSynchronizer.GetInstance();
+                    synchronizerResolver = SynchronizerResolver.GetInstance();
+                    recoverySynchronizer = RecoverySynchronizer.GetInstance();
+                    remoteSynchronizer = RemoteEventsSynchronizer.GetInstance();
+                    localSynchronizer = LocalEventsSynchronizer.GetInstance();
 
-               recoverySynchronizer.Start();
-               while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync);
-               synchronizerResolver.Start (); 
+                   recoverySynchronizer.Start();
+                    while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync)
+                        Thread.Sleep(1000);
+                   synchronizerResolver.Start (); 
 
-                while(!recoverySynchronizer.FinishedSync){
-                    Thread.Sleep (1000);
+                    while(!recoverySynchronizer.FinishedSync){
+                        Thread.Sleep (1000);
+                    }
+
+                    localSynchronizer.Start();
+                    remoteSynchronizer.Start();
+
+
+                    loadedSynchronizers = true;
+                    Logger.LogInfo ("INFO", "Synchronizers Ready!");
+                }catch (Exception e){
+                    Console.WriteLine (e.Message);
                 }
-
-                localSynchronizer.Start();
-                remoteSynchronizer.Start();
-
-
-                Logger.LogInfo ("INFO", "Synchronizers Ready!");
-            }catch (Exception e){
-                Console.WriteLine (e.Message);
-            }
+            });
+            startSync.Start ();                    
         }
 
         public void HandleSyncStatusChanged ()
@@ -238,21 +272,6 @@ namespace GreenQloud {
         {
             try {
                 InitializeSynchronizers();
-
-
-                /*Thread.Sleep (1000);
-
-                int eventsToSync = synchronizerResolver.EventsToSync;
-                int totalEventsToSync = eventsToSync;
-
-                while(recoverySynchronizer.IsAlive){
-
-                    double percent = 100 - (100*eventsToSync/totalEventsToSync);
-
-                    ProgressChanged (percent , 0.0);
-                    eventsToSync = synchronizerResolver.EventsToSync;
-                    Thread.Sleep (1000);
-                }*/
             }catch (Exception e) {                
                 Logger.LogInfo ("Initial Sync Error", e.Message+"\n "+e.StackTrace);
             }
@@ -380,31 +399,34 @@ namespace GreenQloud {
         }
 
 
-        public void HandleDisconnection(){
-            ErrorType = ERROR_TYPE.DISCONNECTION;
-            OnError ();
-            remoteSynchronizer.Kill ();
-            synchronizerResolver.Kill ();
-
-            WaitForConnection ();
-
+        public void HandleReconnection(){
+            OnIdle();
+            if(remoteSynchronizer != null)
             remoteSynchronizer.Start ();
+            if(synchronizerResolver != null)
             synchronizerResolver.Start ();
         }
 
-        private void WaitForConnection ()
+        public void HandleDisconnection(){
+            ErrorType = ERROR_TYPE.DISCONNECTION;
+            OnError ();
+            if(remoteSynchronizer != null)
+            remoteSynchronizer.Stop ();
+            if(synchronizerResolver != null)
+            synchronizerResolver.Stop ();
+        }
+
+        private bool CheckConnection ()
         {
-            Thread.Sleep (5000);
             bool hasConnection = false;
-            while(!hasConnection){
-                try{
-                    Ping pingSender = new Ping ();
-                    if(pingSender.Send(GlobalSettings.StorageHost).Status == IPStatus.Success)//TODO ADD ALL HOSTS TO PING
-                        hasConnection = true;
-                } catch {
-                    
-                }
+            try{
+                Ping pingSender = new Ping ();
+                if(pingSender.Send(GlobalSettings.StorageHost).Status == IPStatus.Success)//TODO ADD ALL HOSTS TO PING
+                    hasConnection = true;
+            } catch {
+                return false;
             }
+            return hasConnection;
         }
 
         public void HandleError(){
