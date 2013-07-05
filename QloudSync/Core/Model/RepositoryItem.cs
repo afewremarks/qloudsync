@@ -62,6 +62,11 @@ namespace GreenQloud.Model
         public int Id {
             set; get;
         }
+
+        public int ResultItemId {
+            set; get;
+        }
+
         public string Key{
             set; get;
         }
@@ -106,8 +111,17 @@ namespace GreenQloud.Model
             set; get;
         }
 
+        private RepositoryItem resultItem;
         public RepositoryItem ResultItem{
-            set; get;
+            set {
+                resultItem = value;
+                ResultItemId = resultItem.Id;
+            }
+            get {
+                if (resultItem == null && ResultItemId > 0)
+                    resultItem = CreateInstance (ResultItemId);
+                return resultItem;
+            }
         }
 
         public string LocalAbsolutePath {
@@ -124,7 +138,8 @@ namespace GreenQloud.Model
 
         public void BuildResultItem(string key){
             if(key != string.Empty)
-                ResultItem = CreateInstance (this.Repository, this.IsFolder, key, this.ETag, this.LocalETag);
+                resultItem = CreateInstance (this.Repository, this.IsFolder, key, this.ETag, this.LocalETag);
+            ResultItemId = resultItem.Id;
         }
 
         private string ToPathString (string path)

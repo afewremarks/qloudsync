@@ -24,23 +24,24 @@ namespace GreenQloud.Synchrony
         }
 
         public override void Run(){
-            watcherThread = new Thread(()=>{
-                watchers = new Dictionary<string, QloudSyncFileSystemWatcher>();
-                foreach (LocalRepository repo in repositoryDAO.All){ 
-                    QloudSyncFileSystemWatcher watcher = new QloudSyncFileSystemWatcher(repo.Path);
-                    watcher.Changed += delegate(Event e) {
-                        lock(_lock){
-                            Logger.LogEvent("EVENT FOUND", e);
-                            CreateEvent (e);
-                        }
-                    };
-                    watchers.Add (repo.Path, watcher);
-                    watcher.Start();
+            if(watcherThread == null){
+                watcherThread = new Thread(()=>{
+                    watchers = new Dictionary<string, QloudSyncFileSystemWatcher>();
+                    foreach (LocalRepository repo in repositoryDAO.All){ 
+                        QloudSyncFileSystemWatcher watcher = new QloudSyncFileSystemWatcher(repo.Path);
+                        watcher.Changed += delegate(Event e) {
+                            lock(_lock){
+                                Logger.LogEvent("EVENT FOUND", e);
+                                CreateEvent (e);
+                            }
+                        };
+                        watchers.Add (repo.Path, watcher);
+                        watcher.Start();
+                    }
+                });
+                if(watcherThread != null){
+                    watcherThread.Start ();
                 }
-            });
-
-            if(watcherThread != null){
-                watcherThread.Start ();
             }
         }
 

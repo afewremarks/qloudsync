@@ -18,15 +18,16 @@ namespace GreenQloud.Persistence.SQLite
         #region implemented abstract members of EventDAO
         SQLiteDatabase database = new SQLiteDatabase();
 
-        public override void Create (Event e, bool cascade = true)
+        public override void Create (Event e)
         {
             if (e == null)
                 return;
-            repositoryItemDAO.Create (e);
             bool noConflicts = !ExistsConflict(e);
 
            if (noConflicts){
                 try{
+                    repositoryItemDAO.Create (e);
+
                     string dateOfEvent =  e.InsertTime;
                     if(dateOfEvent==null){
                         dateOfEvent = GlobalDateTime.NowUniversalString;
@@ -34,9 +35,6 @@ namespace GreenQloud.Persistence.SQLite
 
                     string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
                                               e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
-
-                    if(cascade)
-                        repositoryItemDAO.Update(e.Item);
 
                     e.Id = (int) database.ExecuteNonQuery (sql, true);
                 }catch(Exception err){
@@ -57,9 +55,16 @@ namespace GreenQloud.Persistence.SQLite
             database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\" WHERE EventID =\"{1}\"", bool.TrueString, e.Id));
         }
 
+        public override void IgnoreEquals (Event e)
+        {            
+            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\" WHERE ItemId =\"{1}\" AND TYPE = '{2}' AND SYNCHRONIZED <> '{3}' AND EventID <> '{4}'", bool.TrueString, e.Item.Id, e.EventType, bool.TrueString, e.Id));
+        }
+        //EventID, ItemId, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET
+
         public override List<Event> EventsNotSynchronized {
             get {
-                List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\" ORDER BY EventID ASC", bool.FalseString));
+                string sql = string.Format ("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\" AND INSERTTIME < '{1}' ORDER BY EventID ASC", bool.FalseString, GlobalDateTime.Now.AddSeconds (-5).ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+                List<Event> list = Select (sql);
                 return list;
             }
         }

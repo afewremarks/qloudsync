@@ -125,6 +125,7 @@ namespace GreenQloud.Synchrony
         }
 
         void Synchronize(Event e){
+            PerformIgnores (e);
             if (VerifyIgnore (e)) {
                 eventDAO.UpdateToSynchronized(e);
                 Logger.LogInfo ("EVENT IGNORE", "Ignore event on " + e.Item.LocalAbsolutePath);
@@ -182,6 +183,11 @@ namespace GreenQloud.Synchrony
             Program.Controller.HandleSyncStatusChanged ();
 
             Logger.LogEvent("DONE Event Synchronizing", e);
+        }
+
+        void PerformIgnores (Event e)
+        {
+            eventDAO.IgnoreEquals(e);
         }
 
         void VerifySucess (Event e)
