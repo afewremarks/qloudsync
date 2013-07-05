@@ -13,32 +13,34 @@ namespace GreenQloud.Persistence.SQLite
     {
         #region implemented abstract members of RepositoryItemDAO
         SQLiteDatabase database = new SQLiteDatabase();
-        public override void Create (RepositoryItem item)
-        {
-            if (item.ResultItem != null)
-                Create (item.ResultItem);
 
-            item.Id = (int) database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Key, RepositoryId, IsFolder, ResultItemId, eTag, eTagLocal, Moved, UpdatedAt) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",'{4}','{5}', '{6}', '{7}')", item.Key, item.Repository.Id, item.IsFolder, ((item.ResultItem == null) ? "" : item.ResultItem.Id.ToString()), item.ETag, item.LocalETag, item.Moved, item.UpdatedAt), true);
-        }
         public RepositoryItem Create (Event e)
         {
-            if (!Exists (e.Item)) {
+            if (!ExistsUnmoved (e.Item)) {
                 Create (e.Item);
             } else {
                 Update (e.Item);
             }
+            if (e.Item.ResultItem != null && e.Item.ResultItem.Id == 0) {
+                Create (e.Item.ResultItem);
+                e.Item.ResultItemId = GetId ( e.Item.ResultItem);
+                Update (e.Item);
+            }else if(e.Item.ResultItem != null && e.Item.ResultItem.Id != 0)
+                Update (e.Item.ResultItem);
+
             e.Item.Id = GetId (e.Item);
             return e.Item;
+        }
+
+        public override void Create (RepositoryItem item)
+        {
+            item.Id = (int) database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Key, RepositoryId, IsFolder, ResultItemId, eTag, eTagLocal, Moved, UpdatedAt) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",'{4}','{5}', '{6}', '{7}')", item.Key, item.Repository.Id, item.IsFolder, ((item.ResultItem == null) ? "" : item.ResultItemId.ToString()), item.ETag, item.LocalETag, item.Moved, item.UpdatedAt), true);
         }
 
 
         public override void Update (RepositoryItem i)
         {            
-            if (i.ResultItem != null && i.ResultItem.Id == 0)
-                Create (i.ResultItem);
-            else if(i.ResultItem != null && i.ResultItem.Id != 0)
-                 Update (i.ResultItem);
-            database.ExecuteNonQuery (string.Format("UPDATE REPOSITORYITEM SET  Key='{1}', RepositoryId='{2}', IsFolder='{3}', ResultItemId = '{4}', eTag = '{5}', eTagLocal = '{6}', Moved = '{7}', UpdatedAt = '{8}' WHERE RepositoryItemID =\"{0}\"", i.Id, i.Key, i.Repository.Id, i.IsFolder, ((i.ResultItem == null) ? "" : i.ResultItem.Id.ToString()), i.ETag, i.LocalETag, i.Moved, i.UpdatedAt));
+            database.ExecuteNonQuery (string.Format("UPDATE REPOSITORYITEM SET  Key='{1}', RepositoryId='{2}', IsFolder='{3}', ResultItemId = '{4}', eTag = '{5}', eTagLocal = '{6}', Moved = '{7}', UpdatedAt = '{8}' WHERE RepositoryItemID =\"{0}\"", i.Id, i.Key, i.Repository.Id, i.IsFolder, ((i.ResultItem == null) ? "" : i.ResultItemId.ToString()), i.ETag, i.LocalETag, i.Moved, i.UpdatedAt));
         }
 
         public override List<RepositoryItem> All {
@@ -143,8 +145,8 @@ namespace GreenQloud.Persistence.SQLite
                 if(dr[2].ToString().Length > 0)
                 item.Repository = LocalRepository.CreateInstance(int.Parse(dr[2].ToString()));
                 item.IsFolder = bool.Parse (dr[3].ToString());
-                if(dr[4].ToString().Length > 0 &&  int.Parse(dr[4].ToString()) != int.Parse(dr[0].ToString())) //TODO DISCOVER THE BUG THAT MAKE A SELF REFERENCE ON RESULTITEM
-                item.ResultItem = RepositoryItem.CreateInstance(int.Parse(dr[4].ToString()));
+                if(dr[4].ToString().Length > 0)
+                item.ResultItemId = int.Parse (dr[4].ToString());
                 item.ETag = dr[5].ToString();
                 item.LocalETag = dr[6].ToString();
                 item.Moved = bool.Parse (dr[7].ToString());

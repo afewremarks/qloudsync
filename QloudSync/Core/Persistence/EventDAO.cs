@@ -6,7 +6,7 @@ namespace GreenQloud.Persistence
 {
     public abstract class EventDAO
     {
-        public abstract void Create (Event e, bool cascade);
+        public abstract void Create (Event e);
         public abstract List<Event> All{
             get;
         }
@@ -14,9 +14,9 @@ namespace GreenQloud.Persistence
             get;
         }
         public abstract void UpdateToSynchronized (Event e);
-       
-        public abstract void SetEventType (Event e);
 
+        public abstract void IgnoreEquals (Event e);
+        public abstract void SetEventType (Event e);
         public abstract void RemoveAllUnsynchronized ();
         public abstract string LastSyncTime{get;}
     }

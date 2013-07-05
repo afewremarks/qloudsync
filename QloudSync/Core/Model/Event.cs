@@ -40,7 +40,7 @@ using System.IO;
 
         public bool HaveResultItem {
             get {
-                if (Item != null && Item.ResultItem != null && 
+                if (Item != null && Item.ResultItemId > 0 && 
                     (this.EventType != EventType.CREATE && this.EventType != EventType.UPDATE && this.EventType != EventType.NULL && this.EventType != EventType.DELETE))//TODO MOVE TO TRASH WILL GENERATE RESULT ITEM
                     return true;
 
