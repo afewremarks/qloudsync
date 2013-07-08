@@ -119,28 +119,29 @@ namespace GreenQloud
                             e.EventType = EventType.CREATE;
                         } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Removed)) {
                             e.EventType = EventType.DELETE;
-                        } else {
-                            if (flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) {
-                                e.EventType = EventType.UPDATE;
-                            } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Renamed)) {
-                                if ((i + 1) < numEvents && (ids [i] == ids [i+1] - 1)) {
-                                    e.EventType = EventType.MOVE;
-                                    i++;
-                                    string key2 = paths [i].Substring (repo.Path.Length);
-                                    if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key2.EndsWith (Path.DirectorySeparatorChar.ToString()))
-                                        key2 += Path.DirectorySeparatorChar;
-                                    e.Item.BuildResultItem (key2);
-                                } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !Directory.Exists (paths[i])) {
-                                    e.EventType = EventType.DELETE;
-                                } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile) && !File.Exists (paths[i])) {
-                                    e.EventType = EventType.DELETE;
-                                } else {
-                                    if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile)) {
-                                        e.EventType = EventType.UPDATE;
-                                    }
+                        }
+
+                        if (flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) {
+                            e.EventType = EventType.UPDATE;
+                        } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Renamed)) {
+                            if ((i + 1) < numEvents && (ids [i] == ids [i+1] - 1)) {
+                                e.EventType = EventType.MOVE;
+                                i++;
+                                string key2 = paths [i].Substring (repo.Path.Length);
+                                if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key2.EndsWith (Path.DirectorySeparatorChar.ToString()))
+                                    key2 += Path.DirectorySeparatorChar;
+                                e.Item.BuildResultItem (key2);
+                            } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !Directory.Exists (paths[i])) {
+                                e.EventType = EventType.DELETE;
+                            } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile) && !File.Exists (paths[i])) {
+                                e.EventType = EventType.DELETE;
+                            } else {
+                                if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile)) {
+                                    e.EventType = EventType.UPDATE;
                                 }
                             }
                         }
+
                         handler (e);
 
                     }
