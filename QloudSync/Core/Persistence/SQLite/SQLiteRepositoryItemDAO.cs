@@ -69,7 +69,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public bool ExistsUnmoved (RepositoryItem item)
         {
-            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\" AND Moved = '{2}'", item.Key, item.Repository.Id, bool.FalseString);
+            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\" AND Moved <> '{2}'", item.Key, item.Repository.Id, bool.TrueString);
             int i = int.Parse(database.ExecuteScalar (sql));
             return i > 0;
         }
@@ -94,9 +94,10 @@ namespace GreenQloud.Persistence.SQLite
             item.Moved = true;
             string sql;
             if(item.IsFolder)
-                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" AND Key LIKE '{2}%' ", bool.TrueString, item.Id, item.Key);
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryId = \"{1}\" AND Key LIKE '{2}%' ", bool.TrueString, item.Repository.Id, item.Key);
             else
-                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" ", bool.TrueString, item.Id);
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryId = \"{1}\" AND Key = '{2}' ", bool.TrueString, item.Repository.Id,  item.Key);
+
             database.ExecuteNonQuery (sql);
         }
 
@@ -121,7 +122,10 @@ namespace GreenQloud.Persistence.SQLite
         public int GetId (RepositoryItem item)
         {
             if (Exists (item)){
-                return Select(string.Format("SELECT * FROM REPOSITORYITEM WHERE  Key = \"{0}\" AND RepositoryId = \"{1}\"", item.Key, item.Repository.Id))[0].Id;
+                //if (item.Id != 0)
+                //    return item.Id;
+                //else
+                    return Select(string.Format("SELECT * FROM REPOSITORYITEM WHERE  Key = \"{0}\" AND RepositoryId = \"{1}\"", item.Key, item.Repository.Id)).Last().Id;
             }
             return 0;
         }
