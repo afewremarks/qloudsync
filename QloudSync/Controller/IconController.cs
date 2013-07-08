@@ -388,7 +388,7 @@ namespace GreenQloud {
 
                 co2_savings_item = new NSMenuItem () {
                     Title = "Loading data of savings",
-                    Enabled = false
+                    Enabled = true
                 };
 
                 help_item = new NSMenuItem(){
