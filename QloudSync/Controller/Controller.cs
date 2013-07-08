@@ -17,10 +17,10 @@ namespace GreenQloud {
 
     
     public enum ERROR_TYPE{
+        NULL,
         DISCONNECTION,
         ACCESS_DENIED,
-        FATAL_ERROR,
-        NULL
+        FATAL_ERROR
     }
 
 	public class Controller{
@@ -83,6 +83,7 @@ namespace GreenQloud {
 
         public void Initialize ()
         {
+            ErrorType = ERROR_TYPE.NULL;
             checkConnection = new Thread (delegate() {
                 while(true){
                     try{
@@ -95,6 +96,7 @@ namespace GreenQloud {
                                     HandleReconnection();
                                 } else {
                                     disconected = false;
+                                    ErrorType = ERROR_TYPE.NULL;
                                     InitializeSynchronizers();
                                 }
                             }
