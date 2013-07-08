@@ -19,7 +19,8 @@ namespace GreenQloud {
     public enum ERROR_TYPE{
         DISCONNECTION,
         ACCESS_DENIED,
-        FATAL_ERROR
+        FATAL_ERROR,
+        NULL
     }
 
 	public class Controller{
@@ -87,9 +88,10 @@ namespace GreenQloud {
                     try{
                         bool hasCon = CheckConnection();
                         if(hasCon){
-                            if(disconected){
+                            if(disconected || ErrorType == ERROR_TYPE.DISCONNECTION){
                                 if(loadedSynchronizers){
                                     disconected = false;
+                                    ErrorType = ERROR_TYPE.NULL;
                                     HandleReconnection();
                                 } else {
                                     disconected = false;
