@@ -285,6 +285,30 @@ namespace GreenQloud {
         {
             try {
                 InitializeSynchronizers();
+
+
+
+
+                Console.WriteLine("Iniciando os sincronizadores");
+                while(recoverySynchronizer == null)
+                    Thread.Sleep(1000);
+                Console.WriteLine("Iniciando os sincronizadores (FIM)");
+
+                Console.WriteLine("Calculando diferencas entre local e remoto");
+                Console.WriteLine("Sincronizando mudancas");
+
+                while(!((RecoverySynchronizer)recoverySynchronizer).FinishedSync)
+                    Thread.Sleep(1000);
+                Console.WriteLine("Calculando diferencas entre local e remoto (FIM)");
+
+                while(synchronizerResolver.Started == false || synchronizerResolver.EventsToSync > 0)
+                    Thread.Sleep(1000);
+                Console.WriteLine("Sincronizando mudancas (FIM)");
+
+
+
+
+
             }catch (Exception e) {                
                 Logger.LogInfo ("Initial Sync Error", e.Message+"\n "+e.StackTrace);
             }
