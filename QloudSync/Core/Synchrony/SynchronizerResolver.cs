@@ -57,6 +57,11 @@ namespace GreenQloud.Synchrony
             get { return eventsToSync; }
         }
 
+        private bool started = false;
+        public bool Started{
+            get { return started; }
+        }
+
         //TODO CREATE a query for this
         public string[] Warnings {
             get {
@@ -79,10 +84,12 @@ namespace GreenQloud.Synchrony
             lock (lockk) {
                 List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
                 eventsToSync = eventsNotSynchronized.Count;
+                started = true;
                 while (eventsNotSynchronized.Count > 0) {
                     Event eventNotSynchronized = eventsNotSynchronized.First();
                     Synchronize (eventNotSynchronized);
                     eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
+                    eventsToSync = eventsNotSynchronized.Count;
                 }
                 SyncStatus = SyncStatus.IDLE;
                 Done = true;

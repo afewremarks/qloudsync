@@ -212,13 +212,13 @@ namespace GreenQloud {
 
                 ProgressIndicator.StartAnimation (this);
 
-                NSTextField TimeRemaining = new NSTextField () {
+                NSTextField ProgressInit = new NSTextField () {
                     Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.WindowBackground,
+                    BackgroundColor = NSColor.Gray,
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (190, Frame.Height - 230, 640 - 150 - 80, 20),
-                    StringValue     = "",
+                    StringValue     = "Iniciando...",
                     Font            = SparkleUI.Font
                 };
 
@@ -250,8 +250,8 @@ namespace GreenQloud {
                                 stime = string.Format("{0} seconds", t.Seconds); 
                             else
                                 stime = "estimating";
-                                TimeRemaining.StringValue = string.Format("Time remaining: {0}", stime);}
-                        catch{
+                                //TimeRemaining.StringValue = string.Format("Time remaining: {0}", stime);
+                        }catch{
 
                         }
                     });
@@ -263,8 +263,9 @@ namespace GreenQloud {
 
                 };
 
-                ContentView.AddSubview (ProgressIndicator);
-                ContentView.AddSubview (TimeRemaining);
+                //ContentView.AddSubview (ProgressIndicator);
+
+                ContentView.AddSubview (ProgressInit);
                 Buttons.Add (FinishButton);
                 Buttons.Add (CancelButton);
             }
