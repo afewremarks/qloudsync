@@ -92,12 +92,13 @@ namespace GreenQloud {
                             if(disconected || ErrorType == ERROR_TYPE.DISCONNECTION){
                                 if(loadedSynchronizers){
                                     disconected = false;
+                                    HandleReconnection(); 
                                     ErrorType = ERROR_TYPE.NULL;
-                                    HandleReconnection();
                                 } else {
                                     disconected = false;
-                                    ErrorType = ERROR_TYPE.NULL;
                                     InitializeSynchronizers();
+                                    ErrorType = ERROR_TYPE.NULL;                                 
+
                                 }
                             }
                         } else {
@@ -224,7 +225,6 @@ namespace GreenQloud {
         }
         public void InitializeSynchronizers (bool initRecovery = false)
         {
-            OnIdle ();
             Thread startSync;
             startSync = new Thread (delegate() {
                 try{
@@ -253,6 +253,7 @@ namespace GreenQloud {
 
                     loadedSynchronizers = true;
                     Logger.LogInfo ("INFO", "Synchronizers Ready!");
+                    OnIdle ();
                 }catch (Exception e){
                     Console.WriteLine (e.Message);
                 }

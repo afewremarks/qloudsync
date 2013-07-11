@@ -30,6 +30,7 @@ namespace GreenQloud {
 
     public enum IconState {
         Idle,
+        Working,
         SyncingUp,
         SyncingDown,
         Syncing,
@@ -53,6 +54,7 @@ namespace GreenQloud {
         private NSMenuItem co2_savings_item;
         private NSMenuItem help_item;
 
+        private NSImage syncing_working;
         private NSImage syncing_idle_image;
         private NSImage syncing_up_image;
         private NSImage syncing_down_image;
@@ -84,7 +86,7 @@ namespace GreenQloud {
         public event UpdateRecentEventsItemEventHandler UpdateRecentEventsItemEvent = delegate { };
         public delegate void UpdateRecentEventsItemEventHandler (bool recent_events_item_enabled);
         
-        public IconState CurrentState = IconState.Idle;
+        public IconState CurrentState = IconState.Working;
         public string StateText = string.Format("Welcome to {0}!", GlobalSettings.ApplicationName);
         
         public readonly int MenuOverflowThreshold   = 9;
@@ -133,6 +135,8 @@ namespace GreenQloud {
                 this.status_item = NSStatusBar.SystemStatusBar.CreateStatusItem (28);
                 this.status_item.HighlightMode = true;
 
+
+                this.syncing_working  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-working.png"));
                 this.syncing_idle_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-idle.png"));
                 this.syncing_up_image    = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-up.png"));
                 this.syncing_down_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-down.png"));
@@ -145,11 +149,11 @@ namespace GreenQloud {
                 this.syncing_image_active  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-active.png"));
                 this.syncing_error_image_active = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error-active.png"));
 
-                this.status_item.Image      = this.syncing_idle_image;
+                this.status_item.Image      = this.syncing_working;
                 this.status_item.Image.Size = new SizeF (16, 16);
 
-                this.status_item.AlternateImage      = this.syncing_idle_image_active;
-                this.status_item.AlternateImage.Size = new SizeF (16, 16);
+                //this.status_item.AlternateImage      = this.syncing_idle_image_active;
+                //this.status_item.AlternateImage.Size = new SizeF (16, 16);
 
                 this.folder_image       = NSImage.ImageNamed ("NSFolder");
                 this.caution_image      = NSImage.ImageNamed ("NSCaution");
@@ -174,6 +178,7 @@ namespace GreenQloud {
                 UpdateIconEvent (CurrentState);
                 UpdateMenuEvent (CurrentState);
             };
+
 
             Program.Controller.OnSyncing += delegate {
                 bool syncDown = SynchronizerResolver.GetInstance().SyncStatus == SyncStatus.DOWNLOADING;
@@ -228,33 +233,27 @@ namespace GreenQloud {
                         switch (state) {
                         case IconState.Idle: {
                             this.status_item.Image          = this.syncing_idle_image;
-                            this.status_item.AlternateImage = this.syncing_idle_image_active;
                             break;
                         }
                         case IconState.SyncingUp: {
                             this.status_item.Image          = this.syncing_up_image;
-                            this.status_item.AlternateImage = this.syncing_up_image_active;
                             break;
                         }
                         case IconState.SyncingDown: {
                             this.status_item.Image          = this.syncing_down_image;
-                            this.status_item.AlternateImage = this.syncing_down_image_active;
                             break;
                         }
                         case IconState.Syncing: {
                             this.status_item.Image          = this.syncing_image;
-                            this.status_item.AlternateImage = this.syncing_image_active;
                             break;
                         }
                         case IconState.Error: {
                             this.status_item.Image          = this.syncing_error_image;
-                            this.status_item.AlternateImage = this.syncing_error_image_active;
                             break;
                         }
                         }
 
                         this.status_item.Image.Size = new SizeF (16, 16);
-                        this.status_item.AlternateImage.Size = new SizeF (16, 16);
                     });
                 }
             };
