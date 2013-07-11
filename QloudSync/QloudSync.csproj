@@ -207,6 +207,9 @@
     <Content Include="Pixmaps\trash.png">
       <Link>Pixmaps\trash.png</Link>
     </Content>
+    <Content Include="Pixmaps\process-syncing-working.png">
+      <Link>Pixmaps\process-syncing-working.png</Link>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
