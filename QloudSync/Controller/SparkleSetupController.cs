@@ -5,6 +5,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using GreenQloud.Synchrony;
+using MonoMac.Foundation;
 
  
 
@@ -82,7 +83,6 @@ namespace GreenQloud {
         private string saved_remote_path = "";
         private bool create_startup_item = true;
         private bool fetch_prior_history = false;
-
 
         public SparkleSetupController ()
         {

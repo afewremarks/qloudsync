@@ -23,7 +23,7 @@ namespace GreenQloud {
         FATAL_ERROR
     }
 
-	public class Controller{
+    public class Controller {
 
         public static int Contador{
             set; get;
@@ -222,7 +222,7 @@ namespace GreenQloud {
             remoteSynchronizer.Stop();
             Logger.LogInfo ("INFO", "Synchronizers Stoped!");
         }
-        public void InitializeSynchronizers ()
+        public void InitializeSynchronizers (bool initRecovery = false)
         {
             OnIdle ();
             Thread startSync;
@@ -235,15 +235,18 @@ namespace GreenQloud {
                     remoteSynchronizer = RemoteEventsSynchronizer.GetInstance();
                     localSynchronizer = LocalEventsSynchronizer.GetInstance();
 
-                   recoverySynchronizer.Start();
-                    while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync)
-                        Thread.Sleep(1000);
-                   synchronizerResolver.Start (); 
+                    if(initRecovery){
+                       recoverySynchronizer.Start();
+                        while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync)
+                            Thread.Sleep(1000);
+                       synchronizerResolver.Start (); 
 
-                    while(!recoverySynchronizer.FinishedSync){
-                        Thread.Sleep (1000);
+                        while(!recoverySynchronizer.FinishedSync){
+                            Thread.Sleep (1000);
+                        }
+                    } else {
+                        synchronizerResolver.Start ();
                     }
-
                     localSynchronizer.Start();
                     remoteSynchronizer.Start();
 
@@ -281,29 +284,46 @@ namespace GreenQloud {
             FinishFetcher();
         }
 
+        public enum START_STATE{
+            NULL = 0,
+            LOAD_START = 1,
+            LOAD_DONE = 2,
+            CALCULATING_START = 3,
+            SYNC_START = 4,
+            CALCULATING_DONE = 5,
+            SYNC_DONE = 6
+        }
+
+        public START_STATE StartState {
+            get;
+            set;
+        }
         public void FirstLoad()
         {
             try {
-                InitializeSynchronizers();
-
-
-
-
-                Console.WriteLine("Iniciando os sincronizadores");
+                InitializeSynchronizers(true);
+                StartState = START_STATE.LOAD_START;
                 while(recoverySynchronizer == null)
                     Thread.Sleep(1000);
-                Console.WriteLine("Iniciando os sincronizadores (FIM)");
+                StartState = START_STATE.LOAD_DONE;
 
-                Console.WriteLine("Calculando diferencas entre local e remoto");
-                Console.WriteLine("Sincronizando mudancas");
+
+                StartState = START_STATE.CALCULATING_START;
+                StartState = START_STATE.SYNC_START;
 
                 while(!((RecoverySynchronizer)recoverySynchronizer).FinishedSync)
                     Thread.Sleep(1000);
-                Console.WriteLine("Calculando diferencas entre local e remoto (FIM)");
+                StartState = START_STATE.CALCULATING_DONE;
 
-                while(synchronizerResolver.Started == false || synchronizerResolver.EventsToSync > 0)
+                while(loadedSynchronizers == false)
                     Thread.Sleep(1000);
-                Console.WriteLine("Sincronizando mudancas (FIM)");
+
+                Thread.Sleep(5000);
+
+                Console.WriteLine(synchronizerResolver.EventsToSync);
+                while(synchronizerResolver.EventsToSync > 0)
+                    Thread.Sleep(1000);
+                StartState = START_STATE.SYNC_DONE;
 
 
 
