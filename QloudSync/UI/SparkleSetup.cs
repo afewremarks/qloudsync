@@ -12,12 +12,13 @@ using MonoMac.WebKit;
 using Mono.Unix;
 using GreenQloud.Repository;
 using QloudSync.Repository;
+using System.Threading;
 
 namespace GreenQloud {
 
     public class SparkleSetup : SparkleSetupWindow {
 
-        public SparkleSetupController Controller = new SparkleSetupController ();
+        public SparkleSetupController SparkleSetupController = new SparkleSetupController ();
 
         private NSButton RegisterButton;
         private NSButton ContinueButton;
@@ -41,19 +42,19 @@ namespace GreenQloud {
         private HyperLink hDescription;
         public SparkleSetup () : base ()
         {
-            Controller.HideWindowEvent += delegate {
+            SparkleSetupController.HideWindowEvent += delegate {
                 InvokeOnMainThread (delegate {
                     PerformClose (this);
                 });
             };
 
-            Controller.ShowWindowEvent += delegate {
+            SparkleSetupController.ShowWindowEvent += delegate {
                 InvokeOnMainThread (delegate {
                     OrderFrontRegardless ();
                 });
             };
 
-            Controller.ChangePageEvent += delegate (PageType type, string [] warnings) {
+            SparkleSetupController.ChangePageEvent += delegate (PageType type, string [] warnings) {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
@@ -65,6 +66,12 @@ namespace GreenQloud {
             };
         }
 
+        public static Action LoadingStart = delegate {};
+        public static Action CalculatingStart = delegate {};
+        public static Action SynchronizingStart = delegate {};
+        public static Action LoadingDone = delegate {};
+        public static Action CalculatingDone = delegate {};
+        public static Action SynchronizingDone = delegate {};
 
         public void ShowPage (PageType type, string [] warnings)
         {
@@ -168,7 +175,7 @@ namespace GreenQloud {
                 };
 
                 CancelButton.Activated += delegate {
-                    Controller.PageCancelled ();
+                    SparkleSetupController.PageCancelled ();
                     Program.Controller.Quit();
                 };
 
@@ -176,7 +183,7 @@ namespace GreenQloud {
                     try{
                         S3Connection.Authenticate (FullNameTextField.StringValue, PasswordTextField.StringValue);
                         Credential.Username = FullNameTextField.StringValue;
-                        Controller.AddPageCompleted (FullNameTextField.StringValue, PasswordTextField.StringValue);
+                        SparkleSetupController.AddPageCompleted (FullNameTextField.StringValue, PasswordTextField.StringValue);
                     }
                     catch (System.Net.WebException)
                     {
@@ -207,18 +214,36 @@ namespace GreenQloud {
                     MinValue      = 0.0,
                     MaxValue      = 100.0,
                     Indeterminate = false,
-                    DoubleValue   = Controller.ProgressBarPercentage
+                    DoubleValue   = SparkleSetupController.ProgressBarPercentage
                 };
 
                 ProgressIndicator.StartAnimation (this);
 
-                NSTextField ProgressInit = new NSTextField () {
+                NSTextField Loading = new NSTextField () {
                     Alignment       = NSTextAlignment.Left,
                     BackgroundColor = NSColor.Gray,
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (190, Frame.Height - 230, 640 - 150 - 80, 20),
-                    StringValue     = "Iniciando...",
+                    StringValue     = "Starting synchronizers...",
+                    Font            = SparkleUI.Font
+                };
+                NSTextField Calculating = new NSTextField () {
+                    Alignment       = NSTextAlignment.Left,
+                    BackgroundColor = NSColor.Gray,
+                    Bordered        = false,
+                    Editable        = false,
+                    Frame           = new RectangleF (190, Frame.Height - 260, 640 - 150 - 80, 20),
+                    StringValue     = "Calculating changes with remote repository...",
+                    Font            = SparkleUI.Font
+                };
+                NSTextField Synchronizing = new NSTextField () {
+                    Alignment       = NSTextAlignment.Left,
+                    BackgroundColor = NSColor.Gray,
+                    Bordered        = false,
+                    Editable        = false,
+                    Frame           = new RectangleF (190, Frame.Height - 290, 640 - 150 - 80, 20),
+                    StringValue     = "Synchronizing changes...",
                     Font            = SparkleUI.Font
                 };
 
@@ -231,13 +256,13 @@ namespace GreenQloud {
                     Enabled = false
                 };
 
-                Controller.UpdateProgressBarEvent += delegate (double percentage) {
+                SparkleSetupController.UpdateProgressBarEvent += delegate (double percentage) {
                     InvokeOnMainThread (() => {
                         ProgressIndicator.DoubleValue = percentage;
                     });
                 };
 
-                Controller.UpdateTimeRemaningEvent += delegate (double time){
+                SparkleSetupController.UpdateTimeRemaningEvent += delegate (double time){
                     InvokeOnMainThread (() => {
                         try{
                             TimeSpan t = TimeSpan.FromSeconds(time);
@@ -259,16 +284,72 @@ namespace GreenQloud {
 
                 CancelButton.Activated += delegate {
 
-                    Controller.SyncingCancelled ();
+                    SparkleSetupController.SyncingCancelled ();
 
                 };
 
-                //ContentView.AddSubview (ProgressIndicator);
+                LoadingStart += delegate() {
+                    InvokeOnMainThread (() => {
+                        ContentView.AddSubview (Loading);
+                    });
+                };
+                CalculatingStart += delegate() {
+                    InvokeOnMainThread (() => {
+                        ContentView.AddSubview (Calculating);
+                    });
+                };
+                SynchronizingStart += delegate() {
+                    InvokeOnMainThread (() => {
+                        ContentView.AddSubview (Synchronizing);
+                    });
+                };
+                LoadingDone += delegate() {
+                    InvokeOnMainThread (() => {
+                        Loading.BackgroundColor = NSColor.Green;
+                    });
+                };
+                CalculatingDone += delegate() {
+                    InvokeOnMainThread (() => {
+                        Calculating.BackgroundColor = NSColor.Green;
+                    });
+                };
+                SynchronizingDone += delegate() {
+                    InvokeOnMainThread (() => {
+                        Synchronizing.BackgroundColor = NSColor.Green;
+                    });
+                };
+                Thread thread = new Thread(delegate() {
+                    while(Program.Controller.StartState != Controller.START_STATE.SYNC_DONE) {
+                        if(Program.Controller.StartState != Controller.START_STATE.NULL){
+                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.LOAD_START){
+                                SparkleSetup.LoadingStart();
+                            }
+                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.CALCULATING_START){
+                                SparkleSetup.CalculatingStart();
+                            }
+                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.SYNC_START){
+                                SparkleSetup.SynchronizingStart();
+                            }
 
-                ContentView.AddSubview (ProgressInit);
+                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.LOAD_DONE){
+                                SparkleSetup.LoadingDone();
+                            }
+                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.CALCULATING_DONE){
+                                SparkleSetup.CalculatingDone();
+                            }
+                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.SYNC_DONE){
+                                SparkleSetup.SynchronizingDone();
+                            }
+                        }
+                        Thread.Sleep(2000);
+                    }
+                });
+                thread.Start ();
+
                 Buttons.Add (FinishButton);
                 Buttons.Add (CancelButton);
             }
+
             if (type == PageType.Finished) {
                 Header      = "Sweet! All done and ready to sync your life…";
                 WinningText = new NSTextField () {
@@ -326,11 +407,11 @@ namespace GreenQloud {
 
 
                 OpenFolderButton.Activated += delegate {
-                    Controller.OpenFolderClicked ();
+                    SparkleSetupController.OpenFolderClicked ();
                 };
 
                 FinishButton.Activated += delegate {
-                    Controller.FinishPageCompleted ();
+                    SparkleSetupController.FinishPageCompleted ();
                 };
 
 
@@ -342,7 +423,7 @@ namespace GreenQloud {
 
             if (type == PageType.Tutorial) {
                 string slide_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath,
-                    "Pixmaps", "tutorial-slide-" + Controller.TutorialPageNumber + ".png");
+                    "Pixmaps", "tutorial-slide-" + SparkleSetupController.TutorialPageNumber + ".png");
 
                 SlideImage = new NSImage (slide_image_path) {
                     Size = new SizeF (350, 200)
@@ -356,7 +437,7 @@ namespace GreenQloud {
                 ContentView.AddSubview (SlideImageView);
 
 
-                switch (Controller.TutorialPageNumber) {
+                switch (SparkleSetupController.TutorialPageNumber) {
 
                     case 1: {
                         Header      = "What's happening next?";
@@ -374,11 +455,11 @@ namespace GreenQloud {
 
 
                         SkipTutorialButton.Activated += delegate {
-                            Controller.TutorialSkipped ();
+                            SparkleSetupController.TutorialSkipped ();
                         };
 
                         ContinueButton.Activated += delegate {
-                            Controller.TutorialPageCompleted ();
+                            SparkleSetupController.TutorialPageCompleted ();
                         };
 
 
@@ -400,7 +481,7 @@ namespace GreenQloud {
                         };
 
                         ContinueButton.Activated += delegate {
-                            Controller.TutorialPageCompleted ();
+                            SparkleSetupController.TutorialPageCompleted ();
                         };
 
                         Buttons.Add (ContinueButton);
@@ -418,7 +499,7 @@ namespace GreenQloud {
                         };
 
                         ContinueButton.Activated += delegate {
-                            Controller.TutorialPageCompleted ();
+                            SparkleSetupController.TutorialPageCompleted ();
                         };
 
                         Buttons.Add (ContinueButton);
@@ -448,11 +529,11 @@ namespace GreenQloud {
 
 
                         StartupCheckButton.Activated += delegate {
-                            Controller.StartupItemChanged (StartupCheckButton.State == NSCellStateValue.On);
+                            SparkleSetupController.StartupItemChanged (StartupCheckButton.State == NSCellStateValue.On);
                         };
 
                         FinishButton.Activated += delegate {
-                            Controller.TutorialPageCompleted ();
+                            SparkleSetupController.TutorialPageCompleted ();
                         };
 
 
