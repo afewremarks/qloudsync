@@ -136,7 +136,7 @@ namespace GreenQloud.Synchrony
                         Logger.LogInfo ("EVENT IGNORE", "Ignore event on " + e.Item.LocalAbsolutePath);
                         return;
                     }
-                    Logger.LogEvent ("Event Synchronizing", e);
+                    Logger.LogEvent ("Event Synchronizing (try "+(e.TryQnt+1)+")", e );
                     if (e.RepositoryType == RepositoryType.LOCAL) {
                         SyncStatus = SyncStatus.UPLOADING;
                         Program.Controller.HandleSyncStatusChanged ();
@@ -202,6 +202,9 @@ namespace GreenQloud.Synchrony
 
                 e.TryQnt++;
                 eventDAO.UpdateTryQnt (e);
+                if(currentException != null){
+                    Thread.Sleep(5000);
+                }
 
             } while (currentException != null && e.TryQnt < 5 && !_stoped);
 
