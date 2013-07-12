@@ -20,7 +20,7 @@ namespace GreenQloud.Repository
             {
                 QloudSyncFileSystemWatcher watcher = LocalEventsSynchronizer.GetInstance ().GetWatcher (path);
                 if (watcher != null) {
-                    Thread.Sleep (1000);
+                    Thread.Sleep (2000);
                     watcher.Unblock (path);
                 }
 
