@@ -21,6 +21,10 @@ namespace GreenQloud.Model
             set;
         }
 
+        public bool Recovering {
+            get;
+            set;
+        }
     }
 }
 
