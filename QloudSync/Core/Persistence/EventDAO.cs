@@ -13,11 +13,13 @@ namespace GreenQloud.Persistence
         public abstract List<Event> EventsNotSynchronized{
             get;
         }
+
+        public abstract Event FindById (int id);
         public abstract void UpdateToSynchronized (Event e, RESPONSE response);
-
         public abstract void UpdateTryQnt (Event e);
-
-        public abstract void IgnoreEquals (Event e);
+        public abstract void IgnoreAllEquals (Event e);
+        public abstract void IgnoreAllIfDeleted (Event e);
+        public abstract void IgnoreAllIfMoved (Event e);
         public abstract void SetEventType (Event e);
         public abstract void RemoveAllUnsynchronized ();
         public abstract string LastSyncTime{get;}

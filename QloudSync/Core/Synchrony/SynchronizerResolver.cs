@@ -78,13 +78,10 @@ namespace GreenQloud.Synchrony
         public void SolveAll ()
         {
             lock (lockk) {
-                List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
-                eventsToSync = eventsNotSynchronized.Count;
-                while (eventsNotSynchronized.Count > 0 && !_stoped) {
-                    Event eventNotSynchronized = eventsNotSynchronized.First();
-                    Synchronize (eventNotSynchronized);
-                    eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
-                    eventsToSync = eventsNotSynchronized.Count;
+                eventsToSync =  eventDAO.EventsNotSynchronized.Count;
+                while (eventsToSync > 0 && !_stoped) {
+                    Synchronize ();
+                    eventsToSync = eventDAO.EventsNotSynchronized.Count;
                 }
                 SyncStatus = SyncStatus.IDLE;
                 Done = true;
@@ -131,8 +128,9 @@ namespace GreenQloud.Synchrony
             return false;
         }
 
-        void Synchronize(Event e){
+        void Synchronize(){
             Exception currentException;
+            Event e = eventDAO.EventsNotSynchronized.FirstOrDefault();
             do {
                 currentException = null;
                 try {
@@ -140,6 +138,13 @@ namespace GreenQloud.Synchrony
                     if (VerifyIgnore (e)) {
                         eventDAO.UpdateToSynchronized (e, RESPONSE.IGNORED);
                         Logger.LogInfo ("EVENT IGNORE", "Ignore event on " + e.Item.LocalAbsolutePath);
+                        return;
+                    }
+
+                    //refresh event
+                    e = eventDAO.FindById(e.Id);
+                    if(e.Synchronized){
+                        Logger.LogInfo ("INFO", "Event " + e.Id + " already synchronized with response " + e.Response);
                         return;
                     }
                     Logger.LogEvent ("Event Synchronizing (try "+(e.TryQnt+1)+")", e );
@@ -221,7 +226,9 @@ namespace GreenQloud.Synchrony
 
         void PerformIgnores (Event e)
         {
-            eventDAO.IgnoreEquals(e);
+            eventDAO.IgnoreAllEquals(e);
+            eventDAO.IgnoreAllIfDeleted(e);
+            eventDAO.IgnoreAllIfMoved(e);
         }
 
         void VerifySucess (Event e)
@@ -235,7 +242,7 @@ namespace GreenQloud.Synchrony
                         e.Item.Moved = true;
                         repositoryItemDAO.MarkAsMoved (e.Item);
                         break;
-                case EventType.CREATE:
+                    case EventType.CREATE:
                         UpdateETag (e);
                         break;
                     case EventType.UPDATE:

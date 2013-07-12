@@ -49,15 +49,42 @@ namespace GreenQloud.Persistence.SQLite
                 return Select ("SELECT * FROM EVENT");
             }
         }
+        public override Event FindById(int id)
+        {
+            return Select (string.Format("SELECT * FROM EVENT WHERE EventID = '{0}'", id)).FirstOrDefault();
+        }
 
         public override void UpdateToSynchronized (Event e, RESPONSE response)
         {            
             database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{1}\", RESPONSE = \"{2}\" WHERE EventID =\"{0}\"", e.Id, bool.TrueString, response.ToString()));
         }
 
-        public override void IgnoreEquals (Event e)
+        public override void IgnoreAllEquals (Event e)
         {            
-            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{1}\", RESPONSE = \"{5}\" WHERE ItemId =\"{0}\" AND TYPE = '{2}' AND SYNCHRONIZED <> '{3}' AND EventID <> '{4}'", e.Item.Id , bool.TrueString , e.EventType, bool.TrueString, e.Id, RESPONSE.IGNORED.ToString()));
+            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{1}\", RESPONSE = \"{4}\" WHERE ItemId =\"{0}\" AND TYPE = '{2}' AND EventID > '{3}'", e.Item.Id , bool.TrueString , e.EventType, e.Id, RESPONSE.IGNORED.ToString()));
+        }
+
+        public override void IgnoreAllIfDeleted (Event e)
+        {            
+            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'", e.Item.Id, EventType.DELETE, e.Id));
+            if(list.Count > 0) { 
+                database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE ItemId =\"{2}\" AND EventID < '{3}'", bool.TrueString, RESPONSE.IGNORED.ToString(), e.Item.Id , list.Last().Id));
+                repositoryItemDAO.MarkAsMoved (e.Item);
+                if (e.EventType == EventType.CREATE) {
+                    database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE EventID = '{2}'", bool.TrueString, RESPONSE.IGNORED.ToString(), list.Last().Id));
+                }
+            }
+        }
+
+        public override void IgnoreAllIfMoved (Event e){
+            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'", e.Item.Id, EventType.MOVE, e.Id));
+            if(list.Count > 0) { 
+                if (e.EventType == EventType.CREATE) {
+                    database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE EventID = '{2}'", bool.TrueString, RESPONSE.IGNORED.ToString(), list.Last().Id));
+                    repositoryItemDAO.MarkAsMoved (e.Item);
+                    database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  ItemId =\"{0}\" WHERE EventID = '{1}'", list.Last().Item.ResultItem.Id, e.Id));
+                }
+            }
         }
 
         public override void UpdateTryQnt (Event e)
