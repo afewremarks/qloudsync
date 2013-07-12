@@ -37,6 +37,7 @@ namespace GreenQloud {
         private NSTextField DescriptionText;
         private NSTextField WarningTextField;
         private NSTextField WinningText;
+        private NSTextField DisclaimText;
         private NSImage WarningImage;
         private NSImageView WarningImageView;
         private HyperLink hDescription;
@@ -368,7 +369,20 @@ namespace GreenQloud {
                     Font            = NSFontManager.SharedFontManager.FontWithFamily (
                         "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
                 };
+                DisclaimText = new NSTextField () {
+                    Alignment       = NSTextAlignment.Justified,
+                    BackgroundColor = NSColor.WindowBackground,
+                    Bordered        = false,
+                    Editable        = false,
+                    Frame           = new RectangleF (190, Frame.Height - 400, 640 - 240, 125),
+                    StringValue     = "Beware: Please take note that QloudSync is still in it's testing stages and we cannot yet guarantee 100% dataloss prevention. USE AT YOUR OWN RISK!",
+
+                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                        "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
+                };
+
                 ContentView.AddSubview (WinningText);
+                ContentView.AddSubview (DisclaimText);
 
 
 
