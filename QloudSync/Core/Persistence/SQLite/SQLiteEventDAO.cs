@@ -94,7 +94,9 @@ namespace GreenQloud.Persistence.SQLite
                 if (events.Count == 0)
                     events = Select("SELECT * FROM EVENT WHERE REPOSITORY = \"LOCAL\" ORDER BY INSERTTIME DESC LIMIT 1");
 
-                string time = events[0].InsertTime;
+                string time = null;
+                if (events.Count > 0)
+                    time = events[0].InsertTime;
                 if(time == null)
                     return string.Empty;
                 try{
