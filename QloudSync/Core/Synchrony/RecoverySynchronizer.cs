@@ -103,7 +103,7 @@ using GreenQloud.Persistence.SQLite;
                     return e;
                 }
             } else {
-                if(e.Item.Id != 0 && e.Item.Moved == false){
+                if(e.Item.Id != 0 && (e.Item.UpdatedAt != null && e.Item.Moved == false)){
                     e.RepositoryType = RepositoryType.LOCAL;
                     e.EventType = EventType.DELETE;
                     return e;
