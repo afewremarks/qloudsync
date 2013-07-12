@@ -253,6 +253,7 @@ namespace GreenQloud {
 
                     loadedSynchronizers = true;
                     Logger.LogInfo ("INFO", "Synchronizers Ready!");
+                    ErrorType = ERROR_TYPE.NULL;
                     OnIdle ();
                 }catch (Exception e){
                     Console.WriteLine (e.Message);
