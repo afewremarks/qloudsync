@@ -115,12 +115,18 @@ namespace GreenQloud
                             key += Path.DirectorySeparatorChar;
                         e.Item = RepositoryItem.CreateInstance (repo, flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir), key);
 
-                        if (flags [i].HasFlag (FSEventStreamEventFlagItem.Created)) {
+                        if (flags [i].HasFlag (FSEventStreamEventFlagItem.Created) && !flags[i].HasFlag (FSEventStreamEventFlagItem.Renamed)) {
                             e.EventType = EventType.CREATE;
                         } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Removed)) {
                             e.EventType = EventType.DELETE;
                         } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) {
-                            e.EventType = EventType.UPDATE;
+                            if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !Directory.Exists (paths[i])) {
+                                e.EventType = EventType.DELETE;
+                            } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile) && !File.Exists (paths[i])) {
+                                e.EventType = EventType.DELETE;
+                            } else {
+                                e.EventType = EventType.UPDATE;
+                            }
                         } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Renamed)) {
                             if ((i + 1) < numEvents && (ids [i] == ids [i+1] - 1)) {
                                 e.EventType = EventType.MOVE;
