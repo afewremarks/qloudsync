@@ -159,7 +159,12 @@ namespace GreenQloud.Repository
 
         public string RemoteETAG (RepositoryItem item)
         {
-            return GetMetadata(item.Key).ETag.Replace("\"", "");
+            GetObjectResponse meta = GetMetadata (item.Key);
+            if(meta == null){
+                Logger.LogInfo("ERROR", "ETAG from " + item.Key + " cannot be calculated. Metadata not found!");
+                return "";
+            }
+            return meta.ETag.Replace("\"", "");
         }
 
         public GetObjectResponse GetMetadata (string key)
@@ -274,7 +279,10 @@ namespace GreenQloud.Repository
         {
             List <RepositoryItem> remoteItems = new List <RepositoryItem> ();
             foreach (ListEntry s3item in s3items) {
-                remoteItems.Add ( CreateObjectInstance (s3item));  
+                RepositoryItem item = CreateObjectInstance (s3item);
+                if(item != null){
+                    remoteItems.Add (item);  
+                }
             }
             return remoteItems;
         }
@@ -285,8 +293,19 @@ namespace GreenQloud.Repository
             if (key != string.Empty) {
                 LocalRepository repo;
                 repo = new Persistence.SQLite.SQLiteRepositoryDAO ().FindOrCreateByRootName (RuntimeSettings.HomePath);
-                RepositoryItem item = RepositoryItem.CreateInstance (repo, GetMetadata (key).ContentLength == 0, s3item);
-                return item;
+                try{
+                    GetObjectResponse meta = GetMetadata (key);
+                    if(meta != null){
+                        RepositoryItem item = RepositoryItem.CreateInstance (repo, meta.ContentLength == 0, s3item);
+                        return item;
+                    } else {
+                        Logger.LogInfo("ERROR", "File " + key + " ignored. Metadata not found!");
+                        return null;
+                    }
+                } catch (Exception ex) {
+                    Logger.LogInfo("ERROR", ex.Message);
+                    return null;
+                }
             }
             return null;
         }
