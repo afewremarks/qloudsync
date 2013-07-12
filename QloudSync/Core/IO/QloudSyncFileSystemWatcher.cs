@@ -119,9 +119,7 @@ namespace GreenQloud
                             e.EventType = EventType.CREATE;
                         } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Removed)) {
                             e.EventType = EventType.DELETE;
-                        }
-
-                        if (flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) {
+                        } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) {
                             e.EventType = EventType.UPDATE;
                         } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Renamed)) {
                             if ((i + 1) < numEvents && (ids [i] == ids [i+1] - 1)) {

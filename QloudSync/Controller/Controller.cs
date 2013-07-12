@@ -225,6 +225,7 @@ namespace GreenQloud {
         }
         public void InitializeSynchronizers (bool initRecovery = false)
         {
+            Thread.Sleep (5000);
             Thread startSync;
             startSync = new Thread (delegate() {
                 try{
