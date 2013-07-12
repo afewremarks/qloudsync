@@ -138,6 +138,8 @@ namespace GreenQloud
                                     e.EventType = EventType.UPDATE;
                                 }
                             }
+                        } else {
+                            return;
                         }
 
                         handler (e);
