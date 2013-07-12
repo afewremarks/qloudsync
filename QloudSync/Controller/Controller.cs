@@ -494,7 +494,7 @@ namespace GreenQloud {
             OnError ();
             StopSynchronizers ();
             Thread.Sleep (5000);
-            InitializeSynchronizers ();
+            InitializeSynchronizers (true);
         }
 
         public ERROR_TYPE ErrorType {
