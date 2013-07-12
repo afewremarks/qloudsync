@@ -15,6 +15,7 @@ using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
 using GreenQloud.Persistence.SQLite;
 using System.Net.Sockets;
+using LitS3;
 
 namespace GreenQloud.Synchrony
 {
@@ -94,9 +95,14 @@ namespace GreenQloud.Synchrony
         //TODO refactor ignores
         private bool VerifyIgnoreRemote (Event remoteEvent)
         {
+            GetObjectResponse meta = remoteRepository.GetMetadata (remoteEvent.Item.Key);
+            if(meta == null){
+                Logger.LogInfo("ERROR", "File " + remoteEvent.Item.Key + " ignored. Metadata not found!");
+                return true;
+            }
             if(!remoteEvent.HaveResultItem){
                 if (!remoteEvent.Item.IsFolder) {
-                    if (remoteRepository.Exists(remoteEvent.Item) && remoteRepository.GetMetadata(remoteEvent.Item.Key).ContentLength == 0)
+                    if (remoteRepository.Exists(remoteEvent.Item) && meta.ContentLength == 0)
                         return true;
                 }
             }
