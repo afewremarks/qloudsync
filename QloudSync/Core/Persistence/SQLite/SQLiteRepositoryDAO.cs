@@ -15,8 +15,14 @@ namespace GreenQloud.Persistence.SQLite
         SQLiteDatabase database = new SQLiteDatabase ();
         public override void Create (LocalRepository e)
         {
-            database.ExecuteNonQuery (string.Format("INSERT INTO Repository (Path) VALUES (\"{0}\")", e.Path));
+            database.ExecuteNonQuery (string.Format("INSERT INTO Repository (Path, RECOVERING) VALUES (\"{0}\", \"{1}\")", e.Path, e.Recovering.ToString()));
         }
+
+        public void Update (LocalRepository repo)
+        {
+            database.ExecuteNonQuery (string.Format("UPDATE Repository SET Path=\"{0}\", RECOVERING=\"{1}\" WHERE RepositoryID='{2}'", repo.Path, repo.Recovering.ToString(), repo.Id));
+        }
+
         public override List<LocalRepository> All {
             get {        
               return Select("SELECT * FROM REPOSITORY");
@@ -61,6 +67,8 @@ namespace GreenQloud.Persistence.SQLite
                 LocalRepository r = new LocalRepository ();
                 r.Id = int.Parse (dr[0].ToString());
                 r.Path = dr [1].ToString ();
+                if(dr[2].ToString().Length > 0)
+                    r.Recovering = bool.Parse (dr[2].ToString());
                 repos.Add (r);
             }
             return repos;

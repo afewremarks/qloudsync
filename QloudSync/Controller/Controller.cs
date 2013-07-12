@@ -10,6 +10,7 @@ using GreenQloud.Synchrony;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using GreenQloud.Persistence.SQLite;
+using GreenQloud.Model;
 
  
 
@@ -225,6 +226,13 @@ namespace GreenQloud {
         }
         public void InitializeSynchronizers (bool initRecovery = false)
         {
+            SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO ();
+            LocalRepository repo = repoDAO.FindOrCreateByRootName (RuntimeSettings.HomePath);
+            if(initRecovery || repo.Recovering){
+                initRecovery = true;
+                repo.Recovering = true;
+                repoDAO.Update (repo);
+            }
             Thread.Sleep (5000);
             Thread startSync;
             startSync = new Thread (delegate() {
@@ -254,6 +262,10 @@ namespace GreenQloud {
 
                     loadedSynchronizers = true;
                     Logger.LogInfo ("INFO", "Synchronizers Ready!");
+                    if(initRecovery || repo.Recovering){
+                        repo.Recovering = false;
+                        repoDAO.Update (repo);
+                    }
                     ErrorType = ERROR_TYPE.NULL;
                     OnIdle ();
                 }catch (Exception e){
