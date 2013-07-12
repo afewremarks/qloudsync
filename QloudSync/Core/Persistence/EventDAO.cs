@@ -13,7 +13,9 @@ namespace GreenQloud.Persistence
         public abstract List<Event> EventsNotSynchronized{
             get;
         }
-        public abstract void UpdateToSynchronized (Event e);
+        public abstract void UpdateToSynchronized (Event e, RESPONSE response);
+
+        public abstract void UpdateTryQnt (Event e);
 
         public abstract void IgnoreEquals (Event e);
         public abstract void SetEventType (Event e);

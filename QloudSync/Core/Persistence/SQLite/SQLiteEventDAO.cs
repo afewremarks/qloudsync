@@ -33,8 +33,8 @@ namespace GreenQloud.Persistence.SQLite
                         dateOfEvent = GlobalDateTime.NowUniversalString;
                     }
 
-                    string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\")", 
-                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket);
+                    string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET, TRY_QNT, RESPONSE) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\", \"{11}\", \"{12}\")", 
+                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket, e.TryQnt, e.Response.ToString());
 
                     e.Id = (int) database.ExecuteNonQuery (sql, true);
                 }catch(Exception err){
@@ -50,16 +50,20 @@ namespace GreenQloud.Persistence.SQLite
             }
         }
 
-        public override void UpdateToSynchronized (Event e)
+        public override void UpdateToSynchronized (Event e, RESPONSE response)
         {            
-            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\" WHERE EventID =\"{1}\"", bool.TrueString, e.Id));
+            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{1}\", RESPONSE = \"{2}\" WHERE EventID =\"{0}\"", e.Id, bool.TrueString, response.ToString()));
         }
 
         public override void IgnoreEquals (Event e)
         {            
-            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\" WHERE ItemId =\"{1}\" AND TYPE = '{2}' AND SYNCHRONIZED <> '{3}' AND EventID <> '{4}'", bool.TrueString, e.Item.Id, e.EventType, bool.TrueString, e.Id));
+            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{1}\", RESPONSE = \"{5}\" WHERE ItemId =\"{0}\" AND TYPE = '{2}' AND SYNCHRONIZED <> '{3}' AND EventID <> '{4}'", e.Item.Id , bool.TrueString , e.EventType, bool.TrueString, e.Id, RESPONSE.IGNORED.ToString()));
         }
-        //EventID, ItemId, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET
+
+        public override void UpdateTryQnt (Event e)
+        {
+            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  TRY_QNT = \"{0}\" WHERE EventID =\"{1}\"", e.TryQnt, e.Id));
+        }
 
         public override List<Event> EventsNotSynchronized {
             get {
@@ -79,7 +83,7 @@ namespace GreenQloud.Persistence.SQLite
             List<Event> list = EventsNotSynchronized;
             foreach (Event e in list)
             {
-                UpdateToSynchronized (e); // TODO create status!
+                UpdateToSynchronized (e, RESPONSE.IGNORED);
             }
         }
 
@@ -162,6 +166,8 @@ namespace GreenQloud.Persistence.SQLite
                 e.DeviceId = dr[9].ToString();
                 e.OS = dr[10].ToString();
                 e.Bucket = dr[11].ToString();
+                e.TryQnt = int.Parse (dr[12].ToString());
+                e.Response = (RESPONSE) Enum.Parse(typeof(RESPONSE),dr[13].ToString());
                 events.Add (e);
             }
             return events;

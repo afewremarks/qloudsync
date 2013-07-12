@@ -79,7 +79,7 @@ namespace GreenQloud.Synchrony
             lock (lockk) {
                 List<Event> eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
                 eventsToSync = eventsNotSynchronized.Count;
-                while (eventsNotSynchronized.Count > 0) {
+                while (eventsNotSynchronized.Count > 0 && !_stoped) {
                     Event eventNotSynchronized = eventsNotSynchronized.First();
                     Synchronize (eventNotSynchronized);
                     eventsNotSynchronized = eventDAO.EventsNotSynchronized.ToList();
@@ -126,64 +126,88 @@ namespace GreenQloud.Synchrony
         }
 
         void Synchronize(Event e){
-            PerformIgnores (e);
-            if (VerifyIgnore (e)) {
-                eventDAO.UpdateToSynchronized(e);
-                Logger.LogInfo ("EVENT IGNORE", "Ignore event on " + e.Item.LocalAbsolutePath);
-                return;
+            Exception currentException;
+            do {
+                currentException = null;
+                try {
+                    PerformIgnores (e);
+                    if (VerifyIgnore (e)) {
+                        eventDAO.UpdateToSynchronized (e, RESPONSE.IGNORED);
+                        Logger.LogInfo ("EVENT IGNORE", "Ignore event on " + e.Item.LocalAbsolutePath);
+                        return;
+                    }
+                    Logger.LogEvent ("Event Synchronizing", e);
+                    if (e.RepositoryType == RepositoryType.LOCAL) {
+                        SyncStatus = SyncStatus.UPLOADING;
+                        Program.Controller.HandleSyncStatusChanged ();
+
+                        switch (e.EventType) {
+                        case EventType.CREATE: 
+                        case EventType.UPDATE:
+                            remoteRepository.Upload (e.Item);
+                            break;
+                        case EventType.DELETE:
+                            remoteRepository.Delete (e.Item);
+                            break;
+                        case EventType.COPY:
+                            remoteRepository.Copy (e.Item);
+                            break;
+                        case EventType.MOVE:
+                            remoteRepository.Move (e.Item);
+                            break;
+                        }
+                    } else {
+                        SyncStatus = SyncStatus.DOWNLOADING;
+                        Program.Controller.HandleSyncStatusChanged ();
+
+                        switch (e.EventType) {
+                        case EventType.MOVE:
+                            physicalLocalRepository.Move (e.Item);
+                            break;
+                        case EventType.CREATE: 
+                        case EventType.UPDATE:
+                            remoteRepository.Download (e.Item);
+                            break;
+                        case EventType.COPY:
+                            physicalLocalRepository.Copy (e.Item);
+                            break;
+                        case EventType.DELETE:
+                            physicalLocalRepository.Delete (e.Item);
+                            break;
+                        }                
+                    }
+                    
+                    VerifySucess (e);
+
+                    if (e.RepositoryType == RepositoryType.LOCAL) {
+                        new JSONHelper ().postJSON (e);
+                    }
+                    eventDAO.UpdateToSynchronized (e, RESPONSE.OK);
+
+                    SyncStatus = SyncStatus.IDLE;
+                    Program.Controller.HandleSyncStatusChanged ();
+
+                    Logger.LogEvent ("DONE Event Synchronizing", e);
+                } catch (WebException webx) {
+                    if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
+                        throw webx;
+                    } else {
+                        currentException = webx;
+                    }
+                } catch (SocketException sock) {
+                    throw sock;
+                } catch (Exception ex) {
+                    currentException = ex;
+                } 
+
+                e.TryQnt++;
+                eventDAO.UpdateTryQnt (e);
+
+            } while (currentException != null && e.TryQnt < 5 && !_stoped);
+
+            if (currentException != null) {
+                throw currentException;
             }
-            Logger.LogEvent("Event Synchronizing", e);
-            if (e.RepositoryType == RepositoryType.LOCAL){
-                SyncStatus = SyncStatus.UPLOADING;
-                Program.Controller.HandleSyncStatusChanged ();
-
-                switch (e.EventType){
-                    case EventType.CREATE: 
-                    case EventType.UPDATE:
-                        remoteRepository.Upload (e.Item);
-                        break;
-                    case EventType.DELETE:
-                        remoteRepository.Delete (e.Item);
-                        break;
-                    case EventType.COPY:
-                        remoteRepository.Copy (e.Item);
-                        break;
-                    case EventType.MOVE:
-                        remoteRepository.Move (e.Item);
-                        break;
-                }
-            }else{
-                SyncStatus = SyncStatus.DOWNLOADING;
-                Program.Controller.HandleSyncStatusChanged ();
-
-                switch (e.EventType){
-                case EventType.MOVE:
-                    physicalLocalRepository.Move(e.Item);
-                    break;
-                case EventType.CREATE: 
-                case EventType.UPDATE:
-                    remoteRepository.Download (e.Item);
-                    break;
-                case EventType.COPY:
-                    physicalLocalRepository.Copy (e.Item);
-                    break;
-                case EventType.DELETE:
-                    physicalLocalRepository.Delete (e.Item);
-                    break;
-                }                
-            }
-            
-            VerifySucess(e);
-
-            if(e.RepositoryType == RepositoryType.LOCAL){
-                new JSONHelper().postJSON (e);
-            }
-            eventDAO.UpdateToSynchronized(e);
-
-            SyncStatus = SyncStatus.IDLE;
-            Program.Controller.HandleSyncStatusChanged ();
-
-            Logger.LogEvent("DONE Event Synchronizing", e);
         }
 
         void PerformIgnores (Event e)

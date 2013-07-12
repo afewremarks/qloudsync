@@ -17,6 +17,13 @@ using System.IO;
         REMOTE
     }
 
+    public enum RESPONSE{
+        NULL,
+        OK,
+        IGNORED,
+        FAILURE
+    }
+
 	public class Event
 	{
 		public Event ()
@@ -30,6 +37,16 @@ using System.IO;
 		}
 
         public int Id {
+            get;
+            set;
+        }
+
+        public int TryQnt {
+            get;
+            set;
+        }
+
+        public RESPONSE Response {
             get;
             set;
         }
