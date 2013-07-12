@@ -317,17 +317,17 @@ namespace GreenQloud {
                 this.folder_item.Image.Size = new SizeF (16, 16);
                 this.folder_item.Enabled    = true;
 
-                this.preferences_item = new NSMenuItem () {
-                    Title   = "Preferences…",
-                    Enabled = false
-                };
+//                this.preferences_item = new NSMenuItem () {
+//                    Title   = "Preferences…",
+//                    Enabled = false
+//                };
 
-                this.preferences_item.Activated += delegate {
-                    AddHostedProjectClicked ();
-                };
+//                this.preferences_item.Activated += delegate {
+//                    AddHostedProjectClicked ();
+//                };
 
                 this.recent_events_item = new NSMenuItem () {
-                    Title   = "Recent Changes…",
+                    Title   = "Recent Changes…(Coming Soon!)",
                     Enabled =  false//Program.Controller.RecentsTransfers.Count != 0
                 };
 
@@ -384,10 +384,10 @@ namespace GreenQloud {
                 };
 
 
-                co2_savings_item = new NSMenuItem () {
-                    Title = "Loading data of savings",
-                    Enabled = true
-                };
+//                co2_savings_item = new NSMenuItem () {
+//                    Title = "Loading data of savings",
+//                    Enabled = true
+//                };
 
                 help_item = new NSMenuItem(){
                     Title = "Help Center"
@@ -398,13 +398,13 @@ namespace GreenQloud {
                };
 
                 this.menu.AddItem (this.state_item);
-                this.menu.AddItem (co2_savings_item);
+                //this.menu.AddItem (co2_savings_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.folder_item);
                 this.menu.AddItem (this.openweb_item);                
                 this.menu.AddItem (this.recent_events_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.preferences_item);
+                //this.menu.AddItem (this.preferences_item);
                 this.menu.AddItem (help_item);
 				this.menu.AddItem (this.about_item);
 			    this.menu.AddItem (NSMenuItem.SeparatorItem);

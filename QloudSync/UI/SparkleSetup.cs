@@ -221,16 +221,18 @@ namespace GreenQloud {
 
                 NSTextField Loading = new NSTextField () {
                     Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.Gray,
+                    BackgroundColor = NSColor.Red,
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (190, Frame.Height - 230, 640 - 150 - 80, 20),
                     StringValue     = "Starting synchronizers...",
                     Font            = SparkleUI.Font
                 };
+
+
                 NSTextField Calculating = new NSTextField () {
                     Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.Gray,
+                    BackgroundColor = NSColor.Red,
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (190, Frame.Height - 260, 640 - 150 - 80, 20),
@@ -239,13 +241,16 @@ namespace GreenQloud {
                 };
                 NSTextField Synchronizing = new NSTextField () {
                     Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.Gray,
+                    BackgroundColor = NSColor.Red,
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (190, Frame.Height - 290, 640 - 150 - 80, 20),
                     StringValue     = "Synchronizing changes...",
                     Font            = SparkleUI.Font
                 };
+
+
+
 
                 CancelButton = new NSButton () {
                     Title = "Cancel"
@@ -290,7 +295,7 @@ namespace GreenQloud {
 
                 LoadingStart += delegate() {
                     InvokeOnMainThread (() => {
-                        ContentView.AddSubview (Loading);
+                        ContentView.AddSubview (Loading);                       
                     });
                 };
                 CalculatingStart += delegate() {
