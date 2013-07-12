@@ -164,14 +164,13 @@ namespace GreenQloud {
 
             Program.Controller.OnIdle += delegate {
 
-                if (CurrentState != IconState.Error || Program.Controller.ErrorType == ERROR_TYPE.DISCONNECTION) {
-                    CurrentState = IconState.Idle;
+                CurrentState = IconState.Idle;
                     
-                    if (System.IO.Directory.GetDirectories(RuntimeSettings.HomePath).Length == 0 && System.IO.Directory.GetFiles (RuntimeSettings.HomePath).Length < 2)
-                        StateText = string.Format("Welcome to {0}!",GlobalSettings.ApplicationName);
-                    else
-                        StateText = "Files up to date " + FolderSize;
-                }
+                if (System.IO.Directory.GetDirectories(RuntimeSettings.HomePath).Length == 0 && System.IO.Directory.GetFiles (RuntimeSettings.HomePath).Length < 2)
+                    StateText = string.Format("Welcome to {0}!",GlobalSettings.ApplicationName);
+                else
+                    StateText = "Files up to date " + FolderSize;
+
                 
                 UpdateQuitItemEvent (QuitItemEnabled);
                 UpdateStatusItemEvent (StateText);
