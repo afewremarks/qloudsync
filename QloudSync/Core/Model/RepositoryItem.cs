@@ -137,9 +137,10 @@ namespace GreenQloud.Model
         }
 
         public void BuildResultItem(string key){
-            if(key != string.Empty)
+            if(key != string.Empty) {
                 resultItem = CreateInstance (this.Repository, this.IsFolder, key, this.ETag, this.LocalETag);
-            ResultItemId = resultItem.Id;
+                ResultItemId = resultItem.Id;
+            }
         }
 
         private string ToPathString (string path)
