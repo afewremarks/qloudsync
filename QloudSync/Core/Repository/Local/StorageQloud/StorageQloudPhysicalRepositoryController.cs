@@ -31,7 +31,7 @@ namespace GreenQloud.Repository.Local
             List<RepositoryItem> list = new List<RepositoryItem>();
             foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.TopDirectoryOnly).ToList ()) {
                 string key = fileInfo.FullName.Substring(repo.Path.Length);
-                RepositoryItem localFile = RepositoryItem.CreateInstance (repo, false, key);
+                RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
                 list.Add (localFile);
             }
 
@@ -39,7 +39,7 @@ namespace GreenQloud.Repository.Local
                 string key = dirInfo.FullName.Substring(repo.Path.Length);
                 if (!key.EndsWith (Path.DirectorySeparatorChar.ToString()))
                     key += Path.DirectorySeparatorChar;
-                RepositoryItem localFile = RepositoryItem.CreateInstance (repo, true, key);
+                RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
                 list.Add (localFile);
                 list.AddRange (GetItems (dirInfo));
             }
@@ -149,7 +149,7 @@ namespace GreenQloud.Repository.Local
             if (file.Exists){
                 LocalRepository repo = repoDAO.GetRepositoryByItemFullName (fullLocalName);
                 string key = fullLocalName.Substring (repo.Path.Length);
-                return RepositoryItem.CreateInstance(repo,false, key);
+                return RepositoryItem.CreateInstance(repo, key);
             }
             return null;
         }

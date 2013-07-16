@@ -22,17 +22,17 @@ namespace GreenQloud.Model
         {
             return dao.GetById (id);
         }
-        public static RepositoryItem CreateInstance (LocalRepository repo, bool isFolder, string key){
-            return CreateInstance (repo, isFolder, key, null, null);
+        public static RepositoryItem CreateInstance (LocalRepository repo, string key){
+            return CreateInstance (repo, key, null, null);
         }
 
-        public static RepositoryItem CreateInstance (LocalRepository repo, bool isFolder, string key, string eTag, string localETag){
+        public static RepositoryItem CreateInstance (LocalRepository repo, string key, string eTag, string localETag){
             RepositoryItem item = new RepositoryItem();
             item.Repository = repo;
             item.Key = key;
             item.ETag = eTag;
             item.LocalETag = localETag;
-            item.IsFolder = key.EndsWith(Path.DirectorySeparatorChar.ToString());
+            item.IsFolder = key.EndsWith("/");
 
             if(dao.ExistsUnmoved(item)){
                 item = dao.GetFomDatabase (item);
@@ -40,7 +40,7 @@ namespace GreenQloud.Model
             return item;
         }
 
-        public static RepositoryItem CreateInstance (LocalRepository repo, bool isFolder, ListEntry entry){
+        public static RepositoryItem CreateInstance (LocalRepository repo, ListEntry entry){
             RepositoryItem item = new RepositoryItem();
             item.Repository = repo;
             string key = "";
@@ -51,7 +51,7 @@ namespace GreenQloud.Model
             }
             item.Key = key;
             item.LocalETag = null;
-            item.IsFolder = isFolder;
+            item.IsFolder = key.EndsWith("/");
 
             if(dao.ExistsUnmoved(item)){
                 item = dao.GetFomDatabase (item);
@@ -83,7 +83,7 @@ namespace GreenQloud.Model
 
         public string Name{
             get {
-               return Key.Substring (Key.LastIndexOf(Path.DirectorySeparatorChar.ToString())+1);
+               return Key.Substring (Key.LastIndexOf("/")+1);
             }
         }
 
@@ -138,7 +138,7 @@ namespace GreenQloud.Model
 
         public void BuildResultItem(string key){
             if(key != string.Empty) {
-                resultItem = CreateInstance (this.Repository, this.IsFolder, key, this.ETag, this.LocalETag);
+                resultItem = CreateInstance (this.Repository, key, this.ETag, this.LocalETag);
                 ResultItemId = resultItem.Id;
             }
         }
@@ -148,6 +148,7 @@ namespace GreenQloud.Model
             if (IsFolder && !path.EndsWith(Path.DirectorySeparatorChar.ToString())) {
                 path += Path.DirectorySeparatorChar;
             }
+            path = path.Replace ("/", Path.DirectorySeparatorChar.ToString ());
             return path;
         }
     }
