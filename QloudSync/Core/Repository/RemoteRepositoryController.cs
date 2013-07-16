@@ -296,7 +296,7 @@ namespace GreenQloud.Repository
                 try{
                     GetObjectResponse meta = GetMetadata (key);
                     if(meta != null){
-                        RepositoryItem item = RepositoryItem.CreateInstance (repo, meta.ContentLength == 0, s3item);
+                        RepositoryItem item = RepositoryItem.CreateInstance (repo, s3item);
                         return item;
                     } else {
                         Logger.LogInfo("ERROR", "File " + key + " ignored. Metadata not found!");

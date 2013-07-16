@@ -61,14 +61,7 @@ namespace GreenQloud.Synchrony
                         e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 
                         string key = (string)jsonObject["object"];
-                        bool isFolder;
-                        if((string)jsonObject["resultObject"] == string.Empty){
-                            isFolder = remoteController.GetMetadata(key).ContentLength==0;
-                        } else {
-                            isFolder = remoteController.GetMetadata((string)jsonObject["resultObject"]).ContentLength==0;
-                        }
-
-                        e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), isFolder, key);
+                        e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), key);
                         e.Item.BuildResultItem((string)jsonObject["resultObject"]);
                         e.Item.ETag = (string)jsonObject["hash"];
 

@@ -113,7 +113,7 @@ namespace GreenQloud
                         string key = paths [i].Substring (repo.Path.Length);
                         if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key.EndsWith (Path.DirectorySeparatorChar.ToString()))
                             key += Path.DirectorySeparatorChar;
-                        e.Item = RepositoryItem.CreateInstance (repo, flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir), key);
+                        e.Item = RepositoryItem.CreateInstance (repo, key);
 
                         if (flags [i].HasFlag (FSEventStreamEventFlagItem.Created) && !flags[i].HasFlag (FSEventStreamEventFlagItem.Renamed)) {
                             e.EventType = EventType.CREATE;
