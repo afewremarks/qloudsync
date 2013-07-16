@@ -92,9 +92,14 @@ namespace GreenQloud.Synchrony
         //TODO refactor ignores
         private bool VerifyIgnoreRemote (Event remoteEvent)
         {
-            GetObjectResponse meta = remoteRepository.GetMetadata (remoteEvent.Item.Key);
+            GetObjectResponse meta = null;
+            if (remoteEvent.HaveResultItem) { 
+                meta = remoteRepository.GetMetadata (remoteEvent.Item.ResultItem.Key);
+            } else {
+                meta = remoteRepository.GetMetadata (remoteEvent.Item.Key);
+            }
             if(meta == null){
-                Logger.LogInfo("ERROR", "File " + remoteEvent.Item.Key + " ignored. Metadata not found!");
+                Logger.LogInfo("ERROR", "File " + (remoteEvent.HaveResultItem ? remoteEvent.Item.ResultItem.Key : remoteEvent.Item.Key) + " ignored. Metadata not found!");
                 return true;
             }
             if(!remoteEvent.HaveResultItem){
