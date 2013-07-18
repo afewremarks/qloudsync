@@ -91,7 +91,6 @@ namespace GreenQloud.Synchrony
             Thread.Sleep (1000);
         }
 
-        //TODO refactor ignores
         private bool VerifyIgnoreRemote (Event remoteEvent)
         {
             GetObjectResponse meta = null;

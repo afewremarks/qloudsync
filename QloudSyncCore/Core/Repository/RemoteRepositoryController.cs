@@ -89,7 +89,7 @@ namespace GreenQloud.Repository
         public void Upload (RepositoryItem item)
         {
             if(item.IsFolder){
-                GenericUploadFolder (item.Key);
+                GenericCreateFolder (item.Key);
                 UploadEntry(connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, item.Key), item);
             }else{
                 GenericUpload (item.Key,  item.LocalAbsolutePath);
@@ -169,17 +169,35 @@ namespace GreenQloud.Repository
 
         public GetObjectResponse GetMetadata (string key)
         {
+            S3Service service = connection.Connect ();
             try{
-                S3Service service = connection.Connect ();
-
                 var request = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, key, true);
-                using (GetObjectResponse response = request.GetResponse())
-                return response;
+                using (GetObjectResponse response = request.GetResponse()){
+                    return response;
+                }
             } catch (WebException webx) {
-                if (((HttpWebResponse)webx.Response).StatusCode == HttpStatusCode.NotFound)
-                    return null;
-                else
+                if (((HttpWebResponse)webx.Response).StatusCode == HttpStatusCode.NotFound){
+                    try {
+                        //METADATA NOT FOUND, recover it (if is folder)!
+                        if(key.EndsWith("/")){
+                            GenericCreateFolder(key);
+                            Logger.LogInfo("INFO", "METADATA FOR "+ key +" NOT FOUND, trying to recover it!");
+                            GetObjectRequest request2 = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, key, true);
+                            using (GetObjectResponse response2 = request2.GetResponse()){
+                                Logger.LogInfo("INFO", "METADATA FOR "+ key +" RECOVERED, folder created!");
+                                return response2;
+                            }
+                        }
+
+                        Logger.LogInfo("INFO", "METADATA FOR "+ key +" CANNOT BE RECOVERED!");
+                        return null;
+                    } catch {
+                        Logger.LogInfo("INFO", "METADATA FOR "+ key +" CANNOT BE RECOVERED!");
+                        return null;
+                    }
+                } else {
                     throw webx;
+                }
             }
         }
 
@@ -224,7 +242,7 @@ namespace GreenQloud.Repository
             connection.Connect().AddObject(filepath, RuntimeSettings.DefaultBucketName, key);
         }
 
-        private void GenericUploadFolder (string key)
+        private void GenericCreateFolder (string key)
         {
             string objectContents = string.Empty;
             connection.Connect ().AddObject (RuntimeSettings.DefaultBucketName, key, 0, stream =>
