@@ -384,10 +384,25 @@ namespace GreenQloud {
                 };
 
 
-//                co2_savings_item = new NSMenuItem () {
-//                    Title = "Loading data of savings",
-//                    Enabled = true
-//                };
+                co2_savings_item = new NSMenuItem () {
+                    Title = "Loading data of savings",
+                    Enabled = true
+                };
+                Thread co2Update = new Thread (delegate(){
+                    while(true){
+                        try{
+                            InvokeOnMainThread (() => {
+                                co2_savings_item.Title = "Total CO2 saved: "+Statistics.EarlyCO2Savings.Saved;
+                            });
+                        } catch (Exception e){
+                            Console.WriteLine(e.Message);
+                            Logger.LogInfo("INFO", "Cannot load CO2 savings.");
+                        } finally {
+                            Thread.Sleep(60000);
+                        }
+                    }
+                });
+                co2Update.Start ();
 
                 help_item = new NSMenuItem(){
                     Title = "Help Center"
@@ -398,7 +413,7 @@ namespace GreenQloud {
                };
 
                 this.menu.AddItem (this.state_item);
-                //this.menu.AddItem (co2_savings_item);
+                this.menu.AddItem (co2_savings_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.folder_item);
                 this.menu.AddItem (this.openweb_item);                

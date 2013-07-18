@@ -59,8 +59,10 @@ namespace GreenQloud
 
             string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hash={1}", Credential.Username, hash);
             JObject data = JSONHelper.GetInfo (uri);
-            co2savings.Used = (string)data["used"];
-            co2savings.Saved = (string)data["saved"];
+            foreach(JToken o in data ["trulygreen"]){
+                if((string)o["id"] == "co2_savings_total")
+                    co2savings.Saved = (string) o["value"] ;
+            }
             return co2savings;
         }
 
