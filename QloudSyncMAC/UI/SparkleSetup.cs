@@ -221,31 +221,30 @@ namespace GreenQloud {
 
                 NSTextField Loading = new NSTextField () {
                     Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.Red,
+                    BackgroundColor = NSColor.WindowBackground,
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (190, Frame.Height - 230, 640 - 150 - 80, 20),
-                    StringValue     = "Starting synchronizers...",
+                    StringValue     = "Starting synchronizers",
                     Font            = SparkleUI.Font
                 };
 
-
                 NSTextField Calculating = new NSTextField () {
                     Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.Red,
+                    BackgroundColor = NSColor.WindowBackground,
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (190, Frame.Height - 260, 640 - 150 - 80, 20),
-                    StringValue     = "Calculating changes with remote repository...",
+                    StringValue     = "Calculating changes with remote repository",
                     Font            = SparkleUI.Font
                 };
                 NSTextField Synchronizing = new NSTextField () {
                     Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.Red,
+                    BackgroundColor = NSColor.WindowBackground,
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (190, Frame.Height - 290, 640 - 150 - 80, 20),
-                    StringValue     = "Synchronizing changes...",
+                    StringValue     = "Synchronizing changes",
                     Font            = SparkleUI.Font
                 };
 
@@ -295,32 +294,59 @@ namespace GreenQloud {
 
                 LoadingStart += delegate() {
                     InvokeOnMainThread (() => {
-                        ContentView.AddSubview (Loading);                       
+                        ContentView.AddSubview (Loading);
+                        if(!Loading.StringValue.EndsWith("✓")) {
+                            if(Loading.StringValue.EndsWith("..."))
+                                Loading.StringValue = Loading.StringValue.Replace("...", "");
+                            else
+                                Loading.StringValue += ".";
+                        }
                     });
                 };
                 CalculatingStart += delegate() {
                     InvokeOnMainThread (() => {
                         ContentView.AddSubview (Calculating);
+                        if(!Calculating.StringValue.EndsWith("✓")) {
+                            if(Calculating.StringValue.EndsWith("..."))
+                                Calculating.StringValue = Calculating.StringValue.Replace("...", "");
+                            else
+                                Calculating.StringValue += ".";
+                        }
                     });
                 };
                 SynchronizingStart += delegate() {
                     InvokeOnMainThread (() => {
                         ContentView.AddSubview (Synchronizing);
+                        if(!Synchronizing.StringValue.EndsWith("✓")) {
+                            if(Synchronizing.StringValue.EndsWith("..."))
+                                Synchronizing.StringValue = Synchronizing.StringValue.Replace("...", "");
+                            else
+                                Synchronizing.StringValue += ".";
+                        }
                     });
                 };
                 LoadingDone += delegate() {
                     InvokeOnMainThread (() => {
-                        Loading.BackgroundColor = NSColor.Green;
+                        if(!Loading.StringValue.EndsWith("✓")){
+                            Loading.StringValue.Replace(".", "");
+                            Loading.StringValue += "... ✓";
+                        }
                     });
                 };
                 CalculatingDone += delegate() {
                     InvokeOnMainThread (() => {
-                        Calculating.BackgroundColor = NSColor.Green;
+                        if(!Calculating.StringValue.EndsWith("✓")){
+                            Calculating.StringValue.Replace(".", "");
+                            Calculating.StringValue += "... ✓";
+                        }
                     });
                 };
                 SynchronizingDone += delegate() {
                     InvokeOnMainThread (() => {
-                        Synchronizing.BackgroundColor = NSColor.Green;
+                        if(!Synchronizing.StringValue.EndsWith("✓")){
+                            Synchronizing.StringValue.Replace(".", "");
+                            Synchronizing.StringValue += "... ✓";
+                        }
                     });
                 };
                 Thread thread = new Thread(delegate() {
