@@ -87,11 +87,8 @@ namespace GreenQloud
 
             string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hash={1}", Credential.Username, hash);
             JObject data = JSONHelper.GetInfo (uri);
-            if(data != null && data ["usage"] != null){
-                foreach(JToken o in data ["usage"]){
-                    if((string)o["id"] == "storageqloud_size")
-                        sqtotalused.Spent = (string) o["value"] ;
-                }
+            if(data != null && data ["usage"] != null && data ["usage"]["storageqloud_size"] != null){
+                sqtotalused.Spent = (string) data ["usage"]["storageqloud_size"];
             }
             return sqtotalused;
         }
