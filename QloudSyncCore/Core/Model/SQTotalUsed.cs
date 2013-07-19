@@ -17,12 +17,12 @@ namespace GreenQloud.Model
             set {
                 int v;
                 v = int.Parse(value.Split('.')[0]);
-                if (v < (1024^2)) {
+                if (v < Math.Pow(1024,2)) {
                     saved = ((float)v / 1024).ToString ("F1") + "KB";
-                } else if (v < (1024^3)) {
-                    saved = ((float)v / (1024^2)).ToString ("F1") + "MB";
+                } else if (v < Math.Pow(1024,3)) {
+                    saved = ((float)v / Math.Pow(1024,2)).ToString ("F1") + "MB";
                 } else {
-                    saved = ((float)v / (1024^3)).ToString ("F1") + "GB";
+                    saved = ((float)v / Math.Pow(1024,3)).ToString ("F1") + "GB";
                 }
              }
         }
