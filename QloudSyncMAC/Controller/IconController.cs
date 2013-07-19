@@ -392,7 +392,8 @@ namespace GreenQloud {
                     while(true){
                         try{
                             InvokeOnMainThread (() => {
-                                co2_savings_item.Title = "Total CO2 saved: "+Statistics.EarlyCO2Savings.Saved;
+                                co2_savings_item.Title = Statistics.TotalUsedSpace.Spent + " used | " + Statistics.EarlyCO2Savings.Saved + " saved";
+
                             });
                         } catch (Exception e){
                             Console.WriteLine(e.Message);
