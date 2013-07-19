@@ -101,6 +101,7 @@
     <Compile Include="Core\Controller\Controller.cs" />
     <Compile Include="Core\UI\ApplicationUI.cs" />
     <Compile Include="Core\Program.cs" />
+    <Compile Include="Core\Model\SQTotalUsed.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
