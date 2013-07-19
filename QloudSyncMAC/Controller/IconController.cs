@@ -388,20 +388,28 @@ namespace GreenQloud {
                     Title = "Loading data of savings",
                     Enabled = true
                 };
+
                 Thread co2Update = new Thread (delegate(){
+
                     while(true){
                         try{
-                            InvokeOnMainThread (() => {
-                                co2_savings_item.Title = Statistics.TotalUsedSpace.Spent + " used | " + Statistics.EarlyCO2Savings.Saved + " saved";
-
-                            });
+                            string spent = Statistics.TotalUsedSpace.Spent;
+                            string saved = Statistics.EarlyCO2Savings.Saved;
+                            using (var ns = new NSAutoreleasePool ())
+                            {
+                                InvokeOnMainThread (() => { 
+                                    if(spent != null && saved != null){
+                                         co2_savings_item.Title =  spent + " used | " + saved + " saved";
+                                    }
+                                });
+                            }
                         } catch (Exception e){
                             Console.WriteLine(e.Message);
                             Logger.LogInfo("INFO", "Cannot load CO2 savings.");
-                        } finally {
-                            Thread.Sleep(60000);
                         }
+                        Thread.Sleep(60000);
                     }
+
                 });
                 co2Update.Start ();
 
