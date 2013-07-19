@@ -45,52 +45,53 @@ namespace GreenQloud
         static CO2Savings savings = null;
         public static CO2Savings EarlyCO2Savings {
             get {
-                if(savings==null){
-                    savings = GetCO2Statistics();
-                }
-
+                savings = GetCO2Statistics();
                 return savings;
             }
         }
 
         private static CO2Savings GetCO2Statistics (){
+            try {
+                CO2Savings co2savings = new CO2Savings();
+                string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
 
-            CO2Savings co2savings = new CO2Savings();
-            string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
-
-            string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hash={1}", Credential.Username, hash);
-            JObject data = JSONHelper.GetInfo (uri);
-            if(data != null && data ["trulygreen"] != null){
-                foreach(JToken o in data ["trulygreen"]){
-                    if((string)o["id"] == "co2_savings_total")
-                        co2savings.Saved = (string) o["value"] ;
+                string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hash={1}", Credential.Username, hash);
+                JObject data = JSONHelper.GetInfo (uri);
+                if(data != null && data ["trulygreen"] != null){
+                    foreach(JToken o in data ["trulygreen"]){
+                        if((string)o["id"] == "co2_savings_total")
+                            co2savings.Saved = (string) o["value"] ;
+                    }
                 }
+                return co2savings;
+            } catch {
+                return null;
             }
-            return co2savings;
         }
 
         static SQTotalUsed usedup = null;
         public static SQTotalUsed TotalUsedSpace {
             get {
-                if(usedup==null){
-                    usedup = GetSQTotalUsed();
-                }
+                usedup = GetSQTotalUsed();
 
                 return usedup;
             }
         }
 
         private static SQTotalUsed GetSQTotalUsed (){
+            try {
+                SQTotalUsed sqtotalused = new SQTotalUsed();
+                string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
 
-            SQTotalUsed sqtotalused = new SQTotalUsed();
-            string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
-
-            string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hash={1}", Credential.Username, hash);
-            JObject data = JSONHelper.GetInfo (uri);
-            if(data != null && data ["usage"] != null && data ["usage"]["storageqloud_size"] != null){
-                sqtotalused.Spent = (string) data ["usage"]["storageqloud_size"];
+                string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hash={1}", Credential.Username, hash);
+                JObject data = JSONHelper.GetInfo (uri);
+                if(data != null && data ["usage"] != null && data ["usage"]["storageqloud_size"] != null){
+                    sqtotalused.Spent = (string) data ["usage"]["storageqloud_size"];
+                }
+                return sqtotalused;
+            } catch {
+                return null;
             }
-            return sqtotalused;
         }
 
         private static string GetVersionAvaliable(){
