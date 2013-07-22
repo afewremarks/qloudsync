@@ -110,6 +110,15 @@ using System.IO;
             get;
             set;
         }
+
+        public override string ToString(){
+            string s = String.Format ("[{3}] {0} {1} {2}", EventType, RepositoryType, Item.LocalAbsolutePath, Id);
+            if(HaveResultItem){
+                s += String.Format ("  Result Object: {0} \n",Item.ResultItem.LocalAbsolutePath);
+            }
+
+            return s;
+        }
 	}
 }
 
