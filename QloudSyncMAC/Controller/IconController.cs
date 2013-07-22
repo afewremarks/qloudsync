@@ -25,6 +25,9 @@ using MonoMac.ObjCRuntime;
 using System.Threading;
 using GreenQloud.Synchrony;
 using GreenQloud.Model;
+using GreenQloud.Persistence;
+using System.Collections.Generic;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud {
 
@@ -327,9 +330,33 @@ namespace GreenQloud {
 //                };
 
                 this.recent_events_item = new NSMenuItem () {
-                    Title   = "Recent Changes…(Coming Soon!)",
-                    Enabled =  false//Program.Controller.RecentsTransfers.Count != 0
+                    Title   = "Recent Changes…",
+                    Enabled =  true
                 };
+                Thread recentChangesUpdate = new Thread (delegate(){
+                    EventDAO eventDao = new SQLiteEventDAO(); 
+                    while(true){
+                        try{
+                            using (var ns = new NSAutoreleasePool ())
+                            {
+                                List<Event> events = eventDao.LastEvents;
+                                string text = "";
+                                foreach(Event e in events){
+                                    text += e.ToString();
+                                }
+                                InvokeOnMainThread (() => { 
+                                    this.recent_events_item.ToolTip = text;
+                                });
+                            }
+                        } catch (Exception e){
+                            Console.WriteLine(e.Message);
+                            Logger.LogInfo("INFO", "Cannot load CO2 savings.");
+                        }
+                        Thread.Sleep(60000);
+                    }
+
+                });
+                recentChangesUpdate.Start ();
 
                 recent_events_item.Activated += delegate {
                     ChangeClicked ();

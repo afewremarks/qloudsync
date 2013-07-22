@@ -53,11 +53,7 @@ namespace GreenQloud {
             }
         }
         public static void LogEvent (string type, Event e ){
-            string s = String.Format ("[{3}] {0} {1} {2}",e.EventType, e.RepositoryType, e.Item.LocalAbsolutePath, e.Id);
-            if(e.HaveResultItem){
-                s += String.Format ("  Result Object: {0} \n",e.Item.ResultItem.LocalAbsolutePath);
-            }
-            Logger.LogInfo(type, s);
+            Logger.LogInfo(type, e.ToString());
         }
         public static void LogInfo (string type, Exception e ){
             string message = string.Format("{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.Message, e.StackTrace, e.GetBaseException());
