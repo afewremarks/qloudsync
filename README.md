@@ -3,7 +3,8 @@ QloudSync
 
 An open source sync client written mostly in C# and Mono. Originally built for GreenQloud's StorageQloud but could be adapted for any service. GPL v3 licensed. Also available from GreenQloud with commercial license (legal/Authors.txt).
 
-Builds on Mac, Windows and Linux.
+Builds on Mac and Windows.
+Linux is coming soon.
 
 [Read more on QloudSync's homepage](http://qloudsync.com)
 
