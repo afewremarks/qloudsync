@@ -400,7 +400,7 @@ namespace GreenQloud {
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (190, Frame.Height - 400, 640 - 240, 125),
-                    StringValue     = "Beware: Please take note that QloudSync is still in it's testing stages and we cannot yet guarantee 100% dataloss prevention. USE AT YOUR OWN RISK!",
+                    StringValue     = "QloudSync V. 2.6 @GreenQloud",
 
                     Font            = NSFontManager.SharedFontManager.FontWithFamily (
                         "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
