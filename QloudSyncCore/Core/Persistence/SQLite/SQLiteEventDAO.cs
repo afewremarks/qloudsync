@@ -66,14 +66,14 @@ namespace GreenQloud.Persistence.SQLite
 
         public override void IgnoreAllEquals (Event e)
         {            
-            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{1}\", RESPONSE = \"{4}\" WHERE ItemId =\"{0}\" AND TYPE = '{2}' AND EventID > '{3}'", e.Item.Id , bool.TrueString , e.EventType, e.Id, RESPONSE.IGNORED.ToString()));
+            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{1}\", RESPONSE = \"{4}\" WHERE ItemId =\"{0}\" AND TYPE = '{2}' AND EventID > '{3}' AND SYNCHRONIZED <> \"{5}\"", e.Item.Id , bool.TrueString , e.EventType, e.Id, RESPONSE.IGNORED.ToString(), bool.TrueString));
         }
 
         public override void IgnoreAllIfDeleted (Event e)
         {            
-            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'", e.Item.Id, EventType.DELETE, e.Id));
+            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\"", e.Item.Id, EventType.DELETE, e.Id, bool.TrueString));
             if(list.Count > 0) { 
-                database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE ItemId =\"{2}\" AND EventID < '{3}'", bool.TrueString, RESPONSE.IGNORED.ToString(), e.Item.Id , list.Last().Id));
+                database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE ItemId =\"{2}\" AND EventID < '{3}' ", bool.TrueString, RESPONSE.IGNORED.ToString(), e.Item.Id , list.Last().Id));
                 repositoryItemDAO.MarkAsMoved (e.Item);
                 if (e.EventType == EventType.CREATE) {
                     database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE EventID = '{2}'", bool.TrueString, RESPONSE.IGNORED.ToString(), list.Last().Id));
@@ -81,13 +81,49 @@ namespace GreenQloud.Persistence.SQLite
             }
         }
 
+        public void CombineMultipleMoves (Event e){
+            Event toCombine = null;
+            Event combineWith = null;
+            if (e.EventType == EventType.MOVE)
+                toCombine = e;
+
+            if(e == null) { 
+                List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\"", e.Item.Id, EventType.MOVE, e.Id, bool.TrueString));
+                if(list.Count > 0) { 
+                    toCombine = list.First ();   
+                }
+            }
+
+            //do while move.hasnext
+            //ignore o next
+            try {
+                if (toCombine != null){
+                    List<Event> list2;
+                    do {
+                        list2 = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\"", toCombine.Item.ResultItemId, EventType.MOVE, e.Id, bool.TrueString));
+                        if (list2.Count > 0) { 
+                            combineWith = list2.First ();  
+                            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE EventID = '{2}'", bool.TrueString, RESPONSE.IGNORED.ToString(), combineWith.Id));
+                            repositoryItemDAO.MarkAsMoved (toCombine.Item.ResultItem);
+                            toCombine.Item.ResultItem = combineWith.Item.ResultItem;
+                            database.ExecuteNonQuery (string.Format("UPDATE RepositoryItem SET  ResultItemId =\"{0}\" WHERE RepositoryItemID = '{1}'", combineWith.Item.ResultItemId, toCombine.Item.Id));
+                        }
+                    } while (list2 != null && list2.Count > 0);
+                }
+            } catch (Exception ex) {
+                Logger.LogInfo("ERROR", ex.Message);
+            }
+        }
+
         public override void IgnoreAllIfMoved (Event e){
-            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'", e.Item.Id, EventType.MOVE, e.Id));
+            CombineMultipleMoves (e);
+            e = FindById(e.Id);
+            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\"", e.Item.Id, EventType.MOVE, e.Id, bool.TrueString));
             if(list.Count > 0) { 
-                if (e.EventType == EventType.CREATE) {
-                    database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE EventID = '{2}'", bool.TrueString, RESPONSE.IGNORED.ToString(), list.Last().Id));
+                if (e.EventType == EventType.CREATE || e.EventType == EventType.UPDATE) {
+                    database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE EventID = '{2}'", bool.TrueString, RESPONSE.IGNORED.ToString(), list.First().Id));
                     repositoryItemDAO.MarkAsMoved (e.Item);
-                    database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  ItemId =\"{0}\" WHERE EventID = '{1}'", list.Last().Item.ResultItem.Id, e.Id));
+                    database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  ItemId =\"{0}\" WHERE EventID = '{1}'", list.First().Item.ResultItem.Id, e.Id));
                 }
             }
         }
@@ -99,7 +135,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public override List<Event> EventsNotSynchronized {
             get {
-                string sql = string.Format ("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\" AND INSERTTIME < '{1}' ORDER BY EventID ASC", bool.FalseString, GlobalDateTime.Now.AddSeconds (-5).ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+                string sql = string.Format ("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\" AND INSERTTIME < '{1}' ORDER BY EventID ASC", bool.FalseString, GlobalDateTime.Now.AddSeconds (-10).ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
                 List<Event> list = Select (sql);
                 return list;
             }
