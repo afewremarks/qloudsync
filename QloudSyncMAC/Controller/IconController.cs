@@ -52,7 +52,7 @@ namespace GreenQloud {
         private NSMenuItem about_item;
         private NSMenuItem openweb_item;
         private NSMenuItem notify_item;
-        private NSMenuItem recent_events_item;
+        private NSMenuItem recent_events_title;
         private NSMenuItem quit_item;
         private NSMenuItem co2_savings_item;
         private NSMenuItem help_item;
@@ -85,23 +85,17 @@ namespace GreenQloud {
         
         public event UpdateQuitItemEventHandler UpdateQuitItemEvent = delegate { };
         public delegate void UpdateQuitItemEventHandler (bool quit_item_enabled);
-        
-        public event UpdateRecentEventsItemEventHandler UpdateRecentEventsItemEvent = delegate { };
-        public delegate void UpdateRecentEventsItemEventHandler (bool recent_events_item_enabled);
-        
-        public IconState CurrentState = IconState.Working;
-        public string StateText = string.Format("Welcome to {0}!", GlobalSettings.ApplicationName);
-        
-        public readonly int MenuOverflowThreshold   = 9;
-        public readonly int MinSubmenuOverflowCount = 3;
-        
-        public string [] Folders;
-        public string [] FolderErrors;
-        
-        public string [] OverflowFolders;
-        public string [] OverflowFolderErrors;
-        
-        
+
+            public IconState CurrentState = IconState.Working;
+            public string StateText = string.Format ("Welcome to {0}!", GlobalSettings.ApplicationName);
+            public readonly int MenuOverflowThreshold = 9;
+            public readonly int MinSubmenuOverflowCount = 3;
+            public string[] Folders;
+            public string[] FolderErrors;
+            public string[] OverflowFolders;
+            public string[] OverflowFolderErrors;
+            private Thread co2Update;
+
         public string FolderSize {
             get {
                 double size = 0;
@@ -130,7 +124,13 @@ namespace GreenQloud {
                 return (CurrentState == IconState.Idle || CurrentState == IconState.Error);
             }
         }
-        
+
+        public bool RecenEventsEnabled {
+            get {
+                return true;
+            }
+        }
+
         public IconController () : base ()
         {
             using (var a = new NSAutoreleasePool ())
@@ -163,6 +163,29 @@ namespace GreenQloud {
                 this.sparkleshare_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "qloudsync-folder.icns"));
 
                 CreateMenu ();
+
+                co2Update = new Thread (delegate(){
+                    while(true){
+                        try{
+                            string spent = Statistics.TotalUsedSpace.Spent;
+                            string saved = Statistics.EarlyCO2Savings.Saved;
+                            using (var ns = new NSAutoreleasePool ())
+                            {
+                                InvokeOnMainThread (() => { 
+                                    if(spent != null && saved != null){
+                                        co2_savings_item.Title =  spent + " used | " + saved + " saved";
+                                    }
+                                });
+                            }
+                        } catch (Exception e){
+                            Console.WriteLine(e.Message);
+                            Logger.LogInfo("INFO", "Cannot load CO2 savings.");
+                        }
+                        Thread.Sleep(60000);
+                    }
+                });
+
+                co2Update.Start ();
             }
 
             Program.Controller.OnIdle += delegate {
@@ -284,15 +307,6 @@ namespace GreenQloud {
                     });
                 }
             };
-
-            UpdateRecentEventsItemEvent += delegate (bool events_item_enabled) {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    InvokeOnMainThread (delegate {
-                      //  this.recent_events_item.Enabled = Program.Controller.RecentsTransfers.Count != 0;
-                    });
-                }
-            };
         }
 
 
@@ -329,36 +343,11 @@ namespace GreenQloud {
 //                    AddHostedProjectClicked ();
 //                };
 
-                this.recent_events_item = new NSMenuItem () {
-                    Title   = "Recent Changes…",
-                    Enabled =  true
-                };
-                Thread recentChangesUpdate = new Thread (delegate(){
-                    EventDAO eventDao = new SQLiteEventDAO(); 
-                    while(true){
-                        try{
-                            using (var ns = new NSAutoreleasePool ())
-                            {
-                                List<Event> events = eventDao.LastEvents;
-                                string text = "";
-                                foreach(Event e in events){
-                                    text += e.ToString();
-                                }
-                                InvokeOnMainThread (() => { 
-                                    this.recent_events_item.ToolTip = text;
-                                });
-                            }
-                        } catch (Exception e){
-                            Console.WriteLine(e.Message);
-                            Logger.LogInfo("INFO", "Cannot load CO2 savings.");
-                        }
-                        Thread.Sleep(60000);
-                    }
-
-                });
-                recentChangesUpdate.Start ();
-
-                recent_events_item.Activated += delegate {
+                this.recent_events_title = new NSMenuItem () {
+                    Title   = "Recent Changes:",
+                    Enabled =  false
+                };       
+                recent_events_title.Activated += delegate {
                     ChangeClicked ();
                 };
 
@@ -416,30 +405,6 @@ namespace GreenQloud {
                     Enabled = true
                 };
 
-                Thread co2Update = new Thread (delegate(){
-
-                    while(true){
-                        try{
-                            string spent = Statistics.TotalUsedSpace.Spent;
-                            string saved = Statistics.EarlyCO2Savings.Saved;
-                            using (var ns = new NSAutoreleasePool ())
-                            {
-                                InvokeOnMainThread (() => { 
-                                    if(spent != null && saved != null){
-                                         co2_savings_item.Title =  spent + " used | " + saved + " saved";
-                                    }
-                                });
-                            }
-                        } catch (Exception e){
-                            Console.WriteLine(e.Message);
-                            Logger.LogInfo("INFO", "Cannot load CO2 savings.");
-                        }
-                        Thread.Sleep(60000);
-                    }
-
-                });
-                co2Update.Start ();
-
                 help_item = new NSMenuItem(){
                     Title = "Help Center"
                 };
@@ -448,20 +413,41 @@ namespace GreenQloud {
                     Program.Controller.OpenWebsite ("http://support.greenqloud.com");
                };
 
-                this.menu.AddItem (this.state_item);
                 this.menu.AddItem (co2_savings_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.folder_item);
-                this.menu.AddItem (this.openweb_item);                
-                this.menu.AddItem (this.recent_events_item);
+                this.menu.AddItem (this.openweb_item);    
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-                //this.menu.AddItem (this.preferences_item);
+                this.menu.AddItem (this.recent_events_title);
+
+                this.menu.AddItem (NSMenuItem.SeparatorItem);
+
+                SQLiteEventDAO eventDao = new SQLiteEventDAO();
+                List<Event> events = eventDao.LastEvents;
+                string text = "";
+
+                foreach(Event e in events){
+                    NSMenuItem current = new NSMenuItem(){
+                        Title = e.ShortString(),
+                        Enabled = true
+                    };
+                    current.ToolTip = e.ToString ();
+                    //current.Activated += delegate {                    
+                    //string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
+                    //Program.Controller.OpenWebsite (string.Format("https://my.greenqloud.com/qloudsync?username={0}&hash={1}&returnUrl=/storageQloud", Credential.Username, hash));
+                    //};
+
+                    this.menu.AddItem(current);
+                    text += e.ToString() + "\n\n";
+                }
+                this.recent_events_title.ToolTip = text;
+
+                this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (help_item);
 				this.menu.AddItem (this.about_item);
 			    this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.quit_item);
-
-                this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
+                this.menu.AddItem (this.state_item);
+                //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
                 this.status_item.Menu = this.menu;
             }
         }
@@ -513,7 +499,6 @@ namespace GreenQloud {
     
     
     public class SparkleStatusIconMenuDelegate : NSMenuDelegate {
-
         public SparkleStatusIconMenuDelegate ()
         {
         }
@@ -528,6 +513,9 @@ namespace GreenQloud {
         {
         }
 
+        public override void MenuDidClose (NSMenu menu) {
+        
+        }
     
         public override void MenuWillOpen (NSMenu menu)
         {

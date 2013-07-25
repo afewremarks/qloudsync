@@ -119,6 +119,11 @@ using System.IO;
 
             return s;
         }
+
+        public string ShortString ()
+        {
+            return String.Format ("{0} - {1}", EventType,  (HaveResultItem ? Item.ResultItem.Key : Item.Key));
+        }
 	}
 }
 
