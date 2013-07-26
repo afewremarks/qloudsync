@@ -422,7 +422,7 @@ namespace GreenQloud {
 
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
 
-                if(!Program.Controller.FirstRun()) {
+                if(Program.Controller.DatabaseLoaded()) {
                     SQLiteEventDAO eventDao = new SQLiteEventDAO();
                     List<Event> events = eventDao.LastEvents;
                     string text = "";
