@@ -20,6 +20,6 @@ namespace GreenQloud {
         void HandleDisconnection();
         void HandleError();
         void HandleSyncStatusChanged();
-        bool FirstRun();
+        bool DatabaseLoaded();
     }
 }

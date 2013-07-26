@@ -76,8 +76,12 @@ namespace GreenQloud {
 
         bool firstRun = RuntimeSettings.FirstRun;
 
-        public bool FirstRun(){
-            return firstRun;
+        public bool DatabaseLoaded(){
+            if (File.Exists (RuntimeSettings.DatabaseFile) && File.Exists (RuntimeSettings.DatabaseInfoFile)) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
         public Controller () : base ()
