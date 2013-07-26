@@ -35,7 +35,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
-    <Reference Include="Mono.Posix" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web" />
     <Reference Include="System.Data" />
@@ -49,7 +48,6 @@
       <HintPath>lib\LitS3.dll</HintPath>
     </Reference>
     <Reference Include="System.Transactions" />
-    <Reference Include="Mono.Data.Tds" />
     <Reference Include="Mono.Data.Sqlite" />
   </ItemGroup>
   <ItemGroup>

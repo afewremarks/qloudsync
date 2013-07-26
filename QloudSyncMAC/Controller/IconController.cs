@@ -422,26 +422,27 @@ namespace GreenQloud {
 
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
 
-                SQLiteEventDAO eventDao = new SQLiteEventDAO();
-                List<Event> events = eventDao.LastEvents;
-                string text = "";
+                if(!Program.Controller.FirstRun()) {
+                    SQLiteEventDAO eventDao = new SQLiteEventDAO();
+                    List<Event> events = eventDao.LastEvents;
+                    string text = "";
 
-                foreach(Event e in events){
-                    NSMenuItem current = new NSMenuItem(){
-                        Title = e.ShortString(),
-                        Enabled = true
-                    };
-                    current.ToolTip = e.ToString ();
-                    //current.Activated += delegate {                    
-                    //string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
-                    //Program.Controller.OpenWebsite (string.Format("https://my.greenqloud.com/qloudsync?username={0}&hash={1}&returnUrl=/storageQloud", Credential.Username, hash));
-                    //};
+                    foreach(Event e in events){
+                        NSMenuItem current = new NSMenuItem(){
+                            Title = e.ShortString(),
+                            Enabled = true
+                        };
+                        current.ToolTip = e.ToString ();
+                        //current.Activated += delegate {                    
+                        //string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
+                        //Program.Controller.OpenWebsite (string.Format("https://my.greenqloud.com/qloudsync?username={0}&hash={1}&returnUrl=/storageQloud", Credential.Username, hash));
+                        //};
 
-                    this.menu.AddItem(current);
-                    text += e.ToString() + "\n\n";
+                        this.menu.AddItem(current);
+                        text += e.ToString() + "\n\n";
+                    }
+                    this.recent_events_title.ToolTip = text;
                 }
-                this.recent_events_title.ToolTip = text;
-
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (help_item);
 				this.menu.AddItem (this.about_item);

@@ -26,7 +26,7 @@ namespace GreenQloud {
 
     public class Controller : ApplicationController {
 
-        public static int Contador{
+        public int Contador{
             set; get;
         }
         public new event ProgressChangedEventHandler ProgressChanged = delegate { };
@@ -74,7 +74,11 @@ namespace GreenQloud {
 
         Thread checkConnection;
 
-        bool FirstRun = RuntimeSettings.FirstRun;
+        bool firstRun = RuntimeSettings.FirstRun;
+
+        public bool FirstRun(){
+            return firstRun;
+        }
 
         public Controller () : base ()
         {
@@ -145,7 +149,7 @@ namespace GreenQloud {
             }
 
             CalcTimeDiff ();
-            if (FirstRun) {
+            if (firstRun) {
                 ShowSetupWindow (PageType.Login);
                 foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
                     File.Delete (f);
