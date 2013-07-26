@@ -45,7 +45,6 @@ namespace GreenQloud {
             using (var a = new NSAutoreleasePool ())
             {
                 NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("qloudsync-app.icns");
-                SetFolderIcon ();
                 Setup      = new SparkleSetup ();
                 About      = new AboutWindow ();
                 StatusIcon = new IconController ();
@@ -67,6 +66,7 @@ namespace GreenQloud {
         {
             using (var a = new NSAutoreleasePool ())
             {
+                SetFolderIcon ();
                 Program.Controller.UIHasLoaded ();
                 NSApplication.Main (new string [0]);
             }
