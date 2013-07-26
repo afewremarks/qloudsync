@@ -173,7 +173,7 @@ namespace GreenQloud {
                             {
                                 InvokeOnMainThread (() => { 
                                     if(spent != null && saved != null){
-                                        co2_savings_item.Title =  spent + " used | " + saved + " saved";
+                                        co2_savings_item.Title =  spent + " used. | " + saved + " CO2 saved.";
                                     }
                                 });
                             }
