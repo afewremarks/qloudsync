@@ -112,8 +112,6 @@
   <ItemGroup>
     <None Include="Core\Config\.DS_Store" />
     <None Include="lib\LitS3.dll" />
-    <None Include="lib\MonoMac.dll" />
     <None Include="lib\Newtonsoft.Json.dll" />
-    <None Include="lib\XamaMac.dll" />
   </ItemGroup>
 </Project>
