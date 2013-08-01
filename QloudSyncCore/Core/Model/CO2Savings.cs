@@ -18,9 +18,9 @@ namespace GreenQloud.Model
                 int v;
                 v = int.Parse(value.Split('.')[0]);
                 if (v <= 1000) {
-                    saved = v.ToString () + "g";
+                    saved = v.ToString () + " g";
                 } else {
-                    saved = ((float)v/1000).ToString("F1") + "Kg";
+                    saved = ((float)v/1000).ToString("F1") + " Kg";
                 }
             }
         }
