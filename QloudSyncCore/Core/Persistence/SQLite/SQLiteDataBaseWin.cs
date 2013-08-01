@@ -7,11 +7,11 @@ using Mono.Data.Sqlite;
 
 namespace GreenQloud.Persistence.SQLite{
 
-    public class SQLiteDatabase
+    public class SQLiteDatabaseWin
     {
         String dbConnection;
 
-        public SQLiteDatabase(){
+        public SQLiteDatabaseWin(){
         }
 
         
@@ -34,7 +34,7 @@ namespace GreenQloud.Persistence.SQLite{
         ///     Single Param Constructor for specifying advanced connection options.
         /// </summary>
         /// <param name="connectionOpts">A dictionary containing all desired options and their values</param>
-        public SQLiteDatabase(Dictionary<String, String> connectionOpts)
+        public SQLiteDatabaseWin(Dictionary<String, String> connectionOpts)
         {
             String str = "";
             foreach (KeyValuePair<String, String> row in connectionOpts)

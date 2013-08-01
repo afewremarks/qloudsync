@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using GreenQloud.Model;
 using System.Linq;
 using System.Data;
-using Mono.Data.Sqlite;
 
 namespace GreenQloud.Persistence.SQLite
 {
@@ -12,7 +11,13 @@ namespace GreenQloud.Persistence.SQLite
     {
 
         #region implemented abstract members of RepositoryDAO
-        SQLiteDatabase database = new SQLiteDatabase ();
+
+        #if __MonoCS__
+            SQLiteDatabase database = new SQLiteDatabase();
+        #elif
+            SQLiteDatabaseWin database = new SQLiteDatabaseWin();
+        #endif
+
         public override void Create (LocalRepository e)
         {
             database.ExecuteNonQuery (string.Format("INSERT INTO Repository (Path, RECOVERING) VALUES (\"{0}\", \"{1}\")", e.Path, e.Recovering.ToString()));
