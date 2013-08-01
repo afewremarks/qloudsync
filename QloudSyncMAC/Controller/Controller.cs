@@ -362,10 +362,10 @@ namespace GreenQloud {
         {  
             Logger.LogInfo ("Controller", "First load sucessfully");
             FolderFetched ();
-            new Thread (() => CreateStartupItem ()).Start ();
+            //new Thread (() => CreateStartupItem ()).Start ();
         }
 
-        public void CreateStartupItem ()
+        /*public void CreateStartupItem ()
         {
             // There aren't any bindings in MonoMac to support this yet, so
             // we call out to an applescript to do the job
@@ -381,7 +381,7 @@ namespace GreenQloud {
             process.WaitForExit ();
             
             Logger.LogInfo ("Controller", "Added " + MonoMac.Foundation.NSBundle.MainBundle.BundlePath + " to startup items");
-        }
+        }*/
         
         public void ShowSetupWindow (PageType page_type)
         {
