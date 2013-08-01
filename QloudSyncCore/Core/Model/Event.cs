@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Globalization;
+using System.Threading;
 
  namespace GreenQloud.Model
 {
@@ -122,7 +124,9 @@ using System.IO;
 
         public string ShortString ()
         {
-            return String.Format ("{0} - {1}", EventType,  (HaveResultItem ? Item.ResultItem.Key : Item.Key));
+            CultureInfo cultureInfo   = Thread.CurrentThread.CurrentCulture;
+            TextInfo textInfo = cultureInfo.TextInfo;
+            return String.Format ("{0} - {1}", textInfo.ToTitleCase(EventType),  (HaveResultItem ? Item.ResultItem.Key : Item.Key));
         }
 	}
 }
