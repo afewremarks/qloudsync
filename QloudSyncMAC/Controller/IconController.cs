@@ -29,6 +29,7 @@ using GreenQloud.Persistence;
 using System.Collections.Generic;
 using GreenQloud.Persistence.SQLite;
 
+
 namespace GreenQloud {
 
     public enum IconState {
@@ -106,6 +107,7 @@ namespace GreenQloud {
                     return "— " + Program.Controller.FormatSize (size);
             }
         }
+
         
         public int ProgressPercentage {
             get {
@@ -162,6 +164,8 @@ namespace GreenQloud {
                 this.caution_image      = NSImage.ImageNamed ("NSCaution");
                 this.sparkleshare_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "qloudsync-folder.icns"));
 
+              
+
                 CreateMenu ();
 
                 co2Update = new Thread (delegate(){
@@ -169,17 +173,20 @@ namespace GreenQloud {
                         try{
                             string spent = Statistics.TotalUsedSpace.Spent;
                             string saved = Statistics.EarlyCO2Savings.Saved;
+                            string subscript = "2";
+                            subscript.ToLowerInvariant();
+
                             using (var ns = new NSAutoreleasePool ())
                             {
                                 InvokeOnMainThread (() => { 
                                     if(spent != null && saved != null){
-                                        co2_savings_item.Title =  spent + " used. | " + saved + " CO2 saved.";
+                                        co2_savings_item.Title =  spent + " used | " + saved + " CO₂ saved";
                                     }
                                 });
                             }
                         } catch (Exception e){
                             Console.WriteLine(e.Message);
-                            Logger.LogInfo("INFO", "Cannot load CO2 savings.");
+                            Logger.LogInfo("INFO", "Cannot load CO₂ savings.");
                         }
                         Thread.Sleep(60000);
                     }
@@ -245,7 +252,7 @@ namespace GreenQloud {
                         StateText = "Failed to send some changes";
                     break;
                 }
-                //UpdateQuitItemEvent (QuitItemEnabled);
+                UpdateQuitItemEvent (QuitItemEnabled);
                 UpdateStatusItemEvent (StateText);
                 UpdateIconEvent (CurrentState);
                 UpdateMenuEvent (CurrentState);
@@ -450,6 +457,8 @@ namespace GreenQloud {
                 this.menu.AddItem (this.state_item);
                 //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
                 this.status_item.Menu = this.menu;
+                this.menu.AddItem (NSMenuItem.SeparatorItem);
+                this.menu.AddItem (quit_item);
             }
         }
 
@@ -492,7 +501,7 @@ namespace GreenQloud {
         {
             CO2Savings saving = Statistics.EarlyCO2Savings;
 
-            this.co2_savings_item.Title = string.Format ("Yearly CO2 Savings: {0}", saving.Saved);
+            this.co2_savings_item.Title = string.Format ("Yearly CO₂ Savings: {0}", saving.Saved);
            
         }
 
