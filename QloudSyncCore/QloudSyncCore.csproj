@@ -38,9 +38,6 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web" />
     <Reference Include="System.Data" />
-    <Reference Include="MonoMac">
-      <HintPath>lib\MonoMac.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
