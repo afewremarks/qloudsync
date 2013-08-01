@@ -4,7 +4,6 @@ using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
 using GreenQloud.Model;
 using System.Collections.Generic;
-using Mono.Data.Sqlite;
 using GreenQloud.Persistence.SQLite;
 using System.Linq;
 using System.Data;
@@ -16,7 +15,12 @@ namespace GreenQloud.Persistence.SQLite
 
         SQLiteRepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO();
         #region implemented abstract members of EventDAO
-        SQLiteDatabase database = new SQLiteDatabase();
+
+        #if __MonoCS__
+            SQLiteDatabase database = new SQLiteDatabase();
+        #elif
+            SQLiteDatabaseWin database = new SQLiteDatabaseWin();
+        #endif
 
         public override void Create (Event e)
         {

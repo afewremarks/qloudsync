@@ -65,7 +65,6 @@
     <Compile Include="Core\Persistence\EventDAO.cs" />
     <Compile Include="Core\Persistence\RepositoryItemDAO.cs" />
     <Compile Include="Core\Persistence\RepositoryDAO.cs" />
-    <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryDAO.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteEventDAO.cs" />
     <Compile Include="Core\Repository\Local\StorageQloud\StorageQloudPhysicalRepositoryController.cs" />
@@ -100,6 +99,8 @@
     <Compile Include="Core\UI\ApplicationUI.cs" />
     <Compile Include="Core\Program.cs" />
     <Compile Include="Core\Model\SQTotalUsed.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteDataBaseWin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

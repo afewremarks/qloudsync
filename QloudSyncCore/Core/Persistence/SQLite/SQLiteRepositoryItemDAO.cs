@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using GreenQloud.Model;
 using System.Linq;
 using GreenQloud.Persistence;
-using Mono.Data.Sqlite;
 using System.Data;
 
 namespace GreenQloud.Persistence.SQLite
@@ -12,7 +11,12 @@ namespace GreenQloud.Persistence.SQLite
     class SQLiteRepositoryItemDAO : RepositoryItemDAO
     {
         #region implemented abstract members of RepositoryItemDAO
-        SQLiteDatabase database = new SQLiteDatabase();
+
+        #if __MonoCS__
+            SQLiteDatabase database = new SQLiteDatabase();
+        #elif
+            SQLiteDatabaseWin database = new SQLiteDatabaseWin();
+        #endif
 
         public RepositoryItem Create (Event e)
         {

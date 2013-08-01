@@ -7,21 +7,21 @@ using Mono.Data.Sqlite;
 
 namespace GreenQloud.Persistence.SQLite{
 
-    public class SQLiteDatabase
+    public class SQLiteDatabaseUnix : SQLiteDatabase
     {
         String dbConnection;
 
-        public SQLiteDatabase(){
+        public SQLiteDatabaseUnix(){
         }
 
         
         public string ConnectionString{
             get{
-                return String.Format("URI=file:{0};Version=3;", RuntimeSettings.DatabaseFile);
+                return String.Format("URI=file:{0};Version=3;", RuntimeSettings.DatabaseFile);;
             }
         }
         
-        public void CreateDataBase(){
+        public override void CreateDataBase(){
             ExecuteNonQuery("CREATE TABLE Repository (RepositoryID INTEGER PRIMARY KEY AUTOINCREMENT , Path ntext, RECOVERING ntext)");
             ExecuteNonQuery ("CREATE TABLE RepositoryItem (RepositoryItemID INTEGER PRIMARY KEY AUTOINCREMENT , Key ntext, RepositoryId ntext, IsFolder ntext, ResultItemId ntext, eTag ntext, eTagLocal ntext,  Moved ntext, UpdatedAt ntext)");
             ExecuteNonQuery ("CREATE TABLE EVENT (EventID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId ntext, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext, USER ntext, APPLICATION ntext, APPLICATION_VERSION ntext, DEVICE_ID ntext, OS ntext, BUCKET ntext, TRY_QNT ntext, RESPONSE ntext)");
@@ -34,7 +34,7 @@ namespace GreenQloud.Persistence.SQLite{
         ///     Single Param Constructor for specifying advanced connection options.
         /// </summary>
         /// <param name="connectionOpts">A dictionary containing all desired options and their values</param>
-        public SQLiteDatabase(Dictionary<String, String> connectionOpts)
+        public SQLiteDatabaseUnix(Dictionary<String, String> connectionOpts)
         {
             String str = "";
             foreach (KeyValuePair<String, String> row in connectionOpts)
@@ -50,7 +50,7 @@ namespace GreenQloud.Persistence.SQLite{
         /// </summary>
         /// <param name="sql">The SQL to run</param>
         /// <returns>A DataTable containing the result set.</returns>
-        public DataTable GetDataTable(string sql)
+        public override DataTable GetDataTable(string sql)
         {
             DataTable dt = new DataTable();
             try
@@ -145,11 +145,11 @@ namespace GreenQloud.Persistence.SQLite{
         /// </summary>
         /// <param name="sql">The SQL to be run.</param>
         /// <returns>An Integer containing the number of rows updated.</returns>
-        public int ExecuteNonQuery(string sql)
+        public override int ExecuteNonQuery(string sql)
         {
             return ExecuteNonQuery (sql, false);
         }
-        public int ExecuteNonQuery(string sql, bool returnId)
+        public override int ExecuteNonQuery(string sql, bool returnId)
         {
             SqliteConnection cnn = new SqliteConnection(ConnectionString);
             cnn.Open();
@@ -174,7 +174,7 @@ namespace GreenQloud.Persistence.SQLite{
         /// </summary>
         /// <param name="sql">The query to run.</param>
         /// <returns>A string.</returns>
-        public string ExecuteScalar(string sql)
+        public override string ExecuteScalar(string sql)
         {
             SqliteConnection cnn = new SqliteConnection(ConnectionString);
             cnn.Open();
@@ -267,6 +267,7 @@ namespace GreenQloud.Persistence.SQLite{
             }
             catch(Exception fail)
             {
+                Logger.LogInfo("ERROR", fail.Message);
                 returnCode = false;
             }
             return returnCode;

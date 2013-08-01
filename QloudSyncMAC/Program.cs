@@ -18,6 +18,7 @@ namespace GreenQloud {
         #endif
         public static void Main (string [] args)
         {
+
             Controller = new Controller ();
             UI = new SparkleUI ();
             if (!program_mutex.WaitOne (0, false)) {

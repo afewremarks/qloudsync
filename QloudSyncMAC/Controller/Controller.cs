@@ -134,7 +134,7 @@ namespace GreenQloud {
             if (!File.Exists (RuntimeSettings.DatabaseFile)){
                 if (!Directory.Exists(RuntimeSettings.DatabaseFolder))
                     Directory.CreateDirectory (RuntimeSettings.DatabaseFolder);
-                new Persistence.SQLite.SQLiteDatabase().CreateDataBase();
+                new SQLiteDatabase().CreateDataBase();
                 File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
             } else {
                 if (!File.Exists (RuntimeSettings.DatabaseInfoFile)){
@@ -147,7 +147,7 @@ namespace GreenQloud {
                     } 
                 }
                 if(!File.Exists (RuntimeSettings.DatabaseFile)){
-                    new Persistence.SQLite.SQLiteDatabase().CreateDataBase();
+                    new SQLiteDatabase().CreateDataBase();
                     File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
                 }
             }
