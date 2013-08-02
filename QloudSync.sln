@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncMAC", "QloudSyncMAC/QloudSyncMAC.csproj", "{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncMAC", "QloudSyncMAC\QloudSyncMAC.csproj", "{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncCore", "QloudSyncCore\QloudSyncCore.csproj", "{2039E95A-5F46-43E1-BA58-B33C73972B0E}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "QloudSyncWin", "QloudSyncWin\QloudSyncWin.mdproj", "{53F535BC-5C83-4027-B679-FA1AFE130810}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncWIN", "QloudSyncWIN\QloudSyncWIN.csproj", "{EC175EE2-8B70-4DF9-A4AA-8EC87D86E832}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,21 +20,21 @@ Global
 		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.Default|Any CPU.Build.0 = Release|Any CPU
 		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{53F535BC-5C83-4027-B679-FA1AFE130810}.Debug|Any CPU.ActiveCfg = Default|Any CPU
-		{53F535BC-5C83-4027-B679-FA1AFE130810}.Debug|Any CPU.Build.0 = Default|Any CPU
-		{53F535BC-5C83-4027-B679-FA1AFE130810}.Default|Any CPU.ActiveCfg = Default|Any CPU
-		{53F535BC-5C83-4027-B679-FA1AFE130810}.Default|Any CPU.Build.0 = Default|Any CPU
-		{53F535BC-5C83-4027-B679-FA1AFE130810}.Release|Any CPU.ActiveCfg = Default|Any CPU
-		{53F535BC-5C83-4027-B679-FA1AFE130810}.Release|Any CPU.Build.0 = Default|Any CPU
 		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.Default|Any CPU.ActiveCfg = Release|Any CPU
 		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.Default|Any CPU.Build.0 = Release|Any CPU
 		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC175EE2-8B70-4DF9-A4AA-8EC87D86E832}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC175EE2-8B70-4DF9-A4AA-8EC87D86E832}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC175EE2-8B70-4DF9-A4AA-8EC87D86E832}.Default|Any CPU.ActiveCfg = Release|Any CPU
+		{EC175EE2-8B70-4DF9-A4AA-8EC87D86E832}.Default|Any CPU.Build.0 = Release|Any CPU
+		{EC175EE2-8B70-4DF9-A4AA-8EC87D86E832}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC175EE2-8B70-4DF9-A4AA-8EC87D86E832}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = QloudSyncMAC.csproj
+		StartupItem = QloudSyncMAC\QloudSyncMAC.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
