@@ -2,6 +2,7 @@ using System;
 using GreenQloud.Repository;
 using GreenQloud.Model;
 using System.Collections.Generic;
+using System.IO;
 
 namespace GreenQloud.Repository.Local
 {
@@ -16,6 +17,7 @@ namespace GreenQloud.Repository.Local
             get ;
         }
 
+        List<RepositoryItem> GetItems(DirectoryInfo dir);
         void Copy (RepositoryItem item);
         void Delete (RepositoryItem  item);
         void Move (RepositoryItem item);

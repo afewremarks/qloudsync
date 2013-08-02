@@ -26,22 +26,25 @@ namespace GreenQloud.Repository.Local
             }
         }
 
-        private List<RepositoryItem> GetItems (DirectoryInfo dir) {
+        public List<RepositoryItem> GetItems (DirectoryInfo dir) {
             LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (dir.FullName);
             List<RepositoryItem> list = new List<RepositoryItem>();
-            foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.TopDirectoryOnly).ToList ()) {
-                string key = fileInfo.FullName.Substring(repo.Path.Length);
-                RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
-                list.Add (localFile);
-            }
+            if(dir.Exists) {
+                foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.TopDirectoryOnly).ToList ()) {
+                    string key = fileInfo.FullName.Substring(repo.Path.Length);
+                    RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
+                    list.Add (localFile);
+                }
 
-            foreach (DirectoryInfo dirInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
-                string key = dirInfo.FullName.Substring(repo.Path.Length);
-                if (!key.EndsWith (Path.DirectorySeparatorChar.ToString()))
-                    key += Path.DirectorySeparatorChar;
-                RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
-                list.Add (localFile);
-                list.AddRange (GetItems (dirInfo));
+           
+                foreach (DirectoryInfo dirInfo in dir.GetDirectories ("*", System.IO.SearchOption.AllDirectories).ToList ()){
+                    string key = dirInfo.FullName.Substring(repo.Path.Length);
+                    if (!key.EndsWith (Path.DirectorySeparatorChar.ToString()))
+                        key += Path.DirectorySeparatorChar;
+                    RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
+                    list.Add (localFile);
+                    list.AddRange (GetItems (dirInfo));
+                }
             }
             return list;
         } 
