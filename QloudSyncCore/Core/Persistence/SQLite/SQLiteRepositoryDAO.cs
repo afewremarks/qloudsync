@@ -12,11 +12,7 @@ namespace GreenQloud.Persistence.SQLite
 
         #region implemented abstract members of RepositoryDAO
 
-        #if __MonoCS__
-            SQLiteDatabase database = new SQLiteDatabase();
-        #elif
-            SQLiteDatabaseWin database = new SQLiteDatabaseWin();
-        #endif
+        SQLiteDatabase database = new SQLiteDatabase();
 
         public override void Create (LocalRepository e)
         {

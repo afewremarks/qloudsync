@@ -16,11 +16,7 @@ namespace GreenQloud.Persistence.SQLite
         SQLiteRepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO();
         #region implemented abstract members of EventDAO
 
-        #if __MonoCS__
-            SQLiteDatabase database = new SQLiteDatabase();
-        #elif
-            SQLiteDatabaseWin database = new SQLiteDatabaseWin();
-        #endif
+        SQLiteDatabase database = new SQLiteDatabase();
 
         public override void Create (Event e)
         {
