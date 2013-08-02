@@ -34,4 +34,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="lib\MonoMac.dll" />
+    <None Include="lib\XamaMac.dll" />
+    <None Include="lib\LitS3.dll" />
+    <None Include="lib\Newtonsoft.Json.dll" />
+  </ItemGroup>
 </Project>
