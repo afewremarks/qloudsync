@@ -126,7 +126,7 @@ using System.Threading;
         {
             CultureInfo cultureInfo   = Thread.CurrentThread.CurrentCulture;
             TextInfo textInfo = cultureInfo.TextInfo;
-            return String.Format ("{0} - {1}", textInfo.ToTitleCase(EventType),  (HaveResultItem ? Item.ResultItem.Key : Item.Key));
+            return String.Format ("{0} - {1}", textInfo.ToTitleCase(EventType.ToString()),  (HaveResultItem ? Item.ResultItem.Key : Item.Key));
         }
 	}
 }
