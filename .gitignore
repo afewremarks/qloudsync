@@ -11,3 +11,4 @@ obj/
 *.am
 
 QloudSync/test-results/
+QloudSyncMAC/test-results/QloudSyncMAC.csproj.test-cache

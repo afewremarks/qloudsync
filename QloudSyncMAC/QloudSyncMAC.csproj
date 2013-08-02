@@ -71,9 +71,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="QloudSyncCore">
-      <HintPath>lib\QloudSyncCore.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
@@ -103,7 +100,6 @@
     <None Include="lib\XamaMac.dll" />
     <None Include="lib\LitS3.dll" />
     <None Include="lib\Newtonsoft.Json.dll" />
-    <None Include="lib\QloudSyncCore.dll" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" />
@@ -142,5 +138,11 @@
     <Content Include="Pixmaps\qloudsync-folder.icns">
       <Link>qloudsync-folder.icns</Link>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QloudSyncCore\QloudSyncCore.csproj">
+      <Project>{2039E95A-5F46-43E1-BA58-B33C73972B0E}</Project>
+      <Name>QloudSyncCore</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

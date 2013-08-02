@@ -31,7 +31,6 @@ namespace GreenQloud.Synchrony
                         QloudSyncFileSystemWatcher watcher = new QloudSyncFileSystemWatcher(repo.Path);
                         watcher.Changed += delegate(Event e) {
                             lock(_lock){
-                                Logger.LogEvent("EVENT FOUND", e);
                                 CreateEvent (e);
                             }
                         };

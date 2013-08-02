@@ -9,21 +9,25 @@ using System.Collections.Concurrent;
 using GreenQloud.Model;
 using GreenQloud.Persistence.SQLite;
 using System.Collections;
+using GreenQloud.Repository.Local;
 
 namespace GreenQloud
 {
     public class QloudSyncFileSystemWatcher
     {
         private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+        private IPhysicalRepositoryController physicalController;
         private ArrayList ignoreBag;
         private object _bagLock = new object();
         private FSEventStreamCallback callback;
         Thread runLoop;
         IntPtr stream;
+
         public QloudSyncFileSystemWatcher(string pathwatcher)
         {
             ignoreBag = new ArrayList();
-            string watchedFolder = pathwatcher   ;
+            physicalController = new StorageQloudPhysicalRepositoryController ();
+            string watchedFolder = pathwatcher;
             this.callback = this.Callback;
 
             IntPtr path = CFStringCreateWithCString (IntPtr.Zero, watchedFolder, 0);
@@ -109,14 +113,30 @@ namespace GreenQloud
                     if (!ignore) {
 
                         Event e = new Event ();
+                        List<Event> subEvents = new List<Event> ();
                         LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (paths[i]);
                         string key = paths [i].Substring (repo.Path.Length);
                         if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key.EndsWith (Path.DirectorySeparatorChar.ToString()))
                             key += Path.DirectorySeparatorChar;
                         e.Item = RepositoryItem.CreateInstance (repo, key);
 
-                        if (flags [i].HasFlag (FSEventStreamEventFlagItem.Created) && !flags[i].HasFlag (FSEventStreamEventFlagItem.Renamed)) {
+                        if (
+                                flags [i].HasFlag (FSEventStreamEventFlagItem.Created) && 
+                                ((flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile) && !flags[i].HasFlag (FSEventStreamEventFlagItem.Renamed)) || flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir))
+                            ) {
                             e.EventType = EventType.CREATE;
+                            List<RepositoryItem> items =  new List<RepositoryItem>();
+                            if(e.Item.IsFolder){
+                                items = physicalController.GetItems (new DirectoryInfo(e.Item.LocalAbsolutePath));
+                            }
+                            if (items.Count > 0) {
+                                foreach(RepositoryItem item in items){
+                                    Event e2 = new Event ();
+                                    e2.EventType = EventType.CREATE;
+                                    e2.Item = item;
+                                    subEvents.Add (e2);
+                                }
+                            }
                         } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Removed)) {
                             e.EventType = EventType.DELETE;
                         } else if (flags [i].HasFlag (FSEventStreamEventFlagItem.Modified)) {
@@ -149,6 +169,9 @@ namespace GreenQloud
                         }
 
                         handler (e);
+                        foreach(Event e2 in subEvents){
+                            handler(e2);
+                        }
 
                     }
                 }

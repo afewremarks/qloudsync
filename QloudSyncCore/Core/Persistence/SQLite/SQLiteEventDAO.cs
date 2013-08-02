@@ -41,6 +41,8 @@ namespace GreenQloud.Persistence.SQLite
                                               e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket, e.TryQnt, e.Response.ToString());
 
                     e.Id = (int) database.ExecuteNonQuery (sql, true);
+
+                    Logger.LogEvent("EVENT CREATED", e);
                 }catch(Exception err){
                     Logger.LogInfo("ERROR", err);
                 }
@@ -187,31 +189,13 @@ namespace GreenQloud.Persistence.SQLite
 
         public bool ExistsConflict (Event e)
         {
-            string query = "SELECT * FROM EVENT WHERE REPOSITORY= \"{0}\" AND ITEMID = \"{1}\"";
-            string sql ="";
-            DateTime limitDate = GlobalDateTime.Now.Subtract(new TimeSpan(0,0,60));
-            if (e.RepositoryType == RepositoryType.LOCAL)
-            {
-                sql = string.Format (query, RepositoryType.REMOTE, e.Item.Id);
-            }
-            else{
-                sql = string.Format (query, RepositoryType.LOCAL, e.Item.Id);
-            }
+            System.Object temp = database.ExecuteScalar (
+                            string.Format ("SELECT count(*) FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND SYNCHRONIZED <> \"{2}\"", e.Item.Id, e.EventType.ToString(), bool.TrueString)
+                        );
+            int count = int.Parse (temp.ToString());
 
-            List<Event> list = Select (sql);
-
-            foreach (Event ev in list)
-            {
-               if (!ev.Synchronized)
-                    return true;
-                if (e.InsertTime != null){
-                    try{
-
-                        if(Convert.ToDateTime(e.InsertTime)  >limitDate){
-                            return true;
-                        }
-                    }catch{}
-                }
+            if (count > 0) {
+                return true;
             }
 
             return false;
