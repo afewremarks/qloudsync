@@ -35,9 +35,40 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="lib\MonoMac.dll" />
-    <None Include="lib\XamaMac.dll" />
+    <Folder Include="Controller\" />
+    <Folder Include="lib\" />
+    <Folder Include="UI\" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="lib\LitS3.dll" />
+    <None Include="lib\MonoMac.dll" />
     <None Include="lib\Newtonsoft.Json.dll" />
+    <None Include="lib\XamaMac.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Pixmaps\about.png" />
+    <BundleResource Include="Pixmaps\file_down.png" />
+    <BundleResource Include="Pixmaps\file_up.png" />
+    <BundleResource Include="Pixmaps\folder_down.png" />
+    <BundleResource Include="Pixmaps\folder_up.png" />
+    <BundleResource Include="Pixmaps\process-syncing-active.png" />
+    <BundleResource Include="Pixmaps\process-syncing-active_new.png" />
+    <BundleResource Include="Pixmaps\process-syncing-down-active.png" />
+    <BundleResource Include="Pixmaps\process-syncing-down.png" />
+    <BundleResource Include="Pixmaps\process-syncing-error-active.png" />
+    <BundleResource Include="Pixmaps\process-syncing-error.png" />
+    <BundleResource Include="Pixmaps\process-syncing-idle-active.png" />
+    <BundleResource Include="Pixmaps\process-syncing-idle.png" />
+    <BundleResource Include="Pixmaps\process-syncing-up-active.png" />
+    <BundleResource Include="Pixmaps\process-syncing-up.png" />
+    <BundleResource Include="Pixmaps\process-syncing-working.png" />
+    <BundleResource Include="Pixmaps\process-syncing.png" />
+    <BundleResource Include="Pixmaps\side-splash.png" />
+    <BundleResource Include="Pixmaps\trash.png" />
+    <BundleResource Include="Pixmaps\tutorial-slide-1.png" />
+    <BundleResource Include="Pixmaps\tutorial-slide-2.png" />
+    <BundleResource Include="Pixmaps\tutorial-slide-3.png" />
+    <BundleResource Include="Pixmaps\tutorial-slide-4.png" />
+    <BundleResource Include="Pixmaps\user-icon-default.png" />
   </ItemGroup>
 </Project>
