@@ -1,3 +1,4 @@
+#if __MonoCS__
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -55,11 +56,11 @@ namespace GreenQloud.Persistence.SQLite{
             DataTable dt = new DataTable();
             try
             {
-                SqliteConnection cnn = new SqliteConnection(ConnectionString);
+                SQLiteConnection cnn = new SQLiteConnection(ConnectionString);
                 cnn.Open();
-                SqliteCommand mycommand = new SqliteCommand(cnn);
+                SQLiteCommand mycommand = new SQLiteCommand(cnn);
                 mycommand.CommandText = sql;
-                SqliteDataReader reader = mycommand.ExecuteReader();
+                SQLiteDataReader reader = mycommand.ExecuteReader();
                 // Add all the columns.
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
@@ -151,9 +152,9 @@ namespace GreenQloud.Persistence.SQLite{
         }
         public int ExecuteNonQuery(string sql, bool returnId)
         {
-            SqliteConnection cnn = new SqliteConnection(ConnectionString);
+            SQLiteConnection cnn = new SQLiteConnection(ConnectionString);
             cnn.Open();
-            SqliteCommand mycommand = new SqliteCommand(cnn);
+            SQLiteCommand mycommand = new SQLiteCommand(cnn);
             mycommand.CommandText = sql;
             int result = mycommand.ExecuteNonQuery();
   
@@ -176,9 +177,9 @@ namespace GreenQloud.Persistence.SQLite{
         /// <returns>A string.</returns>
         public string ExecuteScalar(string sql)
         {
-            SqliteConnection cnn = new SqliteConnection(ConnectionString);
+            SQLiteConnection cnn = new SQLiteConnection(ConnectionString);
             cnn.Open();
-            SqliteCommand mycommand = new SqliteCommand(cnn);
+            SQLiteCommand mycommand = new SQLiteCommand(cnn);
             mycommand.CommandText = sql;
             object value = mycommand.ExecuteScalar();
             cnn.Close();
@@ -313,7 +314,7 @@ namespace GreenQloud.Persistence.SQLite{
             }
         }       
 
-        private void close (ref SqliteConnection cnn, ref SqliteCommand mycommand)
+        private void close (ref SQLiteConnection cnn, ref SQLiteCommand mycommand)
         {
             mycommand.Dispose ();
             mycommand = null;
@@ -321,7 +322,7 @@ namespace GreenQloud.Persistence.SQLite{
             cnn = null;
         }
 
-        private void close (ref SqliteDataReader reader, ref SqliteConnection cnn, ref SqliteCommand mycommand)
+        private void close (ref SQLiteDataReader reader, ref SQLiteConnection cnn, ref SQLiteCommand mycommand)
         {
             reader.Close ();
             reader = null;
@@ -329,4 +330,4 @@ namespace GreenQloud.Persistence.SQLite{
         }
     }
 }
-
+#endif

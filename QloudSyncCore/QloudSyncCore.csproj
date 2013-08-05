@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -31,6 +31,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\packages\System.Data.SQLite.1.0.87.0\lib\net40\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\packages\System.Data.SQLite.1.0.87.0\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -45,9 +51,9 @@
       <HintPath>lib\LitS3.dll</HintPath>
     </Reference>
     <Reference Include="System.Transactions" />
-    <Reference Include="Mono.Data.Sqlite" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Persistence\SQLite\SQLiteDataBaseWin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Exception\DisconnectionException.cs" />
     <Compile Include="Core\Exception\AccessDeniedException.cs" />
@@ -99,15 +105,19 @@
     <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="Core\Config\" />
-    <Folder Include="Core\Controller\" />
-    <Folder Include="Core\UI\" />
-    <Folder Include="lib\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Core\Config\.DS_Store" />
     <None Include="lib\LitS3.dll" />
     <None Include="lib\Newtonsoft.Json.dll" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="x64\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="x86\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>
