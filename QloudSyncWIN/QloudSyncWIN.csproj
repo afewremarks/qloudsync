@@ -1,37 +1,278 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{EC175EE2-8B70-4DF9-A4AA-8EC87D86E832}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>QloudSyncWIN</RootNamespace>
-    <AssemblyName>QloudSyncWIN</AssemblyName>
+    <ProjectGuid>{80CD83D2-DD03-42DD-B530-C84669653183}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GreenQloud</RootNamespace>
+    <AssemblyName>QloudSync.Windows</AssemblyName>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ReleaseVersion />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>qloudsync-app2.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>GreenQloud.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LitS3">
+      <HintPath>lib\LitS3.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>..\DLLs\Mono.Data.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMac">
+      <HintPath>lib\MonoMac.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppDelegate.cs" />
+    <Compile Include="Backgrounds.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Backgrounds.resources</DependentUpon>
+    </Compile>
+    <Compile Include="Controller\Controller.cs" />
+    <Compile Include="FieldState.cs" />
+    <Compile Include="Icons.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Icons.resources</DependentUpon>
+    </Compile>
+    <Compile Include="PageType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\AboutWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\AboutWindow.Designer.cs">
+      <DependentUpon>AboutWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Setup\Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Setup\Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Setup\Sync.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Setup\Sync.Designer.cs">
+      <DependentUpon>Sync.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\UIManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resources</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Pixmaps\qloudsync-app.icns" />
+    <None Include="Pixmaps\qloudsync-folder.icns" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="lib\LitS3.dll" />
+    <None Include="lib\MonoMac.dll" />
+    <None Include="lib\Newtonsoft.Json.dll" />
+    <None Include="lib\XamaMac.dll" />
+    <EmbeddedResource Include="UI\Setup\Login.resources">
+      <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Backgrounds.resources">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Backgrounds.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons.resources">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Icons.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resources">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Setup\Sync.resources">
+      <DependentUpon>Sync.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="qloudsync.config" />
+    <None Include="Resources\process-syncing.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\process-syncing-active.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\process-syncing-down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\process-syncing-down-active.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\process-syncing-error.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\process-syncing-error-active.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\process-syncing-idle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\process-syncing-idle-active.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\process-syncing-up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\process-syncing-up-active.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\about.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\side-splash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Pixmaps\about.png" />
+    <Content Include="Pixmaps\file_down.png" />
+    <Content Include="Pixmaps\file_up.png" />
+    <Content Include="Pixmaps\folder_down.png" />
+    <Content Include="Pixmaps\folder_up.png" />
+    <Content Include="Pixmaps\process-syncing-active.png" />
+    <Content Include="Pixmaps\process-syncing-active_new.png" />
+    <Content Include="Pixmaps\process-syncing-down-active.png" />
+    <Content Include="Pixmaps\process-syncing-down.png" />
+    <Content Include="Pixmaps\process-syncing-error-active.png" />
+    <Content Include="Pixmaps\process-syncing-error.png" />
+    <Content Include="Pixmaps\process-syncing-idle-active.png" />
+    <Content Include="Pixmaps\process-syncing-idle.png" />
+    <Content Include="Pixmaps\process-syncing-up-active.png" />
+    <Content Include="Pixmaps\process-syncing-up.png" />
+    <Content Include="Pixmaps\process-syncing.png" />
+    <Content Include="Pixmaps\side-splash.png" />
+    <Content Include="Pixmaps\trash.png" />
+    <Content Include="Pixmaps\tutorial-slide-1.png" />
+    <Content Include="Pixmaps\tutorial-slide-2.png" />
+    <Content Include="Pixmaps\tutorial-slide-3.png" />
+    <Content Include="Pixmaps\tutorial-slide-4.png" />
+    <Content Include="Pixmaps\user-icon-default.png" />
+    <Content Include="qloudsync-app2.ico" />
+    <Content Include="x64\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="x86\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="lib\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\QloudSyncCore\QloudSyncCore.csproj">
+      <Project>{2039E95A-5F46-43E1-BA58-B33C73972B0E}</Project>
+      <Name>QloudSyncCore</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
