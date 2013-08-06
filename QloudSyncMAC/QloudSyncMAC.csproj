@@ -140,9 +140,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QloudSyncCore\QloudSyncCore.csproj">
+    <ProjectReference Include="..\QloudSyncCore\QloudSyncCoreMAC.csproj">
       <Project>{2039E95A-5F46-43E1-BA58-B33C73972B0E}</Project>
-      <Name>QloudSyncCore</Name>
+      <Name>QloudSyncCoreMAC</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
