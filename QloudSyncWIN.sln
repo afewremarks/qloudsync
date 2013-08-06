@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncCore", "QloudSyncCore\QloudSyncCore.csproj", "{2039E95A-5F46-43E1-BA58-B33C73972B0E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncCore", "QloudSyncCore\QloudSyncCoreWIN.csproj", "{2039E95A-5F46-43E1-BA58-B33C73972B0E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncWIN", "QloudSyncWIN\QloudSyncWIN.csproj", "{80CD83D2-DD03-42DD-B530-C84669653183}"
 EndProject

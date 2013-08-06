@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncMAC", "QloudSyncMAC\QloudSyncMAC.csproj", "{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncCore", "QloudSyncCore\QloudSyncCoreMAC.csproj", "{2039E95A-5F46-43E1-BA58-B33C73972B0E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		ReleaseMono|Any CPU = ReleaseMono|Any CPU
+		DebugMono|Any CPU = DebugMono|Any CPU
+		DefaultMono|Any CPU = DefaultMono|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.DebugMono|Any CPU.ActiveCfg = DebugMono|AnyCPU' Or '$(Configuration)|$(Platform)' == 'Debug|AnyCPU
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.DebugMono|Any CPU.Build.0 = DebugMono|AnyCPU' Or '$(Configuration)|$(Platform)' == 'Debug|AnyCPU
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.DefaultMono|Any CPU.ActiveCfg = DebugMono|AnyCPU' Or '$(Configuration)|$(Platform)' == 'Debug|AnyCPU
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.DefaultMono|Any CPU.Build.0 = DebugMono|AnyCPU' Or '$(Configuration)|$(Platform)' == 'Debug|AnyCPU
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.ReleaseMono|Any CPU.ActiveCfg = ReleaseMono|AnyCPU' Or '$(Configuration)|$(Platform)' == 'Debug|AnyCPU
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.ReleaseMono|Any CPU.Build.0 = ReleaseMono|AnyCPU' Or '$(Configuration)|$(Platform)' == 'Debug|AnyCPU
+		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.DebugMono|Any CPU.ActiveCfg = DebugMono|Any CPU
+		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.DebugMono|Any CPU.Build.0 = DebugMono|Any CPU
+		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.DefaultMono|Any CPU.ActiveCfg = ReleaseMono|Any CPU
+		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.DefaultMono|Any CPU.Build.0 = ReleaseMono|Any CPU
+		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.ReleaseMono|Any CPU.ActiveCfg = ReleaseMono|Any CPU
+		{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}.ReleaseMono|Any CPU.Build.0 = ReleaseMono|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = QloudSyncMAC\QloudSyncMAC.csproj
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.inheritsSet = null
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
+		$0.TextStylePolicy = $3
+		$3.FileWidth = 120
+		$3.inheritsSet = VisualStudio
+		$3.inheritsScope = text/plain
+		$3.scope = text/plain
+		$0.StandardHeader = $4
+		$4.Text = 
+		$4.IncludeInNewFiles = True
+		version = 
+	EndGlobalSection
+EndGlobal
