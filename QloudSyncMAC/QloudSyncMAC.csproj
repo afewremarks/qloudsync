@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">ReleaseMono</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -12,41 +12,41 @@
     <ReleaseVersion />
     <AssemblyName>QloudSync</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseMono|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>False</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <IncludeMonoRuntime>true</IncludeMonoRuntime>
-    <I18n />
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <UseSGen>true</UseSGen>
-    <EnableCodeSigning>False</EnableCodeSigning>
-    <ConsolePause>False</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <I18n />
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <ConsolePause>false</ConsolePause>
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
-    <EnablePackageSigning>False</EnablePackageSigning>
+    <EnablePackageSigning>false</EnablePackageSigning>
     <CreatePackage>true</CreatePackage>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugMono|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <IncludeMonoRuntime>False</IncludeMonoRuntime>
-    <I18n />
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>true</UseSGen>
-    <EnableCodeSigning>False</EnableCodeSigning>
-    <Externalconsole>True</Externalconsole>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <I18n />
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <Externalconsole>true</Externalconsole>
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
-    <EnablePackageSigning>False</EnablePackageSigning>
+    <EnablePackageSigning>false</EnablePackageSigning>
     <CreatePackage>true</CreatePackage>
   </PropertyGroup>
   <ItemGroup>
