@@ -38,12 +38,11 @@ namespace GreenQloud.UI
                     this.SyncWindow.RunSync();
                 }
             });
-            
-            Program.Controller.UIHasLoaded();
+           
         }
 
-        public void Run() { 
-        
+        public void Run() {
+            Program.Controller.UIHasLoaded();
         }
         private void AddToSystemTray()
         {
