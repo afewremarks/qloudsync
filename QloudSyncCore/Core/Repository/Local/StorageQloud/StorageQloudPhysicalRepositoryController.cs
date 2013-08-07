@@ -170,20 +170,21 @@ namespace GreenQloud.Repository.Local
         
         void CreatePath (string path)
         {
-            string parent = path.Substring (0,path.LastIndexOf("/"));
-            
-            if (parent == string.Empty)
+            string parent = path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar.ToString()));
+
+            if (parent == string.Empty || parent.EndsWith(Path.VolumeSeparatorChar.ToString()))
                 return;
-            
+
             CreatePath(parent);
 
-            if (!path.EndsWith (Path.VolumeSeparatorChar.ToString()))
-                path += Path.VolumeSeparatorChar;
+            if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                path += Path.DirectorySeparatorChar;
 
-            if(!Directory.Exists(path)){
-                BlockWatcher (path);
+            if (!Directory.Exists(path))
+            {
+                BlockWatcher(path);
                 DirectoryInfo di = Directory.CreateDirectory(path);
-                UnblockWatcher (path);
+                UnblockWatcher(path);
             }
         }
 

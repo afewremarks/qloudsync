@@ -144,10 +144,10 @@ namespace GreenQloud.Model
 
         private string ToPathString (string path)
         {
+            path = path.Replace("/", Path.DirectorySeparatorChar.ToString());
             if (IsFolder && !path.EndsWith(Path.DirectorySeparatorChar.ToString())) {
                 path += Path.DirectorySeparatorChar;
             }
-            path = path.Replace ("/", Path.DirectorySeparatorChar.ToString ());
             return path;
         }
     }
