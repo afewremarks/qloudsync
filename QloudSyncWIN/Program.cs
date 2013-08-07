@@ -17,9 +17,9 @@ namespace GreenQloud
 
         // private static Mutex program_mutex = new Mutex (false, "QloudSync");
 
-        #if !__MonoCS__
+#if !__MonoCS__
         [STAThread]
-        #endif
+#endif
         public static void Main(string[] args)
         {
             try
@@ -28,7 +28,7 @@ namespace GreenQloud
                 Controller.Initialize();
 
                 UI = new UIManager();
-                Application.Run(UI);
+                GreenQloud.Core.Program.Run(Controller, UI);
             }
             catch (Exception e)
             {
@@ -37,12 +37,11 @@ namespace GreenQloud
                 Environment.Exit(-1);
             }
 
-            #if !__MonoCS__
+#if !__MonoCS__
             // Suppress assertion messages in debug mode
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             GC.WaitForPendingFinalizers();
-            #endif
+#endif
         }
     }
 }
-

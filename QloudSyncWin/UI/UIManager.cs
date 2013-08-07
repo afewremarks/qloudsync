@@ -23,9 +23,7 @@ namespace GreenQloud.UI
             this.LoginWindow = new Setup.Login();
             this.SyncWindow = new Setup.Sync();
             this.About = new AboutWindow();
-        }
 
-        public void Run(){
             Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
             Program.Controller.ShowSetupWindowEvent += ((PageType page_type) => this.LoginWindow.ShowDialog());
             this.LoginWindow.OnLoginDone += (() => {
@@ -40,10 +38,13 @@ namespace GreenQloud.UI
                     this.SyncWindow.RunSync();
                 }
             });
-
+            
             Program.Controller.UIHasLoaded();
         }
 
+        public void Run() { 
+        
+        }
         private void AddToSystemTray()
         {
             this.trayMenu = new ContextMenu();

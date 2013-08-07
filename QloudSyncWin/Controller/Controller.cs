@@ -24,7 +24,7 @@ namespace GreenQloud {
         FATAL_ERROR
     }
 
-    public class Controller : ApplicationController{
+	public class Controller : ApplicationController{
 
         public static int Contador{
             set; get;
@@ -126,10 +126,14 @@ namespace GreenQloud {
                 AddToBookmarks();
          }
 
-        public bool DatabaseLoaded(){
-            if (File.Exists (RuntimeSettings.DatabaseFile) && File.Exists (RuntimeSettings.DatabaseInfoFile)) {
+        public bool DatabaseLoaded()
+        {
+            if (File.Exists(RuntimeSettings.DatabaseFile) && File.Exists(RuntimeSettings.DatabaseInfoFile))
+            {
                 return true;
-            } else {
+            }
+            else
+            {
                 return false;
             }
         }
