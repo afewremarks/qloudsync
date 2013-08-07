@@ -173,7 +173,12 @@ namespace GreenQloud {
             CalcTimeDiff();
             if (FirstRun)
             {
-                ShowSetupWindow(PageType.Login);
+                Thread t = new Thread(delegate()
+                {
+                    ShowSetupWindow(PageType.Login);
+                });
+                t.Start();
+
                 foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
                     File.Delete(f);
                 UpdateConfigFile();
