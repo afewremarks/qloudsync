@@ -62,9 +62,6 @@
     <Reference Include="LitS3">
       <HintPath>lib\LitS3.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Data.Sqlite">
-      <HintPath>..\DLLs\Mono.Data.Sqlite.dll</HintPath>
-    </Reference>
     <Reference Include="MonoMac">
       <HintPath>lib\MonoMac.dll</HintPath>
     </Reference>
