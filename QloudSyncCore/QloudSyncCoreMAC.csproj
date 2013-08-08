@@ -100,6 +100,7 @@
     <Compile Include="Core\Program.cs" />
     <Compile Include="Core\Model\SQTotalUsed.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
+    <Compile Include="Core\IO\QloudSyncFileSystemWatcherWIN.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
