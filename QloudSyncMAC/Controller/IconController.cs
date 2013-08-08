@@ -64,6 +64,7 @@ namespace GreenQloud {
         private NSImage syncing_down_image;
         private NSImage syncing_image;
         private NSImage syncing_error_image;
+        private NSImage disconnected_image;
 
         private NSImage syncing_idle_image_active;
         private NSImage syncing_up_image_active;
@@ -146,7 +147,8 @@ namespace GreenQloud {
                 this.syncing_up_image    = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-up.png"));
                 this.syncing_down_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-down.png"));
                 this.syncing_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing.png"));
-                this.syncing_error_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-active_new.png"));
+                this.syncing_error_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.png"));
+                this.disconnected_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-active_new.png"));
                 
                 this.syncing_idle_image_active  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-idle-active.png"));
                 this.syncing_up_image_active    = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-up-active.png"));
@@ -280,7 +282,11 @@ namespace GreenQloud {
                             break;
                         }
                         case IconState.Error: {
-                            this.status_item.Image          = this.syncing_error_image;
+                            if(Program.Controller.ErrorType == ERROR_TYPE.DISCONNECTION){
+                                this.status_item.Image          = this.disconnected_image;
+                            } else {
+                                this.status_item.Image          = this.syncing_error_image;
+                            }
                             break;
                         }
                         }
