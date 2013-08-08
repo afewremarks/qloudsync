@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">DebugMono</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU' Or '$(Configuration)|$(Platform)' == 'Debug|AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2039E95A-5F46-43E1-BA58-B33C73972B0E}</ProjectGuid>
@@ -45,6 +45,9 @@
       <HintPath>lib\LitS3.dll</HintPath>
     </Reference>
     <Reference Include="System.Transactions" />
+    <Reference Include="MonoMac">
+      <HintPath>lib\MonoMac.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Persistence\SQLite\SQLiteDataBaseWin.cs" />
@@ -105,6 +108,7 @@
     <None Include="lib\LitS3.dll" />
     <None Include="lib\Newtonsoft.Json.dll" />
     <None Include="packages.config" />
+    <None Include="lib\MonoMac.dll" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Mono.Data.Sqlite" />
