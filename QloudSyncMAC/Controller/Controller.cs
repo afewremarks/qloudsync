@@ -483,16 +483,14 @@ namespace GreenQloud {
         public void HandleReconnection(){
             OnIdle();
             if(remoteSynchronizer != null)
-            remoteSynchronizer.Start ();
+                remoteSynchronizer.Start ();
             if(synchronizerResolver != null)
-            synchronizerResolver.Start ();
+                synchronizerResolver.Start ();
         }
 
         public void HandleDisconnection(){
             ErrorType = ERROR_TYPE.DISCONNECTION;
             OnError ();
-            if(remoteSynchronizer != null)
-                recoverySynchronizer.Stop ();
             if(remoteSynchronizer != null)
                 remoteSynchronizer.Stop ();
             if(synchronizerResolver != null)
