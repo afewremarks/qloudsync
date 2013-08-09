@@ -75,6 +75,10 @@ namespace GreenQloud {
         private NSImage folder_image;
         private NSImage caution_image;
         private NSImage sparkleshare_image;
+        private NSImage up_to_date;
+        private NSImage work_in_progress;
+        private NSImage error_in_sync;
+
 
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
         public delegate void UpdateIconEventHandler (IconState state);
@@ -83,13 +87,14 @@ namespace GreenQloud {
         public delegate void UpdateMenuEventHandler (IconState state);
         
         public event UpdateStatusItemEventHandler UpdateStatusItemEvent = delegate { };
-        public delegate void UpdateStatusItemEventHandler (string state_text);
+        public delegate void UpdateStatusItemEventHandler (string state_text, NSImage image);
         
         public event UpdateQuitItemEventHandler UpdateQuitItemEvent = delegate { };
         public delegate void UpdateQuitItemEventHandler (bool quit_item_enabled);
 
             public IconState CurrentState = IconState.Working;
             public string StateText = string.Format ("Welcome to {0}!", GlobalSettings.ApplicationName);
+            public NSImage StateImage;
             public readonly int MenuOverflowThreshold = 9;
             public readonly int MinSubmenuOverflowCount = 3;
             public string[] Folders;
@@ -98,16 +103,7 @@ namespace GreenQloud {
             public string[] OverflowFolderErrors;
             private Thread co2Update;
 
-        public string FolderSize {
-            get {
-                double size = 0;
-                
-                if (size == 0)
-                    return "";
-                else
-                    return "— " + Program.Controller.FormatSize (size);
-            }
-        }
+
 
         
         public int ProgressPercentage {
@@ -159,6 +155,10 @@ namespace GreenQloud {
                 this.status_item.Image      = this.syncing_working;
                 this.status_item.Image.Size = new SizeF (16, 16);
 
+                this.up_to_date         = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "up_to_date.png"));
+                this.work_in_progress         = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing.png"));
+                this.error_in_sync         = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.png"));
+
                 //this.status_item.AlternateImage      = this.syncing_idle_image_active;
                 //this.status_item.AlternateImage.Size = new SizeF (16, 16);
 
@@ -204,11 +204,11 @@ namespace GreenQloud {
                 if (System.IO.Directory.GetDirectories(RuntimeSettings.HomePath).Length == 0 && System.IO.Directory.GetFiles (RuntimeSettings.HomePath).Length < 2)
                     StateText = string.Format("Welcome to {0}!",GlobalSettings.ApplicationName);
                 else
-                    StateText = "Files up to date " + FolderSize;
+                    StateText = " Up to date ";
 
                 
                 UpdateQuitItemEvent (QuitItemEnabled);
-                UpdateStatusItemEvent (StateText);
+                UpdateStatusItemEvent (StateText, this.up_to_date);
                 UpdateIconEvent (CurrentState);
                 UpdateMenuEvent (CurrentState);
             };
@@ -235,7 +235,7 @@ namespace GreenQloud {
                     StateText += " " + ProgressPercentage + "%  " + ProgressSpeed;
                 
                 UpdateIconEvent (CurrentState);
-                UpdateStatusItemEvent (StateText);
+                UpdateStatusItemEvent (StateText, this.syncing_working);
                 UpdateQuitItemEvent (QuitItemEnabled);
             };
             
@@ -255,7 +255,7 @@ namespace GreenQloud {
                     break;
                 }
                 UpdateQuitItemEvent (QuitItemEnabled);
-                UpdateStatusItemEvent (StateText);
+                UpdateStatusItemEvent (StateText, this.error_in_sync);
                 UpdateIconEvent (CurrentState);
                 UpdateMenuEvent (CurrentState);
             };			
@@ -296,11 +296,12 @@ namespace GreenQloud {
                 }
             };
 
-            UpdateStatusItemEvent += delegate (string state_text) {
+            UpdateStatusItemEvent += delegate (string state_text, NSImage image) {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
-                        this.state_item.Title = state_text;
+                        StateText = state_text;
+                        StateImage = image;
                     });
                 }
             };
@@ -331,9 +332,13 @@ namespace GreenQloud {
                 this.menu.AutoEnablesItems = false;
 
                 this.state_item = new NSMenuItem () {
-                    Title   = StateText,
+                    Title = StateText,
                     Enabled = false
                 };
+                if (StateImage != null) {
+                    this.state_item.Image = StateImage;
+                    this.state_item.Image.Size = new SizeF (16, 16);
+                }
 
                 this.folder_item = new NSMenuItem () {
                     Title = GlobalSettings.HomeFolderName+" Folder"
@@ -357,7 +362,7 @@ namespace GreenQloud {
 //                };
 
                 this.recent_events_title = new NSMenuItem () {
-                    Title   = "Recent Changes:",
+                    Title   = "RECENTLY CHANGED",
                     Enabled =  false
                 };       
                 recent_events_title.Activated += delegate {
@@ -427,7 +432,7 @@ namespace GreenQloud {
                };
 
                 this.menu.AddItem (co2_savings_item);
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
+                //this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.folder_item);
                 this.menu.AddItem (this.openweb_item);    
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
@@ -457,10 +462,11 @@ namespace GreenQloud {
                     this.recent_events_title.ToolTip = text;
                 }
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (help_item);
-				this.menu.AddItem (this.about_item);
-			    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.state_item);
+			    this.menu.AddItem (NSMenuItem.SeparatorItem);
+                this.menu.AddItem (help_item);
+                this.menu.AddItem (this.about_item);
+
                 //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
                 this.status_item.Menu = this.menu;
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
