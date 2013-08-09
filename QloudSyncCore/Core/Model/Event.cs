@@ -122,12 +122,26 @@ using System.Threading;
             return s;
         }
 
-        public string ShortString ()
+        public string ShortString
         {
-            CultureInfo cultureInfo   = Thread.CurrentThread.CurrentCulture;
-            TextInfo textInfo = cultureInfo.TextInfo;
-            return String.Format ("{0} - {1}", textInfo.ToTitleCase(EventType.ToString().ToLower()),  (HaveResultItem ? Item.ResultItem.Key : Item.Key));
-
+            get {
+                CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+                TextInfo textInfo = cultureInfo.TextInfo;
+                return String.Format ("{0} - {1}", textInfo.ToTitleCase (EventType.ToString ().ToLower ()), (HaveResultItem ? Item.ResultItem.Key : Item.Key));
+            }
+        }
+        public string ItemSummary
+        {
+            get{
+                try{
+                    String s = (HaveResultItem ? Item.ResultItem.Name : Item.Name);
+                    DateTime updatedAt = DateTime.ParseExact((HaveResultItem ? Item.ResultItem.UpdatedAt : Item.UpdatedAt), "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'", System.Globalization.CultureInfo.InvariantCulture);
+                    s += " " + GlobalDateTime.ToHumanReadableString(GlobalDateTime.Now.Subtract(updatedAt));
+                    return s;
+                } catch {
+                    return "";
+                }
+            }
         }
 	}
 }

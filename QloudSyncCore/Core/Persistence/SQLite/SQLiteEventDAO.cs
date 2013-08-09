@@ -53,7 +53,8 @@ namespace GreenQloud.Persistence.SQLite
         }
         public override List<Event> LastEvents{
             get{
-                return Select(string.Format("SELECT * FROM EVENT WHERE SYNCHRONIZED = \"{0}\" AND RESPONSE = \"{1}\" GROUP BY ItemId ORDER BY EventID DESC LIMIT '{2}'  ", bool.TrueString, RESPONSE.OK, 5));
+                return Select(string.Format("SELECT * FROM EVENT INNER JOIN RepositoryItem ON RepositoryItemID = ITEMID WHERE SYNCHRONIZED = \"{0}\" AND RESPONSE = \"{1}\"  AND isfolder <> '{2}'" +
+                                            "GROUP BY ItemId ORDER BY EventID DESC LIMIT '{3}'  ", bool.TrueString, RESPONSE.OK, bool.TrueString, 5));
             }
         }
         public override Event FindById(int id)

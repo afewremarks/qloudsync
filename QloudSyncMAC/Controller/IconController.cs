@@ -447,7 +447,7 @@ namespace GreenQloud {
 
                     foreach(Event e in events){
                         NSMenuItem current = new NSMenuItem(){
-                            Title = e.ShortString(),
+                            Title = e.ItemSummary,
                             Enabled = true
                         };
                         current.ToolTip = e.ToString ();
