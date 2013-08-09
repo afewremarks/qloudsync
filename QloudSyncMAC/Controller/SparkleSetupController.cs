@@ -272,15 +272,9 @@ namespace GreenQloud {
         public void SyncingCancelled ()
         {
             Program.Controller.StopSynchronizers();
-            string credential_path = Path.Combine(RuntimeSettings.ConfigPath, "credentials.xml");
-            if (System.IO.File.Exists(credential_path))
-                System.IO.File.Delete(credential_path);
-            Credential.Username ="";
-            Credential.Password="";
-            Credential.PublicKey = "";
-            Credential.SecretKey = "";
-
-            ChangePageEvent (PageType.Login, null);
+            this.current_page = PageType.None;
+            HideWindowEvent ();
+            throw new AbortedOperationException ("Stop made by user.");
         }
 
         public void ErrorPageCompleted ()
