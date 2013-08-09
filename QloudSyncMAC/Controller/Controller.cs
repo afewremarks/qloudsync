@@ -227,12 +227,17 @@ namespace GreenQloud {
 
         public void StopSynchronizers () 
         {
-            synchronizerResolver.Stop();
-            recoverySynchronizer.Stop();
-            localSynchronizer.Stop();
-            remoteSynchronizer.Stop();
+            if(synchronizerResolver != null)
+                synchronizerResolver.Stop();
+            if(recoverySynchronizer != null)
+                recoverySynchronizer.Stop();
+            if(localSynchronizer != null)
+                localSynchronizer.Stop();
+            if(remoteSynchronizer != null)
+                remoteSynchronizer.Stop();
             Logger.LogInfo ("INFO", "Synchronizers Stoped!");
         }
+
         public void InitializeSynchronizers (bool initRecovery = false)
         {
             SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO ();

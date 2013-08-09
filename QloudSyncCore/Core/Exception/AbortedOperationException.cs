@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace GreenQloud
 {
-    class AbortedOperationException : Exception
+    public class AbortedOperationException : Exception
 	{
         public AbortedOperationException(string cause) : base(cause){
            

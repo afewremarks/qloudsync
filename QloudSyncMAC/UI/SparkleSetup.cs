@@ -27,6 +27,7 @@ namespace GreenQloud {
         private NSButton StartupCheckButton;
         private NSButton OpenFolderButton;
         private NSButton FinishButton;
+        private NSButton StopButton;
         private NSImage SlideImage;
         private NSImageView SlideImageView;
         private NSProgressIndicator ProgressIndicator;
@@ -251,8 +252,9 @@ namespace GreenQloud {
 
 
 
-                CancelButton = new NSButton () {
-                    Title = "Cancel"
+                StopButton = new NSButton () {
+                    Title = "Stop",
+                    Enabled = false
                 };
 
                 FinishButton = new NSButton () {
@@ -286,10 +288,8 @@ namespace GreenQloud {
                     });
                 };
 
-                CancelButton.Activated += delegate {
-
+                StopButton.Activated += delegate {
                     SparkleSetupController.SyncingCancelled ();
-
                 };
 
                 LoadingStart += delegate() {
@@ -301,6 +301,9 @@ namespace GreenQloud {
                             else
                                 Loading.StringValue += ".";
                         }
+
+                        if(!StopButton.Enabled)
+                            StopButton.Enabled = true;
                     });
                 };
                 CalculatingStart += delegate() {
@@ -378,7 +381,7 @@ namespace GreenQloud {
                 thread.Start ();
 
                 Buttons.Add (FinishButton);
-                Buttons.Add (CancelButton);
+                Buttons.Add (StopButton);
             }
 
             if (type == PageType.Finished) {

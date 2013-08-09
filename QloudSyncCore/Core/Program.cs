@@ -4,6 +4,7 @@ using System.IO;
 using GreenQloud.Repository;
 using System.Linq;
 using QloudSyncCore;
+using System.Diagnostics;
 
 namespace GreenQloud.Core {
 
@@ -20,7 +21,12 @@ namespace GreenQloud.Core {
             UI = ui;
             try {
                 Controller.Initialize ();
-                UI.Run (); 
+                try{
+                    UI.Run ();
+                }catch (AbortedOperationException){
+                    Logger.LogInfo ("Init", "Operation aborted. Sending a QloudSync Kill.");
+                    Process.GetProcessesByName("QloudSync")[0].Kill();
+                }
             } catch (Exception e){
                 Logger.LogInfo ("Init", e);
                 Console.WriteLine (e.StackTrace);
