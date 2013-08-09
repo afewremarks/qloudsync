@@ -21,8 +21,27 @@ namespace GreenQloud
                 SQLiteTimeDiffDAO dao = new SQLiteTimeDiffDAO ();
                 double diff = dao.Last;
                 DateTime local = DateTime.Now;
-                return local.AddMilliseconds(diff);
+                DateTime diffTime = local.AddMilliseconds (diff);
+                return diffTime;
             }
+        }
+
+        public static string ToHumanReadableString(TimeSpan timeSpan)
+        {
+            if (timeSpan.TotalDays > 30)
+                return Math.Floor((timeSpan.TotalDays / 30)) + " month(s) ago";
+            if (timeSpan.TotalDays > 7)
+                return  Math.Floor((timeSpan.TotalDays / 7)) + " week(s) ago";
+            if (timeSpan.TotalDays < 1) {
+                if (timeSpan.TotalHours >= 1) {
+                    return Math.Floor (timeSpan.TotalHours) + " hours(s) ago";
+                } else if (timeSpan.TotalMinutes >= 1) {
+                    return Math.Floor (timeSpan.TotalMinutes) + " mins(s) ago";
+                } else {
+                    return "Just now";
+                }
+            }
+            return Math.Floor(timeSpan.TotalDays) + " day(s) ago";
         }
 
         public static DateTime NowRemote {
