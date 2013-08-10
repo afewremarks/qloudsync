@@ -11,6 +11,16 @@ using System.Linq;
 
 namespace GreenQloud.Model
 {
+
+    public enum ItemType {
+        DEFAULT,
+        IMAGE,
+        TEXT,
+        VIDEO,
+        AUDIO,
+        FOLDER
+    } 
+
     public class RepositoryItem
     {
         private static readonly SQLiteRepositoryItemDAO dao =  new SQLiteRepositoryItemDAO ();
@@ -86,6 +96,36 @@ namespace GreenQloud.Model
             }
         }
 
+        public ItemType Type {
+            get {
+                if (IsFolder)
+                    return ItemType.FOLDER;
+
+                string name = Name;
+                string extension = "";
+                if(name.IndexOf(".") >= 0)
+                    extension = name.Substring (Name.LastIndexOf (".")+1);
+
+                string[] images =  new string[6] {"png" , "jpg", "gif", "jpeg", "tiff", "bmp"};
+                string[] text =  new string[5] {"pdf", "doc", "docx", "odf", "txt"};
+                string[] video =  new string[6] {"mp4" , "m4v", "ogg", "webm", "mov","avi"};
+                string[] audio =  new string[3] {"mp3", "m4a", "wav"};
+
+                if(images.Contains(extension))
+                    return ItemType.IMAGE;
+                if(text.Contains(extension))
+                    return ItemType.TEXT;
+                if(video.Contains(extension))
+                    return ItemType.VIDEO;
+                if(audio.Contains(extension))
+                    return ItemType.AUDIO;
+
+
+
+                return ItemType.DEFAULT;
+            }
+        }
+
         private string etag;
         public string ETag{
             set{
@@ -150,6 +190,7 @@ namespace GreenQloud.Model
             }
             return path;
         }
+
     }
 }
 

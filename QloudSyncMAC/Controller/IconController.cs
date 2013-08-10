@@ -79,6 +79,11 @@ namespace GreenQloud {
         private NSImage work_in_progress;
         private NSImage error_in_sync;
 
+        private NSImage docs_image;
+        private NSImage movies_image;
+        private NSImage music_image;
+        private NSImage pics_image;
+        private NSImage default_image;
 
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
         public delegate void UpdateIconEventHandler (IconState state);
@@ -94,7 +99,7 @@ namespace GreenQloud {
 
             public IconState CurrentState = IconState.Working;
             public string StateText = string.Format ("Welcome to {0}!", GlobalSettings.ApplicationName);
-            public NSImage StateImage;
+
             public readonly int MenuOverflowThreshold = 9;
             public readonly int MinSubmenuOverflowCount = 3;
             public string[] Folders;
@@ -155,10 +160,6 @@ namespace GreenQloud {
                 this.status_item.Image      = this.syncing_working;
                 this.status_item.Image.Size = new SizeF (16, 16);
 
-                this.up_to_date         = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "up_to_date.png"));
-                this.work_in_progress         = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing.png"));
-                this.error_in_sync         = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.png"));
-
                 //this.status_item.AlternateImage      = this.syncing_idle_image_active;
                 //this.status_item.AlternateImage.Size = new SizeF (16, 16);
 
@@ -166,7 +167,11 @@ namespace GreenQloud {
                 this.caution_image      = NSImage.ImageNamed ("NSCaution");
                 this.sparkleshare_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "qloudsync-folder.icns"));
 
-              
+                this.docs_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "folder-docs.png"));
+                this.movies_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "folder-movies.png"));
+                this.music_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "folder-music.png"));
+                this.pics_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "folder-pics.png"));
+                this.default_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "file-default.png"));
 
                 CreateMenu ();
 
@@ -204,7 +209,7 @@ namespace GreenQloud {
                 if (System.IO.Directory.GetDirectories(RuntimeSettings.HomePath).Length == 0 && System.IO.Directory.GetFiles (RuntimeSettings.HomePath).Length < 2)
                     StateText = string.Format("Welcome to {0}!",GlobalSettings.ApplicationName);
                 else
-                    StateText = " Up to date ";
+                    StateText = "✅  Up to date ";
 
                 
                 UpdateQuitItemEvent (QuitItemEnabled);
@@ -220,15 +225,15 @@ namespace GreenQloud {
 
                 if(syncDown && syncUp){
                     CurrentState = IconState.Syncing;
-                    StateText    = "Syncing changes…";
+                    StateText    = "🔄 Syncing changes…";
                     
                 } else if (syncUp) {
                     CurrentState = IconState.SyncingUp;
-                    StateText    = "Sending changes…";
+                    StateText    = "🔄 Sending changes…";
                     
                 } else if (syncDown){
                     CurrentState = IconState.SyncingDown;
-                    StateText    = "Receiving changes…";
+                    StateText    = "🔄 Receiving changes…";
                 }
                 
                 if (ProgressPercentage > 0)
@@ -237,6 +242,7 @@ namespace GreenQloud {
                 UpdateIconEvent (CurrentState);
                 UpdateStatusItemEvent (StateText, this.syncing_working);
                 UpdateQuitItemEvent (QuitItemEnabled);
+                UpdateMenuEvent (CurrentState);
             };
             
             Program.Controller.OnError += delegate {
@@ -244,14 +250,14 @@ namespace GreenQloud {
                 switch(Program.Controller.ErrorType)
                 {
                     case ERROR_TYPE.DISCONNECTION:
-                        StateText = "Lost network connection";
+                        StateText = "⛔ Lost network connection";
                     break;
                     case ERROR_TYPE.ACCESS_DENIED:
-                        StateText = "Access Denied. Login again!";
+                        StateText = "⛔ Access Denied. Login again!";
                         this.preferences_item.Enabled = true;
                     break;
                     default:
-                        StateText = "Failed to send some changes";
+                        StateText = "⛔ Failed to send some changes";
                     break;
                 }
                 UpdateQuitItemEvent (QuitItemEnabled);
@@ -301,7 +307,6 @@ namespace GreenQloud {
                 {
                     InvokeOnMainThread (delegate {
                         StateText = state_text;
-                        StateImage = image;
                     });
                 }
             };
@@ -333,12 +338,8 @@ namespace GreenQloud {
 
                 this.state_item = new NSMenuItem () {
                     Title = StateText,
-                    Enabled = false
+                    Enabled = true
                 };
-                if (StateImage != null) {
-                    this.state_item.Image = StateImage;
-                    this.state_item.Image.Size = new SizeF (16, 16);
-                }
 
                 this.folder_item = new NSMenuItem () {
                     Title = GlobalSettings.HomeFolderName+" Folder"
@@ -431,10 +432,11 @@ namespace GreenQloud {
                     Program.Controller.OpenWebsite ("http://support.greenqloud.com");
                };
 
-                this.menu.AddItem (co2_savings_item);
+
                 //this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.folder_item);
-                this.menu.AddItem (this.openweb_item);    
+                this.menu.AddItem (this.openweb_item);  
+                this.menu.AddItem (co2_savings_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.recent_events_title);
 
@@ -447,16 +449,33 @@ namespace GreenQloud {
 
                     foreach(Event e in events){
                         NSMenuItem current = new NSMenuItem(){
-                            Title = e.ItemSummary,
+                            Title = e.ItemName,
                             Enabled = true
                         };
+                        current.Image = this.default_image;
+                        if(e.ItemType == ItemType.IMAGE)
+                            current.Image = this.pics_image;
+                        if(e.ItemType == ItemType.TEXT)
+                            current.Image = this.docs_image;
+                        if(e.ItemType == ItemType.VIDEO)
+                            current.Image = this.movies_image;
+                        if(e.ItemType == ItemType.AUDIO)
+                            current.Image = this.music_image;
+
                         current.ToolTip = e.ToString ();
                         //current.Activated += delegate {                    
                         //string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
                         //Program.Controller.OpenWebsite (string.Format("https://my.greenqloud.com/qloudsync?username={0}&hash={1}&returnUrl=/storageQloud", Credential.Username, hash));
                         //};
 
+                        NSMenuItem subtitle = new NSMenuItem () {
+                            Title = e.ItemUpdatedAt,    
+                            Enabled = true
+                        };
+                        subtitle.IndentationLevel = 2;
+
                         this.menu.AddItem(current);
+                        this.menu.AddItem(subtitle);
                         text += e.ToString() + "\n\n";
                     }
                     this.recent_events_title.ToolTip = text;
@@ -547,3 +566,4 @@ namespace GreenQloud {
         }
     }
 }
+   
