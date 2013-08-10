@@ -106,9 +106,9 @@ namespace GreenQloud.Model
                 if(name.IndexOf(".") >= 0)
                     extension = name.Substring (Name.LastIndexOf (".")+1);
 
-                string[] images =  new string[6] {"png" , "jpg", "gif", "jpeg", "tiff", "bmp"};
-                string[] text =  new string[5] {"pdf", "doc", "docx", "odf", "txt"};
-                string[] video =  new string[6] {"mp4" , "m4v", "ogg", "webm", "mov","avi"};
+                string[] images =  new string[7] {"png" , "jpg", "gif", "jpeg", "tiff", "bmp", "JPG"};
+                string[] text =  new string[6] {"pdf", "doc", "docx", "odf", "txt", "xls"};
+                string[] video =  new string[7] {"mp4" , "m4v", "ogg", "webm", "mov","avi", "midi"};
                 string[] audio =  new string[3] {"mp3", "m4a", "wav"};
 
                 if(images.Contains(extension))

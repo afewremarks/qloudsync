@@ -130,11 +130,11 @@
     <BundleResource Include="Pixmaps\tutorial-slide-3.png" />
     <BundleResource Include="Pixmaps\tutorial-slide-4.png" />
     <BundleResource Include="Pixmaps\user-icon-default.png" />
-    <BundleResource Include="Pixmaps\file-default.png" />
     <BundleResource Include="Pixmaps\folder-docs.png" />
     <BundleResource Include="Pixmaps\folder-movies.png" />
     <BundleResource Include="Pixmaps\folder-music.png" />
     <BundleResource Include="Pixmaps\folder-pics.png" />
+    <BundleResource Include="Pixmaps\default.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\qloudsync-app.icns">
