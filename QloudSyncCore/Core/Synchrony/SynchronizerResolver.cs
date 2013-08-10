@@ -94,15 +94,21 @@ namespace GreenQloud.Synchrony
         private bool VerifyIgnoreRemote (Event remoteEvent)
         {
             GetObjectResponse meta = null;
-            if (remoteEvent.HaveResultItem) { 
-                meta = remoteRepository.GetMetadata (remoteEvent.Item.ResultItem.Key);
-            } else {
-                meta = remoteRepository.GetMetadata (remoteEvent.Item.Key);
+
+            //Ignore events without metadata....
+            if(remoteEvent.EventType != EventType.DELETE) {
+                if (remoteEvent.HaveResultItem) { 
+                    meta = remoteRepository.GetMetadata (remoteEvent.Item.ResultItem.Key);
+                } else {
+                    meta = remoteRepository.GetMetadata (remoteEvent.Item.Key);
+                }
+                if(meta == null){
+                    Logger.LogInfo("ERROR", "File " + (remoteEvent.HaveResultItem ? remoteEvent.Item.ResultItem.Key : remoteEvent.Item.Key) + " ignored. Metadata not found!");
+                    return true;
+                }
             }
-            if(meta == null){
-                Logger.LogInfo("ERROR", "File " + (remoteEvent.HaveResultItem ? remoteEvent.Item.ResultItem.Key : remoteEvent.Item.Key) + " ignored. Metadata not found!");
-                return true;
-            }
+
+
             if(!remoteEvent.HaveResultItem){
                 if (!remoteEvent.Item.IsFolder) {
                     if (remoteRepository.Exists(remoteEvent.Item) && meta.ContentLength == 0)
