@@ -52,7 +52,10 @@ namespace GreenQloud {
         private NSMenuItem preferences_item;
         private NSMenuItem about_item;
         private NSMenuItem openweb_item;
-        private NSMenuItem current;
+
+        private List<NSMenuItem> recentChanges;
+
+
         private NSMenuItem notify_item;
         private NSMenuItem recent_events_title;
         private NSMenuItem quit_item;
@@ -139,6 +142,7 @@ namespace GreenQloud {
 
         public IconController () : base ()
         {
+            recentChanges = new List<NSMenuItem> ();
             using (var a = new NSAutoreleasePool ())
             {
                 this.status_item = NSStatusBar.SystemStatusBar.CreateStatusItem (28);
@@ -311,6 +315,8 @@ namespace GreenQloud {
 
         public void CreateMenu ()
         {
+            this.recentChanges.Clear ();
+
             using (NSAutoreleasePool a = new NSAutoreleasePool ()) {
                 this.menu = new NSMenu ();
                 this.menu.AutoEnablesItems = false;
@@ -459,7 +465,6 @@ namespace GreenQloud {
                     foreach (Event e in events) {
 
                         NSMenuItem current = new NSMenuItem () {
-                        
                             Title = e.ItemName,
                             Enabled = true
                         };
@@ -477,13 +482,12 @@ namespace GreenQloud {
 
                         current.ToolTip = e.ToString ();
 
-                        current.Activated += delegate 
-
-                        {
-                            //RecentEventClicked();
-                            SparkleShareClicked();
-
-                        };
+                        EventHandler evt = new EventHandler(
+                            delegate {
+                                InvokeOnMainThread (() => RecentChangeItemClicked(e, null));
+                            }
+                        );
+                        current.Activated += evt;
 
                         NSMenuItem subtitle = new NSMenuItem () {
                             Title = ("  "+ e.ItemUpdatedAt),
@@ -492,7 +496,7 @@ namespace GreenQloud {
                         subtitle.IndentationLevel = 1;
 
 
-
+                        this.recentChanges.Add (current);
                         this.menu.AddItem (current);
                         this.menu.AddItem (subtitle);
                         text += e.ToString () + "\n\n";
@@ -517,20 +521,16 @@ namespace GreenQloud {
             }
         }
 
-        public void RecentEventClicked ()
-        {     
-            Console.WriteLine ("Works");
-//            string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
-//            Program.Controller.OpenWebsite (string.Format("https://my.greenqloud.com/qloudsync?username={0}&hash={1}&returnUrl=/storageQloud", Credential.Username, hash));
-        }
-
 
         public void SparkleShareClicked ()
         {
             Program.Controller.OpenSparkleShareFolder ();
         }
         
-        
+        public void RecentChangeItemClicked (object sender, EventArgs e)
+        {
+            Program.Controller.OpenRepositoryitemFolder (((Event)sender).ItemLocalFolderPath);
+        }
         
         public void AddHostedProjectClicked ()
         {

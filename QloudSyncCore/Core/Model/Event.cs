@@ -141,6 +141,17 @@ using System.Threading;
             }
         }
 
+        public string ItemLocalFolderPath
+        {
+            get{
+                try{
+                    return (HaveResultItem ? Item.ResultItem.LocalFolderPath : Item.LocalFolderPath);
+                } catch {
+                    return "";
+                }
+            }
+        }
+
         public string ItemUpdatedAt
         {
             get{
