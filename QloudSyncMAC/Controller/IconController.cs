@@ -73,6 +73,7 @@ namespace GreenQloud {
         private NSImage syncing_image_active;
         private NSImage syncing_error_image_active;
 
+        private NSImage share_image;
         private NSImage folder_image;
         private NSImage caution_image;
         private NSImage sparkleshare_image;
@@ -151,7 +152,7 @@ namespace GreenQloud {
                 this.syncing_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing.png"));
                 this.syncing_error_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.png"));
                 this.disconnected_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-active_new.png"));
-                
+
                 this.syncing_idle_image_active  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-idle-active.png"));
                 this.syncing_up_image_active    = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-up-active.png"));
                 this.syncing_down_image_active  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-down-active.png"));
@@ -163,11 +164,11 @@ namespace GreenQloud {
 
                 //this.status_item.AlternateImage      = this.syncing_idle_image_active;
                 //this.status_item.AlternateImage.Size = new SizeF (16, 16);
-
                 this.folder_image       = NSImage.ImageNamed ("NSFolder");
                 this.caution_image      = NSImage.ImageNamed ("NSCaution");
                 this.sparkleshare_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "qloudsync-folder.icns"));
 
+                this.share_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "share.png"));
                 this.docs_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "folder-docs.png"));
                 this.docs_image.Size = new SizeF (16, 16);
                 this.movies_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "folder-movies.png"));
@@ -179,32 +180,6 @@ namespace GreenQloud {
                 this.default_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "default.png"));
 
                 CreateMenu ();
-
-                co2Update = new Thread (delegate(){
-                    while(true){
-                        try{
-                            string spent = Statistics.TotalUsedSpace.Spent;
-                            string saved = Statistics.EarlyCO2Savings.Saved;
-                            string subscript = "2";
-                            subscript.ToLowerInvariant();
-
-                            using (var ns = new NSAutoreleasePool ())
-                            {
-                                InvokeOnMainThread (() => { 
-                                    if(spent != null && saved != null){
-                                        co2_savings_item.Title =  spent + " used | " + saved + " CO₂ saved";
-                                    }
-                                });
-                            }
-                        } catch (Exception e){
-                            Console.WriteLine(e.Message);
-                            Logger.LogInfo("INFO", "Cannot load CO₂ savings.");
-                        }
-                        Thread.Sleep(60000);
-                    }
-                });
-
-                co2Update.Start ();
             }
 
             Program.Controller.OnIdle += delegate {
@@ -214,7 +189,7 @@ namespace GreenQloud {
                 if (System.IO.Directory.GetDirectories(RuntimeSettings.HomePath).Length == 0 && System.IO.Directory.GetFiles (RuntimeSettings.HomePath).Length < 2)
                     StateText = string.Format("Welcome to {0}!",GlobalSettings.ApplicationName);
                 else
-                    StateText = "✅  Up to date ";
+                    StateText = "✓  Up to date ";
 
                 
                 UpdateQuitItemEvent (QuitItemEnabled);
@@ -230,15 +205,15 @@ namespace GreenQloud {
 
                 if(syncDown && syncUp){
                     CurrentState = IconState.Syncing;
-                    StateText    = "🔄 Syncing changes…";
+                    StateText    = "⟳ Syncing changes…";
                     
                 } else if (syncUp) {
                     CurrentState = IconState.SyncingUp;
-                    StateText    = "🔄 Sending changes…";
+                    StateText    = "⟳ Sending changes…";
                     
                 } else if (syncDown){
                     CurrentState = IconState.SyncingDown;
-                    StateText    = "🔄 Receiving changes…";
+                    StateText    = "⟳ Receiving changes…";
                 }
                 
                 if (ProgressPercentage > 0)
@@ -255,14 +230,14 @@ namespace GreenQloud {
                 switch(Program.Controller.ErrorType)
                 {
                     case ERROR_TYPE.DISCONNECTION:
-                        StateText = "⛔ Lost network connection";
+                    StateText = "✗   Lost network connection";
                     break;
                     case ERROR_TYPE.ACCESS_DENIED:
-                        StateText = "⛔ Access Denied. Login again!";
+                    StateText = "✗   Access Denied. Login again!";
                         this.preferences_item.Enabled = true;
                     break;
                     default:
-                        StateText = "⛔ Failed to send some changes";
+                    StateText = "✗   Failed to send some changes";
                     break;
                 }
                 UpdateQuitItemEvent (QuitItemEnabled);
@@ -336,9 +311,8 @@ namespace GreenQloud {
 
         public void CreateMenu ()
         {
-            using (NSAutoreleasePool a = new NSAutoreleasePool ())
-            {
-                this.menu                  = new NSMenu ();
+            using (NSAutoreleasePool a = new NSAutoreleasePool ()) {
+                this.menu = new NSMenu ();
                 this.menu.AutoEnablesItems = false;
 
                 this.state_item = new NSMenuItem () {
@@ -354,9 +328,9 @@ namespace GreenQloud {
                     SparkleShareClicked ();
                 };
 
-                this.folder_item.Image      = this.sparkleshare_image;
+                this.folder_item.Image = this.sparkleshare_image;
                 this.folder_item.Image.Size = new SizeF (16, 16);
-                this.folder_item.Enabled    = true;
+                this.folder_item.Enabled = true;
 
 //                this.preferences_item = new NSMenuItem () {
 //                    Title   = "Preferences…",
@@ -400,15 +374,19 @@ namespace GreenQloud {
                     Enabled = true
                 };
 
-                this.openweb_item = new NSMenuItem() {
+                this.openweb_item = new NSMenuItem () {
                     Title = "Share/View Online…",
                     Enabled = true
                 };
 
-               this.openweb_item.Activated += delegate {                    
-                    string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
-                    Program.Controller.OpenWebsite (string.Format("https://my.greenqloud.com/qloudsync?username={0}&hash={1}&returnUrl=/storageQloud", Credential.Username, hash));
-               };
+                this.openweb_item.Image = this.share_image;
+                this.openweb_item.Image.Size = new SizeF (16, 16);
+                this.openweb_item.Enabled = true;
+
+                this.openweb_item.Activated += delegate {                    
+                    string hash = Crypto.GetHMACbase64 (Credential.SecretKey, Credential.PublicKey, true);
+                    Program.Controller.OpenWebsite (string.Format ("https://my.greenqloud.com/qloudsync?username={0}&hash={1}&returnUrl=/storageQloud", Credential.Username, hash));
+                };
 
                 this.about_item.Activated += delegate {
                     AboutClicked ();
@@ -424,56 +402,88 @@ namespace GreenQloud {
                 };
 
 
+
                 co2_savings_item = new NSMenuItem () {
-                    Title = "🔄 Loading data of savings",
-                    Enabled = true
+                    Title = "",
+                    Enabled = true,
+                    Hidden = true
                 };
 
-                help_item = new NSMenuItem(){
+                co2Update = new Thread (delegate(){
+                    while(true){
+                        try{
+                            string spent = Statistics.TotalUsedSpace.Spent;
+                            string saved = Statistics.EarlyCO2Savings.Saved;
+                            string subscript = "2";
+                            subscript.ToLowerInvariant();
+
+                            using (var ns = new NSAutoreleasePool ())
+                            {
+                                InvokeOnMainThread (() => { 
+                                    if(spent != null && saved != null){
+                                       co2_savings_item.Title =  spent + " used | " + saved + " CO₂ saved";
+                                        co2_savings_item.Hidden = false;
+                                    }
+                                });
+                            }
+                        } catch (Exception e){
+                            Console.WriteLine(e.Message);
+                            Logger.LogInfo("INFO", "Cannot load CO₂ savings.");
+                        }
+                        Thread.Sleep(60000);
+                    }
+                });
+                co2Update.Start ();
+
+                help_item = new NSMenuItem () {
                     Title = "Help Center"
                 };
 
                 help_item.Activated += delegate {
                     Program.Controller.OpenWebsite ("http://support.greenqloud.com");
-               };
+                };
 
                
-                //this.menu.AddItem (NSMenuItem.SeparatorItem);
+                this.menu.AddItem (co2_savings_item);
                 this.menu.AddItem (this.folder_item);
                 this.menu.AddItem (this.openweb_item);  
-                this.menu.AddItem (co2_savings_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.recent_events_title);
-
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
 
-                if(Program.Controller.DatabaseLoaded()) {
-                    SQLiteEventDAO eventDao = new SQLiteEventDAO();
+                if (Program.Controller.DatabaseLoaded()) {
+                    SQLiteEventDAO eventDao = new SQLiteEventDAO ();
                     List<Event> events = eventDao.LastEvents;
                     string text = "";
-                    foreach(Event e in events){
-                        NSMenuItem current = new NSMenuItem(){
+
+                    foreach (Event e in events) {
+
+                        NSMenuItem current = new NSMenuItem () {
+                        
                             Title = e.ItemName,
                             Enabled = true
                         };
 
 
                         current.Image = this.default_image;
-                        if(e.ItemType == ItemType.IMAGE)
+                        if (e.ItemType == ItemType.IMAGE)
                             current.Image = this.pics_image;
-                        if(e.ItemType == ItemType.TEXT)
+                        if (e.ItemType == ItemType.TEXT)
                             current.Image = this.docs_image;
-                        if(e.ItemType == ItemType.VIDEO)
+                        if (e.ItemType == ItemType.VIDEO)
                             current.Image = this.movies_image;
-                        if(e.ItemType == ItemType.AUDIO)
+                        if (e.ItemType == ItemType.AUDIO)
                             current.Image = this.music_image;
 
                         current.ToolTip = e.ToString ();
-//                        current.Activated += delegate 
-//
-//                        {
-//                            //RecentEventClicked();
-//                        };
+
+                        current.Activated += delegate 
+
+                        {
+                            //RecentEventClicked();
+                            SparkleShareClicked();
+
+                        };
 
                         NSMenuItem subtitle = new NSMenuItem () {
                             Title = ("  "+ e.ItemUpdatedAt),
@@ -483,13 +493,17 @@ namespace GreenQloud {
 
 
 
-                        this.menu.AddItem(current);
-                        this.menu.AddItem(subtitle);
-                        text += e.ToString() + "\n\n";
+                        this.menu.AddItem (current);
+                        this.menu.AddItem (subtitle);
+                        text += e.ToString () + "\n\n";
+
                     }
                     this.recent_events_title.ToolTip = text;
 
+                
+
                 }
+            
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.state_item);
 			    this.menu.AddItem (NSMenuItem.SeparatorItem);
@@ -583,4 +597,4 @@ namespace GreenQloud {
         }
     }
 }
-   
+            
