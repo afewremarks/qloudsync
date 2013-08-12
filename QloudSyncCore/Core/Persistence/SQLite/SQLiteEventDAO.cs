@@ -53,8 +53,15 @@ namespace GreenQloud.Persistence.SQLite
         }
         public override List<Event> LastEvents{
             get{
-                return Select(string.Format("SELECT * FROM EVENT INNER JOIN RepositoryItem ON RepositoryItemID = ITEMID WHERE SYNCHRONIZED = \"{0}\" AND RESPONSE = \"{1}\"  AND isfolder <> '{2}'" +
-                                            "GROUP BY ItemId ORDER BY EventID DESC LIMIT '{3}'  ", bool.TrueString, RESPONSE.OK, bool.TrueString, 5));
+                string sql = string.Format("SELECT e.* FROM Event e INNER JOIN  RepositoryItem ie ON ie.RepositoryItemId = e.ItemId " +
+                "WHERE (" +
+                    "ie.RepositoryItemId IN (SELECT r1.RepositoryItemId FROM RepositoryItem r1 WHERE r1.MOVED <> '{0}')" +
+                    "OR ie.RepositoryItemId IN" +
+                    "(SELECT r2.RepositoryItemId FROM RepositoryItem r2 INNER JOIN RepositoryItem r3 ON r2.ResultItemId = r3.RepositoryItemId WHERE r2.MOVED = '{1}' AND r3.MOVED <> '{2}')" +
+                    ") AND e.SYNCHRONIZED = '{3}' AND ie.isfolder <> '{4}' AND e.RESPONSE = '{5}' " +
+                 "GROUP BY ItemId ORDER BY EventID DESC LIMIT '{6}'",bool.TrueString,bool.TrueString,bool.TrueString,bool.TrueString,bool.TrueString, RESPONSE.OK, 5);
+
+                return Select (sql);
             }
         }
         public override Event FindById(int id)
