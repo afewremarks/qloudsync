@@ -28,20 +28,37 @@ namespace GreenQloud
 
         public static string ToHumanReadableString(TimeSpan timeSpan)
         {
-            if (timeSpan.TotalDays > 30)
-                return Math.Floor((timeSpan.TotalDays / 30)) + " month(s) ago";
-            if (timeSpan.TotalDays > 7)
-                return  Math.Floor((timeSpan.TotalDays / 7)) + " week(s) ago";
-            if (timeSpan.TotalDays < 1) {
+            if (timeSpan.TotalDays > 30) {
+                double month = Math.Floor ((timeSpan.TotalDays / 30));
+                if (month == 1)
+                    return  month + " month ago";
+                else
+                    return  month + "months ago";
+            } else if (timeSpan.TotalDays > 7) {
+                double week = Math.Floor ((timeSpan.TotalDays / 7));
+                if (week == 1)
+                    return   week + " week ago";
+                else
+                    return   week + " weeks ago";
+            } else if (timeSpan.TotalDays > 1) {
+                double day = Math.Floor (timeSpan.TotalDays);
+                if(day == 1)
+                    return day + " day ago";
+                else
+                    return day + " days ago";
+            } else {
                 if (timeSpan.TotalHours >= 1) {
-                    return Math.Floor (timeSpan.TotalHours) + " hours(s) ago";
+                    double hour = Math.Floor (timeSpan.TotalHours);
+                    if (hour == 1)
+                        return hour + " hour ago";
+                    else
+                        return hour + " hours ago";
                 } else if (timeSpan.TotalMinutes >= 1) {
-                    return Math.Floor (timeSpan.TotalMinutes) + " mins(s) ago";
+                    return Math.Floor (timeSpan.TotalMinutes) + " minutes ago";
                 } else {
                     return "Just now";
                 }
             }
-            return Math.Floor(timeSpan.TotalDays) + " day(s) ago";
         }
 
         public static DateTime NowRemote {
