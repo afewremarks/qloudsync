@@ -169,6 +169,15 @@ namespace GreenQloud.Model
             }
         }
 
+        public string LocalFolderPath {
+            get {
+                string path = "";
+                path = Path.Combine (Repository.Path, Key);
+                path = path.Substring(0, path.LastIndexOf("/")); 
+                return ToPathString (path);
+            }
+        }
+
         public string TrashRelativePath {
             get {
                 return ToPathString(Path.Combine (Constant.TRASH, Key));

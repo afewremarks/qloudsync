@@ -411,6 +411,11 @@ namespace GreenQloud {
             OpenFolder (RuntimeSettings.HomePath);
         }
 
+        public void OpenRepositoryitemFolder (string path)
+        {
+            OpenFolder (path);
+        }
+
         public void ShowTransferWindow ()
         {
             ShowTransferWindowEvent ();
