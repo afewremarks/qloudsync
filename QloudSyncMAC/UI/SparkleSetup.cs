@@ -253,7 +253,7 @@ namespace GreenQloud {
 
 
                 StopButton = new NSButton () {
-                    Title = "Stop",
+                    Title = "Cancel",
                     Enabled = false
                 };
 
@@ -403,7 +403,7 @@ namespace GreenQloud {
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (190, Frame.Height - 400, 640 - 240, 125),
-                    StringValue     = "QloudSync v2.7-beta @GreenQloud",
+                    StringValue     = "",
 
                     Font            = NSFontManager.SharedFontManager.FontWithFamily (
                         "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
