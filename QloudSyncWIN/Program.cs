@@ -27,6 +27,7 @@ namespace GreenQloud
                 Controller = new Controller();                
                 UI = new UIManager();
                 GreenQloud.Core.Program.Run(Controller, UI);
+                Application.Run(UI);
             }
             catch (Exception e)
             {
