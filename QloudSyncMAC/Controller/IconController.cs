@@ -391,7 +391,7 @@ namespace GreenQloud {
 
                 this.openweb_item.Activated += delegate {                    
                     string hash = Crypto.GetHMACbase64 (Credential.SecretKey, Credential.PublicKey, true);
-                    Program.Controller.OpenWebsite (string.Format ("https://my.greenqloud.com/qloudsync?username={0}&hash={1}&returnUrl=/storageQloud", Credential.Username, hash));
+                    Program.Controller.OpenWebsite (string.Format ("https://my.greenqloud.com/qloudsync?username={0}&hashValue={1}&returnUrl=/storageQloud", Credential.Username, hash));
                 };
 
                 this.about_item.Activated += delegate {
