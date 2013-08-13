@@ -457,6 +457,7 @@ namespace GreenQloud {
                 this.menu.AddItem (this.recent_events_title);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
 
+
                 if (Program.Controller.DatabaseLoaded()) {
                     SQLiteEventDAO eventDao = new SQLiteEventDAO ();
                     List<Event> events = eventDao.LastEvents;
@@ -489,12 +490,13 @@ namespace GreenQloud {
                         );
                         current.Activated += evt;
 
+                        string title = "   "+e.ItemUpdatedAt;
+                        NSAttributedString att = new NSAttributedString (title, NSFontManager.SharedFontManager.FontWithFamily ("Helvetica", NSFontTraitMask.Narrow, 5, 11));
                         NSMenuItem subtitle = new NSMenuItem () {
-                            Title = ("  "+ e.ItemUpdatedAt),
                             Enabled = false
                         };
                         subtitle.IndentationLevel = 1;
-
+                        subtitle.AttributedTitle = att;
 
                         this.recentChanges.Add (current);
                         this.menu.AddItem (current);
