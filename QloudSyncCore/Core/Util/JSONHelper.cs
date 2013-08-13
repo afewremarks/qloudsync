@@ -59,7 +59,7 @@ namespace GreenQloud
         {
 
             string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(string.Format("https://my.greenqloud.com/qloudsync/history/{0}?username={1}&hash={2}",RuntimeSettings.DefaultBucketName, Credential.Username, hash));
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(string.Format("https://my.greenqloud.com/qloudsync/history/{0}?username={1}&hashValue={2}",RuntimeSettings.DefaultBucketName, Credential.Username, hash));
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
             string json = "";

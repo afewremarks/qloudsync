@@ -55,7 +55,7 @@ namespace GreenQloud
                 CO2Savings co2savings = new CO2Savings();
                 string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
 
-                string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hash={1}", Credential.Username, hash);
+                string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hashValue={1}", Credential.Username, hash);
                 JObject data = JSONHelper.GetInfo (uri);
                 if(data != null && data ["trulygreen"] != null){
                     foreach(JToken o in data ["trulygreen"]){
@@ -83,7 +83,7 @@ namespace GreenQloud
                 SQTotalUsed sqtotalused = new SQTotalUsed();
                 string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, true);
 
-                string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hash={1}", Credential.Username, hash);
+                string uri = string.Format("https://my.greenqloud.com/qloudsync/metrics/?username={0}&hashValue={1}", Credential.Username, hash);
                 JObject data = JSONHelper.GetInfo (uri);
                 if(data != null && data ["usage"] != null && data ["usage"]["storageqloud_size"] != null){
                     sqtotalused.Spent = (string) data ["usage"]["storageqloud_size"];
