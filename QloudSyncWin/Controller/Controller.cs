@@ -542,13 +542,13 @@ namespace GreenQloud {
 
 		public void OpenFolder (string path)
 		{
-			NSWorkspace.SharedWorkspace.OpenFile (path);
+            Process.Start("explorer.exe", path); 
 		}
 		
         
         public void OpenWebsite (string url)
         {
-            NSWorkspace.SharedWorkspace.OpenUrl (new NSUrl (url));
+            Process.Start(url);
         }
 
 
