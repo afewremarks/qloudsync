@@ -38,7 +38,7 @@
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <IncludeMonoRuntime>true</IncludeMonoRuntime>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>true</UseSGen>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <I18n />
@@ -134,6 +134,7 @@
     <BundleResource Include="Pixmaps\folder-pics.png" />
     <BundleResource Include="Pixmaps\default.png" />
     <BundleResource Include="Pixmaps\share.png" />
+    <BundleResource Include="Pixmaps\file-3.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\qloudsync-app.icns">
