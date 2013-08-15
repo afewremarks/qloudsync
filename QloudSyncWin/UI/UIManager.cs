@@ -15,15 +15,21 @@ namespace GreenQloud.UI
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu;
         public GreenQloud.UI.Setup.Login LoginWindow;
-        public GreenQloud.UI.Setup.Sync SyncWindow;
         public AboutWindow About;
         private bool isLoged;
+        private static UIManager instance;
 
-        public UIManager()
+        public static UIManager GetInstance(){
+            if(instance == null)
+                instance = new UIManager();
+
+            return instance;
+        }
+
+        private UIManager()
         {
             this.AddToSystemTray();
             this.LoginWindow = new Setup.Login();
-            this.SyncWindow = new Setup.Sync();
             this.About = new AboutWindow();
 
             Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
@@ -33,13 +39,14 @@ namespace GreenQloud.UI
                 this.isLoged = true;
                 this.LoginWindow.Hide();
                 this.LoginWindow.Close();
+                UIManager.GetInstance().BuildMenu();
+                Program.Controller.SyncStart();
             });
             this.LoginWindow.FormClosed += ((sender, args) =>
             {
                 if (this.isLoged)
                 {
                     Application.DoEvents();
-                    this.SyncWindow.RunSync();
                 }
             });
         }
@@ -51,7 +58,6 @@ namespace GreenQloud.UI
         private void AddToSystemTray()
         {
             this.trayMenu = new ContextMenu();
-            BuildMenu();
             this.trayIcon = new NotifyIcon();
             this.trayIcon.Text = GlobalSettings.ApplicationName;
             this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_idle")).GetHicon());
@@ -59,26 +65,32 @@ namespace GreenQloud.UI
             this.trayIcon.Visible = true;
         }
 
-        private void BuildMenu()
+        public void BuildMenu()
         {
-            this.trayMenu.MenuItems.Add(GetSavings());
-            this.trayMenu.MenuItems.Add("StorageQLoud Folder",OpenStorageQloudFolder);
-            this.trayMenu.MenuItems.Add("Share/View Online...", OpenStorageQloudWebsite);
-            this.trayMenu.MenuItems.Add("-");
-            MenuItem recentlyChanged = new MenuItem("Recently Changed");
-            recentlyChanged.Enabled = false;
-            this.trayMenu.MenuItems.Add(recentlyChanged);
-            this.trayMenu.MenuItems.Add("-");
+            
+                this.trayMenu.MenuItems.Clear();
 
-            LoadRecentlyChangedItems();
+                string savings = GetSavings();
+                if (savings.Length > 0)
+                    this.trayMenu.MenuItems.Add(GetSavings());
+                this.trayMenu.MenuItems.Add("StorageQLoud Folder", OpenStorageQloudFolder);
+                this.trayMenu.MenuItems.Add("Share/View Online...", OpenStorageQloudWebsite);
+                this.trayMenu.MenuItems.Add("-");
+                MenuItem recentlyChanged = new MenuItem("Recently Changed");
+                recentlyChanged.Enabled = false;
+                this.trayMenu.MenuItems.Add(recentlyChanged);
+                this.trayMenu.MenuItems.Add("-");
 
-            this.trayMenu.MenuItems.Add("-");
+                LoadRecentlyChangedItems();
 
-            this.trayMenu.MenuItems.Add("Help Center", OpenStorageQloudHelpCenter);
-            this.trayMenu.MenuItems.Add("About QloudSync", ShowAboutWindow);
+                this.trayMenu.MenuItems.Add("-");
 
-            this.trayMenu.MenuItems.Add("-");
-            this.trayMenu.MenuItems.Add("Quit", OnExit);
+                this.trayMenu.MenuItems.Add("Help Center", OpenStorageQloudHelpCenter);
+                this.trayMenu.MenuItems.Add("About QloudSync", ShowAboutWindow);
+
+                this.trayMenu.MenuItems.Add("-");
+                this.trayMenu.MenuItems.Add("Quit", OnExit);
+            
         }
 
         private void LoadRecentlyChangedItems()
@@ -100,8 +112,13 @@ namespace GreenQloud.UI
 
         private string GetSavings()
         {
-            CO2Savings saving = Statistics.EarlyCO2Savings;
-            return string.Format("Yearly CO₂ Savings: {0}", saving.Saved);
+            try
+            {
+                CO2Savings saving = Statistics.EarlyCO2Savings;
+                return string.Format("Yearly CO₂ Savings: {0}", saving.Saved);
+            } catch {
+                return ""; 
+            }
         }
 
         public void OpenStorageQloudFolder(Object sender, EventArgs e)
@@ -111,7 +128,7 @@ namespace GreenQloud.UI
         public void OpenStorageQloudWebsite(Object sender, EventArgs e)
         {
             string hash = Crypto.GetHMACbase64(Credential.SecretKey, Credential.PublicKey, true);
-            Program.Controller.OpenWebsite(string.Format("https://my.greenqloud.com/qloudsync?username={0}&hash={1}&returnUrl=/storageQloud", Credential.Username, hash));
+            Program.Controller.OpenWebsite(string.Format("https://my.greenqloud.com/qloudsync?username={0}&hashValue={1}&returnUrl=/storageQloud", Credential.Username, hash));
         }
 
         public void OpenStorageQloudHelpCenter(Object sender, EventArgs e)

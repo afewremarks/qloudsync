@@ -25,7 +25,7 @@ namespace GreenQloud
             try
             {
                 Controller = new Controller();                
-                UI = new UIManager();
+                UI = UIManager.GetInstance();
                 GreenQloud.Core.Program.Run(Controller, UI);
                 Application.Run(UI);
             }
