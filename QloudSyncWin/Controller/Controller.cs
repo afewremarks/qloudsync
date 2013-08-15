@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using GreenQloud.Persistence.SQLite;
 using System.Net.NetworkInformation;
 using GreenQloud.Model;
+using GreenQloud.UI;
 
  
 
@@ -80,6 +81,12 @@ namespace GreenQloud {
         public void Initialize ()
         {
             ErrorType = ERROR_TYPE.NULL;
+
+            OnIdle += delegate()
+            {
+                UIManager.GetInstance().BuildMenu();
+            };
+
             checkConnection = new Thread(delegate()
             {
                 while (true)
@@ -186,6 +193,7 @@ namespace GreenQloud {
             else
             {
                 InitializeSynchronizers();
+                UIManager.GetInstance().BuildMenu();
             }
             verifyConfigRequirements();
         }
