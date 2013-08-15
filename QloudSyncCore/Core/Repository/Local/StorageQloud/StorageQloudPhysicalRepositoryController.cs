@@ -168,7 +168,7 @@ namespace GreenQloud.Repository.Local
             }
         }
         
-        void CreatePath (string path)
+        public void CreatePath (string path)
         {
             string parent = path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar.ToString()));
 
