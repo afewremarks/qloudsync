@@ -181,7 +181,8 @@ namespace GreenQloud {
                 this.music_image.Size = new SizeF (16, 16);
                 this.pics_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "folder-pics.png"));
                 this.pics_image.Size = new SizeF (16, 16);
-                this.default_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "default.png"));
+                this.default_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "file-3.png"));
+                this.default_image.Size = new SizeF (16, 16);
 
                 CreateMenu ();
             }
