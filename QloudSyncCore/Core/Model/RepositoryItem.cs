@@ -173,7 +173,7 @@ namespace GreenQloud.Model
             get {
                 string path = "";
                 path = Path.Combine (Repository.Path, Key);
-                path = path.Substring(0, path.LastIndexOf("/")); 
+                path = path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar.ToString())); 
                 return ToPathString (path);
             }
         }

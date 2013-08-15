@@ -66,6 +66,7 @@ namespace GreenQloud.Repository
         #region Manage Itens
         public void Download (RepositoryItem item, bool recursive = false)
         {
+            physicalController.CreatePath(item.LocalFolderPath);
             if (item.IsFolder) {
                 physicalController.CreateFolder(item);
                 if (recursive)
