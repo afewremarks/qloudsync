@@ -97,12 +97,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Backgrounds.resx</DependentUpon>
     </Compile>
-    <Compile Include="Config\ConfigFile.cs" />
-    <Compile Include="Config\Credential.cs" />
-    <Compile Include="Config\GlobalSettings.cs" />
-    <Compile Include="Config\Prefferences.cs" />
-    <Compile Include="Config\RuntimeSettings.cs" />
-    <Compile Include="Config\Settings.cs" />
     <Compile Include="Controller\Controller.cs" />
     <Compile Include="FieldState.cs" />
     <Compile Include="Icons.Designer.cs">
@@ -187,7 +181,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="qloudsync.config" />
+    <None Include="qloudsync.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\process-syncing.png" />
   </ItemGroup>
   <ItemGroup>
