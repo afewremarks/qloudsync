@@ -15,8 +15,12 @@ namespace GreenQloud
     {
         private static string CONFIG_FOLDER = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), GlobalSettings.ApplicationName);
         private static string INIT_CONFIG_FOLDER = AppDomain.CurrentDomain.BaseDirectory;
-
-        private static string INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, "../Resources/qloudsync.config");
+        #if __MonoCS__
+            private static string INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, ".." + Path.DirectorySeparatorChar.ToString() + "Resources" + Path.DirectorySeparatorChar.ToString() + "qloudsync.config");
+        #else
+            private static string INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, "qloudsync.config");
+        #endif
+        
         private static string FULLNAME = Path.Combine(CONFIG_FOLDER, "qloudsync.config");
 
 

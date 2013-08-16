@@ -32,10 +32,12 @@ namespace GreenQloud.Model
             return dao.GetById (id);
         }
         public static RepositoryItem CreateInstance (LocalRepository repo, string key){
+            key = key.Replace(Path.DirectorySeparatorChar.ToString(), "/"); 
             return CreateInstance (repo, key, null, null);
         }
 
         public static RepositoryItem CreateInstance (LocalRepository repo, string key, string eTag, string localETag){
+            key = key.Replace(Path.DirectorySeparatorChar.ToString(), "/");
             RepositoryItem item = new RepositoryItem();
             item.Repository = repo;
             item.Key = key;
