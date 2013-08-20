@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncCore", "QloudSyncCore\QloudSyncCoreWIN.csproj", "{2039E95A-5F46-43E1-BA58-B33C73972B0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QloudSyncWIN", "QloudSyncWIN\QloudSyncWIN.csproj", "{80CD83D2-DD03-42DD-B530-C84669653183}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Default|Any CPU = Default|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.Default|Any CPU.ActiveCfg = Release|Any CPU
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.Default|Any CPU.Build.0 = Release|Any CPU
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2039E95A-5F46-43E1-BA58-B33C73972B0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80CD83D2-DD03-42DD-B530-C84669653183}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{80CD83D2-DD03-42DD-B530-C84669653183}.Default|Any CPU.ActiveCfg = Debug|x86
+		{80CD83D2-DD03-42DD-B530-C84669653183}.Release|Any CPU.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = QloudSyncWIN\QloudSyncWIN.csproj
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		$0.TextStylePolicy = $4
+		$2.inheritsSet = null
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.inheritsSet = Mono
+		$3.inheritsScope = text/x-csharp
+		$3.scope = text/x-csharp
+		$4.FileWidth = 120
+		$4.inheritsSet = VisualStudio
+		$4.inheritsScope = text/plain
+		$4.scope = text/plain
+		$0.StandardHeader = $5
+		$5.Text = 
+		$5.IncludeInNewFiles = True
+		version = 
+	EndGlobalSection
+EndGlobal

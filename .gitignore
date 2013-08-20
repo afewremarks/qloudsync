@@ -1,0 +1,14 @@
+.DS_Store
+*.exe
+*.exe.mdb
+*.userprefs
+bin/
+obj/
+.DS_Store
+*.DS_Store
+*.tiff
+*.psd
+*.am
+
+QloudSync/test-results/
+QloudSyncMAC/test-results/QloudSyncMAC.csproj.test-cache
