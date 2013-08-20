@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}</ProjectGuid>
+    <ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>QloudSync</RootNamespace>
+    <ReleaseVersion />
+    <AssemblyName>QloudSync</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <IncludeMonoRuntime>true</IncludeMonoRuntime>
+    <UseSGen>true</UseSGen>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <I18n />
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <ConsolePause>false</ConsolePause>
+    <CodeSigningKey>Mac Developer</CodeSigningKey>
+    <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <CreatePackage>true</CreatePackage>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <UseSGen>true</UseSGen>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <I18n />
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <Externalconsole>true</Externalconsole>
+    <CodeSigningKey>Mac Developer</CodeSigningKey>
+    <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <CreatePackage>false</CreatePackage>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Data" />
+    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="LitS3">
+      <HintPath>lib\LitS3.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="XamMac" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
+  <ItemGroup>
+    <Folder Include="Controller\" />
+    <Folder Include="UI\" />
+    <Folder Include="Pixmaps\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controller\Controller.cs" />
+    <Compile Include="Controller\IconController.cs" />
+    <Compile Include="Controller\SparkleSetupController.cs" />
+    <Compile Include="UI\AboutWindow.cs" />
+    <Compile Include="UI\HyperLink.cs" />
+    <Compile Include="UI\SparkleSetup.cs" />
+    <Compile Include="UI\SparkleSetupWindow.cs" />
+    <Compile Include="AppDelegate.cs" />
+    <Compile Include="MainMenu.xib.designer.cs">
+      <DependentUpon>MainMenu.xib</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SparkleUI.cs" />
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+    <None Include="lib\MonoMac.dll" />
+    <None Include="lib\XamaMac.dll" />
+    <None Include="lib\LitS3.dll" />
+    <None Include="lib\Newtonsoft.Json.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="MainMenu.xib" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="qloudsync.config" />
+    <BundleResource Include="Pixmaps\about.png" />
+    <BundleResource Include="Pixmaps\file_down.png" />
+    <BundleResource Include="Pixmaps\file_up.png" />
+    <BundleResource Include="Pixmaps\folder_down.png" />
+    <BundleResource Include="Pixmaps\folder_up.png" />
+    <BundleResource Include="Pixmaps\process-syncing-active.png" />
+    <BundleResource Include="Pixmaps\process-syncing-active_new.png" />
+    <BundleResource Include="Pixmaps\process-syncing-down-active.png" />
+    <BundleResource Include="Pixmaps\process-syncing-down.png" />
+    <BundleResource Include="Pixmaps\process-syncing-error-active.png" />
+    <BundleResource Include="Pixmaps\process-syncing-error.png" />
+    <BundleResource Include="Pixmaps\process-syncing-idle-active.png" />
+    <BundleResource Include="Pixmaps\process-syncing-idle.png" />
+    <BundleResource Include="Pixmaps\process-syncing-up-active.png" />
+    <BundleResource Include="Pixmaps\process-syncing-up.png" />
+    <BundleResource Include="Pixmaps\process-syncing-working.png" />
+    <BundleResource Include="Pixmaps\process-syncing.png" />
+    <BundleResource Include="Pixmaps\side-splash.png" />
+    <BundleResource Include="Pixmaps\trash.png" />
+    <BundleResource Include="Pixmaps\tutorial-slide-1.png" />
+    <BundleResource Include="Pixmaps\tutorial-slide-2.png" />
+    <BundleResource Include="Pixmaps\tutorial-slide-3.png" />
+    <BundleResource Include="Pixmaps\tutorial-slide-4.png" />
+    <BundleResource Include="Pixmaps\user-icon-default.png" />
+    <BundleResource Include="Pixmaps\folder-docs.png" />
+    <BundleResource Include="Pixmaps\folder-movies.png" />
+    <BundleResource Include="Pixmaps\folder-music.png" />
+    <BundleResource Include="Pixmaps\folder-pics.png" />
+    <BundleResource Include="Pixmaps\default.png" />
+    <BundleResource Include="Pixmaps\share.png" />
+    <BundleResource Include="Pixmaps\file-3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Pixmaps\qloudsync-app.icns">
+      <Link>qloudsync-app.icns</Link>
+    </Content>
+    <Content Include="Pixmaps\qloudsync-folder.icns">
+      <Link>qloudsync-folder.icns</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QloudSyncCore\QloudSyncCoreMAC.csproj">
+      <Project>{2039E95A-5F46-43E1-BA58-B33C73972B0E}</Project>
+      <Name>QloudSyncCoreMAC</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
