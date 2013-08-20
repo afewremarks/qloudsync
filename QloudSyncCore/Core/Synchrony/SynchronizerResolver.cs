@@ -146,7 +146,7 @@ namespace GreenQloud.Synchrony
             do {
                 currentException = null;
                 if (e  != null){
-                    //try {
+                    try {
                         PerformIgnores (e);
                         if (VerifyIgnore (e)) {
                             eventDAO.UpdateToSynchronized (e, RESPONSE.IGNORED);
@@ -212,7 +212,7 @@ namespace GreenQloud.Synchrony
                         Program.Controller.HandleSyncStatusChanged ();
 
                         Logger.LogEvent ("DONE Event Synchronizing", e);
-                    /*} catch (WebException webx) {
+                    } catch (WebException webx) {
                         if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
                             throw webx;
                         } else {
@@ -222,7 +222,7 @@ namespace GreenQloud.Synchrony
                         throw sock;
                     } catch (Exception ex) {
                         currentException = ex;
-                    } */
+                    }
 
                     e.TryQnt++;
                     eventDAO.UpdateTryQnt (e);
