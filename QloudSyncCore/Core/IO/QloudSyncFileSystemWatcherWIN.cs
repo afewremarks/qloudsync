@@ -27,7 +27,7 @@ namespace GreenQloud
         {
             ignoreBag = new ArrayList();
             watcherFile = new FileSystemWatcher(pathwatcher);
-            watcherFile.NotifyFilter = NotifyFilters.FileName;
+            watcherFile.NotifyFilter = NotifyFilters.FileName | NotifyFilters.Attributes;
             watcherFile.IncludeSubdirectories = true;
             watcherFile.Changed += new FileSystemEventHandler(OnChanged);
             watcherFile.Created += new FileSystemEventHandler(OnCreated);
