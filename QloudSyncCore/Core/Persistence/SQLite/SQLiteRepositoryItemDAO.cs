@@ -74,12 +74,16 @@ namespace GreenQloud.Persistence.SQLite
             return i > 0;
         }
 
-        //TODO FIND By KEy e Repo
         public RepositoryItem GetFomDatabase (RepositoryItem item)
         {
             string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\"", item.Key, item.Repository.Id);
-
             return Select(sql).Last();
+        }
+
+        public bool ExistsUnmoved(string key, LocalRepository repo)
+        {
+            string sql = string.Format("SELECT COUNT(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\" AND Moved <> '{2}'", key, repo.Id, bool.TrueString);
+            return int.Parse(database.ExecuteScalar(sql)) > 0;
         }
 
         //TODO DONT NEED
