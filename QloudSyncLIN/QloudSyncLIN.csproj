@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6E62C52F-19FE-4C47-A483-BB3AF490ACB1}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>QloudSyncLIN</RootNamespace>
+    <AssemblyName>QloudSyncLIN</AssemblyName>
+    <ReleaseVersion />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Controller\Controller.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs" />
+    <Compile Include="Properties\Settings.Designer.cs" />
+    <Compile Include="UI\Setup\Login.cs" />
+    <Compile Include="UI\Setup\Login.Designer.cs" />
+    <Compile Include="UI\Setup\Sync.cs" />
+    <Compile Include="UI\Setup\Sync.Designer.cs" />
+    <Compile Include="UI\AboutWindow.cs" />
+    <Compile Include="UI\AboutWindow.Designer.cs" />
+    <Compile Include="UI\UIManager.cs" />
+    <Compile Include="Backgrounds.Designer.cs" />
+    <Compile Include="Icons.Designer.cs" />
+    <Compile Include="PageType.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Content Include="app.desktop">
+      <DeployService-TargetDirectoryId>Linux.DesktopApplications</DeployService-TargetDirectoryId>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\QloudSyncLIN.exe" />
+    <None Include="bin\Debug\QloudSyncLIN.exe.mdb" />
+    <None Include="lib\LitS3.dll" />
+    <None Include="lib\MonoMac.dll" />
+    <None Include="lib\Newtonsoft.Json.dll" />
+    <None Include="Pixmaps\about.png" />
+    <None Include="Pixmaps\default.png" />
+    <None Include="Pixmaps\file_down.png" />
+    <None Include="Pixmaps\file_up.png" />
+    <None Include="Pixmaps\file-3.png" />
+    <None Include="Pixmaps\file-default.png" />
+    <None Include="Pixmaps\folder_down.png" />
+    <None Include="Pixmaps\folder_up.png" />
+    <None Include="Pixmaps\folder-docs.png" />
+    <None Include="Pixmaps\folder-movies.png" />
+    <None Include="Pixmaps\folder-music.png" />
+    <None Include="Pixmaps\folder-pics.png" />
+    <None Include="Pixmaps\process-syncing.png" />
+    <None Include="Pixmaps\process-syncing-active.png" />
+    <None Include="Pixmaps\process-syncing-active_new.png" />
+    <None Include="Pixmaps\process-syncing-down.png" />
+    <None Include="Pixmaps\process-syncing-down-active.png" />
+    <None Include="Pixmaps\process-syncing-error.png" />
+    <None Include="Pixmaps\process-syncing-error-active.png" />
+    <None Include="Pixmaps\process-syncing-idle.png" />
+    <None Include="Pixmaps\process-syncing-idle-active.png" />
+    <None Include="Pixmaps\process-syncing-up.png" />
+    <None Include="Pixmaps\process-syncing-up-active.png" />
+    <None Include="Pixmaps\process-syncing-working.png" />
+    <None Include="Pixmaps\qloudsync-app.icns" />
+    <None Include="Pixmaps\qloudsync-folder.icns" />
+    <None Include="Pixmaps\share.png" />
+    <None Include="Pixmaps\side-splash.png" />
+    <None Include="Pixmaps\trash.png" />
+    <None Include="Pixmaps\tutorial-slide-1.png" />
+    <None Include="Pixmaps\tutorial-slide-2.png" />
+    <None Include="Pixmaps\tutorial-slide-3.png" />
+    <None Include="Pixmaps\tutorial-slide-4.png" />
+    <None Include="Pixmaps\user-icon-default.png" />
+    <None Include="test-results\QloudSyncMAC.csproj.test-cache" />
+    <None Include="app.config" />
+    <None Include="qloudsync.config" />
+    <None Include="Properties\Resources.resx" />
+    <None Include="Properties\Settings.settings" />
+    <None Include="Resources\about.png" />
+    <None Include="Resources\process-syncing.png" />
+    <None Include="Resources\process-syncing-active.png" />
+    <None Include="Resources\process-syncing-down.png" />
+    <None Include="Resources\process-syncing-down-active.png" />
+    <None Include="Resources\process-syncing-error.png" />
+    <None Include="Resources\process-syncing-error-active.png" />
+    <None Include="Resources\process-syncing-idle.png" />
+    <None Include="Resources\process-syncing-idle-active.png" />
+    <None Include="Resources\process-syncing-up.png" />
+    <None Include="Resources\process-syncing-up-active.png" />
+    <None Include="Resources\side-splash.png" />
+    <None Include="Resources\tutorial-slide-1.png" />
+    <None Include="Resources\tutorial-slide-2.png" />
+    <None Include="Resources\tutorial-slide-3.png" />
+    <None Include="Resources\tutorial-slide-4.png" />
+    <None Include="Resources\user-icon-default.png" />
+    <None Include="UI\Setup\Login.resx" />
+    <None Include="UI\Setup\Sync.resx" />
+    <None Include="Backgrounds.resx" />
+    <None Include="Icons.resx" />
+    <None Include="packages.config" />
+    <None Include="qloudsync-app2.ico" />
+    <None Include="QloudSyncLIN.csproj" />
+    <None Include="QloudSyncLIN.userprefs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QloudSyncCore\QloudSyncCoreLIN.csproj">
+      <Project>{2039E95A-5F46-43E1-BA58-B33C73972B0E}</Project>
+      <Name>QloudSyncCoreLIN</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
