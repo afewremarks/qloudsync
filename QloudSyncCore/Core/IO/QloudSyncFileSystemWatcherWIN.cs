@@ -20,7 +20,7 @@ namespace GreenQloud
         public event ChangedEventHandler Changed;
         private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
 
-        private FileSystemWatcher parentFolderWatcher = null, subfolderWatcher = null;
+        private FileSystemWatcher parentFolderWatcher = null, subfolderWatcher = null, deleteFolderWatcher = null, deleteFileWatcher = null;
         private System.Object lockThis = new System.Object(), processChangesLock = new System.Object();
         private Timer changeNotifier;
 
@@ -50,7 +50,7 @@ namespace GreenQloud
                 NotifyFilters.DirectoryName;
                 // Add event handlers.            
                 subfolderWatcher.Created += new FileSystemEventHandler(handleCreateEvent);
-                subfolderWatcher.Deleted += new FileSystemEventHandler(handleDeleteEvent);
+                //--subfolderWatcher.Deleted += new FileSystemEventHandler(handleDeleteEvent);
                 subfolderWatcher.Renamed += new RenamedEventHandler(handleRenameEvent);
                 //Begin watching
                 subfolderWatcher.EnableRaisingEvents = true;
@@ -67,6 +67,28 @@ namespace GreenQloud
                 changeNotifier = new Timer(1000);
                 changeNotifier.Elapsed += new ElapsedEventHandler(handleFileSystemChange);
 
+
+                //FileSystemWatcher for delete only!
+                    deleteFolderWatcher = new FileSystemWatcher();
+                    deleteFolderWatcher.Path = watchPath;
+                    deleteFolderWatcher.IncludeSubdirectories = true;
+                    deleteFolderWatcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.DirectoryName;
+                    // Add event handlers.            
+                    deleteFolderWatcher.Deleted += new FileSystemEventHandler(handleDeleteEvent);
+                    //Begin watching
+                    deleteFolderWatcher.EnableRaisingEvents = true;
+
+                    deleteFileWatcher = new FileSystemWatcher();
+                    deleteFileWatcher.Path = watchPath;
+                    deleteFileWatcher.IncludeSubdirectories = true;
+                    deleteFileWatcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.FileName;
+                    // Add event handlers.            
+                    deleteFileWatcher.Deleted += new FileSystemEventHandler(handleDeleteEvent);
+                    //Begin watching
+                    deleteFileWatcher.EnableRaisingEvents = true;
+
+
+
                 return true;
             }
             return false;
@@ -77,10 +99,18 @@ namespace GreenQloud
             try
             {
                 parentFolderWatcher.EnableRaisingEvents = false;
+                deleteFileWatcher.EnableRaisingEvents = false;
+                deleteFolderWatcher.EnableRaisingEvents = false;
                 subfolderWatcher.EnableRaisingEvents = false;
+                
                 parentFolderWatcher.Dispose();
+                deleteFileWatcher.Dispose();
+                deleteFolderWatcher.Dispose();
                 subfolderWatcher.Dispose();
+                
                 parentFolderWatcher = null;
+                deleteFileWatcher = null;
+                deleteFolderWatcher = null;
                 subfolderWatcher = null;
                 return true;
             }
@@ -123,7 +153,7 @@ namespace GreenQloud
             lock (lockThis)
             {
                 changeNotifier.Enabled = false;
-                deleteList.Add(new FSOPDeleteVO(args.FullPath));
+                deleteList.Add(new FSOPDeleteVO(args.FullPath, (FileSystemWatcher)sender == deleteFolderWatcher));
                 changeNotifier.Enabled = true;
             }
         }
@@ -255,7 +285,7 @@ namespace GreenQloud
                                 {
                                     if (!ignoreBag.Contains(deleteItem.path))
                                     {
-                                        Event e = BuildEvent(EventType.DELETE, false, deleteItem.path);
+                                        Event e = BuildEvent(EventType.DELETE, deleteItem.isFolder, deleteItem.path);
                                         Changed(e);
 
                                         //Console.WriteLine("***************************************Delete*****************************************\n");
@@ -604,10 +634,12 @@ namespace GreenQloud
     class FSOPDeleteVO
     {
         public String path;
+        public bool isFolder;
 
-        public FSOPDeleteVO(String path)
+        public FSOPDeleteVO(String path, bool isFolder)
         {
             this.path = path;
+            this.isFolder = isFolder;
         }
 
         public void printData()
