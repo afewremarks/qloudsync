@@ -193,9 +193,9 @@ namespace GreenQloud {
             else
             {
                 InitializeSynchronizers();
-                UIManager.GetInstance().BuildMenu();
             }
             verifyConfigRequirements();
+            UIManager.GetInstance().BuildMenu();
         }
 
         void CalcTimeDiff()
