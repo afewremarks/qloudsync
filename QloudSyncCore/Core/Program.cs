@@ -5,7 +5,6 @@ using GreenQloud.Repository;
 using System.Linq;
 using QloudSyncCore;
 using System.Diagnostics;
-using System.Windows.Forms;
 
 namespace GreenQloud.Core {
 
