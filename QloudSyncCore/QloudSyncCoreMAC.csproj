@@ -48,6 +48,7 @@
     <Reference Include="MonoMac">
       <HintPath>lib\MonoMac.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Persistence\SQLite\SQLiteDataBaseWin.cs" />
