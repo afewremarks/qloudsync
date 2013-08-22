@@ -84,7 +84,7 @@ namespace GreenQloud {
 
             OnIdle += delegate()
             {
-                UIManager.GetInstance().BuildMenu();
+                //UIManager.GetInstance().BuildMenu();
             };
 
             checkConnection = new Thread(delegate()
@@ -469,8 +469,7 @@ namespace GreenQloud {
         
         public virtual void Quit ()
         {
-            Process.GetProcessesByName("QloudSync")[0].Kill();
-            Environment.Exit (0);
+            throw new AbortedOperationException("Closed");
         }
 
 		public void AddToBookmarks ()

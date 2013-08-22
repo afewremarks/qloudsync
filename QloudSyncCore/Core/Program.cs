@@ -31,7 +31,7 @@ namespace GreenQloud.Core {
                     UI.Run ();
                 }catch (AbortedOperationException){
                     Logger.LogInfo ("Init", "Operation aborted. Sending a QloudSync Kill.");
-                    Process.GetProcessesByName("QloudSync")[0].Kill();
+                    PriorProcess().Kill();
                 }
             } catch (Exception e){
                 Logger.LogInfo ("Init", e);

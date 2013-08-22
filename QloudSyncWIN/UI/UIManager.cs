@@ -39,7 +39,7 @@ namespace GreenQloud.UI
                 this.isLoged = true;
                 this.LoginWindow.Hide();
                 this.LoginWindow.Close();
-                UIManager.GetInstance().BuildMenu();
+                //UIManager.GetInstance().BuildMenu();
                 Program.Controller.SyncStart();
             });
             this.LoginWindow.FormClosed += ((sender, args) =>
@@ -67,30 +67,26 @@ namespace GreenQloud.UI
 
         public void BuildMenu()
         {
-            
-                this.trayMenu.MenuItems.Clear();
+            string savings = GetSavings();
+            if (savings.Length > 0)
+                this.trayMenu.MenuItems.Add(GetSavings());
+            this.trayMenu.MenuItems.Add("StorageQLoud Folder", OpenStorageQloudFolder);
+            this.trayMenu.MenuItems.Add("Share/View Online...", OpenStorageQloudWebsite);
+            this.trayMenu.MenuItems.Add("-");
+            MenuItem recentlyChanged = new MenuItem("Recently Changed");
+            recentlyChanged.Enabled = false;
+            this.trayMenu.MenuItems.Add(recentlyChanged);
+            this.trayMenu.MenuItems.Add("-");
 
-                string savings = GetSavings();
-                if (savings.Length > 0)
-                    this.trayMenu.MenuItems.Add(GetSavings());
-                this.trayMenu.MenuItems.Add("StorageQLoud Folder", OpenStorageQloudFolder);
-                this.trayMenu.MenuItems.Add("Share/View Online...", OpenStorageQloudWebsite);
-                this.trayMenu.MenuItems.Add("-");
-                MenuItem recentlyChanged = new MenuItem("Recently Changed");
-                recentlyChanged.Enabled = false;
-                this.trayMenu.MenuItems.Add(recentlyChanged);
-                this.trayMenu.MenuItems.Add("-");
+            LoadRecentlyChangedItems();
 
-                LoadRecentlyChangedItems();
+            this.trayMenu.MenuItems.Add("-");
 
-                this.trayMenu.MenuItems.Add("-");
+            this.trayMenu.MenuItems.Add("Help Center", OpenStorageQloudHelpCenter);
+            this.trayMenu.MenuItems.Add("About QloudSync", ShowAboutWindow);
 
-                this.trayMenu.MenuItems.Add("Help Center", OpenStorageQloudHelpCenter);
-                this.trayMenu.MenuItems.Add("About QloudSync", ShowAboutWindow);
-
-                this.trayMenu.MenuItems.Add("-");
-                this.trayMenu.MenuItems.Add("Quit", OnExit);
-            
+            this.trayMenu.MenuItems.Add("-");
+            this.trayMenu.MenuItems.Add("Quit", OnExit);
         }
 
         private void LoadRecentlyChangedItems()
@@ -154,7 +150,7 @@ namespace GreenQloud.UI
         {
             Program.Controller.StopSynchronizers();
             Program.Controller.Quit();
-            Application.Exit();
+            throw new AbortedOperationException("Closed");
         }
 
         protected override void Dispose(bool isDisposing)
