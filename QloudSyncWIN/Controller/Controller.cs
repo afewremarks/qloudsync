@@ -84,7 +84,15 @@ namespace GreenQloud {
 
             OnIdle += delegate()
             {
-                //UIManager.GetInstance().BuildMenu();
+                UIManager.GetInstance().OnIdle();
+            };
+            OnSyncing += delegate()
+            {
+                UIManager.GetInstance().OnSyncing();
+            };
+            OnError += delegate()
+            {
+                UIManager.GetInstance().OnError();
             };
 
             checkConnection = new Thread(delegate()
