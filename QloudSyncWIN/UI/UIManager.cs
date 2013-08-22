@@ -190,5 +190,18 @@ namespace GreenQloud.UI
 
             base.Dispose(isDisposing);
         }
+
+        internal void OnIdle()
+        {
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_idle")).GetHicon()); 
+        }
+        internal void OnError()
+        {
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error")).GetHicon());
+        }
+        internal void OnSyncing()
+        {
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing")).GetHicon());
+        }
     }
 }
