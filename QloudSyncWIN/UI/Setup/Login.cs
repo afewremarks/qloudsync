@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 
 using System.Net;
+using System.Threading;
 
 namespace GreenQloud.UI.Setup
 {
@@ -25,6 +26,7 @@ namespace GreenQloud.UI.Setup
         public Login()
         {
             InitializeComponent();
+            this.loadingGif.Visible = false;
             this.BtnRegister.TabIndex = 1;
             this.TxtUserName.Text = userMark ;
             this.TxtPassword.UseSystemPasswordChar = false;
@@ -39,23 +41,37 @@ namespace GreenQloud.UI.Setup
 
         private void BtnContinue_Click(object sender, EventArgs e)
         {
-            try
-            {
+            
                 this.loadingGif.Visible = true;
-                QloudSync.Repository.S3Connection.Authenticate(this.TxtUserName.Text, this.TxtPassword.Text);
-                Credential.Username = this.TxtUserName.Text;
-                if (this.OnLoginDone != null)
+                new Thread(() =>
                 {
-                    this.OnLoginDone();
-                }
-                else {
-                    this.loadingGif.Visible = false;
-                }
-            }
-            catch (WebException)
-            {
-                MessageBox.Show("An error ocurred while trying authenticate. Please, try again.");
-            }
+                    if (InvokeRequired)
+                    {
+                     
+                        BeginInvoke(new Action(() =>{
+                                        try
+                                        {
+                                            QloudSync.Repository.S3Connection.Authenticate(this.TxtUserName.Text, this.TxtPassword.Text);
+                                            Credential.Username = this.TxtUserName.Text;
+                                            if (this.OnLoginDone != null)
+                                            {
+                                                this.OnLoginDone();
+                                            }
+                                            else
+                                            {
+                                                this.loadingGif.Visible = false;
+                                            }
+                                        }
+                                        catch (WebException)
+                                        {
+                                            this.loadingGif.Visible = false;
+                                            MessageBox.Show("An error ocurred while trying authenticate. Please, try again.");
+                                        }
+                        }));
+                        return;
+                    }
+                }).Start();
+            
         }
 
 
