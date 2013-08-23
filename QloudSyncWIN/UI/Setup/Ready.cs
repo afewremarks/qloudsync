@@ -23,6 +23,8 @@ namespace GreenQloud.UI.Setup
         {
             Program.Controller.OpenStorageQloudWebsite();
             Program.Controller.OpenSparkleShareFolder();
+            this.Hide();
+            this.Close();
         }
 
         private void button1_KeyDown(object sender, KeyEventArgs e)

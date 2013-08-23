@@ -41,11 +41,15 @@ namespace GreenQloud.UI.Setup
         {
             try
             {
+                this.loadingGif.Visible = true;
                 QloudSync.Repository.S3Connection.Authenticate(this.TxtUserName.Text, this.TxtPassword.Text);
                 Credential.Username = this.TxtUserName.Text;
                 if (this.OnLoginDone != null)
                 {
                     this.OnLoginDone();
+                }
+                else {
+                    this.loadingGif.Visible = false;
                 }
             }
             catch (WebException)
@@ -105,8 +109,20 @@ namespace GreenQloud.UI.Setup
 
         }
 
+        public void Done()
+        {
+            this.TxtPassword.Enabled = false;
+            this.TxtUserName.Enabled = false;
+            this.BtnContinue.Enabled = false;
+            this.BtnRegister.Enabled = false;
+        }
 
-
-       
+        private void TxtPassword_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if(e.KeyChar == (char)Keys.Enter)
+            {
+                BtnContinue_Click(sender, e);
+            }
+        }
     }
 }

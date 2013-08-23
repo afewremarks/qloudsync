@@ -58,7 +58,6 @@
             // 
             // button1
             // 
-            this.button1.Enabled = false;
             this.button1.Location = new System.Drawing.Point(248, 214);
             this.button1.MaximumSize = new System.Drawing.Size(100, 50);
             this.button1.MinimumSize = new System.Drawing.Size(100, 50);
