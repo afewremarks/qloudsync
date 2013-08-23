@@ -120,6 +120,10 @@ namespace GreenQloud.UI
 
                     MenuItem current = new MenuItem();
                     current.Text = e.ItemName;
+                    current.Click += (sender, args) =>
+                    {
+                        Program.Controller.OpenFolder(e.ItemLocalFolderPath);
+                    };
                     this.trayMenu.MenuItems.Add(end, current);
                 }
             }
