@@ -158,7 +158,6 @@
             this.loadingGif.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.loadingGif.TabIndex = 12;
             this.loadingGif.TabStop = false;
-            this.loadingGif.Visible = false;
             // 
             // Login
             // 
