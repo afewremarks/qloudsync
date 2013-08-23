@@ -39,7 +39,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.pctbLogin = new System.Windows.Forms.PictureBox();
+            this.loadingGif = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pctbLogin)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.loadingGif)).BeginInit();
             this.SuspendLayout();
             // 
             // label2
@@ -92,11 +94,12 @@
             this.TxtPassword.Size = new System.Drawing.Size(237, 23);
             this.TxtPassword.TabIndex = 3;
             this.TxtPassword.Enter += new System.EventHandler(this.TxtPassword_Enter);
+            this.TxtPassword.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TxtPassword_KeyPress);
             this.TxtPassword.Leave += new System.EventHandler(this.TxtPassword_Leave);
             // 
             // BtnContinue
             // 
-            this.BtnContinue.Location = new System.Drawing.Point(397, 449);
+            this.BtnContinue.Location = new System.Drawing.Point(370, 449);
             this.BtnContinue.Name = "BtnContinue";
             this.BtnContinue.Size = new System.Drawing.Size(75, 23);
             this.BtnContinue.TabIndex = 4;
@@ -145,11 +148,24 @@
             this.pctbLogin.TabIndex = 0;
             this.pctbLogin.TabStop = false;
             // 
+            // loadingGif
+            // 
+            this.loadingGif.Image = global::GreenQloud.Properties.Resources.loadinggif;
+            this.loadingGif.InitialImage = null;
+            this.loadingGif.Location = new System.Drawing.Point(451, 449);
+            this.loadingGif.Name = "loadingGif";
+            this.loadingGif.Size = new System.Drawing.Size(21, 23);
+            this.loadingGif.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.loadingGif.TabIndex = 12;
+            this.loadingGif.TabStop = false;
+            this.loadingGif.Visible = false;
+            // 
             // Login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(484, 482);
+            this.Controls.Add(this.loadingGif);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.BtnRegister);
@@ -171,6 +187,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             ((System.ComponentModel.ISupportInitialize)(this.pctbLogin)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.loadingGif)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -188,5 +205,6 @@
         private System.Windows.Forms.Button BtnRegister;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.PictureBox loadingGif;
     }
 }
