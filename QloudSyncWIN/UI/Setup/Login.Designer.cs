@@ -48,7 +48,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(326, 322);
+            this.label2.Location = new System.Drawing.Point(326, 127);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(0, 20);
             this.label2.TabIndex = 1;
@@ -57,7 +57,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(156, 352);
+            this.label3.Location = new System.Drawing.Point(156, 202);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(77, 17);
             this.label3.TabIndex = 4;
@@ -67,7 +67,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(156, 379);
+            this.label4.Location = new System.Drawing.Point(156, 231);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(73, 17);
             this.label4.TabIndex = 5;
@@ -78,7 +78,7 @@
             this.TxtUserName.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.TxtUserName.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TxtUserName.ForeColor = System.Drawing.Color.DarkGray;
-            this.TxtUserName.Location = new System.Drawing.Point(235, 352);
+            this.TxtUserName.Location = new System.Drawing.Point(235, 202);
             this.TxtUserName.Name = "TxtUserName";
             this.TxtUserName.Size = new System.Drawing.Size(237, 23);
             this.TxtUserName.TabIndex = 2;
@@ -89,7 +89,7 @@
             // 
             this.TxtPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TxtPassword.ForeColor = System.Drawing.Color.DarkGray;
-            this.TxtPassword.Location = new System.Drawing.Point(235, 379);
+            this.TxtPassword.Location = new System.Drawing.Point(235, 231);
             this.TxtPassword.Name = "TxtPassword";
             this.TxtPassword.Size = new System.Drawing.Size(237, 23);
             this.TxtPassword.TabIndex = 3;
@@ -99,7 +99,7 @@
             // 
             // BtnContinue
             // 
-            this.BtnContinue.Location = new System.Drawing.Point(370, 449);
+            this.BtnContinue.Location = new System.Drawing.Point(397, 277);
             this.BtnContinue.Name = "BtnContinue";
             this.BtnContinue.Size = new System.Drawing.Size(75, 23);
             this.BtnContinue.TabIndex = 4;
@@ -110,7 +110,7 @@
             // 
             // BtnRegister
             // 
-            this.BtnRegister.Location = new System.Drawing.Point(156, 449);
+            this.BtnRegister.Location = new System.Drawing.Point(159, 277);
             this.BtnRegister.Name = "BtnRegister";
             this.BtnRegister.Size = new System.Drawing.Size(120, 23);
             this.BtnRegister.TabIndex = 9;
@@ -122,21 +122,23 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI Symbol", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(166, 28);
+            this.label1.Location = new System.Drawing.Point(242, 33);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(177, 19);
             this.label1.TabIndex = 10;
             this.label1.Text = "Welcome to QloudSync!";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Segoe UI Symbol", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(166, 47);
+            this.label5.Location = new System.Drawing.Point(231, 52);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(201, 19);
             this.label5.TabIndex = 11;
             this.label5.Text = "Please enter your login details...";
+            this.label5.Click += new System.EventHandler(this.label5_Click);
             // 
             // pctbLogin
             // 
@@ -144,7 +146,7 @@
             this.pctbLogin.Image = global::GreenQloud.Backgrounds.side_splash;
             this.pctbLogin.Location = new System.Drawing.Point(0, 0);
             this.pctbLogin.Name = "pctbLogin";
-            this.pctbLogin.Size = new System.Drawing.Size(150, 482);
+            this.pctbLogin.Size = new System.Drawing.Size(150, 312);
             this.pctbLogin.TabIndex = 0;
             this.pctbLogin.TabStop = false;
             // 
@@ -152,7 +154,7 @@
             // 
             this.loadingGif.Image = global::GreenQloud.Properties.Resources.loadinggif;
             this.loadingGif.InitialImage = null;
-            this.loadingGif.Location = new System.Drawing.Point(451, 449);
+            this.loadingGif.Location = new System.Drawing.Point(317, 124);
             this.loadingGif.Name = "loadingGif";
             this.loadingGif.Size = new System.Drawing.Size(21, 23);
             this.loadingGif.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -164,7 +166,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 482);
+            this.ClientSize = new System.Drawing.Size(484, 312);
             this.Controls.Add(this.loadingGif);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label1);
@@ -178,9 +180,9 @@
             this.Controls.Add(this.pctbLogin);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(500, 520);
+            this.MaximumSize = new System.Drawing.Size(500, 350);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(500, 520);
+            this.MinimumSize = new System.Drawing.Size(500, 350);
             this.Name = "Login";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
