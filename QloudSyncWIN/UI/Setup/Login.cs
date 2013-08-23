@@ -6,6 +6,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+
+
+
 using System.Net;
 
 namespace GreenQloud.UI.Setup
@@ -14,15 +17,24 @@ namespace GreenQloud.UI.Setup
     {
         public delegate void LoginDone();
         public event LoginDone OnLoginDone;
+        string userMark = " Username";
+        string passMark = " Password";
+
+
 
         public Login()
         {
             InitializeComponent();
+            this.BtnRegister.TabIndex = 1;
+            this.TxtUserName.Text = userMark ;
+            this.TxtPassword.UseSystemPasswordChar = false;
+            this.TxtPassword.Text = passMark ;
         }
 
+        //cancel button if needed
         private void BtnCancel_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            UIManager.GetInstance().OpenStorageQloudRegistration(sender, e);
         }
 
         private void BtnContinue_Click(object sender, EventArgs e)
@@ -42,9 +54,59 @@ namespace GreenQloud.UI.Setup
             }
         }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+
+        private void BtnContinue_KeyDown(object sender, KeyEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://my.greenqloud.com/registration");
+            BtnContinue_Click(sender, e);
         }
+
+
+
+
+        private void TxtUserName_Enter(object sender, EventArgs e)
+        {
+            if (this.TxtUserName.Text == userMark)
+            {
+                this.TxtUserName.Text = "";
+                this.TxtUserName.ForeColor = System.Drawing.Color.Black;
+            }
+        }
+
+        private void TxtUserName_Leave(object sender, EventArgs e)
+        {
+            if (this.TxtUserName.Text.Length == 0)
+            {
+                this.TxtUserName.Text = userMark;
+                this.TxtUserName.ForeColor = System.Drawing.Color.DarkGray;
+            }
+        }
+
+
+        private void TxtPassword_Enter(object sender, EventArgs e)
+        {
+            if (this.TxtPassword.Text == passMark)
+            {
+                this.TxtPassword.Text = "";
+                this.TxtPassword.PasswordChar = '*'; 
+                this.TxtPassword.ForeColor = System.Drawing.Color.Black;
+            }
+
+        }
+
+        private void TxtPassword_Leave(object sender, EventArgs e)
+        {
+            if (this.TxtPassword.Text.Length == 0)
+            {
+                this.TxtPassword.UseSystemPasswordChar = false;
+                this.TxtPassword.PasswordChar = new Char();
+                this.TxtPassword.Text = passMark;
+                this.TxtPassword.ForeColor = System.Drawing.Color.DarkGray;
+            }
+
+        }
+
+
+
+       
     }
 }
