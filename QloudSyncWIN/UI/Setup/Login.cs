@@ -140,5 +140,15 @@ namespace GreenQloud.UI.Setup
                 BtnContinue_Click(sender, e);
             }
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
