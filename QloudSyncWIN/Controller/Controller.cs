@@ -463,7 +463,7 @@ namespace GreenQloud {
         
         public virtual void Quit ()
         {
-            throw new AbortedOperationException("Closed");
+            Program.Exit();
         }
 
 		public void AddToBookmarks ()

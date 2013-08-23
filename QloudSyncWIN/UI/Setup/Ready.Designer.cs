@@ -113,8 +113,9 @@
             this.pathlabel.Name = "pathlabel";
             this.pathlabel.Size = new System.Drawing.Size(266, 19);
             this.pathlabel.TabIndex = 16;
-            this.pathlabel.Text = "C:\\Users\\Carlos Maia\\StorageQloud\\";
+            this.pathlabel.Text = RuntimeSettings.HomePath;
             this.pathlabel.UseMnemonic = false;
+            this.pathlabel.Click += new System.EventHandler(this.pathlabel_Click);
             // 
             // label4
             // 

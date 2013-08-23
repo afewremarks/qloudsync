@@ -188,7 +188,7 @@ namespace GreenQloud.UI
         {
             Program.Controller.StopSynchronizers();
             Program.Controller.Quit();
-            throw new AbortedOperationException("Closed");
+            //throw new AbortedOperationException("Closed");
         }
 
         protected override void Dispose(bool isDisposing)
