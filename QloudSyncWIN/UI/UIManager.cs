@@ -7,6 +7,7 @@ using System.Drawing;
 using QloudSyncCore;
 using GreenQloud.Model;
 using GreenQloud.Persistence.SQLite;
+using GreenQloud.UI.Setup;
 
 namespace GreenQloud.UI
 {
@@ -14,7 +15,8 @@ namespace GreenQloud.UI
     {
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu;
-        public GreenQloud.UI.Setup.Login LoginWindow;
+        public Login LoginWindow;
+        public Ready readyWindow;
         public AboutWindow About;
         private bool isLoged;
         private static UIManager instance;
@@ -31,6 +33,7 @@ namespace GreenQloud.UI
             this.AddToSystemTray();
             this.LoginWindow = new Setup.Login();
             this.About = new AboutWindow();
+            this.readyWindow = new Ready();
 
             Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
             Program.Controller.ShowSetupWindowEvent += ((PageType page_type) => this.LoginWindow.ShowDialog());
@@ -39,6 +42,7 @@ namespace GreenQloud.UI
                 this.isLoged = true;
                 this.LoginWindow.Hide();
                 this.LoginWindow.Close();
+                this.readyWindow.ShowDialog();
                 UIManager.GetInstance().BuildMenu();
                 Program.Controller.SyncStart();
             });
@@ -80,14 +84,10 @@ namespace GreenQloud.UI
                 recentlyChanged.Enabled = false;
                 this.trayMenu.MenuItems.Add(recentlyChanged);
                 this.trayMenu.MenuItems.Add("-");
-
                 LoadRecentlyChangedItems();
-
                 this.trayMenu.MenuItems.Add("-");
-
                 this.trayMenu.MenuItems.Add("Help Center", OpenStorageQloudHelpCenter);
                 this.trayMenu.MenuItems.Add("About QloudSync", ShowAboutWindow);
-
                 this.trayMenu.MenuItems.Add("-");
                 this.trayMenu.MenuItems.Add("Quit", OnExit);
             
@@ -125,12 +125,14 @@ namespace GreenQloud.UI
         {
             Program.Controller.OpenSparkleShareFolder();
         }
-        public void OpenStorageQloudWebsite(Object sender, EventArgs e)
-        {
-            string hash = Crypto.GetHMACbase64(Credential.SecretKey, Credential.PublicKey, true);
-            Program.Controller.OpenWebsite(string.Format("https://my.greenqloud.com/qloudsync?username={0}&hashValue={1}&returnUrl=/storageQloud", Credential.Username, hash));
-        }
 
+        public void OpenStorageQloudRegistration(Object sender, EventArgs e)
+        {
+            Program.Controller.OpenWebsite("https://my.greenqloud.com/registration");
+        }
+        public void OpenStorageQloudWebsite(Object sender, EventArgs e){
+            Program.Controller.OpenStorageQloudWebsite();
+        }
         public void OpenStorageQloudHelpCenter(Object sender, EventArgs e)
         {
             Program.Controller.OpenWebsite("http://support.greenqloud.com");
