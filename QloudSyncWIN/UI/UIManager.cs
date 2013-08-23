@@ -75,7 +75,7 @@ namespace GreenQloud.UI
             MenuItem savings = new MenuItem("");
             savings.Visible = false;
             this.trayMenu.MenuItems.Add(savings);
-            this.trayMenu.MenuItems.Add("StorageQLoud Folder", OpenStorageQloudFolder);
+            this.trayMenu.MenuItems.Add("StorageQloud Folder", OpenStorageQloudFolder);
             this.trayMenu.MenuItems.Add("Share/View Online...", OpenStorageQloudWebsite);
             this.trayMenu.MenuItems.Add("-");
 
