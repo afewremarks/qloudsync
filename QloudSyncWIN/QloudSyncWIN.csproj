@@ -170,8 +170,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <None Include="Pixmaps\qloudsync-app.icns" />
-    <None Include="Pixmaps\qloudsync-folder.icns" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -238,29 +236,6 @@
     <Content Include="lib\MonoMac.dll" />
     <Content Include="lib\Newtonsoft.Json.dll" />
     <Content Include="lib\XamaMac.dll" />
-    <Content Include="Pixmaps\about.png" />
-    <Content Include="Pixmaps\file_down.png" />
-    <Content Include="Pixmaps\file_up.png" />
-    <Content Include="Pixmaps\folder_down.png" />
-    <Content Include="Pixmaps\folder_up.png" />
-    <Content Include="Pixmaps\process-syncing-active.png" />
-    <Content Include="Pixmaps\process-syncing-active_new.png" />
-    <Content Include="Pixmaps\process-syncing-down-active.png" />
-    <Content Include="Pixmaps\process-syncing-down.png" />
-    <Content Include="Pixmaps\process-syncing-error-active.png" />
-    <Content Include="Pixmaps\process-syncing-error.png" />
-    <Content Include="Pixmaps\process-syncing-idle-active.png" />
-    <Content Include="Pixmaps\process-syncing-idle.png" />
-    <Content Include="Pixmaps\process-syncing-up-active.png" />
-    <Content Include="Pixmaps\process-syncing-up.png" />
-    <Content Include="Pixmaps\process-syncing.png" />
-    <Content Include="Pixmaps\side-splash.png" />
-    <Content Include="Pixmaps\trash.png" />
-    <Content Include="Pixmaps\tutorial-slide-1.png" />
-    <Content Include="Pixmaps\tutorial-slide-2.png" />
-    <Content Include="Pixmaps\tutorial-slide-3.png" />
-    <Content Include="Pixmaps\tutorial-slide-4.png" />
-    <Content Include="Pixmaps\user-icon-default.png" />
     <Content Include="qloudsync-app2.ico" />
     <Content Include="x64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
