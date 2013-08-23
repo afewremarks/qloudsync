@@ -37,6 +37,11 @@ namespace GreenQloud.UI.Setup
 
         }
 
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
 
     }
 }
