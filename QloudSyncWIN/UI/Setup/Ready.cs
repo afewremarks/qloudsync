@@ -32,6 +32,11 @@ namespace GreenQloud.UI.Setup
             button1_Click(sender, e);
         }
 
+        private void pathlabel_Click(object sender, EventArgs e)
+        {
+
+        }
+
 
     }
 }
