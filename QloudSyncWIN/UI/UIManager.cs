@@ -6,8 +6,13 @@ using System.Windows.Forms;
 using System.Drawing;
 using QloudSyncCore;
 using GreenQloud.Model;
+<<<<<<< HEAD
 using GreenQloud.Persistence.SQLite;
 using GreenQloud.UI.Setup;
+=======
+using GreenQloud.Persistence.SQLite;
+using System.Threading;
+>>>>>>> 7da00f1e497ce84ab841289770d15e3b5fb7ac32
 
 namespace GreenQloud.UI
 {
@@ -42,8 +47,12 @@ namespace GreenQloud.UI
                 this.isLoged = true;
                 this.LoginWindow.Hide();
                 this.LoginWindow.Close();
+<<<<<<< HEAD
                 this.readyWindow.ShowDialog();
                 UIManager.GetInstance().BuildMenu();
+=======
+                //UIManager.GetInstance().BuildMenu();
+>>>>>>> 7da00f1e497ce84ab841289770d15e3b5fb7ac32
                 Program.Controller.SyncStart();
             });
             this.LoginWindow.FormClosed += ((sender, args) =>
@@ -70,6 +79,7 @@ namespace GreenQloud.UI
         }
 
         public void BuildMenu()
+<<<<<<< HEAD
         {
             
                 this.trayMenu.MenuItems.Clear();
@@ -91,23 +101,77 @@ namespace GreenQloud.UI
                 this.trayMenu.MenuItems.Add("-");
                 this.trayMenu.MenuItems.Add("Quit", OnExit);
             
+=======
+        {
+            MenuItem savings = new MenuItem("");
+            savings.Visible = false;
+            this.trayMenu.MenuItems.Add(savings);
+            this.trayMenu.MenuItems.Add("StorageQLoud Folder", OpenStorageQloudFolder);
+            this.trayMenu.MenuItems.Add("Share/View Online...", OpenStorageQloudWebsite);
+            this.trayMenu.MenuItems.Add("-");
+
+            MenuItem recentlyChanged = new MenuItem("Recently Changed");
+            recentlyChanged.Enabled = false;
+            this.trayMenu.MenuItems.Add(recentlyChanged);
+            
+            //Dont remove this separators
+            MenuItem recentlyChangedSeparator = new MenuItem("-");
+            this.trayMenu.MenuItems.Add(recentlyChangedSeparator);
+            //place to load recently changes
+            MenuItem recentlyChangedFinalSeparator = new MenuItem("-");
+            this.trayMenu.MenuItems.Add(recentlyChangedFinalSeparator);
+            
+            this.trayMenu.MenuItems.Add("Help Center", OpenStorageQloudHelpCenter);
+            this.trayMenu.MenuItems.Add("About QloudSync", ShowAboutWindow);
+            this.trayMenu.MenuItems.Add("-");
+            this.trayMenu.MenuItems.Add("Quit", OnExit);
+
+            this.trayMenu.Popup += (sender, args) => {
+                LoadExtraItems(recentlyChangedSeparator, recentlyChangedFinalSeparator, savings);
+            };
+>>>>>>> 7da00f1e497ce84ab841289770d15e3b5fb7ac32
         }
 
-        private void LoadRecentlyChangedItems()
+        private void LoadExtraItems(MenuItem separator,  MenuItem finalSeparator, MenuItem savings)
         {
+
+            //First load the recently changes
+            int begin = this.trayMenu.MenuItems.IndexOf(separator);
+            int end = this.trayMenu.MenuItems.IndexOf(finalSeparator);
+            while(begin+1 < end) {
+                this.trayMenu.MenuItems.RemoveAt(begin + 1);
+                begin = this.trayMenu.MenuItems.IndexOf(separator);
+                end = this.trayMenu.MenuItems.IndexOf(finalSeparator);
+            }
+
+
             if (Program.Controller.DatabaseLoaded())
             {
                 SQLiteEventDAO eventDao = new SQLiteEventDAO();
                 List<Event> events = eventDao.LastEvents;
-                string text = "";
-
+                
                 foreach (Event e in events)
                 {
+                    end = this.trayMenu.MenuItems.IndexOf(finalSeparator);
+
                     MenuItem current = new MenuItem();
                     current.Text = e.ItemName;
-                    this.trayMenu.MenuItems.Add(current);
+                    current.Click += (sender, args) =>
+                    {
+                        Program.Controller.OpenFolder(e.ItemLocalFolderPath);
+                    };
+                    this.trayMenu.MenuItems.Add(end, current);
                 }
             }
+
+
+            //Load savings in the end...
+            new Thread(() =>
+            {
+                savings.Text = GetSavings();
+                if (savings.Text.Length > 0 && !savings.Visible)
+                    savings.Visible = true;
+            }).Start();
         }
 
         private string GetSavings()
@@ -156,7 +220,7 @@ namespace GreenQloud.UI
         {
             Program.Controller.StopSynchronizers();
             Program.Controller.Quit();
-            Application.Exit();
+            throw new AbortedOperationException("Closed");
         }
 
         protected override void Dispose(bool isDisposing)
@@ -167,6 +231,19 @@ namespace GreenQloud.UI
             }
 
             base.Dispose(isDisposing);
+        }
+
+        internal void OnIdle()
+        {
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_idle")).GetHicon()); 
+        }
+        internal void OnError()
+        {
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error")).GetHicon());
+        }
+        internal void OnSyncing()
+        {
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing")).GetHicon());
         }
     }
 }

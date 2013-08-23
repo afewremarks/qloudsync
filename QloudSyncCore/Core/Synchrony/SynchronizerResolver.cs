@@ -79,15 +79,13 @@ namespace GreenQloud.Synchrony
 
         public void SolveAll ()
         {
-            lock (lockk) {
-                eventsToSync =  eventDAO.EventsNotSynchronized.Count;
-                while (eventsToSync > 0 && !_stoped) {
-                    Synchronize ();
-                    eventsToSync = eventDAO.EventsNotSynchronized.Count;
-                }
-                SyncStatus = SyncStatus.IDLE;
-                Done = true;
+            eventsToSync =  eventDAO.EventsNotSynchronized.Count;
+            while (eventsToSync > 0 && !_stoped) {
+                Synchronize ();
+                eventsToSync = eventDAO.EventsNotSynchronized.Count;
             }
+            SyncStatus = SyncStatus.IDLE;
+            Done = true;
             Thread.Sleep (1000);
         }
 

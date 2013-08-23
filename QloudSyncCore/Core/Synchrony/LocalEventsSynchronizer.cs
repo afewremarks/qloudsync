@@ -57,10 +57,8 @@ namespace GreenQloud.Synchrony
 
         public void CreateEvent (Event e)
         {
-            lock (lockk) {
-                if(!_stoped )
-                    Create(e);
-            }
+            if(!_stoped )
+                Create(e);
         }
 
         public void Create (Event e){       
