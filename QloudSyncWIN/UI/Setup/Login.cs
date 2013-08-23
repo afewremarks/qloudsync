@@ -40,38 +40,41 @@ namespace GreenQloud.UI.Setup
         }
 
         private void BtnContinue_Click(object sender, EventArgs e)
-        {
-            
-                this.loadingGif.Visible = true;
-                new Thread(() =>
+        {   
+            this.loadingGif.Visible = true;
+            new Thread(() =>
+            {
+                try
+                {
+                    QloudSync.Repository.S3Connection.Authenticate(this.TxtUserName.Text, this.TxtPassword.Text);
+                    Credential.Username = this.TxtUserName.Text;
+                    if (this.OnLoginDone != null)
+                    {
+                        this.OnLoginDone();
+                    }
+                    else
+                    {
+                        if (InvokeRequired)
+                        {
+                            BeginInvoke(new Action(() =>
+                            {
+                                this.loadingGif.Visible = false;
+                            }));
+                        }
+                    }
+                }
+                catch (WebException)
                 {
                     if (InvokeRequired)
                     {
-                     
-                        BeginInvoke(new Action(() =>{
-                                        try
-                                        {
-                                            QloudSync.Repository.S3Connection.Authenticate(this.TxtUserName.Text, this.TxtPassword.Text);
-                                            Credential.Username = this.TxtUserName.Text;
-                                            if (this.OnLoginDone != null)
-                                            {
-                                                this.OnLoginDone();
-                                            }
-                                            else
-                                            {
-                                                this.loadingGif.Visible = false;
-                                            }
-                                        }
-                                        catch (WebException)
-                                        {
-                                            this.loadingGif.Visible = false;
-                                            MessageBox.Show("An error ocurred while trying authenticate. Please, try again.");
-                                        }
+                        BeginInvoke(new Action(() =>
+                        {
+                            this.loadingGif.Visible = false;
                         }));
-                        return;
                     }
-                }).Start();
-            
+                    MessageBox.Show("An error ocurred while trying authenticate. Please, try again.");
+                }  
+            }).Start(); 
         }
 
 
@@ -127,10 +130,13 @@ namespace GreenQloud.UI.Setup
 
         public void Done()
         {
-            this.TxtPassword.Enabled = false;
-            this.TxtUserName.Enabled = false;
-            this.BtnContinue.Enabled = false;
-            this.BtnRegister.Enabled = false;
+            BeginInvoke(new Action(() =>
+            {
+                this.TxtPassword.Enabled = false;
+                this.TxtUserName.Enabled = false;
+                this.BtnContinue.Enabled = false;
+                this.BtnRegister.Enabled = false;
+            }));
         }
 
         private void TxtPassword_KeyPress(object sender, KeyPressEventArgs e)
