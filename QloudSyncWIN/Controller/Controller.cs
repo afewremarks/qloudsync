@@ -84,7 +84,15 @@ namespace GreenQloud {
 
             OnIdle += delegate()
             {
-                UIManager.GetInstance().BuildMenu();
+                UIManager.GetInstance().OnIdle();
+            };
+            OnSyncing += delegate()
+            {
+                UIManager.GetInstance().OnSyncing();
+            };
+            OnError += delegate()
+            {
+                UIManager.GetInstance().OnError();
             };
 
             checkConnection = new Thread(delegate()
@@ -193,9 +201,9 @@ namespace GreenQloud {
             else
             {
                 InitializeSynchronizers();
-                UIManager.GetInstance().BuildMenu();
             }
             verifyConfigRequirements();
+            UIManager.GetInstance().BuildMenu();
         }
 
         void CalcTimeDiff()
@@ -455,8 +463,7 @@ namespace GreenQloud {
         
         public virtual void Quit ()
         {
-            Process.GetProcessesByName("QloudSync")[0].Kill();
-            Environment.Exit (0);
+            throw new AbortedOperationException("Closed");
         }
 
 		public void AddToBookmarks ()
