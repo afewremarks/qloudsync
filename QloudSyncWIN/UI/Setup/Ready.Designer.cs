@@ -34,9 +34,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.helpProvider1 = new System.Windows.Forms.HelpProvider();
             this.label5 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.pathlabel = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pctbLogin)).BeginInit();
             this.SuspendLayout();
@@ -55,7 +53,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI Symbol", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(285, 36);
+            this.label1.Location = new System.Drawing.Point(280, 37);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(72, 19);
             this.label1.TabIndex = 11;
@@ -63,7 +61,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(269, 217);
+            this.button1.Location = new System.Drawing.Point(266, 142);
             this.button1.MaximumSize = new System.Drawing.Size(100, 50);
             this.button1.MinimumSize = new System.Drawing.Size(100, 50);
             this.button1.Name = "button1";
@@ -85,17 +83,6 @@
             this.label5.Text = "You are now ready to sync your files.";
             this.label5.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe UI Symbol", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(245, 85);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(151, 19);
-            this.label2.TabIndex = 14;
-            this.label2.Text = "Local files are stored in:";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -105,28 +92,17 @@
             this.label3.Size = new System.Drawing.Size(0, 19);
             this.label3.TabIndex = 15;
             // 
-            // pathlabel
-            // 
-            this.pathlabel.AutoSize = true;
-            this.pathlabel.Font = new System.Drawing.Font("Segoe UI Symbol", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pathlabel.Location = new System.Drawing.Point(192, 113);
-            this.pathlabel.Name = "pathlabel";
-            this.pathlabel.Size = new System.Drawing.Size(266, 19);
-            this.pathlabel.TabIndex = 16;
-            this.pathlabel.Text = RuntimeSettings.HomePath;
-            this.pathlabel.UseMnemonic = false;
-            this.pathlabel.Click += new System.EventHandler(this.pathlabel_Click);
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Segoe UI Symbol", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(185, 153);
+            this.label4.Location = new System.Drawing.Point(184, 85);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(287, 19);
+            this.label4.Size = new System.Drawing.Size(288, 19);
             this.label4.TabIndex = 17;
-            this.label4.Text = "Click the Button to access your online bucket.";
+            this.label4.Text = "Click the Button to access StorageQloud now.";
             this.label4.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // Ready
             // 
@@ -134,9 +110,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(484, 312);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.pathlabel);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
@@ -164,9 +138,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.HelpProvider helpProvider1;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label pathlabel;
         private System.Windows.Forms.Label label4;
     }
 }
