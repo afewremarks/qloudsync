@@ -123,7 +123,7 @@ namespace GreenQloud
 
                         if (
                             flags [i].HasFlag (FSEventStreamEventFlagItem.Created) && 
-                            ((flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile) && !flags[i].HasFlag (FSEventStreamEventFlagItem.Renamed)) || flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir))
+                            ((flags [i].HasFlag (FSEventStreamEventFlagItem.IsFile) && !flags[i].HasFlag (FSEventStreamEventFlagItem.Renamed)) || (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !flags[i].HasFlag (FSEventStreamEventFlagItem.Renamed)))
                             ) {
                             e.EventType = EventType.CREATE;
                             List<RepositoryItem> items =  new List<RepositoryItem>();
