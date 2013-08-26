@@ -89,7 +89,6 @@
     <Compile Include="Core\Synchrony\LocalEventsSynchronizer.cs" />
     <Compile Include="Core\Persistence\TimeDiffDAO.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteTimeDiffDAO.cs" />
-    <Compile Include="Core\IO\QloudSyncFileSystemWatcher.cs" />
     <Compile Include="Core\Config\ConfigFile.cs" />
     <Compile Include="Core\Config\Credential.cs" />
     <Compile Include="Core\Config\GlobalSettings.cs" />
@@ -101,7 +100,7 @@
     <Compile Include="Core\Program.cs" />
     <Compile Include="Core\Model\SQTotalUsed.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
-    <Compile Include="Core\IO\QloudSyncFileSystemWatcherWIN.cs" />
+    <Compile Include="Core\IO\QloudSyncFileSystemWatcherMAC.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
