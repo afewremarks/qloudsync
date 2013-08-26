@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
@@ -10,11 +9,10 @@ using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.UI
 {
-    public class UIManager : Form, ApplicationUI
+    public class UIManager : ApplicationUI
     {
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu;
-        public GreenQloud.UI.Setup.Login LoginWindow;
         public AboutWindow About;
         private bool isLoged;
         private static UIManager instance;
@@ -146,30 +144,5 @@ namespace GreenQloud.UI
          "QloudSync");
         }
 
-        protected override void OnLoad(EventArgs e)
-        {
-            this.Visible = false; // Hide form window.
-            this.ShowInTaskbar = false; // Remove from taskbar.
-
-            base.OnLoad(e);
-        }
-
-        public void OnExit(Object sender, EventArgs e)
-        {
-            Program.Controller.StopSynchronizers();
-            Program.Controller.Quit();
-            Application.Exit();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            /*if (isDisposing)
-            {
-                trayIcon.Dispose();
-            }
-
-            base.Dispose(isDisposing);
-            */
-        }
     }
 }

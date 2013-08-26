@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.IO;
 using GreenQloud.Repository;
-using System.Linq;
 using GreenQloud.UI;
 using System.Windows.Forms;
 
@@ -11,7 +10,6 @@ namespace GreenQloud
 
     public class Program
     {
-
         public static Controller Controller;
         public static UIManager UI;
 
@@ -27,7 +25,6 @@ namespace GreenQloud
                 Controller = new Controller();                
                 UI = UIManager.GetInstance();
                 GreenQloud.Core.Program.Run(Controller, UI);
-                Application.Run(UI);
             }
             catch (Exception e)
             {
