@@ -9,6 +9,7 @@ using GreenQloud.Persistence.SQLite;
 using System.Net.NetworkInformation;
 using GreenQloud.Model;
 using GreenQloud.UI;
+using GreenQloud.UI.Setup;
 
  
 
@@ -24,7 +25,8 @@ namespace GreenQloud {
     }
 
 	public class Controller : ApplicationController{
-
+        public GreenQloud.UI.Setup.Login LoginWindow;
+        
         public static int Contador{
             set; get;
         }
@@ -178,15 +180,11 @@ namespace GreenQloud {
             CalcTimeDiff();
             if (FirstRun)
             {
-                Thread t = new Thread(delegate()
-                {
-                    ShowSetupWindow(PageType.Login);
-                });
-                t.Start();
-
                 foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
                     File.Delete(f);
                 UpdateConfigFile();
+                verifyConfigRequirements();
+                this.LoginWindow = new Login();
             }
             else
             {

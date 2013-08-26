@@ -46,9 +46,6 @@
     <Compile Include="Properties\Resources.Designer.cs" />
     <Compile Include="Properties\Settings.Designer.cs" />
     <Compile Include="UI\Setup\Login.cs" />
-    <Compile Include="UI\Setup\Login.Designer.cs" />
-    <Compile Include="UI\Setup\Sync.cs" />
-    <Compile Include="UI\Setup\Sync.Designer.cs" />
     <Compile Include="UI\AboutWindow.cs" />
     <Compile Include="UI\AboutWindow.Designer.cs" />
     <Compile Include="UI\UIManager.cs" />
@@ -104,7 +101,6 @@
     <None Include="Pixmaps\user-icon-default.png" />
     <None Include="test-results\QloudSyncMAC.csproj.test-cache" />
     <None Include="app.config" />
-    <None Include="qloudsync.config" />
     <None Include="Properties\Resources.resx" />
     <None Include="Properties\Settings.settings" />
     <None Include="Resources\about.png" />
@@ -125,7 +121,6 @@
     <None Include="Resources\tutorial-slide-4.png" />
     <None Include="Resources\user-icon-default.png" />
     <None Include="UI\Setup\Login.resx" />
-    <None Include="UI\Setup\Sync.resx" />
     <None Include="Backgrounds.resx" />
     <None Include="Icons.resx" />
     <None Include="packages.config" />
@@ -138,5 +133,10 @@
       <Project>{2039E95A-5F46-43E1-BA58-B33C73972B0E}</Project>
       <Name>QloudSyncCoreLIN</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="qloudsync.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

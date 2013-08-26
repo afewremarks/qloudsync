@@ -15,12 +15,7 @@ namespace GreenQloud
     {
         private static string CONFIG_FOLDER = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), GlobalSettings.ApplicationName);
         private static string INIT_CONFIG_FOLDER = AppDomain.CurrentDomain.BaseDirectory;
-        #if __MonoCS__
-            private static string INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, ".." + Path.DirectorySeparatorChar.ToString() + "Resources" + Path.DirectorySeparatorChar.ToString() + "qloudsync.config");
-        #else
-            private static string INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, "qloudsync.config");
-        #endif
-        
+        private static string INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, ".." + Path.DirectorySeparatorChar.ToString() + "Resources" + Path.DirectorySeparatorChar.ToString() + "qloudsync.config");
         private static string FULLNAME = Path.Combine(CONFIG_FOLDER, "qloudsync.config");
 
 
@@ -30,6 +25,10 @@ namespace GreenQloud
 
         public static void UpdateConfigFile ()
         {
+            if(!File.Exists(INIT_FULLNAME)){
+                INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, "qloudsync.config");
+            }
+
             try{
                 if (!File.Exists(FULLNAME)) 
                     File.Copy(INIT_FULLNAME, FULLNAME);
