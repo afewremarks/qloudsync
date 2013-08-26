@@ -92,7 +92,6 @@
     <Compile Include="Core\Synchrony\LocalEventsSynchronizer.cs" />
     <Compile Include="Core\Persistence\TimeDiffDAO.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteTimeDiffDAO.cs" />
-    <Compile Include="Core\IO\QloudSyncFileSystemWatcher.cs" />
     <Compile Include="Core\Config\ConfigFile.cs" />
     <Compile Include="Core\Config\Credential.cs" />
     <Compile Include="Core\Config\GlobalSettings.cs" />
