@@ -33,7 +33,7 @@ namespace GreenQloud
             {
                 Console.WriteLine(e.StackTrace);
                 Logger.LogInfo("Init", e);
-                Environment.Exit(-1);
+                Exit();
             }
 
 #if !__MonoCS__
@@ -41,6 +41,11 @@ namespace GreenQloud
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             GC.WaitForPendingFinalizers();
 #endif
+        }
+
+        internal static void Exit()
+        {
+            Environment.Exit(-1);
         }
     }
 }
