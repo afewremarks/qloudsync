@@ -84,7 +84,15 @@ namespace GreenQloud {
 
             OnIdle += delegate()
             {
-                UIManager.GetInstance().BuildMenu();
+                UIManager.GetInstance().OnIdle();
+            };
+            OnSyncing += delegate()
+            {
+                UIManager.GetInstance().OnSyncing();
+            };
+            OnError += delegate()
+            {
+                UIManager.GetInstance().OnError();
             };
 
             checkConnection = new Thread(delegate()
@@ -193,9 +201,9 @@ namespace GreenQloud {
             else
             {
                 InitializeSynchronizers();
-                UIManager.GetInstance().BuildMenu();
             }
             verifyConfigRequirements();
+            UIManager.GetInstance().BuildMenu();
         }
 
         void CalcTimeDiff()
@@ -395,28 +403,9 @@ namespace GreenQloud {
         {
             Logger.LogInfo("Controller", "First load sucessfully");
             FolderFetched();
-            new Thread(() => CreateStartupItem()).Start();
+            
         }
 
-        public void CreateStartupItem ()
-        {
-            // There aren't any bindings in MonoMac to support this yet, so
-            // we call out to an applescript to do the job
-            /*System.Diagnostics.Process process = new System.Diagnostics.Process ();
-            process.StartInfo.FileName               = "osascript";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute        = false;
-            
-            process.StartInfo.Arguments = "-e 'tell application \"System Events\" to " +
-                "make login item at end with properties {path:\"" + MonoMac.Foundation.NSBundle.MainBundle.BundlePath + "\", hidden:false}'";
-            
-            process.Start ();
-            process.WaitForExit ();
-            
-            Logger.LogInfo ("Controller", "Added " + MonoMac.Foundation.NSBundle.MainBundle.BundlePath + " to startup items");
-             */
-        }
-        
         public void ShowSetupWindow (PageType page_type)
         {
             ShowSetupWindowEvent (page_type);
@@ -433,8 +422,13 @@ namespace GreenQloud {
         {
             ShowEventLogWindowEvent ();
         }
-        
-        
+
+        public void OpenStorageQloudWebsite()
+        {
+            string hash = Crypto.GetHMACbase64(Credential.SecretKey, Credential.PublicKey, true);
+            Program.Controller.OpenWebsite(string.Format("https://my.greenqloud.com/qloudsync?username={0}&hashValue={1}&returnUrl=/storageQloud", Credential.Username, hash));
+        }
+
         public void OpenSparkleShareFolder ()
         {
             OpenFolder (RuntimeSettings.HomePath);
@@ -469,8 +463,7 @@ namespace GreenQloud {
         
         public virtual void Quit ()
         {
-            Process.GetProcessesByName("QloudSync")[0].Kill();
-            Environment.Exit (0);
+            Program.Exit();
         }
 
 		public void AddToBookmarks ()

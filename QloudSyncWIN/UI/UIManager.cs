@@ -7,6 +7,8 @@ using System.Drawing;
 using QloudSyncCore;
 using GreenQloud.Model;
 using GreenQloud.Persistence.SQLite;
+using GreenQloud.UI.Setup;
+using System.Threading;
 
 namespace GreenQloud.UI
 {
@@ -14,7 +16,8 @@ namespace GreenQloud.UI
     {
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu;
-        public GreenQloud.UI.Setup.Login LoginWindow;
+        public Login LoginWindow;
+        public Ready readyWindow;
         public AboutWindow About;
         private bool isLoged;
         private static UIManager instance;
@@ -31,16 +34,18 @@ namespace GreenQloud.UI
             this.AddToSystemTray();
             this.LoginWindow = new Setup.Login();
             this.About = new AboutWindow();
+            this.readyWindow = new Ready();
 
             Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
             Program.Controller.ShowSetupWindowEvent += ((PageType page_type) => this.LoginWindow.ShowDialog());
             this.LoginWindow.OnLoginDone += (() =>
             {
                 this.isLoged = true;
+                this.LoginWindow.Done();
+                Program.Controller.SyncStart();
                 this.LoginWindow.Hide();
                 this.LoginWindow.Close();
-                UIManager.GetInstance().BuildMenu();
-                Program.Controller.SyncStart();
+                this.readyWindow.ShowDialog();
             });
             this.LoginWindow.FormClosed += ((sender, args) =>
             {
@@ -60,54 +65,81 @@ namespace GreenQloud.UI
             this.trayMenu = new ContextMenu();
             this.trayIcon = new NotifyIcon();
             this.trayIcon.Text = GlobalSettings.ApplicationName;
-            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_idle")).GetHicon());
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_idle_active")).GetHicon());
             this.trayIcon.ContextMenu = trayMenu;
             this.trayIcon.Visible = true;
         }
 
         public void BuildMenu()
         {
+            MenuItem savings = new MenuItem("");
+            savings.Visible = false;
+            this.trayMenu.MenuItems.Add(savings);
+            this.trayMenu.MenuItems.Add("StorageQloud Folder", OpenStorageQloudFolder);
+            this.trayMenu.MenuItems.Add("Share/View Online...", OpenStorageQloudWebsite);
+            this.trayMenu.MenuItems.Add("-");
+
+            MenuItem recentlyChanged = new MenuItem("Recently Changed");
+            recentlyChanged.Enabled = false;
+            this.trayMenu.MenuItems.Add(recentlyChanged);
             
-                this.trayMenu.MenuItems.Clear();
-
-                string savings = GetSavings();
-                if (savings.Length > 0)
-                    this.trayMenu.MenuItems.Add(GetSavings());
-                this.trayMenu.MenuItems.Add("StorageQLoud Folder", OpenStorageQloudFolder);
-                this.trayMenu.MenuItems.Add("Share/View Online...", OpenStorageQloudWebsite);
-                this.trayMenu.MenuItems.Add("-");
-                MenuItem recentlyChanged = new MenuItem("Recently Changed");
-                recentlyChanged.Enabled = false;
-                this.trayMenu.MenuItems.Add(recentlyChanged);
-                this.trayMenu.MenuItems.Add("-");
-
-                LoadRecentlyChangedItems();
-
-                this.trayMenu.MenuItems.Add("-");
-
-                this.trayMenu.MenuItems.Add("Help Center", OpenStorageQloudHelpCenter);
-                this.trayMenu.MenuItems.Add("About QloudSync", ShowAboutWindow);
-
-                this.trayMenu.MenuItems.Add("-");
-                this.trayMenu.MenuItems.Add("Quit", OnExit);
+            //Dont remove this separators
+            MenuItem recentlyChangedSeparator = new MenuItem("-");
+            this.trayMenu.MenuItems.Add(recentlyChangedSeparator);
+            //place to load recently changes
+            MenuItem recentlyChangedFinalSeparator = new MenuItem("-");
+            this.trayMenu.MenuItems.Add(recentlyChangedFinalSeparator);
             
+            this.trayMenu.MenuItems.Add("Help Center", OpenStorageQloudHelpCenter);
+            this.trayMenu.MenuItems.Add("About QloudSync", ShowAboutWindow);
+            this.trayMenu.MenuItems.Add("-");
+            this.trayMenu.MenuItems.Add("Quit", OnExit);
+
+            this.trayMenu.Popup += (sender, args) => {
+                LoadExtraItems(recentlyChangedSeparator, recentlyChangedFinalSeparator, savings);
+            };
         }
 
-        private void LoadRecentlyChangedItems()
+        private void LoadExtraItems(MenuItem separator,  MenuItem finalSeparator, MenuItem savings)
         {
+
+            //First load the recently changes
+            int begin = this.trayMenu.MenuItems.IndexOf(separator);
+            int end = this.trayMenu.MenuItems.IndexOf(finalSeparator);
+            while(begin+1 < end) {
+                this.trayMenu.MenuItems.RemoveAt(begin + 1);
+                begin = this.trayMenu.MenuItems.IndexOf(separator);
+                end = this.trayMenu.MenuItems.IndexOf(finalSeparator);
+            }
+
+
             if (Program.Controller.DatabaseLoaded())
             {
                 SQLiteEventDAO eventDao = new SQLiteEventDAO();
                 List<Event> events = eventDao.LastEvents;
-                string text = "";
-
+                
                 foreach (Event e in events)
                 {
+                    end = this.trayMenu.MenuItems.IndexOf(finalSeparator);
+
                     MenuItem current = new MenuItem();
                     current.Text = e.ItemName;
-                    this.trayMenu.MenuItems.Add(current);
+                    current.Click += (sender, args) =>
+                    {
+                        Program.Controller.OpenFolder(e.ItemLocalFolderPath);
+                    };
+                    this.trayMenu.MenuItems.Add(end, current);
                 }
             }
+
+
+            //Load savings in the end...
+            new Thread(() =>
+            {
+                savings.Text = GetSavings();
+                if (savings.Text.Length > 0 && !savings.Visible)
+                    savings.Visible = true;
+            }).Start();
         }
 
         private string GetSavings()
@@ -125,12 +157,14 @@ namespace GreenQloud.UI
         {
             Program.Controller.OpenSparkleShareFolder();
         }
-        public void OpenStorageQloudWebsite(Object sender, EventArgs e)
-        {
-            string hash = Crypto.GetHMACbase64(Credential.SecretKey, Credential.PublicKey, true);
-            Program.Controller.OpenWebsite(string.Format("https://my.greenqloud.com/qloudsync?username={0}&hashValue={1}&returnUrl=/storageQloud", Credential.Username, hash));
-        }
 
+        public void OpenStorageQloudRegistration(Object sender, EventArgs e)
+        {
+            Program.Controller.OpenWebsite("https://my.greenqloud.com/registration");
+        }
+        public void OpenStorageQloudWebsite(Object sender, EventArgs e){
+            Program.Controller.OpenStorageQloudWebsite();
+        }
         public void OpenStorageQloudHelpCenter(Object sender, EventArgs e)
         {
             Program.Controller.OpenWebsite("http://support.greenqloud.com");
@@ -154,7 +188,7 @@ namespace GreenQloud.UI
         {
             Program.Controller.StopSynchronizers();
             Program.Controller.Quit();
-            Application.Exit();
+            //throw new AbortedOperationException("Closed");
         }
 
         protected override void Dispose(bool isDisposing)
@@ -165,6 +199,19 @@ namespace GreenQloud.UI
             }
 
             base.Dispose(isDisposing);
+        }
+
+        internal void OnIdle()
+        {
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_idle_active")).GetHicon()); 
+        }
+        internal void OnError()
+        {
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
+        }
+        internal void OnSyncing()
+        {
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_active")).GetHicon());
         }
     }
 }

@@ -6,7 +6,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+
+
+
 using System.Net;
+using System.Threading;
 
 namespace GreenQloud.UI.Setup
 {
@@ -14,37 +18,143 @@ namespace GreenQloud.UI.Setup
     {
         public delegate void LoginDone();
         public event LoginDone OnLoginDone;
+        string userMark = " Username";
+        string passMark = " Password";
+
+
 
         public Login()
         {
             InitializeComponent();
+            this.loadingGif.Visible = false;
+            this.BtnRegister.TabIndex = 1;
+            this.TxtUserName.Text = userMark ;
+            this.TxtPassword.UseSystemPasswordChar = false;
+            this.TxtPassword.Text = passMark ;
         }
 
+        //cancel button if needed
         private void BtnCancel_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            UIManager.GetInstance().OpenStorageQloudRegistration(sender, e);
         }
 
         private void BtnContinue_Click(object sender, EventArgs e)
-        {
-            try
+        {   
+            this.loadingGif.Visible = true;
+            new Thread(() =>
             {
-                QloudSync.Repository.S3Connection.Authenticate(this.TxtUserName.Text, this.TxtPassword.Text);
-                Credential.Username = this.TxtUserName.Text;
-                if (this.OnLoginDone != null)
+                try
                 {
-                    this.OnLoginDone();
+                    QloudSync.Repository.S3Connection.Authenticate(this.TxtUserName.Text, this.TxtPassword.Text);
+                    Credential.Username = this.TxtUserName.Text;
+                    if (this.OnLoginDone != null)
+                    {
+                        this.OnLoginDone();
+                    }
+                    else
+                    {
+                        if (InvokeRequired)
+                        {
+                            BeginInvoke(new Action(() =>
+                            {
+                                this.loadingGif.Visible = false;
+                            }));
+                        }
+                    }
                 }
-            }
-            catch (WebException)
+                catch (WebException)
+                {
+                    if (InvokeRequired)
+                    {
+                        BeginInvoke(new Action(() =>
+                        {
+                            this.loadingGif.Visible = false;
+                        }));
+                    }
+                    MessageBox.Show("An error ocurred while trying authenticate. Please, try again.");
+                }  
+            }).Start(); 
+        }
+
+
+        private void BtnContinue_KeyDown(object sender, KeyEventArgs e)
+        {
+            BtnContinue_Click(sender, e);
+        }
+
+
+
+
+        private void TxtUserName_Enter(object sender, EventArgs e)
+        {
+            if (this.TxtUserName.Text == userMark)
             {
-                MessageBox.Show("An error ocurred while trying authenticate. Please, try again.");
+                this.TxtUserName.Text = "";
+                this.TxtUserName.ForeColor = System.Drawing.Color.Black;
             }
         }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void TxtUserName_Leave(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("https://my.greenqloud.com/registration");
+            if (this.TxtUserName.Text.Length == 0)
+            {
+                this.TxtUserName.Text = userMark;
+                this.TxtUserName.ForeColor = System.Drawing.Color.DarkGray;
+            }
+        }
+
+
+        private void TxtPassword_Enter(object sender, EventArgs e)
+        {
+            if (this.TxtPassword.Text == passMark)
+            {
+                this.TxtPassword.Text = "";
+                this.TxtPassword.PasswordChar = '*'; 
+                this.TxtPassword.ForeColor = System.Drawing.Color.Black;
+            }
+
+        }
+
+        private void TxtPassword_Leave(object sender, EventArgs e)
+        {
+            if (this.TxtPassword.Text.Length == 0)
+            {
+                this.TxtPassword.UseSystemPasswordChar = false;
+                this.TxtPassword.PasswordChar = new Char();
+                this.TxtPassword.Text = passMark;
+                this.TxtPassword.ForeColor = System.Drawing.Color.DarkGray;
+            }
+
+        }
+
+        public void Done()
+        {
+            BeginInvoke(new Action(() =>
+            {
+                this.TxtPassword.Enabled = false;
+                this.TxtUserName.Enabled = false;
+                this.BtnContinue.Enabled = false;
+                this.BtnRegister.Enabled = false;
+            }));
+        }
+
+        private void TxtPassword_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if(e.KeyChar == (char)Keys.Enter)
+            {
+                BtnContinue_Click(sender, e);
+            }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
