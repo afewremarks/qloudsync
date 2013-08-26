@@ -197,6 +197,7 @@ namespace GreenQloud
                             {
                                 if ((createItem = getFirsttmpCreateItem()) != null)
                                 {
+                                    Console.WriteLine("AAAAA");
                                     FSOPRenameVO renameItem = getRenameItem(createItem.path);
                                     if (renameItem != null)
                                     {
@@ -219,6 +220,7 @@ namespace GreenQloud
                                 }
                                 else if ((createItem = createList[0]) != null && deleteList.Count > 0 && (deleteItem = getDeleteItemByName(Path.GetFileName(createItem.path))) != null)
                                 {
+                                    Console.WriteLine("BAAAA");
                                     bool isDirectory = true;
                                     if (createItem.type == "file")
                                     {
@@ -241,23 +243,47 @@ namespace GreenQloud
                                 {
                                     if (Path.GetExtension(createItem.path) != ".tmp" && Path.GetExtension(createItem.path) != ".TMP")
                                     {
-                                        bool isDirectory = true;
-                                        if (createItem.type == "file")
+                                        FSOPRenameVO renameItem = getRenameItem(createItem.path);
+                                        if (renameItem != null)
                                         {
-                                            isDirectory = false;
-                                        }
+                                            bool isDirectory = false;
 
-                                        if (!ignoreBag.Contains(createItem.path))
-                                        {
-                                            Event e = BuildEvent(EventType.CREATE, isDirectory, createItem.path);
-                                            Changed(e);
+                                            if (!ignoreBag.Contains(createItem.path))
+                                            {
+                                                deleteItemFromDeleteList(renameItem.newPath);
+                                                String TMPfilePath = deleteTMPItemFromCreateList(renameItem.newPath);
+                                                deleteItemFromDeleteList(TMPfilePath);
+                                                renameList.Remove(renameItem);
+                                                deleteItemFromChangeList(renameItem.oldPath);
 
-                                            //Console.WriteLine("***************************************" + message + "*****************************************\n");
-                                            //Console.WriteLine("Path: " + createItem.path);
+                                                Event e = BuildEvent(EventType.UPDATE, isDirectory, renameItem.newPath);
+                                                Changed(e);
+
+                                                //Console.WriteLine("***************************************" + message + "*****************************************\n");
+                                                //Console.WriteLine("Path: " + createItem.path);
+                                            }
+                                            
+                                            createList.Remove(createItem);
+                                            deleteItemFromChangeList(createItem.path);
+                                        } else {
+                                            bool isDirectory = true;
+                                            if (createItem.type == "file")
+                                            {
+                                                isDirectory = false;
+                                            }
+
+                                            if (!ignoreBag.Contains(createItem.path))
+                                            {
+                                                Event e = BuildEvent(EventType.CREATE, isDirectory, createItem.path);
+                                                Changed(e);
+
+                                                //Console.WriteLine("***************************************" + message + "*****************************************\n");
+                                                //Console.WriteLine("Path: " + createItem.path);
+                                            }
+                                            
+                                            createList.Remove(createItem);
+                                            deleteItemFromChangeList(createItem.path);
                                         }
-                                        
-                                        createList.Remove(createItem);
-                                        deleteItemFromChangeList(createItem.path);
                                     }
                                 }
                             }
