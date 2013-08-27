@@ -42,10 +42,8 @@ namespace GreenQloud.UI
             {
                 this.isLoged = true;
                 this.LoginWindow.Done();
-                Program.Controller.SyncStart();
-                this.LoginWindow.Hide();
-                this.LoginWindow.Close();
                 this.readyWindow.ShowDialog();
+                Program.Controller.SyncStart();
             });
             this.LoginWindow.FormClosed += ((sender, args) =>
             {
