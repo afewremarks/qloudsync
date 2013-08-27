@@ -416,31 +416,32 @@ namespace GreenQloud {
                     Hidden = true
                 };
 
-                co2Update = new Thread (delegate(){
-                    while(true){
-                        try{
-                            string spent = Statistics.TotalUsedSpace.Spent;
-                            string saved = Statistics.EarlyCO2Savings.Saved;
-                            string subscript = "2";
-                            subscript.ToLowerInvariant();
+                if (co2Update == null) {
+                    co2Update = new Thread (delegate() {
+                        while (true) {
+                            try {
+                                string spent = Statistics.TotalUsedSpace.Spent;
+                                string saved = Statistics.EarlyCO2Savings.Saved;
+                                string subscript = "2";
+                                subscript.ToLowerInvariant ();
 
-                            using (var ns = new NSAutoreleasePool ())
-                            {
-                                InvokeOnMainThread (() => { 
-                                    if(spent != null && saved != null){
-                                       co2_savings_item.Title =  spent + " used | " + saved + " CO₂ saved";
-                                        co2_savings_item.Hidden = false;
-                                    }
-                                });
+                                using (var ns = new NSAutoreleasePool ()) {
+                                    InvokeOnMainThread (() => { 
+                                        if (spent != null && saved != null) {
+                                            co2_savings_item.Title = spent + " used | " + saved + " CO₂ saved";
+                                            co2_savings_item.Hidden = false;
+                                        }
+                                    });
+                                }
+                            } catch (Exception e) {
+                                Console.WriteLine (e.Message);
+                                Logger.LogInfo ("INFO", "Cannot load CO₂ savings.");
                             }
-                        } catch (Exception e){
-                            Console.WriteLine(e.Message);
-                            Logger.LogInfo("INFO", "Cannot load CO₂ savings.");
+                            Thread.Sleep (60000);
                         }
-                        Thread.Sleep(60000);
-                    }
-                });
-                co2Update.Start ();
+                    });
+                    co2Update.Start ();
+                }
 
                 help_item = new NSMenuItem () {
                     Title = "Help Center"
