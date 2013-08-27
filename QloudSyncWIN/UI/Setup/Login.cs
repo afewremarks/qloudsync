@@ -46,6 +46,14 @@ namespace GreenQloud.UI.Setup
             {
                 try
                 {
+                    BeginInvoke(new Action(() =>
+                    {
+                        this.TxtPassword.Enabled = false;
+                        this.TxtUserName.Enabled = false;
+                        this.BtnContinue.Enabled = false;
+                        this.BtnRegister.Enabled = false;
+                    }));
+
                     QloudSync.Repository.S3Connection.Authenticate(this.TxtUserName.Text, this.TxtPassword.Text);
                     Credential.Username = this.TxtUserName.Text;
                     if (this.OnLoginDone != null)
@@ -58,6 +66,10 @@ namespace GreenQloud.UI.Setup
                         {
                             BeginInvoke(new Action(() =>
                             {
+                                this.TxtPassword.Enabled = true;
+                                this.TxtUserName.Enabled = true;
+                                this.BtnContinue.Enabled = true;
+                                this.BtnRegister.Enabled = true;
                                 this.loadingGif.Visible = false;
                             }));
                         }
@@ -69,6 +81,10 @@ namespace GreenQloud.UI.Setup
                     {
                         BeginInvoke(new Action(() =>
                         {
+                            this.TxtPassword.Enabled = true;
+                            this.TxtUserName.Enabled = true;
+                            this.BtnContinue.Enabled = true;
+                            this.BtnRegister.Enabled = true;
                             this.loadingGif.Visible = false;
                         }));
                     }
@@ -132,10 +148,8 @@ namespace GreenQloud.UI.Setup
         {
             BeginInvoke(new Action(() =>
             {
-                this.TxtPassword.Enabled = false;
-                this.TxtUserName.Enabled = false;
-                this.BtnContinue.Enabled = false;
-                this.BtnRegister.Enabled = false;
+                this.Hide();
+                this.Close();
             }));
         }
 
