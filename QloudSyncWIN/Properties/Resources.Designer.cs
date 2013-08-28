@@ -63,9 +63,9 @@ namespace GreenQloud.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap CreateButton139 {
+        internal static System.Drawing.Bitmap about {
             get {
-                object obj = ResourceManager.GetObject("CreateButton139", resourceCulture);
+                object obj = ResourceManager.GetObject("about", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace GreenQloud.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap CreateButton159 {
+        internal static System.Drawing.Bitmap getStarted {
             get {
-                object obj = ResourceManager.GetObject("CreateButton159", resourceCulture);
+                object obj = ResourceManager.GetObject("getStarted", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -86,26 +86,6 @@ namespace GreenQloud.Properties {
         internal static System.Drawing.Bitmap loadinggif {
             get {
                 object obj = ResourceManager.GetObject("loadinggif", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap LoginButton220 {
-            get {
-                object obj = ResourceManager.GetObject("LoginButton220", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap LoginButton242 {
-            get {
-                object obj = ResourceManager.GetObject("LoginButton242", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

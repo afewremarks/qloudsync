@@ -100,6 +100,27 @@ namespace GreenQloud
                 return Path.Combine (DatabaseFolder, ConfigFile.Read("DatabaseInfoFile"));
             }
         }
+
+        public static bool IsLastestVersion
+        {
+            get
+            {
+                return (GlobalSettings.RunningVersion == Statistics.VersionAvailable);
+            }
+        }
+
+
+
+        public static string CheckLatestVersionTextUpdate()
+        {
+            string latestversion = "";
+            if (IsLastestVersion)
+                latestversion = "This is lastest version available..";
+            else
+                latestversion = "Lastest version available: " + Statistics.VersionAvailable;
+
+            return latestversion;
+        }
     }
 }
 

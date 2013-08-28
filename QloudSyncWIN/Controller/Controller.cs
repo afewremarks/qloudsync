@@ -429,10 +429,16 @@ namespace GreenQloud {
             Program.Controller.OpenWebsite(string.Format("https://my.greenqloud.com/qloudsync?username={0}&hashValue={1}&returnUrl=/storageQloud", Credential.Username, hash));
         }
 
+        public void OpenResetPasswordWebsite()
+        {
+            Program.Controller.OpenWebsite(string.Format("https://my.greenqloud.com/resetPassword"));
+        }
+
         public void OpenSparkleShareFolder ()
         {
             OpenFolder (RuntimeSettings.HomePath);
         }
+
 
         public void ShowTransferWindow ()
         {
