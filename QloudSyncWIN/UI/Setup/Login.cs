@@ -170,5 +170,31 @@ namespace GreenQloud.UI.Setup
         {
 
         }
+
+        private void Login_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void BtnRegister_MouseHover(object sender, EventArgs e)
+        {
+            this.BtnRegister.BackgroundImage = global::GreenQloud.Properties.Resources.CreateButton139;
+        }
+
+        private void BtnRegister_MouseLeave(object sender, EventArgs e)
+        {
+            this.BtnRegister.BackgroundImage = global::GreenQloud.Properties.Resources.CreateButton159;
+        }
+
+        private void BtnContinue_MouseHover(object sender, EventArgs e)
+        {
+            this.BtnContinue.BackgroundImage = global::GreenQloud.Properties.Resources.LoginButton220;
+        }
+
+        private void BtnContinue_MouseLeave(object sender, EventArgs e)
+        {
+            this.BtnContinue.BackgroundImage = global::GreenQloud.Properties.Resources.LoginButton242;
+        }
+
     }
 }
