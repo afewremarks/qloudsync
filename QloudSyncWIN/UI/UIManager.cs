@@ -9,13 +9,14 @@ using GreenQloud.Model;
 using GreenQloud.Persistence.SQLite;
 using GreenQloud.UI.Setup;
 using System.Threading;
+using System.Reflection;
 
 namespace GreenQloud.UI
 {
     public class UIManager : Form, ApplicationUI
     {
         private NotifyIcon trayIcon;
-        private ContextMenu trayMenu;
+        private ContextMenuStrip trayMenu;
         public Login LoginWindow;
         public Ready readyWindow;
         public AboutWindow About;
@@ -60,56 +61,65 @@ namespace GreenQloud.UI
 
         private void AddToSystemTray()
         {
-            this.trayMenu = new ContextMenu();
+            this.trayMenu = new ContextMenuStrip();
             this.trayIcon = new NotifyIcon();
             this.trayIcon.Text = GlobalSettings.ApplicationName;
             this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_idle_active")).GetHicon());
-            this.trayIcon.ContextMenu = trayMenu;
+            this.trayIcon.ContextMenuStrip = trayMenu;
             this.trayIcon.Visible = true;
         }
 
         public void BuildMenu()
         {
-            MenuItem savings = new MenuItem("");
+            ToolStripMenuItem savings = new ToolStripMenuItem("");
             savings.Visible = false;
-            this.trayMenu.MenuItems.Add(savings);
-            this.trayMenu.MenuItems.Add("StorageQloud Folder", OpenStorageQloudFolder);
-            this.trayMenu.MenuItems.Add("Share/View Online...", OpenStorageQloudWebsite);
-            this.trayMenu.MenuItems.Add("-");
+            this.trayMenu.Items.Add(savings);
+            ToolStripMenuItem sqFolder = new ToolStripMenuItem("StorageQloud Folder", Icons.qloudsync_folder , OpenStorageQloudFolder);
+            this.trayMenu.Items.Add(sqFolder);
+            this.trayMenu.Items.Add("Share/View Online...", null, OpenStorageQloudWebsite);
+            this.trayMenu.Items.Add("-", null);
 
-            MenuItem recentlyChanged = new MenuItem("Recently Changed");
+            ToolStripMenuItem recentlyChanged = new ToolStripMenuItem("Recently Changed");
             recentlyChanged.Enabled = false;
-            this.trayMenu.MenuItems.Add(recentlyChanged);
+            this.trayMenu.Items.Add(recentlyChanged);
             
             //Dont remove this separators
-            MenuItem recentlyChangedSeparator = new MenuItem("-");
-            this.trayMenu.MenuItems.Add(recentlyChangedSeparator);
+            ToolStripSeparator recentlyChangedSeparator = new ToolStripSeparator();
+            this.trayMenu.Items.Add(recentlyChangedSeparator);
             //place to load recently changes
-            MenuItem recentlyChangedFinalSeparator = new MenuItem("-");
-            this.trayMenu.MenuItems.Add(recentlyChangedFinalSeparator);
+            ToolStripSeparator recentlyChangedFinalSeparator = new ToolStripSeparator();
+            this.trayMenu.Items.Add(recentlyChangedFinalSeparator);
             
-            this.trayMenu.MenuItems.Add("Help Center", OpenStorageQloudHelpCenter);
-            this.trayMenu.MenuItems.Add("About QloudSync", ShowAboutWindow);
-            this.trayMenu.MenuItems.Add("-");
-            this.trayMenu.MenuItems.Add("Quit", OnExit);
+            this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
+            this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
+            this.trayMenu.Items.Add("-", null);
+            this.trayMenu.Items.Add("Quit", null, OnExit);
 
-            this.trayMenu.Popup += (sender, args) => {
+            this.trayIcon.MouseClick += (sender, args) =>
+            {
+                if (((MouseEventArgs)args).Button == System.Windows.Forms.MouseButtons.Left)
+                {
+                    MethodInfo mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+                    mi.Invoke(this.trayIcon, null);
+                }
+            };
+
+            this.trayMenu.Opening += (sender, args) => {
                 LoadExtraItems(recentlyChangedSeparator, recentlyChangedFinalSeparator, savings);
             };
         }
 
-        private void LoadExtraItems(MenuItem separator,  MenuItem finalSeparator, MenuItem savings)
+        private void LoadExtraItems(ToolStripSeparator separator,  ToolStripSeparator finalSeparator, ToolStripMenuItem savings)
         {
 
             //First load the recently changes
-            int begin = this.trayMenu.MenuItems.IndexOf(separator);
-            int end = this.trayMenu.MenuItems.IndexOf(finalSeparator);
+            int begin = this.trayMenu.Items.IndexOf(separator);
+            int end = this.trayMenu.Items.IndexOf(finalSeparator);
             while(begin+1 < end) {
-                this.trayMenu.MenuItems.RemoveAt(begin + 1);
-                begin = this.trayMenu.MenuItems.IndexOf(separator);
-                end = this.trayMenu.MenuItems.IndexOf(finalSeparator);
+                this.trayMenu.Items.RemoveAt(begin + 1);
+                begin = this.trayMenu.Items.IndexOf(separator);
+                end = this.trayMenu.Items.IndexOf(finalSeparator);
             }
-
 
             if (Program.Controller.DatabaseLoaded())
             {
@@ -118,15 +128,28 @@ namespace GreenQloud.UI
                 
                 foreach (Event e in events)
                 {
-                    end = this.trayMenu.MenuItems.IndexOf(finalSeparator);
+                    end = this.trayMenu.Items.IndexOf(finalSeparator);
 
-                    MenuItem current = new MenuItem();
+                   ToolStripMenuItem current = new ToolStripMenuItem();
                     current.Text = e.ItemName;
+                    
+                    current.Image = Icons.folder_default;
+                    if (e.ItemType == ItemType.IMAGE)
+                        current.Image = Icons.folder_pics;
+                    if (e.ItemType == ItemType.TEXT)
+                        current.Image = Icons.folder_docs;
+                    if (e.ItemType == ItemType.VIDEO)
+                        current.Image = Icons.folder_movies;
+                    if (e.ItemType == ItemType.AUDIO)
+                        current.Image = Icons.folder_music;
+
+
+
                     current.Click += (sender, args) =>
                     {
                         Program.Controller.OpenFolder(e.ItemLocalFolderPath);
                     };
-                    this.trayMenu.MenuItems.Add(end, current);
+                    this.trayMenu.Items.Insert(end, current);
                 }
             }
 
@@ -134,9 +157,14 @@ namespace GreenQloud.UI
             //Load savings in the end...
             new Thread(() =>
             {
-                savings.Text = GetSavings();
-                if (savings.Text.Length > 0 && !savings.Visible)
-                    savings.Visible = true;
+                BeginInvoke(new Action(() =>
+                {
+                    savings.Text = GetSavings();
+                    if (savings.Text.Length > 0 && !savings.Visible)
+                    {
+                        savings.Visible = true;
+                    }
+                }));
             }).Start();
         }
 
@@ -184,6 +212,7 @@ namespace GreenQloud.UI
 
         public void OnExit(Object sender, EventArgs e)
         {
+            this.Dispose();
             Program.Controller.StopSynchronizers();
             Program.Controller.Quit();
             //throw new AbortedOperationException("Closed");
