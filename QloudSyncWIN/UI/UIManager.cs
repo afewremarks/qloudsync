@@ -45,7 +45,7 @@ namespace GreenQloud.UI
                 this.About = new AboutWindow();
                 Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
             
-                Program.Controller.SyncStart();
+                Program.Controller.SyncStart(true);
             });
             this.LoginWindow.FormClosed += ((sender, args) =>
             {
