@@ -138,12 +138,6 @@
     <Compile Include="UI\Setup\Ready.Designer.cs">
       <DependentUpon>Ready.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\Setup\Sync.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\Setup\Sync.Designer.cs">
-      <DependentUpon>Sync.cs</DependentUpon>
-    </Compile>
     <Compile Include="UI\UIManager.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -171,9 +165,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Setup\Ready.resx">
       <DependentUpon>Ready.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\Setup\Sync.resx">
-      <DependentUpon>Sync.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config">
       <SubType>Designer</SubType>

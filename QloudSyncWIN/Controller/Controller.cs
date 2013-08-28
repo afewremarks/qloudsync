@@ -155,7 +155,6 @@ namespace GreenQloud {
 
         public void UIHasLoaded ()
         {
-            checkConnection.Start();
             if (!File.Exists(RuntimeSettings.DatabaseFile))
             {
                 if (!Directory.Exists(RuntimeSettings.DatabaseFolder))
@@ -200,10 +199,10 @@ namespace GreenQloud {
             }
             else
             {
-                InitializeSynchronizers();
+                SyncStart(false);
             }
-            verifyConfigRequirements();
-            UIManager.GetInstance().BuildMenu();
+
+            
         }
 
         void CalcTimeDiff()
@@ -342,10 +341,18 @@ namespace GreenQloud {
 
 
 
-        public void SyncStart()
+        public void SyncStart(bool isFirstStart)
         {
-            FirstLoad();
-            FinishFetcher();
+            checkConnection.Start();
+            verifyConfigRequirements();
+            UIManager.GetInstance().BuildMenu();
+            if (isFirstStart)
+            {
+                FirstLoad();
+                FinishFetcher();
+            } else {
+                InitializeSynchronizers();
+            }
         }
 
         public enum START_STATE
