@@ -20,11 +20,16 @@ namespace GreenQloud.UI.Setup
         public event LoginDone OnLoginDone;
         string userMark = "GreenQloud Username";
         string passMark = "GreenQloud Password";
+        private Form parent;
 
 
-
-        public Login()
+       
+        public Login(Form parent)
         {
+            this.parent = parent;
+            this.FormClosed += (sender, args) => {
+                OnExit(sender, args);
+            };
             InitializeComponent();
             this.loadingGif.Visible = false;
             this.BtnRegister.TabIndex = 1;
@@ -32,6 +37,13 @@ namespace GreenQloud.UI.Setup
             this.TxtPassword.UseSystemPasswordChar = false;
             this.TxtPassword.Text = passMark ;
         }
+
+        public void OnExit(Object sender, EventArgs e)
+        {
+            this.Dispose();
+            ((UIManager)this.parent).OnExit(sender, e);
+        }
+
 
         //cancel button if needed
         private void BtnCancel_Click(object sender, EventArgs e)
