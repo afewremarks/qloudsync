@@ -18,8 +18,8 @@ namespace GreenQloud.UI.Setup
     {
         public delegate void LoginDone();
         public event LoginDone OnLoginDone;
-        string userMark = " Username";
-        string passMark = " Password";
+        string userMark = "GreenQloud Username";
+        string passMark = "GreenQloud Password";
 
 
 
@@ -176,24 +176,10 @@ namespace GreenQloud.UI.Setup
 
         }
 
-        private void BtnRegister_MouseHover(object sender, EventArgs e)
-        {
-            this.BtnRegister.BackgroundImage = global::GreenQloud.Properties.Resources.CreateButton139;
-        }
 
-        private void BtnRegister_MouseLeave(object sender, EventArgs e)
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            this.BtnRegister.BackgroundImage = global::GreenQloud.Properties.Resources.CreateButton159;
-        }
-
-        private void BtnContinue_MouseHover(object sender, EventArgs e)
-        {
-            this.BtnContinue.BackgroundImage = global::GreenQloud.Properties.Resources.LoginButton220;
-        }
-
-        private void BtnContinue_MouseLeave(object sender, EventArgs e)
-        {
-            this.BtnContinue.BackgroundImage = global::GreenQloud.Properties.Resources.LoginButton242;
+            Program.Controller.OpenResetPasswordWebsite();
         }
 
     }
