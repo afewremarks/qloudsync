@@ -33,7 +33,7 @@ namespace GreenQloud.UI
         private UIManager()
         {
             this.AddToSystemTray();
-            this.LoginWindow = new Setup.Login();
+            this.LoginWindow = new Setup.Login(this);
             this.readyWindow = new Ready();
             Program.Controller.ShowSetupWindowEvent += ((PageType page_type) => this.LoginWindow.ShowDialog());
             this.LoginWindow.OnLoginDone += (() =>
@@ -219,13 +219,19 @@ namespace GreenQloud.UI
         }
 
         protected override void Dispose(bool isDisposing)
-        {
+        {  
             if (isDisposing)
             {
                 trayIcon.Dispose();
             }
-
-            base.Dispose(isDisposing);
+            if (InvokeRequired)
+            {
+                BeginInvoke(new Action(() =>
+                {
+                    if (!this.IsDisposed)
+                        base.Dispose(isDisposing);
+                }));
+            }
         }
 
         internal void OnIdle()
