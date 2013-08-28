@@ -124,10 +124,16 @@
   <data name="loadinggif" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\loadinggif1.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="getStarted" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\getStarted.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="LoginButton242" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\LoginButton2421.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="about" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\about1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="LoginButton220" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\LoginButton2201.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CreateButton159" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CreateButton1591.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CreateButton139" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CreateButton1391.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
