@@ -34,16 +34,17 @@ namespace GreenQloud.UI
         {
             this.AddToSystemTray();
             this.LoginWindow = new Setup.Login();
-            this.About = new AboutWindow();
             this.readyWindow = new Ready();
-
-            Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
             Program.Controller.ShowSetupWindowEvent += ((PageType page_type) => this.LoginWindow.ShowDialog());
             this.LoginWindow.OnLoginDone += (() =>
             {
                 this.isLoged = true;
                 this.LoginWindow.Done();
                 this.readyWindow.ShowDialog();
+            
+                this.About = new AboutWindow();
+                Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
+            
                 Program.Controller.SyncStart();
             });
             this.LoginWindow.FormClosed += ((sender, args) =>
@@ -198,8 +199,7 @@ namespace GreenQloud.UI
 
         public void ShowAboutWindow(Object sender, EventArgs e)
         {
-            MessageBox.Show("QloudSync@ GreenQloud V.28 Placeholder.",
-         "QloudSync");
+            Program.Controller.ShowAboutWindow();
         }
 
         protected override void OnLoad(EventArgs e)
