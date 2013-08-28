@@ -255,6 +255,11 @@
     <None Include="Resources\loginScreen.png" />
     <None Include="Resources\LoginButton2201.png" />
     <None Include="Resources\CreateButton1391.png" />
+    <Content Include="Resources\file-3.png" />
+    <Content Include="Resources\folder-docs.png" />
+    <Content Include="Resources\folder-movies.png" />
+    <Content Include="Resources\folder-music.png" />
+    <Content Include="Resources\folder-pics.png" />
     <Content Include="x64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
