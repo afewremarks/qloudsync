@@ -44,7 +44,6 @@ namespace GreenQloud.UI.Setup
             ((UIManager)this.parent).OnExit(sender, e);
         }
 
-
         //cancel button if needed
         private void BtnCancel_Click(object sender, EventArgs e)
         {
@@ -161,7 +160,7 @@ namespace GreenQloud.UI.Setup
             BeginInvoke(new Action(() =>
             {
                 this.Hide();
-                this.Close();
+                //this.Close();
             }));
         }
 
