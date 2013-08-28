@@ -247,7 +247,14 @@
     <Content Include="lib\XamaMac.dll" />
     <Content Include="qloudsync-app2.ico" />
     <EmbeddedResource Include="Resources\loadinggif.gif" />
-    <None Include="Resources\loadinggif1.gif" />
+    <EmbeddedResource Include="Resources\loadinggif1.gif" />
+    <EmbeddedResource Include="Resources\CreateButton139.png" />
+    <EmbeddedResource Include="Resources\CreateButton1591.png" />
+    <EmbeddedResource Include="Resources\LoginButton220.png" />
+    <EmbeddedResource Include="Resources\LoginButton2421.png" />
+    <None Include="Resources\loginScreen.png" />
+    <None Include="Resources\LoginButton2201.png" />
+    <None Include="Resources\CreateButton1391.png" />
     <Content Include="x64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
