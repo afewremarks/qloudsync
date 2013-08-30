@@ -172,7 +172,8 @@ namespace GreenQloud.UI
             try
             {
                 CO2Savings saving = Statistics.EarlyCO2Savings;
-                return string.Format("Yearly CO₂ Savings: {0}", saving.Saved);
+                string spent = Statistics.TotalUsedSpace.Spent;
+                return string.Format(spent + " used | " + "{0} CO₂ saved", saving.Saved);
             } catch {
                 return ""; 
             }
