@@ -161,6 +161,7 @@ namespace GreenQloud.UI
 
                 if (savingstext.Length > 0)
                 {
+                    savings.Text = savingstext;
                     savings.Visible = true;
                 }
             }
