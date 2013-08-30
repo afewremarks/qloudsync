@@ -110,6 +110,7 @@ namespace GreenQloud.UI
             };
         }
 
+        private string savingstext = "";
         private void LoadExtraItems(ToolStripSeparator separator,  ToolStripSeparator finalSeparator, ToolStripMenuItem savings)
         {
 
@@ -152,21 +153,18 @@ namespace GreenQloud.UI
                     };
                     this.trayMenu.Items.Insert(end, current);
                 }
+
+                new Thread(() =>
+                {
+                    savingstext = GetSavings();
+                }).Start();
+
+                if (savingstext.Length > 0)
+                {
+                    savings.Visible = true;
+                }
             }
 
-
-            //Load savings in the end...
-            new Thread(() =>
-            {
-                BeginInvoke(new Action(() =>
-                {
-                    savings.Text = GetSavings();
-                    if (savings.Text.Length > 0 && !savings.Visible)
-                    {
-                        savings.Visible = true;
-                    }
-                }));
-            }).Start();
         }
 
         private string GetSavings()
