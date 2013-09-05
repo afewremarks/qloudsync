@@ -77,7 +77,8 @@ namespace GreenQloud.UI
             this.trayMenu.Items.Add(savings);
             ToolStripMenuItem sqFolder = new ToolStripMenuItem("StorageQloud Folder", Icons.qloudsync_folder , OpenStorageQloudFolder);
             this.trayMenu.Items.Add(sqFolder);
-            this.trayMenu.Items.Add("Share/View Online...", null, OpenStorageQloudWebsite);
+            ToolStripMenuItem shareview = new ToolStripMenuItem("Share/View Online...", Icons.process_syncing, OpenStorageQloudWebsite);
+            this.trayMenu.Items.Add(shareview);
             this.trayMenu.Items.Add("-", null);
 
             ToolStripMenuItem recentlyChanged = new ToolStripMenuItem("Recently Changed");
@@ -187,7 +188,7 @@ namespace GreenQloud.UI
 
         public void OpenStorageQloudRegistration(Object sender, EventArgs e)
         {
-            Program.Controller.OpenWebsite("https://my.greenqloud.com/registration");
+            Program.Controller.OpenWebsite("https://my.greenqloud.com/registration/qloudsync");
         }
         public void OpenStorageQloudWebsite(Object sender, EventArgs e){
             Program.Controller.OpenStorageQloudWebsite();
