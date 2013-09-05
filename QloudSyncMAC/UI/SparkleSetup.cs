@@ -77,90 +77,39 @@ namespace GreenQloud {
         public void ShowPage (PageType type, string [] warnings)
         {
             if (type == PageType.Login) {
-                Header      = string.Format("Welcome to {0} for StorageQloud™!", GlobalSettings.ApplicationName);
-                Description = "";
-
-                //string pretext = "<div style='font-size: 10pt; font-family: \"Lucida Grande\";'>With QloudSync you can sync your photos, music, documents and movies to and from your computer to StorageQloud, " +
-                //    "the truly green cloud storage run on 100% renewable energy! All you need to get started is a GreenQloud Username and Password. " +
-                //    "Don't have one? No problem! Click on the register button below to register in one easy step, it's totally free to try.</div>";
-                    
-
-               // hDescription = new HyperLink (pretext, "", "", "", ""){
-               //   Frame           = new RectangleF (190, Frame.Height - 230, 640 - 240, 125)
-               // };
-
-                    DescriptionText = new NSTextField () {
-                    Alignment       = NSTextAlignment.Justified,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (190, Frame.Height - 230, 640 - 240, 125),
-                    StringValue     = "With QloudSync you can sync your photos, music, documents and movies to and from your computer to StorageQloud, " +
-                    "the truly green cloud storage run on 100% renewable energy! All you need to get started is a GreenQloud Username and Password. " +
-                    "Don't have one? No problem! Click on the register button below to register in one easy step, it's totally free to try.",
-                                       
-                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
-                       "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
-                };
-
-
-                FullNameLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Right,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (165, Frame.Height - 262, 160, 17),
-                    StringValue     = "Username:",
-                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
-                        "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
-                };
-
                 FullNameTextField = new NSTextField () {
-                    Frame       = new RectangleF (330, Frame.Height - 266, 196, 22),
-                    Delegate    = new SparkleTextFieldDelegate ()
-                };
-
-                EmailLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Right,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (165, Frame.Height - 296, 160, 17),
-
-                    StringValue     = "Password:",
-                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
-                        "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
+                    Frame       = new RectangleF (90, Frame.Height - 347, 270, 47),
+                    Delegate    = new SparkleTextFieldDelegate (),
+                    Bordered = false,
+                    Alignment = NSTextAlignment.Center
                 };
 
                 NSSecureTextField PasswordTextField = new NSSecureTextField(){
-                    Frame       = new RectangleF (330, Frame.Height - 300, 196, 22),
+                    Frame       = new RectangleF (90, Frame.Height - 407, 270, 47),
                     Delegate    = new SparkleTextFieldDelegate (),
+                    Bordered = false,
+                    Alignment = NSTextAlignment.Center
                 };
-
-
                 NSTextField MessageLabel = new NSTextField () {
                     Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.WindowBackground,
+                    BackgroundColor = NSColor.Clear,
                     Bordered        = false,
                     Editable        = false,
-                    Frame           = new RectangleF (325, 60 , Frame.Width, 60),
-                    StringValue     = "The password you entered is incorrect.\n",
+                    Frame           = new RectangleF (88, 70 , Frame.Width, 60),
+                    StringValue     = "The username or password you entered is incorrect.\n",
                     Font            = NSFontManager.SharedFontManager.FontWithFamily (
                         "Lucida Grande", NSFontTraitMask.Bold, 0, 10),
                     TextColor = NSColor.Red
                 };
 
 
-                CancelButton = new NSButton () {
-                    Title = "Cancel"
-                };
-
                 RegisterButton = new NSButton () {
-                    Title = "Register"
+                    Frame = new RectangleF (30, 12, 150, 32),
+                    Title = "Create Account"
                 };
-
                 ContinueButton = new NSButton () {
-                    Title    = "Continue",
+                    Frame = new RectangleF (270, 12, 150, 32),
+                    Title    = "Log in",
                     Enabled  = false
                 };
 
@@ -175,10 +124,10 @@ namespace GreenQloud {
                     Program.Controller.OpenWebsite("https://my.greenqloud.com/registration/qloudsync");
                 };
 
-                CancelButton.Activated += delegate {
+                /*CancelButton.Activated += delegate {
                     SparkleSetupController.PageCancelled ();
                     Program.Controller.Quit();
-                };
+                };*/
 
                 ContinueButton.Activated += delegate {
                     try{
@@ -192,15 +141,16 @@ namespace GreenQloud {
                     }
                 };
 
-                ContentView.AddSubview (DescriptionText);
+                /*ContentView.AddSubview (DescriptionText);
                 ContentView.AddSubview (FullNameLabel);
                 ContentView.AddSubview (FullNameTextField);
                 ContentView.AddSubview (EmailLabel);
+                ContentView.AddSubview (PasswordTextField);*/
+
+                ContentView.AddSubview (FullNameTextField);
                 ContentView.AddSubview (PasswordTextField);
 
-
                 Buttons.Add (ContinueButton);
-                Buttons.Add (CancelButton);
                 Buttons.Add (RegisterButton);
             }
 

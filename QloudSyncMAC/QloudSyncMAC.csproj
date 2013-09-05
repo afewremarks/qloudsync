@@ -135,6 +135,7 @@
     <BundleResource Include="Pixmaps\default.png" />
     <BundleResource Include="Pixmaps\share.png" />
     <BundleResource Include="Pixmaps\file-3.png" />
+    <BundleResource Include="Pixmaps\loginScreen.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\qloudsync-app.icns">
