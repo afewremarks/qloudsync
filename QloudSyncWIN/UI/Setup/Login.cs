@@ -18,19 +18,30 @@ namespace GreenQloud.UI.Setup
     {
         public delegate void LoginDone();
         public event LoginDone OnLoginDone;
-        string userMark = " Username";
-        string passMark = " Password";
+        string userMark = "GreenQloud Username";
+        string passMark = "GreenQloud Password";
+        private Form parent;
 
 
-
-        public Login()
+       
+        public Login(Form parent)
         {
+            this.parent = parent;
+            this.FormClosed += (sender, args) => {
+                OnExit(sender, args);
+            };
             InitializeComponent();
             this.loadingGif.Visible = false;
             this.BtnRegister.TabIndex = 1;
             this.TxtUserName.Text = userMark ;
             this.TxtPassword.UseSystemPasswordChar = false;
             this.TxtPassword.Text = passMark ;
+        }
+
+        public void OnExit(Object sender, EventArgs e)
+        {
+            this.Dispose();
+            ((UIManager)this.parent).OnExit(sender, e);
         }
 
         //cancel button if needed
@@ -149,7 +160,7 @@ namespace GreenQloud.UI.Setup
             BeginInvoke(new Action(() =>
             {
                 this.Hide();
-                this.Close();
+                //this.Close();
             }));
         }
 
@@ -170,5 +181,17 @@ namespace GreenQloud.UI.Setup
         {
 
         }
+
+        private void Login_Load(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Program.Controller.OpenResetPasswordWebsite();
+        }
+
     }
 }

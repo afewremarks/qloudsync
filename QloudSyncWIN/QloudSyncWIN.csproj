@@ -138,12 +138,6 @@
     <Compile Include="UI\Setup\Ready.Designer.cs">
       <DependentUpon>Ready.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\Setup\Sync.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\Setup\Sync.Designer.cs">
-      <DependentUpon>Sync.cs</DependentUpon>
-    </Compile>
     <Compile Include="UI\UIManager.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -171,9 +165,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Setup\Ready.resx">
       <DependentUpon>Ready.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\Setup\Sync.resx">
-      <DependentUpon>Sync.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config">
       <SubType>Designer</SubType>
@@ -247,7 +238,13 @@
     <Content Include="lib\XamaMac.dll" />
     <Content Include="qloudsync-app2.ico" />
     <EmbeddedResource Include="Resources\loadinggif.gif" />
-    <None Include="Resources\loadinggif1.gif" />
+    <EmbeddedResource Include="Resources\loadinggif1.gif" />
+    <None Include="Resources\loginScreen.png" />
+    <Content Include="Resources\file-3.png" />
+    <Content Include="Resources\folder-docs.png" />
+    <Content Include="Resources\folder-movies.png" />
+    <Content Include="Resources\folder-music.png" />
+    <Content Include="Resources\folder-pics.png" />
     <Content Include="x64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -289,11 +286,8 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
   </Target>
-  -->
 </Project>
