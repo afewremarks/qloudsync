@@ -155,7 +155,6 @@ namespace GreenQloud {
 
         public void UIHasLoaded ()
         {
-            checkConnection.Start();
             if (!File.Exists(RuntimeSettings.DatabaseFile))
             {
                 if (!Directory.Exists(RuntimeSettings.DatabaseFolder))
@@ -200,10 +199,10 @@ namespace GreenQloud {
             }
             else
             {
-                InitializeSynchronizers();
+                SyncStart(false);
             }
-            verifyConfigRequirements();
-            UIManager.GetInstance().BuildMenu();
+
+            
         }
 
         void CalcTimeDiff()
@@ -250,9 +249,13 @@ namespace GreenQloud {
 
         public void StopSynchronizers()
         {
+            if (synchronizerResolver != null)
             synchronizerResolver.Stop();
+            if (recoverySynchronizer != null)
             recoverySynchronizer.Stop();
+            if (localSynchronizer != null)
             localSynchronizer.Stop();
+            if (remoteSynchronizer != null)
             remoteSynchronizer.Stop();
             Logger.LogInfo("INFO", "Synchronizers Stoped!");
         }
@@ -338,10 +341,18 @@ namespace GreenQloud {
 
 
 
-        public void SyncStart()
+        public void SyncStart(bool isFirstStart)
         {
-            FirstLoad();
-            FinishFetcher();
+            checkConnection.Start();
+            verifyConfigRequirements();
+            UIManager.GetInstance().BuildMenu();
+            if (isFirstStart)
+            {
+                FirstLoad();
+                FinishFetcher();
+            } else {
+                InitializeSynchronizers();
+            }
         }
 
         public enum START_STATE
@@ -429,10 +440,16 @@ namespace GreenQloud {
             Program.Controller.OpenWebsite(string.Format("https://my.greenqloud.com/qloudsync?username={0}&hashValue={1}&returnUrl=/storageQloud", Credential.Username, hash));
         }
 
+        public void OpenResetPasswordWebsite()
+        {
+            Program.Controller.OpenWebsite(string.Format("https://my.greenqloud.com/resetPassword"));
+        }
+
         public void OpenSparkleShareFolder ()
         {
             OpenFolder (RuntimeSettings.HomePath);
         }
+
 
         public void ShowTransferWindow ()
         {

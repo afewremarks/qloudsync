@@ -417,7 +417,6 @@ namespace GreenQloud {
                 };
 
                 if (co2Update == null) {
-                    Console.WriteLine ("Iniciando CO2");
                     co2Update = new Thread (delegate() {
                         while (true) {
                             try {
