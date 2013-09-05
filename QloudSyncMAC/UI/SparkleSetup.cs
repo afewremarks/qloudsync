@@ -77,6 +77,10 @@ namespace GreenQloud {
         public void ShowPage (PageType type, string [] warnings)
         {
             if (type == PageType.Login) {
+                background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "loginScreen.png");
+
+                Console.WriteLine (background_image_path);
+
                 FullNameTextField = new NSTextField () {
                     Frame       = new RectangleF (90, Frame.Height - 347, 270, 47),
                     Delegate    = new SparkleTextFieldDelegate (),
@@ -335,86 +339,16 @@ namespace GreenQloud {
             }
 
             if (type == PageType.Finished) {
-                Header      = "Sweet! All done and ready to sync your life…";
-                WinningText = new NSTextField () {
-                    Alignment       = NSTextAlignment.Justified,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (190, Frame.Height - 230, 640 - 240, 125),
-                    StringValue     = "All your StorageQloud files are ready for you now in your local StorageQloud folder. Anything you put into that folder and any changes you make in it will now be automatically synced to StorageQloud and vice versa. Enjoy and thanks for being truly green!",
-
-                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
-                        "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
-                };
-                DisclaimText = new NSTextField () {
-                    Alignment       = NSTextAlignment.Justified,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (190, Frame.Height - 400, 640 - 240, 125),
-                    StringValue     = "",
-
-                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
-                        "Lucida Grande", NSFontTraitMask.Condensed, 0, 13)
-                };
-
-                ContentView.AddSubview (WinningText);
-                ContentView.AddSubview (DisclaimText);
-
-
-
-
-
-                //Description = string.Format("All your StorageQloud files are ready for you now in your local StorageQloud folder. Anything you put into that folder and any changes you make in it will now be automatically synced to StorageQloud and vice versa. Enjoy and thanks for being truly green!");
-
-
-                if (warnings != null && warnings.Length > 0) {
-                    WarningImage = NSImage.ImageNamed ("NSInfo");
-                    WarningImage.Size = new SizeF (24, 24);
-
-                    WarningImageView = new NSImageView () {
-                        Image = WarningImage,
-                        Frame = new RectangleF (200, Frame.Height - 175, 24, 24)
-                    };
-
-                    WarningTextField = new NSTextField () {
-                        Frame           = new RectangleF (235, Frame.Height - 245, 325, 100),
-                        StringValue     = warnings [0],
-                        BackgroundColor = NSColor.WindowBackground,
-                        Bordered        = false,
-                        Editable        = false,
-                        Font            = SparkleUI.Font
-
-                    };
-
-                  
-                    ContentView.AddSubview (WarningImageView);
-                    ContentView.AddSubview (WarningTextField);
-                }
-
-
+                this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getStarted.png");
                 OpenFolderButton = new NSButton () {
                     Title = "Show folder"
                 };
-
-                FinishButton = new NSButton () {
-                    Title = "Finish"
-                };
-
-
                 OpenFolderButton.Activated += delegate {
-                    SparkleSetupController.OpenFolderClicked ();
-                };
-
-                FinishButton.Activated += delegate {
                     SparkleSetupController.FinishPageCompleted ();
+                    SparkleSetupController.GetStartedClicked ();
+
                 };
-
-
-                Buttons.Add (FinishButton);
                 Buttons.Add (OpenFolderButton);
-
                 NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
             }
 

@@ -16,6 +16,7 @@ namespace GreenQloud {
         public List <NSButton> Buttons = new List <NSButton> ();
         public string Header;
         new public string Description;
+        public string background_image_path;
 
         private NSImage background_image;
         private NSImageView background_image_view;
@@ -35,14 +36,8 @@ namespace GreenQloud {
 
             Center ();
 
-            string background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "loginScreen.png");
-
-            this.background_image = new NSImage (background_image_path) {
-                Size = new SizeF (450, 542)
-            };
-
             this.background_image_view = new NSImageView () {
-                Image = this.background_image,
+                //Image = this.background_image,
                 Frame = new RectangleF (0, 0, 450, 542)
             };
 
@@ -81,6 +76,13 @@ namespace GreenQloud {
 
         public void ShowAll ()
         {
+            if (background_image_path != null) {
+                this.background_image = new NSImage (background_image_path) {
+                    Size = new SizeF (450, 542)
+                };
+                this.background_image_view.Image = this.background_image;
+            }
+
             this.header_text_field.StringValue      = Header;
             this.description_text_field.StringValue = Description;
             
