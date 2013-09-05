@@ -98,6 +98,7 @@
     <None Include="lib\XamaMac.dll" />
     <None Include="lib\LitS3.dll" />
     <None Include="lib\Newtonsoft.Json.dll" />
+    <None Include="Pixmaps\file-default.png" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" />
@@ -136,6 +137,8 @@
     <BundleResource Include="Pixmaps\share.png" />
     <BundleResource Include="Pixmaps\file-3.png" />
     <BundleResource Include="Pixmaps\loginScreen.png" />
+    <BundleResource Include="Pixmaps\getStarted.png" />
+    <BundleResource Include="Pixmaps\LoginButton242.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\qloudsync-app.icns">

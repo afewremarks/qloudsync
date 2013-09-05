@@ -489,6 +489,10 @@ namespace GreenQloud {
             NSWorkspace.SharedWorkspace.OpenUrl (new NSUrl (url));
         }
 
+        public void OpenStorageQloudWebSite(){
+            string hash = Crypto.GetHMACbase64 (Credential.SecretKey, Credential.PublicKey, true);
+            Program.Controller.OpenWebsite (string.Format ("https://my.greenqloud.com/qloudsync?username={0}&hashValue={1}&returnUrl=/storageQloud", Credential.Username, hash));
+        }
 
         public void HandleReconnection(){
             OnIdle();

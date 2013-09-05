@@ -85,7 +85,7 @@ namespace GreenQloud {
         private void HideDockIcon ()
         {
             // Currently not supported, here for completeness sake (see Apple's docs)
-            // NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.None;
+            NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.Prohibited;
         }
 
 

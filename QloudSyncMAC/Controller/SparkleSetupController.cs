@@ -228,7 +228,7 @@ namespace GreenQloud {
         public void AddPageCompleted (string username, string password)
         {
             ProgressBarPercentage = 1.0;
-            ChangePageEvent (PageType.Syncing, null);
+            ChangePageEvent (PageType.Finished, null);
 
             Program.Controller.FolderFetched    += AddPageFetchedDelegate;
             Program.Controller.FolderFetchError += AddPageFetchErrorDelegate;
@@ -288,9 +288,10 @@ namespace GreenQloud {
             bool valid_password = (password.Length > 0 && !password.Contains (" "));
             UpdateCryptoSetupContinueButtonEvent (valid_password);
         }
-        public void OpenFolderClicked ()
+        public void GetStartedClicked ()
         {
             Program.Controller.OpenSparkleShareFolder();
+            Program.Controller.OpenStorageQloudWebSite ();
             FinishPageCompleted ();
         }
 
@@ -298,7 +299,6 @@ namespace GreenQloud {
         public void FinishPageCompleted ()
         {
             this.fetch_prior_history = false;
-
             this.current_page = PageType.None;
             HideWindowEvent ();
         }
