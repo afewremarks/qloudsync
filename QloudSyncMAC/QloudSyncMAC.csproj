@@ -139,6 +139,9 @@
     <BundleResource Include="Pixmaps\loginScreen.png" />
     <BundleResource Include="Pixmaps\getStarted.png" />
     <BundleResource Include="Pixmaps\LoginButton242.png" />
+    <BundleResource Include="Pixmaps\LoginButton220.png" />
+    <BundleResource Include="Pixmaps\CreateButton159.png" />
+    <BundleResource Include="Pixmaps\getstartedbutton.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\qloudsync-app.icns">
