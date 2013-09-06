@@ -76,7 +76,16 @@ namespace GreenQloud {
 
         public void ShowPage (PageType type, string [] warnings)
         {
+            EventHandler closeAppDelegate = delegate {
+                Program.Controller.Quit();
+            };
+            EventHandler hiddeWindowDelegate = delegate {
+                SparkleSetupController.FinishPageCompleted ();
+            };
+
             if (type == PageType.Login) {
+                this.WillClose += closeAppDelegate;
+
                 background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "loginScreen.png");
 
                 Console.WriteLine (background_image_path);
@@ -108,21 +117,26 @@ namespace GreenQloud {
 
 
                 RegisterButton = new NSButton () {
-                    Frame = new RectangleF (30, 12, 150, 32),
-                    Title = "Create Account"
+                    Frame = new RectangleF (49, 18, 137, 40),
+                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "CreateButton159.png")),
+                    Transparent = false,
+                    Bordered = false,
+                    Enabled  = true
                 };
                 ContinueButton = new NSButton () {
-                    Frame = new RectangleF (270, 12, 150, 32),
-                    Title    = "Log in",
-                    Enabled  = false
+                    Frame = new RectangleF (264, 18, 137, 40),
+                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "LoginButton242.png")),
+                    Transparent = false,
+                    Bordered = false,
+                    Enabled  = true
                 };
 
-                (PasswordTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+                /*(PasswordTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
                     if(PasswordTextField.StringValue.Length < 3)
                         ContinueButton.Enabled = false;
                     else
                         ContinueButton.Enabled = true;
-                };
+                };*/
 
                 RegisterButton.Activated += delegate {
                     Program.Controller.OpenWebsite("https://my.greenqloud.com/registration/qloudsync");
@@ -159,194 +173,23 @@ namespace GreenQloud {
             }
 
             if (type == PageType.Syncing) {
-                Header      = "Winning! QloudSync is now connected to your \nGreenQloud account…";
-                Description = "You have successfully logged into GreenQloud and now QloudSync will find your truly green™ files in StorageQloud and sync them to your computer in a folder named StorageQloud.";
 
-
-                ProgressIndicator = new NSProgressIndicator () {
-                    Frame         = new RectangleF (190, Frame.Height - 250, 640 - 150 - 80, 20),
-                    Style         = NSProgressIndicatorStyle.Bar,
-                    MinValue      = 0.0,
-                    MaxValue      = 100.0,
-                    Indeterminate = false,
-                    DoubleValue   = SparkleSetupController.ProgressBarPercentage
-                };
-
-                ProgressIndicator.StartAnimation (this);
-
-                NSTextField Loading = new NSTextField () {
-                    Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (190, Frame.Height - 230, 640 - 150 - 80, 20),
-                    StringValue     = "Starting synchronizers",
-                    Font            = SparkleUI.Font
-                };
-
-                NSTextField Calculating = new NSTextField () {
-                    Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (190, Frame.Height - 260, 640 - 150 - 80, 20),
-                    StringValue     = "Calculating changes with remote repository",
-                    Font            = SparkleUI.Font
-                };
-                NSTextField Synchronizing = new NSTextField () {
-                    Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (190, Frame.Height - 290, 640 - 150 - 80, 20),
-                    StringValue     = "Synchronizing changes",
-                    Font            = SparkleUI.Font
-                };
-
-
-
-
-                StopButton = new NSButton () {
-                    Title = "Cancel",
-                    Enabled = false
-                };
-
-                FinishButton = new NSButton () {
-                    Title = "Finish",
-                    Enabled = false
-                };
-
-                SparkleSetupController.UpdateProgressBarEvent += delegate (double percentage) {
-                    InvokeOnMainThread (() => {
-                        ProgressIndicator.DoubleValue = percentage;
-                    });
-                };
-
-                SparkleSetupController.UpdateTimeRemaningEvent += delegate (double time){
-                    InvokeOnMainThread (() => {
-                        try{
-                            TimeSpan t = TimeSpan.FromSeconds(time);
-                            string stime = "";
-                            if (t.Hours >0)
-                                stime = string.Format("{0} hours and {1} minutes",t.Hours, t.Minutes);
-                            else if (t.Minutes>0)
-                                stime = string.Format("{0} minutes and {1} seconds",t.Minutes, t.Seconds);
-                            else if(t.Seconds>0)
-                                stime = string.Format("{0} seconds", t.Seconds); 
-                            else
-                                stime = "estimating";
-                                //TimeRemaining.StringValue = string.Format("Time remaining: {0}", stime);
-                        }catch{
-
-                        }
-                    });
-                };
-
-                StopButton.Activated += delegate {
-                    SparkleSetupController.SyncingCancelled ();
-                };
-
-                LoadingStart += delegate() {
-                    InvokeOnMainThread (() => {
-                        ContentView.AddSubview (Loading);
-                        if(!Loading.StringValue.EndsWith("✓")) {
-                            if(Loading.StringValue.EndsWith("..."))
-                                Loading.StringValue = Loading.StringValue.Replace("...", "");
-                            else
-                                Loading.StringValue += ".";
-                        }
-
-                        if(!StopButton.Enabled)
-                            StopButton.Enabled = true;
-                    });
-                };
-                CalculatingStart += delegate() {
-                    InvokeOnMainThread (() => {
-                        ContentView.AddSubview (Calculating);
-                        if(!Calculating.StringValue.EndsWith("✓")) {
-                            if(Calculating.StringValue.EndsWith("..."))
-                                Calculating.StringValue = Calculating.StringValue.Replace("...", "");
-                            else
-                                Calculating.StringValue += ".";
-                        }
-                    });
-                };
-                SynchronizingStart += delegate() {
-                    InvokeOnMainThread (() => {
-                        ContentView.AddSubview (Synchronizing);
-                        if(!Synchronizing.StringValue.EndsWith("✓")) {
-                            if(Synchronizing.StringValue.EndsWith("..."))
-                                Synchronizing.StringValue = Synchronizing.StringValue.Replace("...", "");
-                            else
-                                Synchronizing.StringValue += ".";
-                        }
-                    });
-                };
-                LoadingDone += delegate() {
-                    InvokeOnMainThread (() => {
-                        if(!Loading.StringValue.EndsWith("✓")){
-                            Loading.StringValue.Replace(".", "");
-                            Loading.StringValue += "... ✓";
-                        }
-                    });
-                };
-                CalculatingDone += delegate() {
-                    InvokeOnMainThread (() => {
-                        if(!Calculating.StringValue.EndsWith("✓")){
-                            Calculating.StringValue.Replace(".", "");
-                            Calculating.StringValue += "... ✓";
-                        }
-                    });
-                };
-                SynchronizingDone += delegate() {
-                    InvokeOnMainThread (() => {
-                        if(!Synchronizing.StringValue.EndsWith("✓")){
-                            Synchronizing.StringValue.Replace(".", "");
-                            Synchronizing.StringValue += "... ✓";
-                        }
-                    });
-                };
-                Thread thread = new Thread(delegate() {
-                    while(Program.Controller.StartState != Controller.START_STATE.SYNC_DONE) {
-                        if(Program.Controller.StartState != Controller.START_STATE.NULL){
-                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.LOAD_START){
-                                SparkleSetup.LoadingStart();
-                            }
-                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.CALCULATING_START){
-                                SparkleSetup.CalculatingStart();
-                            }
-                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.SYNC_START){
-                                SparkleSetup.SynchronizingStart();
-                            }
-
-                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.LOAD_DONE){
-                                SparkleSetup.LoadingDone();
-                            }
-                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.CALCULATING_DONE){
-                                SparkleSetup.CalculatingDone();
-                            }
-                            if((int)Program.Controller.StartState >= (int)Controller.START_STATE.SYNC_DONE){
-                                SparkleSetup.SynchronizingDone();
-                            }
-                        }
-                        Thread.Sleep(2000);
-                    }
-                });
-                thread.Start ();
-
-                Buttons.Add (FinishButton);
-                Buttons.Add (StopButton);
             }
 
             if (type == PageType.Finished) {
+                this.WillClose -= closeAppDelegate;
+                this.WillClose += hiddeWindowDelegate;
                 this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getStarted.png");
                 OpenFolderButton = new NSButton () {
-                    Title = "Show folder"
+                    Frame = new RectangleF (157, 18, 137, 40),
+                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getstartedbutton.png")),
+                    Transparent = false,
+                    Bordered = false,
+                    Enabled  = true
                 };
                 OpenFolderButton.Activated += delegate {
                     SparkleSetupController.FinishPageCompleted ();
                     SparkleSetupController.GetStartedClicked ();
-
                 };
                 Buttons.Add (OpenFolderButton);
                 NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);

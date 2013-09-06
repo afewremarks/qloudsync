@@ -28,7 +28,7 @@ namespace GreenQloud {
         {
             SetFrame (new RectangleF (0, 0, 450, 542), true);
 
-            StyleMask   = NSWindowStyle.Titled;
+            StyleMask   = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
             MaxSize     = new SizeF (450, 542);
             MinSize     = new SizeF (450, 542);
             HasShadow   = true;
