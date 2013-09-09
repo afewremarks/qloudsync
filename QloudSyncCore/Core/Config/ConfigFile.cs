@@ -17,8 +17,8 @@ namespace GreenQloud
         private static string INIT_CONFIG_FOLDER = AppDomain.CurrentDomain.BaseDirectory;
         private static string INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, ".." + Path.DirectorySeparatorChar.ToString() + "Resources" + Path.DirectorySeparatorChar.ToString() + "qloudsync.config");
         private static string FULLNAME = Path.Combine(CONFIG_FOLDER, "qloudsync.config");
-
-
+        private static Hashtable ht = new Hashtable ();
+        private static object _readLock = new object();
         public ConfigFile ()
         {
         }
@@ -38,18 +38,23 @@ namespace GreenQloud
         }
 
         public static Hashtable Read(){
-            if (File.Exists (FULLNAME)) {
-                string[] lines = File.ReadAllLines (FULLNAME);
-                Hashtable ht = new Hashtable ();
-                foreach(string line in lines){
-                    int index = line.IndexOf (":");
-                    string key = line.Substring (0, index);
-                    string value = line.Substring (index+1, line.Length - index-1);
-                    ht [key] = value;
-                }
-                return ht;
-            } else
-                throw new ConfigurationException ("Config file do not exists.");
+
+            lock (_readLock) {
+                if (ht.Count > 0)
+                    return ht;
+
+                if (File.Exists (FULLNAME)) {
+                    string[] lines = File.ReadAllLines (FULLNAME);
+                    foreach (string line in lines) {
+                        int index = line.IndexOf (":");
+                        string key = line.Substring (0, index);
+                        string value = line.Substring (index + 1, line.Length - index - 1);
+                        ht [key] = value;
+                    }
+                    return ht;
+                } else
+                    throw new ConfigurationException ("Config file do not exists.");
+            }
         }
 
         public static string Read(string key){
