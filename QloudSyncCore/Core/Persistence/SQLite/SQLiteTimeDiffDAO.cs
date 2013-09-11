@@ -12,7 +12,7 @@ namespace GreenQloud.Persistence.SQLite
 
         #region implemented abstract members of RepositoryDAO
 
-        SQLiteDatabase database = new SQLiteDatabase();
+        SQLiteDatabase database = SQLiteDatabase.Instance();
 
         public override void Create (double e)
         {

@@ -11,8 +11,16 @@ namespace GreenQloud.Persistence.SQLite{
     public class SQLiteDatabase
     {
         String dbConnection;
+        private SqliteConnection cnn;
+        private static SQLiteDatabase instance = new SQLiteDatabase();
 
-        public SQLiteDatabase(){
+        private SQLiteDatabase(){
+            cnn = new SqliteConnection(ConnectionString);
+            cnn.Open();
+        }
+
+        public static SQLiteDatabase Instance(){
+            return instance;
         }
 
         
@@ -54,13 +62,11 @@ namespace GreenQloud.Persistence.SQLite{
         public DataTable GetDataTable(string sql)
         {
             DataTable dt = new DataTable();
-            try
-            {
-                SqliteConnection cnn = new SqliteConnection(ConnectionString);
-                cnn.Open();
-                SqliteCommand mycommand = new SqliteCommand(cnn);
+            SqliteDataReader reader;
+            using (SqliteCommand mycommand = new SqliteCommand (cnn)) {
                 mycommand.CommandText = sql;
-                SqliteDataReader reader = mycommand.ExecuteReader();
+                reader = mycommand.ExecuteReader ();
+                
                 // Add all the columns.
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
@@ -129,13 +135,6 @@ namespace GreenQloud.Persistence.SQLite{
                     
                     dt.Rows.Add(row);
                 }
-                
-                close(ref reader, ref cnn, ref mycommand);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine (e.StackTrace);
-                throw new Exception(e.Message);
             }
             return dt;
         }
@@ -152,21 +151,18 @@ namespace GreenQloud.Persistence.SQLite{
         }
         public int ExecuteNonQuery(string sql, bool returnId)
         {
-            SqliteConnection cnn = new SqliteConnection(ConnectionString);
-            cnn.Open();
-            SqliteCommand mycommand = new SqliteCommand(cnn);
-            mycommand.CommandText = sql;
-            int result = mycommand.ExecuteNonQuery();
-  
-            if (returnId) {
-                string last_insert_rowid = @"select last_insert_rowid()";
-                mycommand.CommandText = last_insert_rowid; 
-                System.Object temp = mycommand.ExecuteScalar();
-                int id = int.Parse (temp.ToString());
-                return id;
+            int result;
+            using (SqliteCommand mycommand = new SqliteCommand (cnn)) {
+                mycommand.CommandText = sql;
+                result = mycommand.ExecuteNonQuery ();
+                if (returnId) {
+                    string last_insert_rowid = @"select last_insert_rowid()";
+                    mycommand.CommandText = last_insert_rowid; 
+                    System.Object temp = mycommand.ExecuteScalar ();
+                    int id = int.Parse (temp.ToString ());
+                    return id;
+                }
             }
-
-            close(ref cnn, ref mycommand);
             return result;
         }
         
@@ -177,19 +173,14 @@ namespace GreenQloud.Persistence.SQLite{
         /// <returns>A string.</returns>
         public string ExecuteScalar(string sql)
         {
-            SqliteConnection cnn = new SqliteConnection(ConnectionString);
-            cnn.Open();
-            SqliteCommand mycommand = new SqliteCommand(cnn);
+            object value;
+            SqliteCommand mycommand = new SqliteCommand (cnn);
             mycommand.CommandText = sql;
-            object value = mycommand.ExecuteScalar();
-            cnn.Close();
+            value = mycommand.ExecuteScalar ();
             if (value != null)
             {
                 return value.ToString();
             }
-
-            close(ref cnn, ref mycommand);
-
             return "";
         }
         
@@ -314,20 +305,6 @@ namespace GreenQloud.Persistence.SQLite{
             }
         }       
 
-        private void close (ref SqliteConnection cnn, ref SqliteCommand mycommand)
-        {
-            mycommand.Dispose ();
-            mycommand = null;
-            cnn.Close ();
-            cnn = null;
-        }
-
-        private void close (ref SqliteDataReader reader, ref SqliteConnection cnn, ref SqliteCommand mycommand)
-        {
-            reader.Close ();
-            reader = null;
-            close(ref cnn, ref mycommand);
-        }
     }
 }
 #endif

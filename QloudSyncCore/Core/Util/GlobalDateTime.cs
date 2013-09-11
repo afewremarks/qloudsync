@@ -11,6 +11,8 @@ namespace GreenQloud
 {
 	public class GlobalDateTime
 	{
+        private static double diff;
+        private static bool loadedDiff = false;
         public static DateTime Now {
             get{
                 return NowFromDiff;
@@ -18,8 +20,10 @@ namespace GreenQloud
         }
         public static DateTime NowFromDiff {
             get {
-                SQLiteTimeDiffDAO dao = new SQLiteTimeDiffDAO ();
-                double diff = dao.Last;
+                if (!loadedDiff) {
+                    diff = new SQLiteTimeDiffDAO ().Last;
+                    loadedDiff = true;
+                }
                 DateTime local = DateTime.Now;
                 DateTime diffTime = local.AddMilliseconds (diff);
                 return diffTime;
