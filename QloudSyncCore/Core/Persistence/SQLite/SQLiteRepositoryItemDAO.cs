@@ -12,7 +12,7 @@ namespace GreenQloud.Persistence.SQLite
     {
         #region implemented abstract members of RepositoryItemDAO
 
-        SQLiteDatabase database = new SQLiteDatabase();
+        SQLiteDatabase database = SQLiteDatabase.Instance();
 
         public RepositoryItem Create (Event e)
         {
