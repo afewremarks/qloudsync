@@ -3,6 +3,7 @@ using System.Threading;
 using System.IO;
 using GreenQloud.Repository;
 using System.Linq;
+using Mono.Data.Sqlite;
 
 namespace GreenQloud {
 
@@ -18,7 +19,7 @@ namespace GreenQloud {
         #endif
         public static void Main (string [] args)
         {
-
+            Mono.Data.Sqlite.SqliteConnection.SetConfig (Mono.Data.Sqlite.SQLiteConfig.Serialized);
             Controller = new Controller ();
             UI = new SparkleUI ();
             if (!program_mutex.WaitOne (0, false)) {
