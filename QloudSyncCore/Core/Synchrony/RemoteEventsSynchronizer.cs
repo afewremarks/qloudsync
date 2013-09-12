@@ -46,7 +46,7 @@ namespace GreenQloud.Synchrony
 
             JArray jsonObjects = JSONHelper.GetInfoArray(uri);
             foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
-                if(!((string)jsonObject["application"]).Equals(GlobalSettings.FullApplicationName)){
+                if(jsonObject["application"] != null && !((string)jsonObject["application"]).Equals(GlobalSettings.FullApplicationName)){
                     Event e = new Event();
                     e.RepositoryType = RepositoryType.REMOTE;
                     e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
