@@ -22,7 +22,7 @@ namespace GreenQloud.Synchrony
     public abstract class AbstractSynchronizer<T>
     {
         private Thread _thread;
-        protected bool _stoped;
+        protected volatile bool _stoped;
         static T instance;
         protected Object lockk = new object();
 
