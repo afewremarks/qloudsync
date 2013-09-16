@@ -15,7 +15,7 @@ namespace GreenQloud.Persistence.SQLite{
         private static SQLiteConnection cnn = new SQLiteConnection(ConnectionString);
         private static SQLiteDatabase instance = new SQLiteDatabase();
 
-        public SQLiteDatabase(){
+        private SQLiteDatabase(){
             cnn.Open();
         }
 
