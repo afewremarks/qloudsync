@@ -91,16 +91,20 @@ namespace GreenQloud {
                 Console.WriteLine (background_image_path);
 
                 FullNameTextField = new NSTextField () {
-                    Frame       = new RectangleF (90, Frame.Height - 347, 270, 47),
+                    Frame       = new RectangleF (90, Frame.Height - 337, 270, 25),
                     Delegate    = new SparkleTextFieldDelegate (),
                     Bordered = false,
+                    Bezeled = false,
+                    FocusRingType = NSFocusRingType.None,
                     Alignment = NSTextAlignment.Center
                 };
 
                 NSSecureTextField PasswordTextField = new NSSecureTextField(){
-                    Frame       = new RectangleF (90, Frame.Height - 407, 270, 47),
+                    Frame       = new RectangleF (90, Frame.Height - 397, 270, 25),
                     Delegate    = new SparkleTextFieldDelegate (),
                     Bordered = false,
+                    Bezeled = false,
+                    FocusRingType = NSFocusRingType.None,
                     Alignment = NSTextAlignment.Center
                 };
                 NSTextField MessageLabel = new NSTextField () {
