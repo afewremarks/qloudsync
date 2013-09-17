@@ -41,9 +41,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="LitS3">
-      <HintPath>lib\LitS3.dll</HintPath>
-    </Reference>
     <Reference Include="System.Transactions" />
     <Reference Include="MonoMac">
       <HintPath>lib\MonoMac.dll</HintPath>
@@ -52,7 +49,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Persistence\SQLite\SQLiteDataBaseWin.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Exception\DisconnectionException.cs" />
     <Compile Include="Core\Exception\AccessDeniedException.cs" />
     <Compile Include="Core\Exception\PhysicalLocalRepositoryException.cs" />
@@ -101,6 +97,29 @@
     <Compile Include="Core\Model\SQTotalUsed.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
     <Compile Include="Core\IO\QloudSyncFileSystemWatcherMAC.cs" />
+    <Compile Include="Core\LitS3\AccessControl.cs" />
+    <Compile Include="Core\LitS3\AddObject.cs" />
+    <Compile Include="Core\LitS3\AssemblyInfo.cs" />
+    <Compile Include="Core\LitS3\Bucket.cs" />
+    <Compile Include="Core\LitS3\BucketAccess.cs" />
+    <Compile Include="Core\LitS3\CopyObject.cs" />
+    <Compile Include="Core\LitS3\CreateBucket.cs" />
+    <Compile Include="Core\LitS3\DeleteBucket.cs" />
+    <Compile Include="Core\LitS3\DeleteObject.cs" />
+    <Compile Include="Core\LitS3\GetAllBuckets.cs" />
+    <Compile Include="Core\LitS3\GetBucketLocation.cs" />
+    <Compile Include="Core\LitS3\GetObject.cs" />
+    <Compile Include="Core\LitS3\Identity.cs" />
+    <Compile Include="Core\LitS3\ListEntries.cs" />
+    <Compile Include="Core\LitS3\ListObjects.cs" />
+    <Compile Include="Core\LitS3\ObjectTransfer.cs" />
+    <Compile Include="Core\LitS3\S3Authorizer.cs" />
+    <Compile Include="Core\LitS3\S3ErrorCode.cs" />
+    <Compile Include="Core\LitS3\S3Exception.cs" />
+    <Compile Include="Core\LitS3\S3Headers.cs" />
+    <Compile Include="Core\LitS3\S3Request.cs" />
+    <Compile Include="Core\LitS3\S3Response.cs" />
+    <Compile Include="Core\LitS3\S3Service.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -113,5 +132,8 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Mono.Data.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Core\LitS3\" />
   </ItemGroup>
 </Project>
