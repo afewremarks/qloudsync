@@ -40,8 +40,10 @@ namespace GreenQloud.UI
             {
                 this.isLoged = true;
                 this.LoginWindow.Done();
-                this.readyWindow.ShowDialog();
-            
+                new Thread(delegate()
+                {
+                    this.readyWindow.ShowDialog();
+                }).Start();
                 this.About = new AboutWindow();
                 Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
             
