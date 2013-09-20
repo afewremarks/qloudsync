@@ -188,15 +188,8 @@ namespace GreenQloud {
             }
 
             Program.Controller.OnIdle += delegate {
-
                 CurrentState = IconState.Idle;
-                    
-                if (System.IO.Directory.GetDirectories(RuntimeSettings.HomePath).Length == 0 && System.IO.Directory.GetFiles (RuntimeSettings.HomePath).Length < 2)
-                    StateText = string.Format("Welcome to {0}!",GlobalSettings.ApplicationName);
-                else
-                    StateText = "✓  Up to date ";
-
-                
+                StateText = "✓  Up to date ";
                 UpdateQuitItemEvent (QuitItemEnabled);
                 UpdateStatusItemEvent (StateText, this.up_to_date);
                 UpdateIconEvent (CurrentState);
@@ -205,8 +198,8 @@ namespace GreenQloud {
 
 
             Program.Controller.OnSyncing += delegate {
-                bool syncDown = SynchronizerResolver.GetInstance().SyncStatus == SyncStatus.DOWNLOADING;
-                bool syncUp = SynchronizerResolver.GetInstance().SyncStatus == SyncStatus.UPLOADING;
+                bool syncDown = Program.Controller.IsDownloading();
+                bool syncUp = Program.Controller.IsUploading();
 
                 if(syncDown && syncUp){
                     CurrentState = IconState.Syncing;

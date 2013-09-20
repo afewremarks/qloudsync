@@ -28,14 +28,14 @@ namespace GreenQloud
 
         public static string RunningVersion {
             get {
-                return ConfigFile.Read ("RunningVersion");
+                return ConfigFile.GetInstance().Read ("RunningVersion");
             }
         }
 
         public static int IntervalBetweenChecksStatistics{
             get{
                 try{
-                    return int.Parse(ConfigFile.Read("IntervalBetweenChecksStatistics"));
+                    return int.Parse(ConfigFile.GetInstance().Read("IntervalBetweenChecksStatistics"));
                 }
                 catch{
                     Logger.LogInfo ("GlobalSettings", "Invalid IntervalBetweenChecksStatistics value");
@@ -51,50 +51,50 @@ namespace GreenQloud
         }
         public static string FullApplicationName {
             get {
-                return ApplicationName + "; InstanceID: "+ConfigFile.Read("InstanceID");
+                return ApplicationName + "; InstanceID: "+ConfigFile.GetInstance().Read("InstanceID");
             }
         }
 
         public static string HomeFolderName {
             get {
-                return ConfigFile.Read("HomeFolderName");
+                return ConfigFile.GetInstance().Read("HomeFolderName");
             }
         }
 
         public static string SuffixNameBucket {
             get{
-                return ConfigFile.Read ("SuffixNameBucket");
+                return ConfigFile.GetInstance().Read ("SuffixNameBucket");
             }
         }
 
         public static string AvailableOSXVersion {
             get{
-                return ConfigFile.Read ("AvailableOSXVersion");
+                return ConfigFile.GetInstance().Read ("AvailableOSXVersion");
             }
         }
         
         public static string StorageHost {
             get {
-                return ConfigFile.Read ("StorageHost");
+                return ConfigFile.GetInstance().Read ("StorageHost");
             }
         }
 
         public static string StoragePort {
             get {
-                return ConfigFile.Read ("StoragePort");
+                return ConfigFile.GetInstance().Read ("StoragePort");
             }
         }
         
         public static string AuthenticationURL {
             get {
-                return ConfigFile.Read ("AuthenticationURL");
+                return ConfigFile.GetInstance().Read ("AuthenticationURL");
             }
         }
         
         public static string Trash {
             get {
                 if (trash == null)
-                    trash = ConfigFile.Read ("Trash");
+                    trash = ConfigFile.GetInstance().Read ("Trash");
                 return trash;
             }
         }
@@ -102,7 +102,7 @@ namespace GreenQloud
         public static int UploadTimeout {
             get {
                 try{
-                return int.Parse(ConfigFile.Read ("UploadTimeout"));
+                return int.Parse(ConfigFile.GetInstance().Read ("UploadTimeout"));
                 }
                 catch{
                     Logger.LogInfo ("GlobalSettings", "Invalid UploadTimeout value");
@@ -115,7 +115,7 @@ namespace GreenQloud
         public static int IntervalBetweenChecksRemoteRepository {
             get {
                 try{
-                    return int.Parse(ConfigFile.Read ("IntervalBetweenChecksRemoteRepository"));
+                    return int.Parse(ConfigFile.GetInstance().Read ("IntervalBetweenChecksRemoteRepository"));
                 }
                 catch{
                     Logger.LogInfo ("GlobalSettings", "Invalid IntervalBetweenChecksRemoteRepository value");

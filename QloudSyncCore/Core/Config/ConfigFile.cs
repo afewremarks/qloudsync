@@ -6,24 +6,18 @@ using System.Collections;
 namespace GreenQloud
 {
 
-    /* TO DO List
-     * in first run, move the config file of bundle to config folder (or create)
-     * change all config class to accept Read(key) in replace of AppSettings
-     * handle exceptions
-     */ 
-    public class ConfigFile
+    public class ConfigFile : AbstractConfigFile<ConfigFile>
     {
-        private static string CONFIG_FOLDER = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), GlobalSettings.ApplicationName);
-        private static string INIT_CONFIG_FOLDER = AppDomain.CurrentDomain.BaseDirectory;
-        private static string INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, ".." + Path.DirectorySeparatorChar.ToString() + "Resources" + Path.DirectorySeparatorChar.ToString() + "qloudsync.config");
-        private static string FULLNAME = Path.Combine(CONFIG_FOLDER, "qloudsync.config");
-        private static Hashtable ht = new Hashtable ();
-        private static object _readLock = new object();
-        public ConfigFile ()
-        {
+        protected string INIT_CONFIG_FOLDER;
+        protected string INIT_FULLNAME;
+
+        public ConfigFile(){
+            INIT_CONFIG_FOLDER = AppDomain.CurrentDomain.BaseDirectory;
+            INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, ".." + Path.DirectorySeparatorChar.ToString() + "Resources" + Path.DirectorySeparatorChar.ToString() + "qloudsync.config");
+            FULLNAME = Path.Combine(CONFIG_FOLDER, "qloudsync.config");
         }
 
-        public static void UpdateConfigFile ()
+        public override void UpdateConfigFile ()
         {
             if(!File.Exists(INIT_FULLNAME)){
                 INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, "qloudsync.config");
@@ -35,49 +29,6 @@ namespace GreenQloud
             }catch(Exception e){
                     Logger.LogInfo("Update Config File Error", e);
             }
-        }
-
-        public static Hashtable Read(){
-
-            lock (_readLock) {
-                if (ht.Count > 0)
-                    return ht;
-
-                if (File.Exists (FULLNAME)) {
-                    string[] lines = File.ReadAllLines (FULLNAME);
-                    foreach (string line in lines) {
-                        int index = line.IndexOf (":");
-                        string key = line.Substring (0, index);
-                        string value = line.Substring (index + 1, line.Length - index - 1);
-                        ht [key] = value;
-                    }
-                    return ht;
-                } else
-                    throw new ConfigurationException ("Config file do not exists.");
-            }
-        }
-
-        public static string Read(string key){
-            try{
-                return Read () [key].ToString();
-            }catch{
-                throw new ConfigurationException ("Key "+key+" is not found");
-            }
-        }
-
-        public static bool Write(string key, string value){
-            Hashtable properties = Read ();
-            properties [key] = value;
-            try{
-                string texto = "";
-                foreach (DictionaryEntry pair in properties){
-                    texto+=string.Format("{0}:{1}\n",pair.Key,pair.Value);
-                }
-                File.WriteAllText(FULLNAME, texto);
-            }catch (Exception e){
-                throw new ConfigurationException ("Unknown exception: "+e.GetType());
-            }
-            return true;
         }
     }
 }

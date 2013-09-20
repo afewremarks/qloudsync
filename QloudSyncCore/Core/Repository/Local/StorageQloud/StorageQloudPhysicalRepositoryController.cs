@@ -11,12 +11,8 @@ namespace GreenQloud.Repository.Local
 {
     public class StorageQloudPhysicalRepositoryController : AbstractController, IPhysicalRepositoryController
     {
-        //NEW
-        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
-
         public List<RepositoryItem> Items {
             get {
-                LocalRepository repo = repositoryDAO.FindOrCreateByRootName (RuntimeSettings.HomePath);
                 DirectoryInfo dir = new System.IO.DirectoryInfo (repo.Path);
                 List<RepositoryItem> list = new List<RepositoryItem>();
                 if(dir.Exists){
@@ -27,7 +23,6 @@ namespace GreenQloud.Repository.Local
         }
 
         public List<RepositoryItem> GetItems (DirectoryInfo dir) {
-            LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (dir.FullName);
             List<RepositoryItem> list = new List<RepositoryItem>();
             if(dir.Exists) {
                 foreach (FileInfo fileInfo in dir.GetFiles ("*", System.IO.SearchOption.TopDirectoryOnly).ToList ()) {
@@ -63,8 +58,7 @@ namespace GreenQloud.Repository.Local
 
 
         //OLD
-        SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO();
-        public StorageQloudPhysicalRepositoryController () : base ()
+        public StorageQloudPhysicalRepositoryController (LocalRepository repo) : base (repo)
         {
 
         }
@@ -150,7 +144,6 @@ namespace GreenQloud.Repository.Local
         {
             FileInfo file = new FileInfo (fullLocalName);
             if (file.Exists){
-                LocalRepository repo = repoDAO.GetRepositoryByItemFullName (fullLocalName);
                 string key = fullLocalName.Substring (repo.Path.Length);
                 return RepositoryItem.CreateInstance(repo, key);
             }
@@ -161,7 +154,6 @@ namespace GreenQloud.Repository.Local
         public void CreateFolder(RepositoryItem item){
             if (!Exists(item)){
                 CreatePath (item.LocalAbsolutePath);
-
                 BlockWatcher (item.LocalAbsolutePath);
                 Directory.CreateDirectory (item.LocalAbsolutePath);
                 UnblockWatcher (item.LocalAbsolutePath);   
@@ -183,7 +175,7 @@ namespace GreenQloud.Repository.Local
             if (!Directory.Exists(path))
             {
                 BlockWatcher(path);
-                DirectoryInfo di = Directory.CreateDirectory(path);
+                Directory.CreateDirectory(path);
                 UnblockWatcher(path);
             }
         }

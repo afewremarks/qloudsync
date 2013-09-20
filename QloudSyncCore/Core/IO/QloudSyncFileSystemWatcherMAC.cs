@@ -15,7 +15,7 @@ namespace GreenQloud
 {
     public class QloudSyncFileSystemWatcher
     {
-        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+        private LocalRepository repo;
         private IPhysicalRepositoryController physicalController;
         private ArrayList ignoreBag;
         private object _bagLock = new object();
@@ -23,11 +23,13 @@ namespace GreenQloud
         Thread runLoop;
         IntPtr stream;
 
-        public QloudSyncFileSystemWatcher(string pathwatcher)
+        public QloudSyncFileSystemWatcher(LocalRepository repo)
         {
+            this.repo = repo;
             ignoreBag = new ArrayList();
-            physicalController = new StorageQloudPhysicalRepositoryController ();
-            string watchedFolder = pathwatcher;
+            //Passar no construtor o param repo.....
+            physicalController = new StorageQloudPhysicalRepositoryController (repo);
+            string watchedFolder = this.repo.Path;
             this.callback = this.Callback;
 
             IntPtr path = CFStringCreateWithCString (IntPtr.Zero, watchedFolder, 0);
@@ -112,10 +114,9 @@ namespace GreenQloud
 
                     if (!ignore) {
 
-                        Event e = new Event ();
+                        Event e = new Event (repo);
                         List<Event> subEvents = new List<Event> ();
-                        LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName (paths[i]);
-                        string key = paths [i].Substring (repo.Path.Length);
+                        string key = repo.RemoteFolder + paths [i].Substring (repo.Path.Length);
                         if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key.EndsWith (Path.DirectorySeparatorChar.ToString()))
                             key += Path.DirectorySeparatorChar;
                         e.Item = RepositoryItem.CreateInstance (repo, key);
@@ -131,7 +132,7 @@ namespace GreenQloud
                             }
                             if (items.Count > 0) {
                                 foreach(RepositoryItem item in items){
-                                    Event e2 = new Event ();
+                                    Event e2 = new Event (repo);
                                     e2.EventType = EventType.CREATE;
                                     e2.Item = item;
                                     subEvents.Add (e2);
@@ -151,7 +152,7 @@ namespace GreenQloud
                             if ((i + 1) < numEvents && (ids [i] == ids [i+1] - 1)) {
                                 e.EventType = EventType.MOVE;
                                 i++;
-                                string key2 = paths [i].Substring (repo.Path.Length);
+                                string key2 = repo.RemoteFolder + paths [i].Substring (repo.Path.Length);
                                 if (flags [i].HasFlag (FSEventStreamEventFlagItem.IsDir) && !key2.EndsWith (Path.DirectorySeparatorChar.ToString()))
                                     key2 += Path.DirectorySeparatorChar;
                                 e.Item.BuildResultItem (key2);

@@ -12,6 +12,7 @@ using QloudSync.Repository;
 using System.Threading;
 using LitS3;
 using System.Web.Util;
+using GreenQloud.Synchrony;
 
 namespace GreenQloud.Repository
 {
@@ -19,14 +20,14 @@ namespace GreenQloud.Repository
     {
         private StorageQloudPhysicalRepositoryController physicalController;
         private S3Connection connection;
-        public RemoteRepositoryController (){
+        public RemoteRepositoryController (LocalRepository repo) : base(repo){
             connection = new S3Connection ();
-            physicalController = new StorageQloudPhysicalRepositoryController ();
+            physicalController = new StorageQloudPhysicalRepositoryController (repo);
         }
 
         public List<GreenQloud.Model.RepositoryItem> Items {
             get {
-                return GetInstancesOfItems (GetS3Objects().Where(i => !Key(i).StartsWith(".")).ToList());
+                return GetInstancesOfItems (GetS3Objects().Where(i => Key(i).StartsWith(repo.RemoteFolder) && !Key(i).Equals(repo.RemoteFolder)).ToList());
             }
         }
 
@@ -310,8 +311,6 @@ namespace GreenQloud.Repository
         {
             string key = Key (s3item);
             if (key != string.Empty) {
-                LocalRepository repo;
-                repo = new Persistence.SQLite.SQLiteRepositoryDAO ().FindOrCreateByRootName (RuntimeSettings.HomePath);
                 try{
                     GetObjectResponse meta = GetMetadata (key);
                     if(meta != null){

@@ -135,39 +135,21 @@ namespace GreenQloud {
                     Enabled  = true
                 };
 
-                /*(PasswordTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
-                    if(PasswordTextField.StringValue.Length < 3)
-                        ContinueButton.Enabled = false;
-                    else
-                        ContinueButton.Enabled = true;
-                };*/
-
                 RegisterButton.Activated += delegate {
                     Program.Controller.OpenWebsite("https://my.greenqloud.com/registration/qloudsync");
                 };
-
-                /*CancelButton.Activated += delegate {
-                    SparkleSetupController.PageCancelled ();
-                    Program.Controller.Quit();
-                };*/
 
                 ContinueButton.Activated += delegate {
                     try{
                         S3Connection.Authenticate (FullNameTextField.StringValue, PasswordTextField.StringValue);
                         Credential.Username = FullNameTextField.StringValue;
-                        SparkleSetupController.AddPageCompleted (FullNameTextField.StringValue, PasswordTextField.StringValue);
+                        SparkleSetupController.LoginDone();
                     }
                     catch (System.Net.WebException)
                     {
                         ContentView.AddSubview (MessageLabel);
                     }
                 };
-
-                /*ContentView.AddSubview (DescriptionText);
-                ContentView.AddSubview (FullNameLabel);
-                ContentView.AddSubview (FullNameTextField);
-                ContentView.AddSubview (EmailLabel);
-                ContentView.AddSubview (PasswordTextField);*/
 
                 ContentView.AddSubview (FullNameTextField);
                 ContentView.AddSubview (PasswordTextField);
@@ -176,8 +158,22 @@ namespace GreenQloud {
                 Buttons.Add (RegisterButton);
             }
 
-            if (type == PageType.Syncing) {
-
+            if (type == PageType.ConfigureFolders) {
+                this.WillClose -= closeAppDelegate;
+                this.WillClose += hiddeWindowDelegate;
+                //this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getStarted.png");
+                OpenFolderButton = new NSButton () {
+                    Frame = new RectangleF (157, 18, 137, 40),
+                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getstartedbutton.png")),
+                    Transparent = false,
+                    Bordered = false,
+                    Enabled  = true
+                };
+                OpenFolderButton.Activated += delegate {
+                    SparkleSetupController.Finish ();
+                };
+                Buttons.Add (OpenFolderButton);
+                NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
             }
 
             if (type == PageType.Finished) {

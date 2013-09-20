@@ -7,7 +7,7 @@ namespace GreenQloud
     {
         public static bool NotificationsEnabled {
             get {
-                return bool.Parse (ConfigFile.Read ("NotificationsEnabled"));
+                return bool.Parse (ConfigFile.GetInstance().Read ("NotificationsEnabled"));
             }
             set
             {

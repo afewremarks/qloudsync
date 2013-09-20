@@ -21,20 +21,21 @@ namespace GreenQloud.Synchrony
     
     public abstract class AbstractSynchronizer<T>
     {
+        protected LocalRepository repo;
         private Thread _thread;
         protected volatile bool _stoped;
-        static T instance;
         protected Object lockk = new object();
 
-        public AbstractSynchronizer() 
+        public AbstractSynchronizer(LocalRepository repo) 
         {
+            this.repo = repo;
             _stoped = true;
             _thread = new Thread(new ThreadStart(this.GenericRun)); 
         }
 
-        public static T GetInstance(){
-            if (instance == null)
-                instance = Activator.CreateInstance<T> ();
+        public static T NewInstance(LocalRepository repo){
+            T instance;
+            instance = (T)Activator.CreateInstance(typeof(T), repo);
             return instance;
         }
 
@@ -68,7 +69,7 @@ namespace GreenQloud.Synchrony
                 } else {
                     Logger.LogInfo ("SYNCHRONIZER ERROR", webx);
                     Logger.LogInfo ("INFO", "Preparing to run rescue mode...");
-                    Program.Controller.HandleError ();
+                    Program.Controller.HandleError (repo);
                 }
             } catch (SocketException sock) {
                 Logger.LogInfo ("LOST CONNECTION", sock);
@@ -76,7 +77,7 @@ namespace GreenQloud.Synchrony
             } catch (Exception e) {
                 Logger.LogInfo ("ERROR", e);
                 Logger.LogInfo ("INFO", "Preparing to run rescue mode...");
-                Program.Controller.HandleError ();
+                Program.Controller.HandleError (repo);
             }
         }
 

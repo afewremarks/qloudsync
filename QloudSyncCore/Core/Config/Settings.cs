@@ -30,7 +30,7 @@ namespace GreenQloud {
 
         protected static void AppSettingsUpdate (string name, string value)
         {
-            ConfigFile.Write(name,  value);     
+            ConfigFile.GetInstance().Write(name,  value);     
         }
     }
 }

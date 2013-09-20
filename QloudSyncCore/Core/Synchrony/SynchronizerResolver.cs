@@ -32,17 +32,21 @@ namespace GreenQloud.Synchrony
     public class SynchronizerResolver : AbstractSynchronizer<SynchronizerResolver>
     {
         private SyncStatus status;
-        protected EventDAO eventDAO = new SQLiteEventDAO();
-        protected RepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO ();
-        protected IPhysicalRepositoryController physicalLocalRepository = new StorageQloudPhysicalRepositoryController ();
-        protected RemoteRepositoryController remoteRepository = new RemoteRepositoryController();
+        protected EventDAO eventDAO;
+        protected RepositoryItemDAO repositoryItemDAO;
+        protected IPhysicalRepositoryController physicalLocalRepository;
+        protected RemoteRepositoryController remoteRepository;
 
 
         public delegate void SyncStatusChangedHandler (SyncStatus status);
         public event SyncStatusChangedHandler SyncStatusChanged = delegate {};
 
-        public SynchronizerResolver () : base ()
+        public SynchronizerResolver (LocalRepository repo) : base (repo)
         {
+            eventDAO = new SQLiteEventDAO(repo);
+            repositoryItemDAO = new SQLiteRepositoryItemDAO ();
+            physicalLocalRepository = new StorageQloudPhysicalRepositoryController (repo);
+            remoteRepository = new RemoteRepositoryController(repo);
         }
 
         public SyncStatus SyncStatus {

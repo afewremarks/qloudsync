@@ -14,10 +14,14 @@ namespace GreenQloud.Persistence.SQLite
 	{
 
         SQLiteRepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO();
-        #region implemented abstract members of EventDAO
-
         SQLiteDatabase database = SQLiteDatabase.Instance ();
+        LocalRepository repo;
 
+        public SQLiteEventDAO(LocalRepository repo){
+            this.repo = repo;
+        }
+        public SQLiteEventDAO(){
+        }
         public override void Create (Event e)
         {
             if (e == null)
@@ -33,8 +37,8 @@ namespace GreenQloud.Persistence.SQLite
                         dateOfEvent = GlobalDateTime.NowUniversalString;
                     }
 
-                    string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET, TRY_QNT, RESPONSE) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\", \"{11}\", \"{12}\")", 
-                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket, e.TryQnt, e.Response.ToString());
+                    string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET, TRY_QNT, RESPONSE, RepositoryId) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\", \"{11}\", \"{12}\", \"{13}\")", 
+                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), bool.FalseString, dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket, e.TryQnt, e.Response.ToString(), e.Repository.Id);
 
                     e.Id = (int) database.ExecuteNonQuery (sql, true);
 
@@ -76,14 +80,14 @@ namespace GreenQloud.Persistence.SQLite
 
         public override void IgnoreAllEquals (Event e)
         {            
-            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{1}\", RESPONSE = \"{4}\" WHERE ItemId =\"{0}\" AND TYPE = '{2}' AND EventID > '{3}' AND SYNCHRONIZED <> \"{5}\"", e.Item.Id , bool.TrueString , e.EventType, e.Id, RESPONSE.IGNORED.ToString(), bool.TrueString));
+            database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{1}\", RESPONSE = \"{4}\" WHERE ItemId =\"{0}\" AND TYPE = '{2}' AND EventID > '{3}' AND SYNCHRONIZED <> \"{5}\" AND RepositoryId = '{6}'", e.Item.Id , bool.TrueString , e.EventType, e.Id, RESPONSE.IGNORED.ToString(), bool.TrueString, repo.Id));
         }
 
         public override void IgnoreAllIfDeleted (Event e)
         {            
-            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\"", e.Item.Id, EventType.DELETE, e.Id, bool.TrueString));
+            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\" AND RepositoryId = '{4}'", e.Item.Id, EventType.DELETE, e.Id, bool.TrueString, repo.Id));
             if(list.Count > 0) { 
-                database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE ItemId =\"{2}\" AND EventID < '{3}' ", bool.TrueString, RESPONSE.IGNORED.ToString(), e.Item.Id , list.Last().Id));
+                database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE ItemId =\"{2}\" AND EventID < '{3}'  AND RepositoryId = '{4}' ", bool.TrueString, RESPONSE.IGNORED.ToString(), e.Item.Id , list.Last().Id, repo.Id));
                 repositoryItemDAO.MarkAsMoved (e.Item);
                 if (e.EventType == EventType.CREATE) {
                     database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE EventID = '{2}'", bool.TrueString, RESPONSE.IGNORED.ToString(), list.Last().Id));
@@ -98,7 +102,7 @@ namespace GreenQloud.Persistence.SQLite
                 toCombine = e;
 
             if(e == null) { 
-                List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\"", e.Item.Id, EventType.MOVE, e.Id, bool.TrueString));
+                List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\"  AND RepositoryId = '{4}'", e.Item.Id, EventType.MOVE, e.Id, bool.TrueString, repo.Id));
                 if(list.Count > 0) { 
                     toCombine = list.First ();   
                 }
@@ -110,13 +114,13 @@ namespace GreenQloud.Persistence.SQLite
                 if (toCombine != null){
                     List<Event> list2;
                     do {
-                        list2 = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\"", toCombine.Item.ResultItemId, EventType.MOVE, e.Id, bool.TrueString));
+                        list2 = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\" AND RepositoryId = '{4}'", toCombine.Item.ResultItemId, EventType.MOVE, e.Id, bool.TrueString, repo.Id));
                         if (list2.Count > 0) { 
                             combineWith = list2.First ();  
                             database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE EventID = '{2}'", bool.TrueString, RESPONSE.IGNORED.ToString(), combineWith.Id));
                             repositoryItemDAO.MarkAsMoved (toCombine.Item.ResultItem);
                             toCombine.Item.ResultItem = combineWith.Item.ResultItem;
-                            database.ExecuteNonQuery (string.Format("UPDATE RepositoryItem SET  ResultItemId =\"{0}\" WHERE RepositoryItemID = '{1}'", combineWith.Item.ResultItemId, toCombine.Item.Id));
+                            database.ExecuteNonQuery (string.Format("UPDATE RepositoryItem SET  ResultItemId =\"{0}\" WHERE RepositoryItemID = '{1}'  AND RepositoryId = '{2}'", combineWith.Item.ResultItemId, toCombine.Item.Id, repo.Id));
                         }
                     } while (list2 != null && list2.Count > 0);
                 }
@@ -128,7 +132,7 @@ namespace GreenQloud.Persistence.SQLite
         public override void IgnoreAllIfMoved (Event e){
             CombineMultipleMoves (e);
             e = FindById(e.Id);
-            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\"", e.Item.Id, EventType.MOVE, e.Id, bool.TrueString));
+            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> \"{3}\" AND RepositoryId = '{4}'", e.Item.Id, EventType.MOVE, e.Id, bool.TrueString, repo.Id));
             if(list.Count > 0) { 
                 if (e.EventType == EventType.CREATE || e.EventType == EventType.UPDATE) {
                     database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = \"{0}\", RESPONSE = \"{1}\" WHERE EventID = '{2}'", bool.TrueString, RESPONSE.IGNORED.ToString(), list.First().Id));
@@ -145,7 +149,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public override List<Event> EventsNotSynchronized {
             get {
-                string sql = string.Format ("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\" AND INSERTTIME < '{1}' ORDER BY EventID ASC", bool.FalseString, GlobalDateTime.Now.AddSeconds (-10).ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+                string sql = string.Format ("SELECT * FROM EVENT WHERE SYNCHRONIZED =\"{0}\" AND INSERTTIME < '{1}' AND RepositoryId = '{2}' ORDER BY EventID ASC", bool.FalseString, GlobalDateTime.Now.AddSeconds (-10).ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"), repo.Id);
                 List<Event> list = Select (sql);
                 return list;
             }
@@ -168,9 +172,9 @@ namespace GreenQloud.Persistence.SQLite
         
         public override string LastSyncTime{
             get{
-                List<Event> events = Select("SELECT * FROM EVENT WHERE REPOSITORY = \"REMOTE\" ORDER BY INSERTTIME DESC LIMIT 1");
+                List<Event> events = Select(string.Format("SELECT * FROM EVENT WHERE REPOSITORY = \"REMOTE\" AND RepositoryId = '{0}' ORDER BY INSERTTIME DESC LIMIT 1", repo.Id));
                 if (events.Count == 0)
-                    events = Select("SELECT * FROM EVENT WHERE REPOSITORY = \"LOCAL\" ORDER BY INSERTTIME DESC LIMIT 1");
+                    events = Select(string.Format("SELECT * FROM EVENT WHERE REPOSITORY = \"LOCAL\" AND RepositoryId = '{0}' ORDER BY INSERTTIME DESC LIMIT 1", repo.Id));
 
                 string time = null;
                 if (events.Count > 0)
@@ -189,12 +193,10 @@ namespace GreenQloud.Persistence.SQLite
             }
         }
 
-        #endregion
-
         public bool ExistsConflict (Event e)
         {
             System.Object temp = database.ExecuteScalar (
-                            string.Format ("SELECT count(*) FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND SYNCHRONIZED <> \"{2}\"", e.Item.Id, e.EventType.ToString(), bool.TrueString)
+                string.Format ("SELECT count(*) FROM EVENT WHERE ItemId =\"{0}\" AND TYPE = '{1}' AND SYNCHRONIZED <> \"{2}\"  AND RepositoryId = '{3}'", e.Item.Id, e.EventType.ToString(), bool.TrueString, repo.Id)
                         );
             int count = int.Parse (temp.ToString());
 
@@ -215,7 +217,7 @@ namespace GreenQloud.Persistence.SQLite
             List<Event> events = new List<Event>();
             DataTable dt = database.GetDataTable(sql);
             foreach(DataRow dr in dt.Rows){
-                Event e = new Event();
+                Event e = new Event(LocalRepository.CreateInstance(int.Parse(dr[14].ToString())));
                 e.Id = int.Parse (dr[0].ToString());
                 e.Item = repositoryItemDAO.GetById (int.Parse (dr[1].ToString()));
                 e.EventType = (EventType) Enum.Parse(typeof(EventType), dr[2].ToString());

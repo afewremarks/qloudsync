@@ -14,7 +14,7 @@ namespace GreenQloud {
     public interface ApplicationController {
         void Initialize ();
         void HandleDisconnection();
-        void HandleError();
+        void HandleError(LocalRepository repo);
         void HandleSyncStatusChanged();
         bool DatabaseLoaded();
     }

@@ -26,8 +26,7 @@ namespace GreenQloud
             }
         }
 
-        
-        public static string HomePath{
+        /*public static string HomePath{
             get {
                 if (homePath == null)
                 {
@@ -44,10 +43,10 @@ namespace GreenQloud
         
         public static string TmpPath {
             get {
-                return Path.Combine(HomePath, ConfigFile.Read ("Tmp"));
+                return Path.Combine(HomePath, ConfigFile.GetInstance().Read ("Tmp"));
             }
         }
-        
+        */
         public static string ConfigPath {
             get {
                 if (configPath == null)
@@ -63,7 +62,7 @@ namespace GreenQloud
         public static string LogFilePath {
             get {
                 if (logfilepath == null){
-                    logfilepath = Path.Combine (ConfigPath, ConfigFile.Read ("LogFile"));
+                    logfilepath = Path.Combine (ConfigPath, ConfigFile.GetInstance().Read ("LogFile"));
                 }
                 return logfilepath;
             }
@@ -80,24 +79,24 @@ namespace GreenQloud
 
         public static string DatabaseFolder {
             get{
-                return Path.Combine (ConfigPath, ConfigFile.Read ("DatabaseFolder"));
+                return Path.Combine (ConfigPath, ConfigFile.GetInstance().Read ("DatabaseFolder"));
             }
         }
 
         public static string DatabaseFile {
             get{
-                return Path.Combine (DatabaseFolder, ConfigFile.Read ("DatabaseFile"));
+                return Path.Combine (DatabaseFolder, ConfigFile.GetInstance().Read ("DatabaseFile"));
             }
         }
 
         public static string DatabaseVersion {
             get{
-                return ConfigFile.Read("DatabaseVersion");
+                return ConfigFile.GetInstance().Read("DatabaseVersion");
             }
         }
         public static string DatabaseInfoFile {
             get{
-                return Path.Combine (DatabaseFolder, ConfigFile.Read("DatabaseInfoFile"));
+                return Path.Combine (DatabaseFolder, ConfigFile.GetInstance().Read("DatabaseInfoFile"));
             }
         }
 
