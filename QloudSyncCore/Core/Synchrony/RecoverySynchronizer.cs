@@ -13,11 +13,15 @@ using GreenQloud.Persistence.SQLite;
 {
     public class RecoverySynchronizer : AbstractSynchronizer<RecoverySynchronizer>
     {
-        private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
-        private IPhysicalRepositoryController localRepository = new StorageQloudPhysicalRepositoryController ();
-        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
+        private IRemoteRepositoryController remoteRepository;
+        private IPhysicalRepositoryController localRepository;
+        private SQLiteEventDAO eventDAO;
 
-        public RecoverySynchronizer () : base () { }
+        public RecoverySynchronizer (LocalRepository repo) : base (repo) {
+            remoteRepository = new RemoteRepositoryController (repo);
+            localRepository = new StorageQloudPhysicalRepositoryController (repo);
+            eventDAO = new SQLiteEventDAO(repo);
+        }
 
         public override void Run() {
             Synchronize ();
@@ -36,9 +40,25 @@ using GreenQloud.Persistence.SQLite;
                 return finishedSync;
             }
         }
+
+        void CheckRemoteFolder ()
+        {
+            Event e = new Event (repo);
+            RepositoryItem item1 = RepositoryItem.CreateInstance(repo, repo.RemoteFolder);
+            e.Item = item1;
+            e.RepositoryType = RepositoryType.LOCAL;
+            e.EventType = EventType.CREATE;
+            eventDAO.Create (e);
+            if (remoteRepository.Exists (item1)) {
+                eventDAO.UpdateToSynchronized (e, RESPONSE.IGNORED);
+            }
+        }
+
         public void Synchronize (){
             eventDAO.RemoveAllUnsynchronized();
             startedSync = true; //only after remove all unsync events.
+
+            CheckRemoteFolder ();
 
             List<RepositoryItem> localItems = localRepository.Items;
             List<RepositoryItem> remoteItems = remoteRepository.Items;
@@ -80,7 +100,7 @@ using GreenQloud.Persistence.SQLite;
 
         private Event SolveFromRemote (RepositoryItem item)
         {
-            Event e = new Event ();
+            Event e = new Event (repo);
             e.Item = item;
             if (localRepository.Exists (e.Item)) {
                 string actualRemoteEtag = remoteRepository.RemoteETAG (e.Item);
@@ -116,7 +136,7 @@ using GreenQloud.Persistence.SQLite;
 
         private Event SolveFromLocal (RepositoryItem item)
         {
-            Event e = new Event ();
+            Event e = new Event (repo);
             e.Item = item;
             if (localRepository.Exists (e.Item)) {
                 if (e.Item.UpdatedAt == null) {

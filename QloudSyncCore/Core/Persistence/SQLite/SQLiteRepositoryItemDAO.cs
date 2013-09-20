@@ -147,11 +147,10 @@ namespace GreenQloud.Persistence.SQLite
             List<RepositoryItem> items = new List<RepositoryItem>();
             DataTable dt = database.GetDataTable(sql);
             foreach(DataRow dr in dt.Rows){
-                RepositoryItem item = new RepositoryItem ();
+                RepositoryItem item = new RepositoryItem (LocalRepository.CreateInstance(int.Parse(dr[2].ToString())));
                 item.Id = int.Parse(dr[0].ToString());
                 item.Key = dr[1].ToString();
                 if(dr[2].ToString().Length > 0)
-                item.Repository = LocalRepository.CreateInstance(int.Parse(dr[2].ToString()));
                 item.IsFolder = bool.Parse (dr[3].ToString());
                 if(dr[4].ToString().Length > 0)
                 item.ResultItemId = int.Parse (dr[4].ToString());

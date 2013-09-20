@@ -12,6 +12,7 @@ using MonoMac.Foundation;
 namespace GreenQloud {
 
     public enum PageType {
+
         None,
         Setup,
         Add,
@@ -22,7 +23,8 @@ namespace GreenQloud {
         Tutorial,
         CryptoSetup,
         CryptoPassword,
-        Login
+        Login,
+        ConfigureFolders
     }
 
     public enum FieldState {
@@ -224,8 +226,11 @@ namespace GreenQloud {
             UpdateAddProjectButtonEvent (fields_valid);
         }
 
-
-        public void AddPageCompleted (string username, string password)
+        public void LoginDone ()
+        {
+            ChangePageEvent (PageType.ConfigureFolders, null);
+        }
+        public void Finish ()
         {
             ProgressBarPercentage = 1.0;
             ChangePageEvent (PageType.Finished, null);
@@ -267,14 +272,6 @@ namespace GreenQloud {
             ProgressBarPercentage = percentage;
             UpdateProgressBarEvent (ProgressBarPercentage);
             UpdateTimeRemaningEvent (time);
-        }
-
-        public void SyncingCancelled ()
-        {
-            Program.Controller.StopSynchronizers();
-            this.current_page = PageType.None;
-            HideWindowEvent ();
-            throw new AbortedOperationException ("Stop made by user.");
         }
 
         public void ErrorPageCompleted ()

@@ -28,8 +28,9 @@ using System.Threading;
 
 	public class Event
 	{
-		public Event ()
+        public Event (LocalRepository repo)
 		{
+            this.Repository = repo;
             User = Credential.Username;
             Application = GlobalSettings.FullApplicationName;
             ApplicationVersion = GlobalSettings.RunningVersion;
@@ -56,6 +57,10 @@ using System.Threading;
         public RepositoryItem Item{
 			set; get;
 		}
+
+        public LocalRepository Repository{
+            set; get;
+        }
 
         public bool HaveResultItem {
             get {
@@ -114,7 +119,7 @@ using System.Threading;
         }
 
         public override string ToString(){
-            string s = String.Format ("[{3}] {0} {1} {2}", EventType, RepositoryType, Item.LocalAbsolutePath, Id);
+            string s = String.Format ("[{3}] {0} {1} {2}", EventType, RepositoryType, Item.LocalAbsolutePath,  Id);
             if(HaveResultItem){
                 s += String.Format ("  Result Object: {0} \n",Item.ResultItem.LocalAbsolutePath);
             }

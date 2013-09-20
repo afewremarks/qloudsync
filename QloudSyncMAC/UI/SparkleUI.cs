@@ -57,7 +57,7 @@ namespace GreenQloud {
             using (var a = new NSAutoreleasePool ())
             {
                 NSImage folder_icon = NSImage.ImageNamed ("qloudsync-folder.icns");
-                NSWorkspace.SharedWorkspace.SetIconforFile (folder_icon, RuntimeSettings.HomePath, 0);
+                //NSWorkspace.SharedWorkspace.SetIconforFile (folder_icon, RuntimeSettings.HomePath, 0);
             }
         }
 
@@ -66,7 +66,6 @@ namespace GreenQloud {
         {
             using (var a = new NSAutoreleasePool ())
             {
-                SetFolderIcon ();
                 Program.Controller.UIHasLoaded ();
                 NSApplication.Main (new string [0]);
             }

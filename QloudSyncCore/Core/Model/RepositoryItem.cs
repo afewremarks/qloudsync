@@ -25,8 +25,10 @@ namespace GreenQloud.Model
     {
         private static readonly SQLiteRepositoryItemDAO dao =  new SQLiteRepositoryItemDAO ();
 
-        public RepositoryItem ()
-        {}
+        public RepositoryItem (LocalRepository repo)
+        {
+            this.Repository = repo;
+        }
         public static RepositoryItem CreateInstance(int id)
         {
             return dao.GetById (id);
@@ -38,8 +40,7 @@ namespace GreenQloud.Model
 
         public static RepositoryItem CreateInstance (LocalRepository repo, string key, string eTag, string localETag){
             key = key.Replace(Path.DirectorySeparatorChar.ToString(), "/");
-            RepositoryItem item = new RepositoryItem();
-            item.Repository = repo;
+            RepositoryItem item = new RepositoryItem(repo);
             item.Key = key;
             item.ETag = eTag;
             item.LocalETag = localETag;
@@ -52,8 +53,7 @@ namespace GreenQloud.Model
         }
 
         public static RepositoryItem CreateInstance (LocalRepository repo, ListEntry entry){
-            RepositoryItem item = new RepositoryItem();
-            item.Repository = repo;
+            RepositoryItem item = new RepositoryItem(repo);
             string key = "";
             if (entry is CommonPrefix) {
                 key = ((CommonPrefix)entry).Prefix;
@@ -167,16 +167,22 @@ namespace GreenQloud.Model
 
         public string LocalAbsolutePath {
             get {
-                return ToPathString(Path.Combine(Repository.Path, Key));
+                return ToPathString(Path.Combine(Repository.Path, KeyRelative));
             }
         }
 
         public string LocalFolderPath {
             get {
                 string path = "";
-                path = Path.Combine (Repository.Path, Key);
+                path = Path.Combine (Repository.Path, KeyRelative);
                 path = path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar.ToString())); 
                 return ToPathString (path);
+            }
+        }
+
+        public string KeyRelative {
+            get {
+                return Key.Substring (Repository.RemoteFolder.Length);
             }
         }
 

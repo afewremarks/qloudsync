@@ -17,15 +17,18 @@ namespace GreenQloud.Synchrony
     public class RemoteEventsSynchronizer : AbstractSynchronizer<RemoteEventsSynchronizer>
     {
         private bool eventsCreated;
-        private IRemoteRepositoryController remoteController = new RemoteRepositoryController ();
-        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
-        private SQLiteEventDAO eventDAO = new SQLiteEventDAO();
-        private RepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO();
-        private IRemoteRepositoryController remoteRepository = new RemoteRepositoryController ();
+        private IRemoteRepositoryController remoteController;
+        private SQLiteEventDAO eventDAO;
+        private RepositoryItemDAO repositoryItemDAO;
+        private IRemoteRepositoryController remoteRepository;
 
 
-        public RemoteEventsSynchronizer () : base ()
+        public RemoteEventsSynchronizer (LocalRepository repo) : base (repo)
         {
+            remoteController = new RemoteRepositoryController (repo);
+            eventDAO = new SQLiteEventDAO(repo);
+            repositoryItemDAO = new SQLiteRepositoryItemDAO();
+            remoteRepository = new RemoteRepositoryController (repo);
         }
 
         public override void Run(){
@@ -39,7 +42,7 @@ namespace GreenQloud.Synchrony
         {
             string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
             string time = eventDAO.LastSyncTime;
-            Logger.LogInfo("StorageQloud", "Looking for new changes ["+time+"]");
+            Logger.LogInfo("StorageQloud", "Looking for new changes on " + repo.RemoteFolder + " ["+time+"]");
 
             UrlEncode encoder = new UrlEncode();
             string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hashValue={2}&createdDate={3}", encoder.Encode (RuntimeSettings.DefaultBucketName), encoder.Encode (Credential.Username), encoder.Encode (hash), encoder.Encode (time));
@@ -47,26 +50,25 @@ namespace GreenQloud.Synchrony
             JArray jsonObjects = JSONHelper.GetInfoArray(uri);
             foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
                 if(jsonObject["application"] != null && !((string)jsonObject["application"]).Equals(GlobalSettings.FullApplicationName)){
-                    Event e = new Event();
-                    e.RepositoryType = RepositoryType.REMOTE;
-                    e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
-                    e.User = (string)jsonObject["username"];
-                    e.Application = (string)jsonObject["application"];
-                    e.ApplicationVersion = (string)jsonObject["applicationVersion"];
-                    e.DeviceId = (string)jsonObject["deviceId"];
-                    e.OS = (string)jsonObject["os"];
-                    e.Bucket = (string)jsonObject["bucket"];
-
-                    e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
-
                     string key = (string)jsonObject["object"];
-                    e.Item = RepositoryItem.CreateInstance (repositoryDAO.FindOrCreateByRootName(RuntimeSettings.HomePath), key);
-                    e.Item.BuildResultItem((string)jsonObject["resultObject"]);
-                    e.Item.ETag = (string)jsonObject["hash"];
-
-                    e.Synchronized = false;
-                    eventDAO.Create(e);
-                    repositoryItemDAO.Update(e.Item);
+                    if(repo.Accepts(key)){
+                        Event e = new Event(repo);
+                        e.RepositoryType = RepositoryType.REMOTE;
+                        e.EventType = (EventType) Enum.Parse(typeof(EventType), (string)jsonObject["action"]);
+                        e.User = (string)jsonObject["username"];
+                        e.Application = (string)jsonObject["application"];
+                        e.ApplicationVersion = (string)jsonObject["applicationVersion"];
+                        e.DeviceId = (string)jsonObject["deviceId"];
+                        e.OS = (string)jsonObject["os"];
+                        e.Bucket = (string)jsonObject["bucket"];
+                        e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                        e.Item = RepositoryItem.CreateInstance (repo, key);
+                        e.Item.BuildResultItem((string)jsonObject["resultObject"]);
+                        e.Item.ETag = (string)jsonObject["hash"];
+                        e.Synchronized = false;
+                        eventDAO.Create(e);
+                        repositoryItemDAO.Update(e.Item);
+                    }
                 }
             }
             eventsCreated = true;

@@ -120,6 +120,9 @@
     <Compile Include="Core\LitS3\S3Request.cs" />
     <Compile Include="Core\LitS3\S3Response.cs" />
     <Compile Include="Core\LitS3\S3Service.cs" />
+    <Compile Include="Core\Config\SelectedFoldersConfig.cs" />
+    <Compile Include="Core\Config\AbstractConfigFile.cs" />
+    <Compile Include="Core\Synchrony\SynchronizerUnit.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

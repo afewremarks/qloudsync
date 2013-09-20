@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using GreenQloud.Persistence.SQLite;
 using GreenQloud.Model;
+using System.Collections;
 
  
 
@@ -30,14 +31,9 @@ namespace GreenQloud {
             set; get;
         }
         public new event ProgressChangedEventHandler ProgressChanged = delegate { };
-        public new delegate void ProgressChangedEventHandler (double percentage, double time);
-
+        public new delegate void ProgressChangedEventHandler (double percentage,double time);
 
         public IconController StatusIcon;
-        private LocalEventsSynchronizer localSynchronizer;
-        private RemoteEventsSynchronizer remoteSynchronizer;
-        private RecoverySynchronizer recoverySynchronizer;
-        private SynchronizerResolver synchronizerResolver;
 
         public double ProgressPercentage = 0.0;
         public string ProgressSpeed      = "";
@@ -124,8 +120,6 @@ namespace GreenQloud {
 
             CreateConfigFolder();
             UpdateConfigFile ();
-            if (CreateHomeFolder ())
-                AddToBookmarks ();
          }
 
         public void UIHasLoaded ()
@@ -187,18 +181,18 @@ namespace GreenQloud {
         void verifyConfigRequirements ()
         {
             try{
-                ConfigFile.Read("InstanceID");
+                ConfigFile.GetInstance().Read("InstanceID");
             }catch {
-                string id = Crypto.Getbase64(ConfigFile.Read("ApplicationName") + Credential.Username + GlobalDateTime.NowUniversalString);
-                ConfigFile.Write ("InstanceID", id); 
-                ConfigFile.Read("InstanceID");
+                string id = Crypto.Getbase64(ConfigFile.GetInstance().Read("ApplicationName") + Credential.Username + GlobalDateTime.NowUniversalString);
+                ConfigFile.GetInstance().Write ("InstanceID", id); 
+                ConfigFile.GetInstance().Read("InstanceID");
                 Logger.LogInfo ("INFO", "Generated InstanceID: " + id);
             }
         }
         
         [System.Runtime.InteropServices.DllImport("/System/Library/Frameworks/CoreServices.framework/CoreServices")]
         internal static extern short Gestalt(int selector, ref int response);
-        static string m_OSInfoString = null;
+        //static string m_OSInfoString = null;
         static string InitOSInfoString()
         {
             try{
@@ -225,24 +219,28 @@ namespace GreenQloud {
             return "";
         }
 
-        public void StopSynchronizers () 
+        public void StopSynchronizers (LocalRepository repo) 
         {
-            if(synchronizerResolver != null)
-                synchronizerResolver.Stop();
-            if(recoverySynchronizer != null)
-                recoverySynchronizer.Stop();
-            if(localSynchronizer != null)
-                localSynchronizer.Stop();
-            if(remoteSynchronizer != null)
-                remoteSynchronizer.Stop();
-            Logger.LogInfo ("INFO", "Synchronizers Stoped!");
+            SynchronizerUnit unit = SynchronizerUnit.GetByRepo(repo);
+            if (unit != null) {
+                unit.StopAll ();
+                Logger.LogInfo ("INFO", "Synchronizers Stoped!");
+            } else {
+                Logger.LogInfo ("INFO", "Cannot stop synchronizers! [repository not found]");
+            }
         }
-
-        public void InitializeSynchronizers (bool initRecovery = false)
+        public void InitializeSynchronizers ( bool initRecovery = false){
+            SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO ();
+            Hashtable ht = SelectedFoldersConfig.GetInstance().Read ();
+            foreach (string folder in ht.Keys) {
+                LocalRepository repo = repoDAO.FindOrCreate (folder, ht [folder].ToString ());
+                InitializeSynchronizers (repo, initRecovery);
+            }
+        }
+        public void InitializeSynchronizers (LocalRepository repo, bool initRecovery = false)
         {
             SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO ();
-            LocalRepository repo = repoDAO.FindOrCreateByRootName (RuntimeSettings.HomePath);
-            if(initRecovery || repo.Recovering){
+            if (initRecovery || repo.Recovering) {
                 initRecovery = true;
                 repo.Recovering = true;
                 repoDAO.Update (repo);
@@ -250,62 +248,52 @@ namespace GreenQloud {
             Thread.Sleep (5000);
             Thread startSync;
             startSync = new Thread (delegate() {
-                try{
+                try {
                     Logger.LogInfo ("INFO", "Initializing Synchronizers!");
-
-                    synchronizerResolver = SynchronizerResolver.GetInstance();
-                    recoverySynchronizer = RecoverySynchronizer.GetInstance();
-                    remoteSynchronizer = RemoteEventsSynchronizer.GetInstance();
-                    localSynchronizer = LocalEventsSynchronizer.GetInstance();
-
-                    if(initRecovery){
-                       recoverySynchronizer.Start();
-                        while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync)
-                            Thread.Sleep(1000);
-                       synchronizerResolver.Start (); 
-
-                        while(!recoverySynchronizer.FinishedSync){
-                            Thread.Sleep (1000);
-                        }
-                    } else {
-                        synchronizerResolver.Start ();
+                    SynchronizerUnit unit = SynchronizerUnit.GetByRepo(repo);
+                    if(unit == null){
+                        unit = new SynchronizerUnit(repo);
+                        SynchronizerUnit.Add(repo, unit);
                     }
-                    localSynchronizer.Start();
-                    remoteSynchronizer.Start();
-
-
+                    unit.InitializeSynchronizers(initRecovery);
                     loadedSynchronizers = true;
                     Logger.LogInfo ("INFO", "Synchronizers Ready!");
-                    if(initRecovery || repo.Recovering){
+                    if (initRecovery || repo.Recovering) {
                         repo.Recovering = false;
                         repoDAO.Update (repo);
                     }
                     ErrorType = ERROR_TYPE.NULL;
                     OnIdle ();
-                }catch (Exception e){
+                } catch (Exception e) {
                     Console.WriteLine (e.Message);
                 }
             });
-            startSync.Start ();                    
+            startSync.Start ();
         }
 
         public void HandleSyncStatusChanged ()
         {
             UpdateState ();
         }
-        
-        
-        // Fires events for the current syncing state
+
+        public bool IsDownloading ()
+        {
+            return SynchronizerUnit.AnyDownloading ();
+        }
+
+        public bool IsUploading ()
+        {
+            return SynchronizerUnit.AnyUploading ();
+        }
+
         private void UpdateState ()
         {
-            if (synchronizerResolver.SyncStatus == SyncStatus.DOWNLOADING || synchronizerResolver.SyncStatus == SyncStatus.UPLOADING) {
+            if (SynchronizerUnit.AnyWorking()) {
                 OnSyncing ();
             } else {
                 OnIdle ();
             }
         }
-        
-
 
         public void SyncStart ()
         {
@@ -313,51 +301,10 @@ namespace GreenQloud {
             FinishFetcher();
         }
 
-        public enum START_STATE{
-            NULL = 0,
-            LOAD_START = 1,
-            LOAD_DONE = 2,
-            CALCULATING_START = 3,
-            SYNC_START = 4,
-            CALCULATING_DONE = 5,
-            SYNC_DONE = 6
-        }
-
-        public START_STATE StartState {
-            get;
-            set;
-        }
         public void FirstLoad()
         {
             try {
                 InitializeSynchronizers(true);
-                StartState = START_STATE.LOAD_START;
-                while(recoverySynchronizer == null)
-                    Thread.Sleep(1000);
-                StartState = START_STATE.LOAD_DONE;
-
-
-                StartState = START_STATE.CALCULATING_START;
-                StartState = START_STATE.SYNC_START;
-
-                while(!((RecoverySynchronizer)recoverySynchronizer).FinishedSync)
-                    Thread.Sleep(1000);
-                StartState = START_STATE.CALCULATING_DONE;
-
-                while(loadedSynchronizers == false)
-                    Thread.Sleep(1000);
-
-                Thread.Sleep(5000);
-
-                Console.WriteLine(synchronizerResolver.EventsToSync);
-                while(synchronizerResolver.EventsToSync > 0)
-                    Thread.Sleep(1000);
-                StartState = START_STATE.SYNC_DONE;
-
-
-
-
-
             }catch (Exception e) {                
                 Logger.LogInfo ("Initial Sync Error", e.Message+"\n "+e.StackTrace);
             }
@@ -408,7 +355,7 @@ namespace GreenQloud {
         
         public void OpenSparkleShareFolder ()
         {
-            OpenFolder (RuntimeSettings.HomePath);
+            //OpenFolder (RuntimeSettings.HomePath);
         }
 
         public void OpenRepositoryitemFolder (string path)
@@ -453,26 +400,14 @@ namespace GreenQloud {
         {
 		}
 
-
-		public bool CreateHomeFolder ()
-		{
-            if (!Directory.Exists (RuntimeSettings.HomePath)) {
-                Directory.CreateDirectory (RuntimeSettings.HomePath);
-                return true;
-
-            } else {
-                return false;
-            }
-		}
-
         public void UpdateConfigFile ()
         {
-            ConfigFile.UpdateConfigFile ();
+            ConfigFile.GetInstance().UpdateConfigFile ();
+            SelectedFoldersConfig.GetInstance().UpdateConfigFile ();
         }
 
         void CreateConfigFolder ()
         {
-
             if (!Directory.Exists (RuntimeSettings.ConfigPath)) 
                 Directory.CreateDirectory (RuntimeSettings.ConfigPath);
                 
@@ -496,19 +431,13 @@ namespace GreenQloud {
 
         public void HandleReconnection(){
             OnIdle();
-            if(remoteSynchronizer != null)
-                remoteSynchronizer.Start ();
-            if(synchronizerResolver != null)
-                synchronizerResolver.Start ();
+            SynchronizerUnit.ReconnectAll ();
         }
 
         public void HandleDisconnection(){
             ErrorType = ERROR_TYPE.DISCONNECTION;
             OnError ();
-            if(remoteSynchronizer != null)
-                remoteSynchronizer.Stop ();
-            if(synchronizerResolver != null)
-                synchronizerResolver.Stop ();
+            SynchronizerUnit.DisconnectAll ();
         }
 
         private bool CheckConnection ()
@@ -524,12 +453,12 @@ namespace GreenQloud {
             return hasConnection;
         }
 
-        public void HandleError(){
+        public void HandleError(LocalRepository repo){
             ErrorType = ERROR_TYPE.FATAL_ERROR;
             OnError ();
-            StopSynchronizers ();
+            StopSynchronizers(repo);
             Thread.Sleep (5000);
-            InitializeSynchronizers (true);
+            InitializeSynchronizers (repo, true);
         }
 
         public ERROR_TYPE ErrorType {
