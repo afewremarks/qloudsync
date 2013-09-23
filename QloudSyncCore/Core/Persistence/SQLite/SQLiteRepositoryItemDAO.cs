@@ -62,27 +62,27 @@ namespace GreenQloud.Persistence.SQLite
 
         public bool Exists (RepositoryItem item)
         {
-            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\"", item.Key, item.Repository.Id);
+            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE Key = \"{0}\"", item.Key);
             int i = int.Parse(database.ExecuteScalar (sql));
             return i > 0;
         }
 
         public bool ExistsUnmoved (RepositoryItem item)
         {
-            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\" AND Moved <> '{2}'", item.Key, item.Repository.Id, bool.TrueString);
+            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND Moved <> '{1}'", item.Key, bool.TrueString);
             int i = int.Parse(database.ExecuteScalar (sql));
             return i > 0;
         }
 
         public RepositoryItem GetFomDatabase (RepositoryItem item)
         {
-            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\"", item.Key, item.Repository.Id);
+            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE Key = \"{0}\"", item.Key);
             return Select(sql).Last();
         }
 
         public bool ExistsUnmoved(string key, LocalRepository repo)
         {
-            string sql = string.Format("SELECT COUNT(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND RepositoryId = \"{1}\" AND Moved <> '{2}'", key, repo.Id, bool.TrueString);
+            string sql = string.Format("SELECT COUNT(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND Moved <> '{1}'", key, bool.TrueString);
             return int.Parse(database.ExecuteScalar(sql)) > 0;
         }
 
