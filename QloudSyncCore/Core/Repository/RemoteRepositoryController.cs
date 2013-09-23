@@ -21,13 +21,19 @@ namespace GreenQloud.Repository
         private StorageQloudPhysicalRepositoryController physicalController;
         private S3Connection connection;
         public RemoteRepositoryController (LocalRepository repo) : base(repo){
+            HttpEncoder.Current = HttpEncoder.Default;
             connection = new S3Connection ();
             physicalController = new StorageQloudPhysicalRepositoryController (repo);
         }
-
+       
         public List<GreenQloud.Model.RepositoryItem> Items {
             get {
                 return GetInstancesOfItems (GetS3Objects().Where(i => Key(i).StartsWith(repo.RemoteFolder) && !Key(i).Equals(repo.RemoteFolder)).ToList());
+            }
+        }
+        public List<GreenQloud.Model.RepositoryItem> RootFolders {
+            get {
+                return GetInstancesOfItems (GetRootFoldersS3Objects().ToList());
             }
         }
 
@@ -263,6 +269,14 @@ namespace GreenQloud.Repository
 
 
         #region Handle S3Objects
+        public IEnumerable<ListEntry> GetRootFoldersS3Objects ()
+        {
+            HttpEncoder.Current = HttpEncoder.Default;
+            List<ListEntry> entries = new List<ListEntry> ();
+            entries = connection.Connect ().ListAllObjects (RuntimeSettings.DefaultBucketName).Where(i => Key(i).EndsWith("/")).ToList();
+            return entries;
+        }
+
         public IEnumerable<ListEntry> GetS3Objects ()
         {
             HttpEncoder.Current = HttpEncoder.Default;
@@ -281,6 +295,7 @@ namespace GreenQloud.Repository
 
         private IEnumerable<ListEntry> GetSubS3Objects (CommonPrefix prefix)
         {
+            HttpEncoder.Current = HttpEncoder.Default;
             IEnumerable<ListEntry> subEntries = connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, prefix.Prefix).ToList();
             List<ListEntry> entries = new List<ListEntry> ();
             foreach (ListEntry entry in subEntries) {
@@ -311,17 +326,12 @@ namespace GreenQloud.Repository
         {
             string key = Key (s3item);
             if (key != string.Empty) {
-                try{
-                    GetObjectResponse meta = GetMetadata (key);
-                    if(meta != null){
-                        RepositoryItem item = RepositoryItem.CreateInstance (repo, s3item);
-                        return item;
-                    } else {
-                        Logger.LogInfo("ERROR", "File " + key + " ignored. Metadata not found!");
-                        return null;
-                    }
-                } catch (Exception ex) {
-                    Logger.LogInfo("ERROR", ex.Message);
+                GetObjectResponse meta = GetMetadata (key);
+                if(meta != null){
+                    RepositoryItem item = RepositoryItem.CreateInstance (repo, s3item);
+                    return item;
+                } else {
+                    Logger.LogInfo("ERROR", "File " + key + " ignored. Metadata not found!");
                     return null;
                 }
             }

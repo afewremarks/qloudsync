@@ -5,6 +5,7 @@ using GreenQloud.Repository;
 using System.Linq;
 using QloudSyncCore;
 using System.Diagnostics;
+using System.Web.Util;
 
 namespace GreenQloud.Core {
 
@@ -17,7 +18,7 @@ namespace GreenQloud.Core {
         #endif
         public static void Run (ApplicationController controller, ApplicationUI ui)
         {
-
+            HttpEncoder.Current = HttpEncoder.Default;
             Controller = controller;
             UI = ui;
             try {
