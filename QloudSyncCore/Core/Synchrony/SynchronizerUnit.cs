@@ -95,6 +95,20 @@ namespace GreenQloud.Synchrony
                 unit.Disconnect ();
             }
         }
+
+        public static void ReconnectResolver()
+        {
+            foreach (SynchronizerUnit unit in synchronizerUnits.Values) {
+                unit.ResumeResolver ();
+            }
+        }
+
+        public static void DisconnectResolver ()
+        {
+            foreach (SynchronizerUnit unit in synchronizerUnits.Values) {
+                unit.SuspendResolver ();
+            }
+        }
         
         public SynchronizerUnit (LocalRepository repo)
         {
@@ -135,12 +149,25 @@ namespace GreenQloud.Synchrony
                 remoteSynchronizer.Stop();
         }
 
+        public void ResumeResolver()
+        {
+            if (synchronizerResolver != null) {
+                synchronizerResolver.Start ();
+            }
+        }
+
         public void Reconnect ()
         {
 			if(remoteSynchronizer != null)
 				remoteSynchronizer.Start ();
 			if(synchronizerResolver != null)
 				synchronizerResolver.Start ();
+        }
+
+        public void SuspendResolver(){
+            if (synchronizerResolver != null) {
+                synchronizerResolver.Stop ();
+            }
         }
 
         public void Disconnect ()
