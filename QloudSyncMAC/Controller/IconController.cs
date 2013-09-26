@@ -28,6 +28,7 @@ using GreenQloud.Model;
 using GreenQloud.Persistence;
 using System.Collections.Generic;
 using GreenQloud.Persistence.SQLite;
+using System.Diagnostics;
 
 
 namespace GreenQloud {
@@ -58,6 +59,7 @@ namespace GreenQloud {
 
         private NSMenuItem notify_item;
         private NSMenuItem recent_events_title;
+        private NSMenuItem pause_sync;
         private NSMenuItem quit_item;
         private NSMenuItem co2_savings_item;
         private NSMenuItem help_item;
@@ -89,6 +91,8 @@ namespace GreenQloud {
         private NSImage music_image;
         private NSImage pics_image;
         private NSImage default_image;
+        private bool isPaused = false;
+
 
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
         public delegate void UpdateIconEventHandler (IconState state);
@@ -391,6 +395,15 @@ namespace GreenQloud {
                     AboutClicked ();
                 };
 
+                this.pause_sync = new NSMenuItem() {
+                    Title = PauseText(),
+                    Enabled = true
+                };
+
+                this.pause_sync.Activated += delegate {
+                  PauseSync();
+                };
+
                 this.quit_item = new NSMenuItem () {
                     Title   = "Quit",
                     Enabled = QuitItemEnabled
@@ -509,12 +522,29 @@ namespace GreenQloud {
 			    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (help_item);
                 this.menu.AddItem (this.about_item);
-
+               
                 //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
                 this.status_item.Menu = this.menu;
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
+                this.menu.AddItem (this.pause_sync);
                 this.menu.AddItem (quit_item);
             }
+        }
+
+        public void PauseSync(){
+
+            if (isPaused) {
+                isPaused = false;
+                SynchronizerUnit.ReconnectResolver ();
+                this.pause_sync.Title = "Pause Sync";
+                Console.Out.WriteLine("Syncronizers Resumed!");
+            } else {
+                isPaused = true;
+                SynchronizerUnit.DisconnectResolver ();
+                this.pause_sync.Title = "Resume Sync";
+                Console.Out.WriteLine("Syncronizers Paused!");
+            }
+
         }
 
 
@@ -549,7 +579,16 @@ namespace GreenQloud {
         {
             Program.Controller.ShowTransferWindow ();
         }
-        
+
+        public String PauseText (){
+            if (isPaused) {
+                return "Resume Sync"; 
+            }else{
+                return "Pause Sync";
+            }
+
+        }
+
         public void QuitClicked ()
         {
             Program.Controller.Quit ();
