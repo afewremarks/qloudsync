@@ -42,9 +42,16 @@ namespace GreenQloud.Synchrony
         public void Start() {
             lock (lockk) {
                 _stoped = false;
-                if(_thread == null)
-                    _thread = new Thread(new ThreadStart(this.GenericRun)); 
-                _thread.Start ();
+                if (_thread == null) {
+                    _thread = new Thread(new ThreadStart(this.GenericRun));
+                }
+                if (!_thread.IsAlive) {
+                    if (_thread.ThreadState == ThreadState.Stopped) {
+                        _thread = new Thread(new ThreadStart(this.GenericRun));
+                    }
+                    _thread.Start ();
+                }
+                    
             }
         }
         public void Join() { _thread.Join(); }
@@ -53,7 +60,7 @@ namespace GreenQloud.Synchrony
             lock (lockk) {
                 if (!_stoped) {
                     _stoped = true;
-                    _thread = null;
+                    //_thread = null;
                 }
             }
         }

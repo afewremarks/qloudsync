@@ -59,6 +59,7 @@ namespace GreenQloud {
         public event Action OnIdle = delegate { };
         public event Action OnSyncing = delegate { };
         public event Action OnError = delegate { };
+        public event Action OnPaused = delegate { };
 
         protected List<string> warnings = new List<string> ();
         protected List<string> errors   = new List<string> ();
@@ -67,6 +68,7 @@ namespace GreenQloud {
 
         private bool disconected = false;
         private bool loadedSynchronizers = false;
+        private bool isPaused = false;
 
         Thread checkConnection;
 
@@ -451,6 +453,20 @@ namespace GreenQloud {
                 return false;
             }
             return hasConnection;
+        }
+
+        public void PauseSync(){
+            if (isPaused) {
+                isPaused = false;
+                SynchronizerUnit.ReconnectResolver ();
+                OnSyncing ();
+                Console.Out.WriteLine("Resolver Synchronizer Resumed!");
+            } else {
+                isPaused = true;
+                SynchronizerUnit.DisconnectResolver ();
+                OnPaused ();
+                Console.Out.WriteLine("Resolver Synchronizer Paused!");
+            }
         }
 
         public void HandleError(LocalRepository repo){
