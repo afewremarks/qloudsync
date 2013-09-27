@@ -91,8 +91,6 @@ namespace GreenQloud {
         private NSImage music_image;
         private NSImage pics_image;
         private NSImage default_image;
-        private bool isPaused = false;
-
 
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
         public delegate void UpdateIconEventHandler (IconState state);
@@ -106,16 +104,17 @@ namespace GreenQloud {
         public event UpdateQuitItemEventHandler UpdateQuitItemEvent = delegate { };
         public delegate void UpdateQuitItemEventHandler (bool quit_item_enabled);
 
-            public IconState CurrentState = IconState.Working;
-            public string StateText = string.Format ("Welcome to {0}!", GlobalSettings.ApplicationName);
+        public IconState CurrentState = IconState.Working;
+        public string StateText = string.Format ("Welcome to {0}!", GlobalSettings.ApplicationName);
 
-            public readonly int MenuOverflowThreshold = 9;
-            public readonly int MinSubmenuOverflowCount = 3;
-            public string[] Folders;
-            public string[] FolderErrors;
-            public string[] OverflowFolders;
-            public string[] OverflowFolderErrors;
-            private Thread co2Update;
+        public readonly int MenuOverflowThreshold = 9;
+        public readonly int MinSubmenuOverflowCount = 3;
+        public string[] Folders;
+        public string[] FolderErrors;
+        public string[] OverflowFolders;
+        public string[] OverflowFolderErrors;
+        private Thread co2Update;
+        private bool isPaused = false;
 
 
 
@@ -200,8 +199,20 @@ namespace GreenQloud {
                 UpdateMenuEvent (CurrentState);
             };
 
+            Program.Controller.OnPaused += delegate {
+                CurrentState = IconState.Error;
+                StateText = "Sync Paused ";
+                UpdateQuitItemEvent (QuitItemEnabled);
+                UpdateStatusItemEvent (StateText, this.up_to_date);
+                UpdateIconEvent (CurrentState);
+                UpdateMenuEvent (CurrentState);
+                this.status_item.Image = this.disconnected_image;
+                isPaused = true;
+           }; 
 
             Program.Controller.OnSyncing += delegate {
+                isPaused = false;
+
                 bool syncDown = Program.Controller.IsDownloading();
                 bool syncUp = Program.Controller.IsUploading();
 
@@ -216,6 +227,9 @@ namespace GreenQloud {
                 } else if (syncDown){
                     CurrentState = IconState.SyncingDown;
                     StateText    = "⟳ Receiving changes…";
+                } else {
+                    CurrentState = IconState.Idle;
+                    StateText = "✓  Up to date ";
                 }
                 
                 if (ProgressPercentage > 0)
@@ -228,6 +242,7 @@ namespace GreenQloud {
             };
             
             Program.Controller.OnError += delegate {
+                isPaused = false;
                 CurrentState = IconState.Error;
                 switch(Program.Controller.ErrorType)
                 {
@@ -401,7 +416,7 @@ namespace GreenQloud {
                 };
 
                 this.pause_sync.Activated += delegate {
-                  PauseSync();
+                    PauseSync();
                 };
 
                 this.quit_item = new NSMenuItem () {
@@ -532,21 +547,12 @@ namespace GreenQloud {
         }
 
         public void PauseSync(){
-
-            if (isPaused) {
-                isPaused = false;
-                SynchronizerUnit.ReconnectResolver ();
-                this.pause_sync.Title = "Pause Sync";
-                Console.Out.WriteLine("Syncronizers Resumed!");
-            } else {
-                isPaused = true;
-                SynchronizerUnit.DisconnectResolver ();
-                this.pause_sync.Title = "Resume Sync";
-                Console.Out.WriteLine("Syncronizers Paused!");
+            Program.Controller.PauseSync ();
+            using (var a = new NSAutoreleasePool ()) {
+                this.pause_sync.Title = PauseText ();
             }
 
         }
-
 
         public void SparkleShareClicked ()
         {
