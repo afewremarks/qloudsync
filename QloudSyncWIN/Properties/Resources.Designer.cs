@@ -83,9 +83,9 @@ namespace GreenQloud.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap loadinggif {
+        internal static System.Drawing.Bitmap loginScreen {
             get {
-                object obj = ResourceManager.GetObject("loadinggif", resourceCulture);
+                object obj = ResourceManager.GetObject("loginScreen", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace GreenQloud.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap loginScreen {
+        internal static System.Drawing.Bitmap SelectSync1 {
             get {
-                object obj = ResourceManager.GetObject("loginScreen", resourceCulture);
+                object obj = ResourceManager.GetObject("SelectSync1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
