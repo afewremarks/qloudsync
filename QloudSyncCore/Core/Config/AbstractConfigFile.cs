@@ -26,6 +26,11 @@ namespace GreenQloud
 
 		public abstract void UpdateConfigFile();
 
+        public virtual Boolean IsEmpty()
+        {
+            return Read().Count == 0;
+        }
+        
         public virtual Hashtable Read(){
 
             lock (_readLock) {
@@ -35,7 +40,7 @@ namespace GreenQloud
 				if (File.Exists (FULLNAME)) {
 					string[] lines = File.ReadAllLines (FULLNAME);
 					foreach (string line in lines) {
-						int index = line.IndexOf (":");
+                        int index = line.IndexOf ("@");
 						string key = line.Substring (0, index);
 						string value = line.Substring (index + 1, line.Length - index - 1);
 						ht [key] = value;
@@ -61,7 +66,7 @@ namespace GreenQloud
             try{
                 string texto = "";
                 foreach (DictionaryEntry pair in properties){
-                    texto+=string.Format("{0}:{1}\n",pair.Key,pair.Value);
+                    texto+=string.Format("{0}@{1}\n",pair.Key,pair.Value);
                 }
                 File.WriteAllText(FULLNAME, texto);
             }catch (Exception e){

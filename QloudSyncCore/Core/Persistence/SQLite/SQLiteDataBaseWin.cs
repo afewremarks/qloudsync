@@ -3,19 +3,20 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Data.SQLite;
+using System.IO;
 
 
-namespace GreenQloud.Persistence.SQLite{
+namespace GreenQloud.Persistence.SQLite
+{
 
     public class SQLiteDatabase
     {
-
         private static SQLiteConnection cnn = new SQLiteConnection(ConnectionString);
         private static SQLiteDatabase instance = new SQLiteDatabase();
 
-        private SQLiteDatabase(){
+        private SQLiteDatabase()
+        {
             cnn.Open();
         }
 
@@ -23,19 +24,23 @@ namespace GreenQloud.Persistence.SQLite{
         {
             return instance;
         }
-        
-        public static string ConnectionString{
-            get{
+
+
+        public static string ConnectionString
+        {
+            get
+            {
                 return String.Format("URI=file:{0};Version=3;", RuntimeSettings.DatabaseFile);
             }
         }
-        
-        public void CreateDataBase(){
-            ExecuteNonQuery("CREATE TABLE Repository (RepositoryID INTEGER PRIMARY KEY AUTOINCREMENT , Path ntext, RECOVERING ntext)");
-            ExecuteNonQuery ("CREATE TABLE RepositoryItem (RepositoryItemID INTEGER PRIMARY KEY AUTOINCREMENT , Key ntext, RepositoryId ntext, IsFolder ntext, ResultItemId ntext, eTag ntext, eTagLocal ntext,  Moved ntext, UpdatedAt ntext)");
-            ExecuteNonQuery ("CREATE TABLE EVENT (EventID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId ntext, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext, USER ntext, APPLICATION ntext, APPLICATION_VERSION ntext, DEVICE_ID ntext, OS ntext, BUCKET ntext, TRY_QNT ntext, RESPONSE ntext)");
+
+        public void CreateDataBase()
+        {
+            ExecuteNonQuery("CREATE TABLE Repository (RepositoryID INTEGER PRIMARY KEY AUTOINCREMENT , Path ntext, RECOVERING ntext, RemoteFolder ntext)");
+            ExecuteNonQuery("CREATE TABLE RepositoryItem (RepositoryItemID INTEGER PRIMARY KEY AUTOINCREMENT , Key ntext, RepositoryId ntext, IsFolder ntext, ResultItemId ntext, eTag ntext, eTagLocal ntext,  Moved ntext, UpdatedAt ntext)");
+            ExecuteNonQuery("CREATE TABLE EVENT (EventID INTEGER PRIMARY KEY AUTOINCREMENT , ItemId ntext, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext, USER ntext, APPLICATION ntext, APPLICATION_VERSION ntext, DEVICE_ID ntext, OS ntext, BUCKET ntext, TRY_QNT ntext, RESPONSE ntext, RepositoryId ntext)");
             ExecuteNonQuery("CREATE TABLE TimeDiff (TimeDiffID INTEGER PRIMARY KEY AUTOINCREMENT , Diff ntext)");
-            ExecuteNonQuery (string.Format("INSERT INTO Repository (Path) VALUES (\"{0}\")", RuntimeSettings.HomePath));
+            //ExecuteNonQuery (string.Format("INSERT INTO Repository (Path) VALUES (\"{0}\")", RuntimeSettings.HomePath));
         }
 
         /// <summary>
@@ -46,13 +51,12 @@ namespace GreenQloud.Persistence.SQLite{
         public DataTable GetDataTable(string sql)
         {
             DataTable dt = new DataTable();
-            try
+            SQLiteDataReader reader;
+            using (SQLiteCommand mycommand = new SQLiteCommand(cnn))
             {
-                SQLiteConnection cnn = new SQLiteConnection(ConnectionString);
-                cnn.Open();
-                SQLiteCommand mycommand = new SQLiteCommand(cnn);
                 mycommand.CommandText = sql;
-                SQLiteDataReader reader = mycommand.ExecuteReader();
+                reader = mycommand.ExecuteReader();
+
                 // Add all the columns.
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
@@ -67,9 +71,10 @@ namespace GreenQloud.Persistence.SQLite{
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
                         // Ignore Null fields.
-                        if (reader.IsDBNull(i)) continue;
+                        if (reader.IsDBNull(i))
+                            continue;
 
-                         if (reader.GetFieldType(i) == typeof(String))
+                        if (reader.GetFieldType(i) == typeof(String))
                         {
                             row[dt.Columns[i].ColumnName] = reader.GetString(i);
                         }
@@ -87,7 +92,8 @@ namespace GreenQloud.Persistence.SQLite{
                         }
                         else if (reader.GetFieldType(i) == typeof(Boolean))
                         {
-                            row[dt.Columns[i].ColumnName] = reader.GetBoolean(i); ;
+                            row[dt.Columns[i].ColumnName] = reader.GetBoolean(i);
+                            ;
                         }
                         else if (reader.GetFieldType(i) == typeof(Byte))
                         {
@@ -118,20 +124,14 @@ namespace GreenQloud.Persistence.SQLite{
                             row[dt.Columns[i].ColumnName] = reader.GetGuid(i);
                         }
                     }
-                    
+
                     dt.Rows.Add(row);
                 }
-                
+                return dt;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine (e.StackTrace);
-                throw new Exception(e.Message);
-            }
-            return dt;
         }
 
-        
+
         /// <summary>
         ///     Allows the programmer to interact with the database for purposes other than a query.
         /// </summary>
@@ -139,7 +139,7 @@ namespace GreenQloud.Persistence.SQLite{
         /// <returns>An Integer containing the number of rows updated.</returns>
         public int ExecuteNonQuery(string sql)
         {
-            return ExecuteNonQuery (sql, false);
+            return ExecuteNonQuery(sql, false);
         }
         public int ExecuteNonQuery(string sql, bool returnId)
         {
@@ -164,13 +164,12 @@ namespace GreenQloud.Persistence.SQLite{
             }
             catch (Exception e)
             {
-                Logger.LogInfo("ERROR ", e);
+                Logger.LogInfo("ERROR", e);
                 tr.Rollback();
             }
-
             return result;
         }
-        
+
         /// <summary>
         ///     Allows the programmer to retrieve single items from the DB.
         /// </summary>
@@ -189,7 +188,8 @@ namespace GreenQloud.Persistence.SQLite{
                 }
                 return "";
             }
-        }               
+        }
+
     }
 }
 #endif
