@@ -41,7 +41,6 @@ namespace GreenQloud
 
         public bool Start()
         {
-            Console.WriteLine("************************* "+watchPath);
             if (!String.IsNullOrEmpty(watchPath))
             {
                 subfolderWatcher = new FileSystemWatcher();
