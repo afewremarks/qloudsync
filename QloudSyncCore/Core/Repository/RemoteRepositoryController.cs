@@ -28,7 +28,7 @@ namespace GreenQloud.Repository
        
         public List<GreenQloud.Model.RepositoryItem> Items {
             get {
-                return GetInstancesOfItems (GetS3Objects().Where(i => Key(i).StartsWith(repo.RemoteFolder) && !Key(i).Equals(repo.RemoteFolder)).ToList());
+                return GetInstancesOfItems(GetS3Objects().Where(i => Key(i).StartsWith(repo.RemoteFolder) && !Key(i).Equals(repo.RemoteFolder) && !Key(i).StartsWith(".trash")).ToList());
             }
         }
         public List<GreenQloud.Model.RepositoryItem> RootFolders {

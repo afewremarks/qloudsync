@@ -16,7 +16,7 @@ namespace GreenQloud
         private object _bagLock = new object();
         public delegate void ChangedEventHandler(Event e);
         public event ChangedEventHandler Changed;
-        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+        private LocalRepository repo;
         private SQLiteRepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO();
 
         private FileSystemWatcher parentFolderWatcher = null, subfolderWatcher = null;
@@ -30,9 +30,9 @@ namespace GreenQloud
 
         private String watchPath = null;
 
-        public QloudSyncFileSystemWatcher(String path)
+        public QloudSyncFileSystemWatcher(LocalRepository repo)
         {
-            this.watchPath = path;
+            this.repo = repo;
             this.ignoreBag = new ArrayList();
             Start();
         }
@@ -128,7 +128,6 @@ namespace GreenQloud
                 //Detect if have a file with the name on database, if its true, so its a file.
                 //The need of this line is because the watcher cannot catch if the delete is a file or folder.
                 bool isFolder = true;
-                LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName(args.FullPath);
                 if (args.FullPath != null)
                 {
                     string key = args.FullPath.Substring(repo.Path.Length);
@@ -159,8 +158,7 @@ namespace GreenQloud
         }
 
         private Event BuildEvent(EventType type, bool isDirectory, string path, string newPath = null) {
-            Event e = new Event();
-            LocalRepository repo = repositoryDAO.GetRepositoryByItemFullName(path);
+            Event e = new Event(repo);
             e.EventType = type;
             if (path != null)
             {

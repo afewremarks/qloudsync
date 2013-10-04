@@ -55,6 +55,7 @@ namespace GreenQloud.UI.Setup
             this.loadingGif.Visible = true;
             new Thread(() =>
             {
+                
                 try
                 {
                     BeginInvoke(new Action(() =>

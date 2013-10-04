@@ -19,6 +19,7 @@ namespace GreenQloud.UI
         private ContextMenuStrip trayMenu;
         public Login LoginWindow;
         public Ready readyWindow;
+        public ConfFolders confFoldersWindow;
         public AboutWindow About;
         private bool isLoged;
         private static UIManager instance;
@@ -35,19 +36,27 @@ namespace GreenQloud.UI
             this.AddToSystemTray();
             this.LoginWindow = new Setup.Login(this);
             this.readyWindow = new Ready();
-            Program.Controller.ShowSetupWindowEvent += ((PageType page_type) => this.LoginWindow.ShowDialog());
+            Program.Controller.ShowSetupWindowEvent += delegate(GreenQloud.AbstractApplicationController.PageType page_type)
+            {
+                if (page_type == GreenQloud.AbstractApplicationController.PageType.Login) {
+                    this.LoginWindow.ShowDialog();
+                }
+                else if (page_type == GreenQloud.AbstractApplicationController.PageType.ConfigureFolders)
+                {
+                    this.confFoldersWindow = new ConfFolders();
+                    this.confFoldersWindow.ShowDialog();
+                }
+            };
+
             this.LoginWindow.OnLoginDone += (() =>
             {
                 this.isLoged = true;
                 this.LoginWindow.Done();
-                new Thread(delegate()
-                {
-                    this.readyWindow.ShowDialog();
-                }).Start();
                 this.About = new AboutWindow();
+                this.confFoldersWindow = new ConfFolders();
                 Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
-            
-                Program.Controller.SyncStart(true);
+               
+                this.confFoldersWindow.ShowDialog();
             });
             this.LoginWindow.FormClosed += ((sender, args) =>
             {
@@ -170,6 +179,14 @@ namespace GreenQloud.UI
             }
 
         }
+        public void ReadyToSync()
+        {
+            new Thread(delegate()
+            {
+                this.readyWindow.ShowDialog();
+            }).Start();
+            Program.Controller.SyncStart();
+        }
 
         private string GetSavings()
         {
@@ -193,8 +210,9 @@ namespace GreenQloud.UI
             Program.Controller.OpenWebsite("https://my.greenqloud.com/registration/qloudsync");
         }
         public void OpenStorageQloudWebsite(Object sender, EventArgs e){
-            Program.Controller.OpenStorageQloudWebsite();
+            Program.Controller.OpenStorageQloudWebSite();
         }
+
         public void OpenStorageQloudHelpCenter(Object sender, EventArgs e)
         {
             Program.Controller.OpenWebsite("http://support.greenqloud.com");
@@ -216,9 +234,8 @@ namespace GreenQloud.UI
         public void OnExit(Object sender, EventArgs e)
         {
             this.Dispose();
-            Program.Controller.StopSynchronizers();
+            //Program.Controller.StopSynchronizers();
             Program.Controller.Quit();
-            //throw new AbortedOperationException("Closed");
         }
 
         protected override void Dispose(bool isDisposing)

@@ -26,7 +26,7 @@ namespace GreenQloud
             }
         }
 
-        /*public static string HomePath{
+        public static string HomePath{
             get {
                 if (homePath == null)
                 {
@@ -41,6 +41,7 @@ namespace GreenQloud
             }
         }
         
+        /*
         public static string TmpPath {
             get {
                 return Path.Combine(HomePath, ConfigFile.GetInstance().Read ("Tmp"));
