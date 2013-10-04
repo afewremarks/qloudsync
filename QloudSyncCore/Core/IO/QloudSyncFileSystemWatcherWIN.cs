@@ -33,6 +33,7 @@ namespace GreenQloud
         public QloudSyncFileSystemWatcher(LocalRepository repo)
         {
             this.repo = repo;
+            this.watchPath = this.repo.Path;
             this.ignoreBag = new ArrayList();
             Start();
         }
@@ -40,6 +41,7 @@ namespace GreenQloud
 
         public bool Start()
         {
+            Console.WriteLine("************************* "+watchPath);
             if (!String.IsNullOrEmpty(watchPath))
             {
                 subfolderWatcher = new FileSystemWatcher();
