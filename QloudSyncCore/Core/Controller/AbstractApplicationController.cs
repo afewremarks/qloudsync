@@ -206,6 +206,7 @@ namespace GreenQloud
 
         public void UIHasLoaded()
         {
+            new Thread(() => CreateStartupItem()).Start();
             checkConnection.Start();
             if (!File.Exists(RuntimeSettings.DatabaseFile))
             {
@@ -295,7 +296,6 @@ namespace GreenQloud
         {
             Logger.LogInfo("Controller", "First load sucessfully");
             FolderFetched();
-            new Thread(() => CreateStartupItem()).Start();
         }
         
         public void FirstLoad()
