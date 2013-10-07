@@ -105,6 +105,7 @@ namespace GreenQloud.UI
             
             this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
             this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
+            this.trayMenu.Items.Add("Check for Updates", null);
             this.trayMenu.Items.Add("-", null);
             this.trayMenu.Items.Add("Quit", null, OnExit);
 
@@ -265,6 +266,10 @@ namespace GreenQloud.UI
         internal void OnSyncing()
         {
             this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_active")).GetHicon());
+        }
+        internal void OnPaused()
+        {
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_pause_active")).GetHicon());
         }
     }
 }
