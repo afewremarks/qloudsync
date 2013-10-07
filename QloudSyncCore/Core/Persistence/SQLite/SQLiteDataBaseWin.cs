@@ -30,7 +30,7 @@ namespace GreenQloud.Persistence.SQLite
         {
             get
             {
-                return String.Format("URI=file:{0};Version=3;", RuntimeSettings.DatabaseFile);
+                return String.Format("URI=file:{0}", RuntimeSettings.DatabaseFile);
             }
         }
 
