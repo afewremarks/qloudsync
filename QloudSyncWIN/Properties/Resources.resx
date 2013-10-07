@@ -121,13 +121,13 @@
   <data name="loginScreen" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\loginScreen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="loadinggif" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\loadinggif1.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="getStarted" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\getStarted.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="about" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\about1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SelectSync1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\SelectSync1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
