@@ -142,30 +142,23 @@ namespace GreenQloud.Persistence.SQLite
         }
         public int ExecuteNonQuery(string sql, bool returnId)
         {
-            IDbTransaction tr = cnn.BeginTransaction();
+ 
             int result = 0;
-            try
+
+            using (SqliteCommand mycommand = new SqliteCommand(sql, cnn))
             {
-                using (SqliteCommand mycommand = new SqliteCommand(sql, cnn))
+                result = mycommand.ExecuteNonQuery();
+                if (returnId)
                 {
-                    result = mycommand.ExecuteNonQuery();
-                    tr.Commit();
-                    if (returnId)
-                    {
-                        string last_insert_rowid = @"select last_insert_rowid()";
-                        mycommand.CommandText = last_insert_rowid;
-                        System.Object temp = mycommand.ExecuteScalar();
-                        int id = int.Parse(temp.ToString());
-                        return id;
-                    }
+                    string last_insert_rowid = @"select last_insert_rowid()";
+                    mycommand.CommandText = last_insert_rowid;
+                    System.Object temp = mycommand.ExecuteScalar();
+                    int id = int.Parse(temp.ToString());
+                    return id;
                 }
+
+                return result;
             }
-            catch (Exception e)
-            {
-                Logger.LogInfo("ERROR", e);
-                tr.Rollback();
-            }
-            return result;
         }
 
         /// <summary>
