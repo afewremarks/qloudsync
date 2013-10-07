@@ -40,6 +40,7 @@ namespace GreenQloud
         bool firstRun = RuntimeSettings.FirstRun;
         private bool disconected = false;
         private bool loadedSynchronizers = false;
+        private bool isPaused = false;
 
         public enum ERROR_TYPE
         {
@@ -278,6 +279,24 @@ namespace GreenQloud
             else
             {
                 OnIdle();
+            }
+        }
+
+        public void PauseSync()
+        {
+            if (isPaused)
+            {
+                isPaused = false;
+                SynchronizerUnit.ReconnectResolver();
+                OnSyncing();
+                Console.Out.WriteLine("Resolver Synchronizer Resumed!");
+            }
+            else
+            {
+                isPaused = true;
+                SynchronizerUnit.DisconnectResolver();
+                OnPaused();
+                Console.Out.WriteLine("Resolver Synchronizer Paused!");
             }
         }
 
