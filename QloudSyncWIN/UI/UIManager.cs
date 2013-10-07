@@ -23,6 +23,7 @@ namespace GreenQloud.UI
         public AboutWindow About;
         private bool isLoged;
         private static UIManager instance;
+        private bool isPaused = false;
 
         public static UIManager GetInstance(){
             if(instance == null)
@@ -47,6 +48,12 @@ namespace GreenQloud.UI
                     this.confFoldersWindow.ShowDialog();
                 }
             };
+
+            Program.Controller.OnPaused += delegate()
+            {
+                //TODO Call OnPaused and change text
+                isPaused = true;
+            }; 
 
             this.LoginWindow.OnLoginDone += (() =>
             {
@@ -105,6 +112,7 @@ namespace GreenQloud.UI
             
             this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
             this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
+            this.trayMenu.Items.Add("Pause Sync", null, PauseSyncronizers);
             this.trayMenu.Items.Add("Check for Updates", null);
             this.trayMenu.Items.Add("-", null);
             this.trayMenu.Items.Add("Quit", null, OnExit);
@@ -201,6 +209,8 @@ namespace GreenQloud.UI
             }
         }
 
+      
+
         public void OpenStorageQloudFolder(Object sender, EventArgs e)
         {
             Program.Controller.OpenSparkleShareFolder();
@@ -212,6 +222,11 @@ namespace GreenQloud.UI
         }
         public void OpenStorageQloudWebsite(Object sender, EventArgs e){
             Program.Controller.OpenStorageQloudWebSite();
+        }
+
+        public void PauseSyncronizers(Object sender, EventArgs e)
+        {
+            Program.Controller.PauseSync();
         }
 
         public void OpenStorageQloudHelpCenter(Object sender, EventArgs e)
