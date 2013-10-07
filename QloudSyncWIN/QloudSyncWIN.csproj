@@ -192,6 +192,8 @@
     </Compile>
     <None Include="Resources\SelectSync.png" />
     <None Include="Resources\SelectSync1.png" />
+    <Content Include="Resources\process-pause-active.png" />
+    <Content Include="Resources\process-paused.png" />
     <Content Include="update.ini" />
   </ItemGroup>
   <ItemGroup>
@@ -251,8 +253,6 @@
     <Content Include="lib\Newtonsoft.Json.dll" />
     <Content Include="lib\XamaMac.dll" />
     <Content Include="qloudsync-app2.ico" />
-    <EmbeddedResource Include="Resources\loadinggif.gif" />
-    <EmbeddedResource Include="Resources\loadinggif1.gif" />
     <None Include="Resources\loginScreen.png" />
     <Content Include="Resources\file-3.png" />
     <Content Include="Resources\folder-docs.png" />
