@@ -184,7 +184,8 @@ namespace GreenQloud.Repository
                     return response;
                 }
             } catch (WebException webx) {
-                if (((HttpWebResponse)webx.Response).StatusCode == HttpStatusCode.NotFound){
+                if (webx != null && ((HttpWebResponse)webx.Response) != null && ((HttpWebResponse)webx.Response).StatusCode == HttpStatusCode.NotFound)
+                {
                     try {
                         //METADATA NOT FOUND, recover it (if is folder)!
                         if(key.EndsWith("/")){

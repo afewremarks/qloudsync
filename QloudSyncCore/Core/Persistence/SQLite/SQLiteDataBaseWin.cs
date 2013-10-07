@@ -1,9 +1,9 @@
 #if __MonoCS__
 #else
+using Community.CsharpSqlite.SQLiteClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
 using System.IO;
 
 
@@ -12,7 +12,7 @@ namespace GreenQloud.Persistence.SQLite
 
     public class SQLiteDatabase
     {
-        private static SQLiteConnection cnn = new SQLiteConnection(ConnectionString);
+        private static SqliteConnection cnn = new SqliteConnection(ConnectionString);
         private static SQLiteDatabase instance = new SQLiteDatabase();
 
         private SQLiteDatabase()
@@ -51,10 +51,9 @@ namespace GreenQloud.Persistence.SQLite
         public DataTable GetDataTable(string sql)
         {
             DataTable dt = new DataTable();
-            SQLiteDataReader reader;
-            using (SQLiteCommand mycommand = new SQLiteCommand(cnn))
+            SqliteDataReader reader;
+            using (SqliteCommand mycommand = new SqliteCommand(sql, cnn))
             {
-                mycommand.CommandText = sql;
                 reader = mycommand.ExecuteReader();
 
                 // Add all the columns.
@@ -143,13 +142,12 @@ namespace GreenQloud.Persistence.SQLite
         }
         public int ExecuteNonQuery(string sql, bool returnId)
         {
-            SQLiteTransaction tr = cnn.BeginTransaction();
+            IDbTransaction tr = cnn.BeginTransaction();
             int result = 0;
             try
             {
-                using (SQLiteCommand mycommand = new SQLiteCommand(cnn))
+                using (SqliteCommand mycommand = new SqliteCommand(sql, cnn))
                 {
-                    mycommand.CommandText = sql;
                     result = mycommand.ExecuteNonQuery();
                     tr.Commit();
                     if (returnId)
@@ -178,9 +176,8 @@ namespace GreenQloud.Persistence.SQLite
         public string ExecuteScalar(string sql)
         {
             object value;
-            using (SQLiteCommand mycommand = new SQLiteCommand(cnn))
+            using (SqliteCommand mycommand = new SqliteCommand(sql, cnn))
             {
-                mycommand.CommandText = sql;
                 value = mycommand.ExecuteScalar();
                 if (value != null)
                 {
