@@ -48,12 +48,7 @@ namespace GreenQloud.UI
                     this.confFoldersWindow.ShowDialog();
                 }
             };
-
-            Program.Controller.OnPaused += delegate()
-            {
-                //TODO Call OnPaused and change text
-                isPaused = true;
-            }; 
+ 
 
             this.LoginWindow.OnLoginDone += (() =>
             {
@@ -211,6 +206,8 @@ namespace GreenQloud.UI
 
       
 
+
+
         public void OpenStorageQloudFolder(Object sender, EventArgs e)
         {
             Program.Controller.OpenSparkleShareFolder();
@@ -245,6 +242,15 @@ namespace GreenQloud.UI
             this.ShowInTaskbar = false; // Remove from taskbar.
 
             base.OnLoad(e);
+        }
+
+        public void OnPause(Object sender, EventArgs e)
+        {
+            Program.Controller.OnPaused += delegate()
+            {
+                //TODO Call OnPaused and change text
+                isPaused = true;
+            };
         }
 
         public void OnExit(Object sender, EventArgs e)
