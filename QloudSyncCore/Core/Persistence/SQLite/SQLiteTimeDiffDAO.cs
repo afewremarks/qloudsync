@@ -2,8 +2,6 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using GreenQloud.Model;
-using System.Linq;
-using System.Data;
 
 namespace GreenQloud.Persistence.SQLite
 {
@@ -31,7 +29,7 @@ namespace GreenQloud.Persistence.SQLite
         #endregion
 
         public double Select (string sql){
-            DataTable dt = database.GetDataTable(sql);
+            System.Data.DataTable dt = database.GetDataTable(sql);
             return double.Parse(dt.Rows[0][0].ToString());
         }
     }

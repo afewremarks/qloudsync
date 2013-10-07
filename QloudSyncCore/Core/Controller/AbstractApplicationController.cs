@@ -200,7 +200,7 @@ namespace GreenQloud
             foreach (string folder in ht.Keys)
             {
                 LocalRepository repo = repoDAO.FindOrCreate(folder, ht[folder].ToString());
-                InitializeSynchronizers(repo, initRecovery);
+                InitializeSynchronizers(repo, initRecovery || repo.Recovering);
             }
         }
 
