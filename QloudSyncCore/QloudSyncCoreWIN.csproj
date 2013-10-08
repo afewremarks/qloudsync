@@ -57,10 +57,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Config\AbstractConfigFile.cs" />
-    <Compile Include="Core\Config\SelectedFoldersConfig.cs" />
     <Compile Include="Core\Controller\AbstractApplicationController.cs" />
     <Compile Include="Core\IO\QloudSyncFileSystemWatcherWIN.cs" />
-    <Compile Include="Core\Persistence\SQLite\SQLiteDataBaseWin.cs" />
+    <Compile Include="Core\Model\RepositoryIgnore.cs" />
+    <Compile Include="Core\Persistence\RepositoryIgnoreDAO.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryIgnoreDAO.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
     <Compile Include="Core\Exception\DisconnectionException.cs" />
     <Compile Include="Core\Exception\AccessDeniedException.cs" />
     <Compile Include="Core\Exception\PhysicalLocalRepositoryException.cs" />
@@ -108,7 +110,6 @@
     <Compile Include="Core\UI\ApplicationUI.cs" />
     <Compile Include="Core\Program.cs" />
     <Compile Include="Core\Model\SQTotalUsed.cs" />
-    <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

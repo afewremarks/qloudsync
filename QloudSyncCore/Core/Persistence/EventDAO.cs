@@ -26,6 +26,7 @@ namespace GreenQloud.Persistence
         public abstract void SetEventType (Event e);
         public abstract void RemoveAllUnsynchronized ();
         public abstract string LastSyncTime{get;}
+        public abstract void IgnoreFromIgnordList(Event e);
     }
 }
 

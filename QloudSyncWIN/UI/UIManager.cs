@@ -261,7 +261,14 @@ namespace GreenQloud.UI
         }
         internal void OnError()
         {
-            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
+            if (Program.Controller.ErrorType == GreenQloud.AbstractApplicationController.ERROR_TYPE.DISCONNECTION)
+            {
+                Console.WriteLine("DISCONNECTION!!!!!!!");
+                this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
+            }
+            else {
+                this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
+            }
         }
         internal void OnSyncing()
         {

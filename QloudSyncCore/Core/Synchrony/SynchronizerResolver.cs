@@ -246,6 +246,7 @@ namespace GreenQloud.Synchrony
             eventDAO.IgnoreAllEquals(e);
             eventDAO.IgnoreAllIfDeleted(e);
             eventDAO.IgnoreAllIfMoved(e);
+            eventDAO.IgnoreFromIgnordList(e);
         }
 
         void VerifySucess (Event e)

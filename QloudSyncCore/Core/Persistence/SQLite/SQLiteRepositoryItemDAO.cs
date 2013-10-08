@@ -8,7 +8,7 @@ using System.Data;
 
 namespace GreenQloud.Persistence.SQLite
 {
-    class SQLiteRepositoryItemDAO : RepositoryItemDAO
+    public class SQLiteRepositoryItemDAO : RepositoryItemDAO
     {
         #region implemented abstract members of RepositoryItemDAO
 

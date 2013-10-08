@@ -16,20 +16,27 @@ namespace GreenQloud.Persistence.SQLite
 
         public override void Create (LocalRepository e)
         {
-            database.ExecuteNonQuery (string.Format("INSERT INTO Repository (Path, RECOVERING, RemoteFolder) VALUES (\"{0}\", \"{1}\", \"{2}\")", e.Path, e.Recovering.ToString(), e.RemoteFolder));
+           e.Id = database.ExecuteNonQuery(string.Format("INSERT INTO Repository (Path, RECOVERING, RemoteFolder, Active) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\")", e.Path, e.Recovering.ToString(), e.RemoteFolder, e.Active), true);
         }
 
         public void Update (LocalRepository repo)
         {
-            database.ExecuteNonQuery (string.Format("UPDATE Repository SET Path=\"{0}\", RECOVERING=\"{1}\", RemoteFolder = \"{2}\" WHERE RepositoryID='{3}'", repo.Path, repo.Recovering.ToString(), repo.RemoteFolder, repo.Id));
+            database.ExecuteNonQuery(string.Format("UPDATE Repository SET Path=\"{0}\", RECOVERING=\"{1}\", RemoteFolder = \"{2}\", Active=\"{3}\" WHERE RepositoryID='{4}'", repo.Path, repo.Recovering.ToString(), repo.RemoteFolder, repo.Active, repo.Id));
         }
 
-        public override List<LocalRepository> All {
+        public List<LocalRepository> AllActived {
             get {        
-              return Select("SELECT * FROM REPOSITORY");
+              return Select(string.Format("SELECT * FROM REPOSITORY WHERE Active <> '{0}'", bool.FalseString));
             }
         }
 
+        public override List<LocalRepository> All
+        {
+            get
+            {
+                return Select("SELECT * FROM REPOSITORY");
+            }
+        }
         public void DeleteAll ()
         {
             database.ExecuteNonQuery ("DELETE FROM REPOSITORY");
@@ -38,7 +45,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public LocalRepository GetRepositoryByItemFullName (string itemFullName)
         {
-            return All.First (r=> itemFullName.StartsWith(r.Path));
+            return AllActived.First (r=> itemFullName.StartsWith(r.Path));
         }
 
         public LocalRepository FindOrCreate (string root, string remoteFolder)
@@ -50,6 +57,7 @@ namespace GreenQloud.Persistence.SQLite
             } else {
                 repo = new LocalRepository (root, remoteFolder);
                 repo.Recovering = true;
+                repo.Active = true;
                 Create (repo);
                 return FindOrCreate (root, remoteFolder);
             }
@@ -71,6 +79,10 @@ namespace GreenQloud.Persistence.SQLite
                 r.Id = int.Parse (dr[0].ToString());
                 if(dr[2].ToString().Length > 0)
                     r.Recovering = bool.Parse (dr[2].ToString());
+                r.RemoteFolder = dr[3].ToString();
+                if (dr[4].ToString().Length > 0)
+                    r.Active = bool.Parse(dr[4].ToString());
+
                 repos.Add (r);
             }
             return repos;
