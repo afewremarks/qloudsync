@@ -31,6 +31,10 @@ namespace GreenQloud {
             {
                 UIManager.GetInstance().OnError();
             };
+            OnPaused += delegate()
+            {
+                UIManager.GetInstance().OnPaused();
+            };
         }
 
         public override void CreateStartupItem() {

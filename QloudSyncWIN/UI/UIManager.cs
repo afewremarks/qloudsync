@@ -23,8 +23,7 @@ namespace GreenQloud.UI
         public AboutWindow About;
         private bool isLoged;
         private static UIManager instance;
-        private bool isPaused = false;
-
+        
         public static UIManager GetInstance(){
             if(instance == null)
                 instance = new UIManager();
@@ -49,7 +48,6 @@ namespace GreenQloud.UI
                 }
             };
  
-
             this.LoginWindow.OnLoginDone += (() =>
             {
                 this.isLoged = true;
@@ -97,6 +95,10 @@ namespace GreenQloud.UI
             ToolStripMenuItem recentlyChanged = new ToolStripMenuItem("Recently Changed");
             recentlyChanged.Enabled = false;
             this.trayMenu.Items.Add(recentlyChanged);
+
+            ToolStripMenuItem pauseSync = new ToolStripMenuItem();
+            pauseSync.Text = this.PauseText();
+            pauseSync.Click += PauseSyncronizers;
             
             //Dont remove this separators
             ToolStripSeparator recentlyChangedSeparator = new ToolStripSeparator();
@@ -107,7 +109,7 @@ namespace GreenQloud.UI
             
             this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
             this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
-            this.trayMenu.Items.Add("Pause Sync", null, PauseSyncronizers);
+            this.trayMenu.Items.Add(pauseSync);
             this.trayMenu.Items.Add("Check for Updates", null);
             this.trayMenu.Items.Add("-", null);
             this.trayMenu.Items.Add("Quit", null, OnExit);
@@ -122,6 +124,7 @@ namespace GreenQloud.UI
             };
 
             this.trayMenu.Opening += (sender, args) => {
+                pauseSync.Text = PauseText();
                 LoadExtraItems(recentlyChangedSeparator, recentlyChangedFinalSeparator, savings);
             };
         }
@@ -192,6 +195,18 @@ namespace GreenQloud.UI
             Program.Controller.SyncStart();
         }
 
+        private string PauseText()
+        {
+            if (Program.Controller.IsPaused())
+            {
+                return "Resume Sync";
+            }
+            else
+            {
+                return "Pause Sync";
+            }
+        }
+
         private string GetSavings()
         {
             try
@@ -244,15 +259,8 @@ namespace GreenQloud.UI
             base.OnLoad(e);
         }
 
-        public void OnPause(Object sender, EventArgs e)
-        {
-            Program.Controller.OnPaused += delegate()
-            {
-                //TODO Call OnPaused and change text
-                isPaused = true;
-            };
-        }
 
+   
         public void OnExit(Object sender, EventArgs e)
         {
             this.Dispose();
