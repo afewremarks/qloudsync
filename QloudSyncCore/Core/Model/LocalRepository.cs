@@ -8,9 +8,11 @@ namespace GreenQloud.Model
     {
         private static readonly SQLiteRepositoryDAO dao =  new SQLiteRepositoryDAO ();
 
-        public LocalRepository(string path, string remoteFolder){
+        public LocalRepository(string path, string remoteFolder, bool active = true, bool recovering = true){
             this.Path = path;
             this.RemoteFolder = remoteFolder;
+            this.Active = active;
+            this.Recovering = true;
         }
 
         public static LocalRepository CreateInstance (int id)
@@ -51,6 +53,8 @@ namespace GreenQloud.Model
         {
             return key.StartsWith (this.RemoteFolder) && !key.Equals (this.RemoteFolder);
         }
+
+        public bool Active { get; set; }
     }
 }
 
