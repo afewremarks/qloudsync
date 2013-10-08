@@ -272,13 +272,16 @@ namespace GreenQloud
 
         private void UpdateState()
         {
-            if (SynchronizerUnit.AnyWorking())
+            if (!isPaused)
             {
-                OnSyncing();
-            }
-            else
-            {
-                OnIdle();
+                if (SynchronizerUnit.AnyWorking())
+                {
+                    OnSyncing();
+                }
+                else
+                {
+                    OnIdle();
+                }
             }
         }
 
@@ -438,5 +441,11 @@ namespace GreenQloud
                 return false;
             }
         }
+
+        public bool IsPaused()
+        {
+            return isPaused;
+        }
+  
     }
 }
