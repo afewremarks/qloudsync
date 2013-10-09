@@ -85,6 +85,7 @@
     <Compile Include="Core\Synchrony\SynchronizerUnit.cs" />
     <Compile Include="Core\Util\Crypto.cs" />
     <Compile Include="Core\Util\Logger.cs" />
+    <Compile Include="Core\Util\NetworkTraffic.cs" />
     <Compile Include="Core\Util\Statistics.cs" />
     <Compile Include="Core\Util\Constant.cs" />
     <Compile Include="Core\Util\JSONHelper.cs" />
