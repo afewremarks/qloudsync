@@ -197,10 +197,9 @@ namespace GreenQloud
         public void InitializeSynchronizers(bool initRecovery = false)
         {
             RepositoryRaven repoRaven = new RepositoryRaven();
-            Hashtable ht = SelectedFoldersConfig.GetInstance().Read();
-            foreach (string folder in ht.Keys)
+            List<LocalRepository> repos = repoRaven.AllActived;
+            foreach (LocalRepository repo in repos)
             {
-                LocalRepository repo = repoRaven.FindOrCreate(folder, ht[folder].ToString());
                 InitializeSynchronizers(repo, initRecovery || repo.Recovering);
             }
         }
@@ -247,7 +246,8 @@ namespace GreenQloud
             }
             else
             {
-                if (SelectedFoldersConfig.GetInstance().IsEmpty())
+                RepositoryRaven rpoDAO = new RepositoryRaven();
+                if (rpoDAO.AllActived.Count == 0)
                 {
                     ShowSetupWindow(PageType.ConfigureFolders);
                 } else {
@@ -399,7 +399,6 @@ namespace GreenQloud
         public void UpdateConfigFile()
         {
             ConfigFile.GetInstance().UpdateConfigFile();
-            SelectedFoldersConfig.GetInstance().UpdateConfigFile();
         }
 
         public bool CreateHomeFolder()

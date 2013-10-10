@@ -132,16 +132,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Config\AbstractConfigFile.cs" />
-    <Compile Include="Core\Config\SelectedFoldersConfig.cs" />
     <Compile Include="Core\Controller\AbstractApplicationController.cs" />
     <Compile Include="Core\IO\QloudSyncFileSystemWatcherWIN.cs" />
     <Compile Include="Core\Model\RepositoryRavens.cs" />
     <Compile Include="Core\Model\TimeDiff.cs" />
     <Compile Include="Core\Persistence\RavenDB\DataDocumentStore.cs" />
     <Compile Include="Core\Persistence\RavenDB\EventRaven.cs" />
+    <Compile Include="Core\Persistence\RavenDB\RepositoryIgnoreRaven.cs" />
     <Compile Include="Core\Persistence\RavenDB\RepositoryItemRaven.cs" />
     <Compile Include="Core\Persistence\RavenDB\RepositoryRaven.cs" />
     <Compile Include="Core\Persistence\RavenDB\TimeDiffRaven.cs" />
+    <Compile Include="Core\Model\RepositoryIgnore.cs" />
     <Compile Include="Core\Exception\DisconnectionException.cs" />
     <Compile Include="Core\Exception\AccessDeniedException.cs" />
     <Compile Include="Core\Exception\PhysicalLocalRepositoryException.cs" />
@@ -159,6 +160,7 @@
     <Compile Include="Core\Synchrony\SynchronizerUnit.cs" />
     <Compile Include="Core\Util\Crypto.cs" />
     <Compile Include="Core\Util\Logger.cs" />
+    <Compile Include="Core\Util\NetworkTraffic.cs" />
     <Compile Include="Core\Util\Statistics.cs" />
     <Compile Include="Core\Util\Constant.cs" />
     <Compile Include="Core\Util\JSONHelper.cs" />

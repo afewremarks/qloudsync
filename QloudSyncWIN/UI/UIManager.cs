@@ -108,6 +108,7 @@ namespace GreenQloud.UI
             this.trayMenu.Items.Add(recentlyChangedFinalSeparator);
             
             this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
+            this.trayMenu.Items.Add("Network Status", null, OpenNetworkManager);
             this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
             this.trayMenu.Items.Add(pauseSync);
             this.trayMenu.Items.Add("Check for Updates", null);
@@ -218,14 +219,17 @@ namespace GreenQloud.UI
                 return ""; 
             }
         }
-
       
-
-
-
         public void OpenStorageQloudFolder(Object sender, EventArgs e)
         {
             Program.Controller.OpenSparkleShareFolder();
+        }
+
+        public void OpenNetworkManager(Object sender, EventArgs e)
+        {
+            NetworkManager manager = new NetworkManager();
+            manager.ShowDialog();
+
         }
 
         public void OpenStorageQloudRegistration(Object sender, EventArgs e)
@@ -286,7 +290,14 @@ namespace GreenQloud.UI
 
         internal void OnIdle()
         {
-            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_idle_active")).GetHicon()); 
+            if (Program.Controller.ErrorType == GreenQloud.AbstractApplicationController.ERROR_TYPE.DISCONNECTION)
+            {
+                Console.WriteLine("DISCONNECTION!!!!!!!");
+                this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
+            }
+            else {
+                this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
+            }
         }
         internal void OnError()
         {
