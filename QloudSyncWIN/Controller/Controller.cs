@@ -7,7 +7,6 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 using GreenQloud.Synchrony;
 using System.Collections.Generic;
-using GreenQloud.Persistence.SQLite;
 using System.Net.NetworkInformation;
 using GreenQloud.Model;
 using GreenQloud.UI;

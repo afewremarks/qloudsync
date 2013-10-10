@@ -2,12 +2,11 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using GreenQloud.Persistence;
-using GreenQloud.Persistence.SQLite;
 using GreenQloud.Repository;
 using GreenQloud.Util;
 using LitS3;
 using System.Linq;
+using QloudSyncCore.Core.Persistence;
 
 namespace GreenQloud.Model
 {
@@ -23,7 +22,7 @@ namespace GreenQloud.Model
 
     public class RepositoryItem
     {
-        private static readonly SQLiteRepositoryItemDAO dao =  new SQLiteRepositoryItemDAO ();
+        private static readonly RepositoryItemRaven dao =  new RepositoryItemRaven ();
 
         public RepositoryItem (LocalRepository repo)
         {
@@ -156,7 +155,8 @@ namespace GreenQloud.Model
         public RepositoryItem ResultItem{
             set {
                 resultItem = value;
-                ResultItemId = resultItem.Id;
+                if (resultItem != null)
+                    ResultItemId = resultItem.Id;
             }
             get {
                 if (resultItem == null && ResultItemId > 0)

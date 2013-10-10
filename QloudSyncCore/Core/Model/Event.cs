@@ -54,12 +54,41 @@ using System.Threading;
             set;
         }
 
+        public int ItemId
+        {
+            get;
+            set;
+        }
+
+
+        private RepositoryItem item;
         public RepositoryItem Item{
-			set; get;
+			set{
+               item = value;
+               if (repo != null)
+                   ItemId = item.Id;
+            } 
+            get{
+                return item;   
+            }
 		}
 
+        public int RepositoryId
+        {
+            set;
+            get;
+        }
+
+        private LocalRepository repo;
         public LocalRepository Repository{
-            set; get;
+            set {
+                repo = value;
+                if(repo != null)
+                    RepositoryId = repo.Id;
+            }
+            get{
+                return repo;
+            }
         }
 
         public bool HaveResultItem {
@@ -84,7 +113,7 @@ using System.Threading;
             set; get;
         }
 
-        public string InsertTime {
+        public DateTime InsertTime {
             get;
             set;
         }

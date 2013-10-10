@@ -11,13 +11,11 @@ using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Repository;
 using GreenQloud.Util;
-using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
-using GreenQloud.Persistence.SQLite;
 using System.Net.Sockets;
 using LitS3;
-using System.Linq;
 using GreenQloud.Core;
+using QloudSyncCore.Core.Persistence;
 
 namespace GreenQloud.Synchrony
 {
@@ -32,8 +30,8 @@ namespace GreenQloud.Synchrony
     public class SynchronizerResolver : AbstractSynchronizer<SynchronizerResolver>
     {
         private SyncStatus status;
-        protected EventDAO eventDAO;
-        protected RepositoryItemDAO repositoryItemDAO;
+        protected EventRaven eventDAO;
+        protected RepositoryItemRaven repositoryItemDAO;
         protected IPhysicalRepositoryController physicalLocalRepository;
         protected RemoteRepositoryController remoteRepository;
 
@@ -43,8 +41,8 @@ namespace GreenQloud.Synchrony
 
         public SynchronizerResolver (LocalRepository repo) : base (repo)
         {
-            eventDAO = new SQLiteEventDAO(repo);
-            repositoryItemDAO = new SQLiteRepositoryItemDAO ();
+            eventDAO = new EventRaven(repo);
+            repositoryItemDAO = new RepositoryItemRaven ();
             physicalLocalRepository = new StorageQloudPhysicalRepositoryController (repo);
             remoteRepository = new RemoteRepositoryController(repo);
         }
@@ -123,7 +121,7 @@ namespace GreenQloud.Synchrony
         {
             if(!localEvent.HaveResultItem){
                 if (!localEvent.Item.IsFolder) {
-                    FileInfo fi = new FileInfo (localEvent.Item.LocalAbsolutePath);
+                    FileInfo fi = new FileInfo (localEvent.Item.LocalAbsolutePath.Replace(@"\\", @"\"));
                     if (fi.Exists && fi.Length == 0)
                         return true;
                 }
@@ -156,12 +154,12 @@ namespace GreenQloud.Synchrony
                             return;
                         }
 
-                        //refresh event
-                        e = eventDAO.FindById(e.Id);
                         if(e.Synchronized){
                             Logger.LogInfo ("INFO", "Event " + e.Id + " already synchronized with response " + e.Response);
                             return;
                         }
+                        //refresh event
+                        e = eventDAO.FindById(e.Id);
                         Logger.LogEvent ("Event Synchronizing (try "+(e.TryQnt+1)+")", e );
                         if (e.RepositoryType == RepositoryType.LOCAL) {
                             SyncStatus = SyncStatus.UPLOADING;
@@ -225,6 +223,8 @@ namespace GreenQloud.Synchrony
                     } catch (Exception ex) {
                         currentException = ex;
                     }
+
+                    //TODO teste
 
                     e.TryQnt++;
                     eventDAO.UpdateTryQnt (e);

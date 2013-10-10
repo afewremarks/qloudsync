@@ -1,12 +1,12 @@
+using QloudSyncCore.Core.Persistence;
 using System;
-using GreenQloud.Persistence.SQLite;
 using System.Collections.Generic;
 
 namespace GreenQloud.Model
 {
     public class LocalRepository
     {
-        private static readonly SQLiteRepositoryDAO dao =  new SQLiteRepositoryDAO ();
+        private static readonly RepositoryRaven dao =  new RepositoryRaven ();
 
         public LocalRepository(string path, string remoteFolder){
             this.Path = path;

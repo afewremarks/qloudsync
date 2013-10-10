@@ -6,7 +6,7 @@ using System.IO;
 using System.Timers;
 using System.Collections;
 using GreenQloud.Model;
-using GreenQloud.Persistence.SQLite;
+using QloudSyncCore.Core.Persistence;
 
 namespace GreenQloud
 {
@@ -17,7 +17,7 @@ namespace GreenQloud
         public delegate void ChangedEventHandler(Event e);
         public event ChangedEventHandler Changed;
         private LocalRepository repo;
-        private SQLiteRepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO();
+        private RepositoryItemRaven repositoryItemDAO = new RepositoryItemRaven();
 
         private FileSystemWatcher parentFolderWatcher = null, subfolderWatcher = null;
         private System.Object lockThis = new System.Object(), processChangesLock = new System.Object();
@@ -158,22 +158,28 @@ namespace GreenQloud
             processChanges();
         }
 
+        private string ConvertToDirectoryPathString(string key){
+            if (!key.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    return key + Path.DirectorySeparatorChar;
+
+            return key;
+        }
         private Event BuildEvent(EventType type, bool isDirectory, string path, string newPath = null) {
             Event e = new Event(repo);
             e.EventType = type;
             if (path != null)
             {
                 string key = path.Substring(repo.Path.Length);
-                if (isDirectory && !key.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                    key += Path.DirectorySeparatorChar;
+                if (isDirectory)
+                    key = ConvertToDirectoryPathString(key);
                 e.Item = RepositoryItem.CreateInstance(repo, key);
             }
 
             if (newPath != null)
             {
                 string key = newPath.Substring(repo.Path.Length);
-                if (isDirectory && !key.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                    key += Path.DirectorySeparatorChar;
+                if (isDirectory)
+                    key = ConvertToDirectoryPathString(key); ;
 
                 e.Item.ResultItem = RepositoryItem.CreateInstance(repo, key);
             }
@@ -224,6 +230,11 @@ namespace GreenQloud
                                         isDirectory = false;
                                     }
 
+                                    if (isDirectory) {
+                                        deleteItem.path = ConvertToDirectoryPathString(deleteItem.path);
+                                        createItem.path = ConvertToDirectoryPathString(createItem.path);
+                                    }
+
                                     if (!ignoreBag.Contains(deleteItem.path))
                                     {
                                         Event e = BuildEvent(EventType.MOVE, isDirectory, deleteItem.path, createItem.path);
@@ -246,6 +257,11 @@ namespace GreenQloud
                                             isDirectory = false;
                                         }
 
+                                        if (isDirectory)
+                                        {
+                                            createItem.path = ConvertToDirectoryPathString(createItem.path);
+                                        }
+
                                         if (!ignoreBag.Contains(createItem.path))
                                         {
                                             Event e = BuildEvent(EventType.CREATE, isDirectory, createItem.path);
@@ -266,6 +282,12 @@ namespace GreenQloud
 
                                 if (deleteItem != null)
                                 {
+
+                                    if (deleteItem.isFolder)
+                                    {
+                                        deleteItem.path = ConvertToDirectoryPathString(deleteItem.path);
+                                    }
+
                                     if (!ignoreBag.Contains(deleteItem.path))
                                     {
                                         Event e = BuildEvent(EventType.DELETE, deleteItem.isFolder, deleteItem.path);
@@ -290,6 +312,12 @@ namespace GreenQloud
                                     if (renameItem.type == "file")
                                     {
                                         isDirectory = false;
+                                    }
+
+                                    if (isDirectory)
+                                    {
+                                        renameItem.oldPath = ConvertToDirectoryPathString(renameItem.oldPath);
+                                        renameItem.newPath = ConvertToDirectoryPathString(renameItem.newPath);
                                     }
 
                                     if (!ignoreBag.Contains(renameItem.oldPath))

@@ -14,7 +14,6 @@ using Newtonsoft;
 using GreenQloud.Model;
 using GreenQloud.Repository;
 using GreenQloud.Util;
-using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
 
 
@@ -36,6 +35,7 @@ namespace GreenQloud
                 
                 return Newtonsoft.Json.Linq.JObject.Parse(receiveContent);
             } catch (Exception e){
+                Console.WriteLine(e.StackTrace);
                 return new JObject();
             }
         }

@@ -1,7 +1,7 @@
 ﻿using GreenQloud;
 using GreenQloud.Model;
-using GreenQloud.Persistence.SQLite;
 using GreenQloud.Synchrony;
+using QloudSyncCore.Core.Persistence;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -124,7 +124,7 @@ namespace GreenQloud
                 }
                 catch
                 {
-                    SQLiteTimeDiffDAO dao = new SQLiteTimeDiffDAO();
+                    TimeDiffRaven dao = new TimeDiffRaven();
                     if (dao.Count == 0)
                     {
                         Logger.LogInfo("ERROR", "Failed to load server time... attempt to try again.");
@@ -141,7 +141,7 @@ namespace GreenQloud
 
         public void InitializeSynchronizers(LocalRepository repo, bool initRecovery = false)
         {
-            SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO();
+            RepositoryRaven repoDAO = new RepositoryRaven();
             if (initRecovery || repo.Recovering)
             {
                 initRecovery = true;
@@ -196,11 +196,11 @@ namespace GreenQloud
 
         public void InitializeSynchronizers(bool initRecovery = false)
         {
-            SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO();
+            RepositoryRaven repoRaven = new RepositoryRaven();
             Hashtable ht = SelectedFoldersConfig.GetInstance().Read();
             foreach (string folder in ht.Keys)
             {
-                LocalRepository repo = repoDAO.FindOrCreate(folder, ht[folder].ToString());
+                LocalRepository repo = repoRaven.FindOrCreate(folder, ht[folder].ToString());
                 InitializeSynchronizers(repo, initRecovery || repo.Recovering);
             }
         }
@@ -209,11 +209,13 @@ namespace GreenQloud
         {
             new Thread(() => CreateStartupItem()).Start();
             checkConnection.Start();
+
+            //TODO REFATORAR URGENTEs
             if (!File.Exists(RuntimeSettings.DatabaseFile))
             {
                 if (!Directory.Exists(RuntimeSettings.DatabaseFolder))
                     Directory.CreateDirectory(RuntimeSettings.DatabaseFolder);
-                SQLiteDatabase.Instance().CreateDataBase();
+                DataDocumentStore.Initialize();
                 File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
             }
             else
@@ -233,7 +235,7 @@ namespace GreenQloud
                 }
                 if (!File.Exists(RuntimeSettings.DatabaseFile))
                 {
-                    SQLiteDatabase.Instance().CreateDataBase();
+                    DataDocumentStore.Initialize();
                     File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
                 }
             }
