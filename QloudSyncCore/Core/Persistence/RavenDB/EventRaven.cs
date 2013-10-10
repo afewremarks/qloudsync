@@ -33,12 +33,30 @@ namespace QloudSyncCore.Core.Persistence
                 {
                     dateOfEvent = GlobalDateTime.Now;
                 }
+                e.InsertTime = dateOfEvent;
 
-                e.Synchronized = false;
-                e.InsertTime = dateOfEvent;;
+
+                //Verify ignore
+                RepositoryIgnoreRaven ignoreDato = new RepositoryIgnoreRaven();
+                List<RepositoryIgnore> ignores = ignoreDato.All(this.repo);
+                bool ignore = false;
+                foreach (RepositoryIgnore ignoreItem in ignores)
+                {
+                    if (e.Item.Key.StartsWith(ignoreItem.Path))
+                    {
+                        e.Synchronized = true;
+                        e.Response = RESPONSE.IGNORED;
+                    }
+                }
+
+                
                 DataDocumentStore.Insert(e);
 
                 Logger.LogEvent("EVENT CREATED", e);
+                if (e.Response == RESPONSE.IGNORED)
+                {
+                    Logger.LogEvent("EVENT MARKED TO IGNORE", e);
+                }
             }catch(Exception err){
                 Logger.LogInfo("ERROR", err);
             }
