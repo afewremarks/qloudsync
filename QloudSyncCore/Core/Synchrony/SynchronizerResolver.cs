@@ -81,14 +81,15 @@ namespace GreenQloud.Synchrony
 
         public void SolveAll ()
         {
-            eventsToSync =  eventDAO.EventsNotSynchronized.Count;
-            while (eventsToSync > 0 && !_stoped) {
-                Synchronize ();
+            eventsToSync = eventDAO.EventsNotSynchronized.Count;
+            while (eventsToSync > 0 && !_stoped)
+            {
+                Synchronize();
                 eventsToSync = eventDAO.EventsNotSynchronized.Count;
             }
             SyncStatus = SyncStatus.IDLE;
             Done = true;
-            Thread.Sleep (1000);
+            Thread.Sleep(1000);
         }
 
         private bool VerifyIgnoreRemote (Event remoteEvent)
@@ -154,12 +155,13 @@ namespace GreenQloud.Synchrony
                             return;
                         }
 
+                        //refresh event
+                        e = eventDAO.FindById(e.Id);
                         if(e.Synchronized){
                             Logger.LogInfo ("INFO", "Event " + e.Id + " already synchronized with response " + e.Response);
                             return;
                         }
-                        //refresh event
-                        e = eventDAO.FindById(e.Id);
+                       
                         Logger.LogEvent ("Event Synchronizing (try "+(e.TryQnt+1)+")", e );
                         if (e.RepositoryType == RepositoryType.LOCAL) {
                             SyncStatus = SyncStatus.UPLOADING;
