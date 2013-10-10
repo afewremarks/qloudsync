@@ -61,6 +61,14 @@ namespace QloudSyncCore.Core.Persistence
         {
             return DataDocumentStore.Instance.OpenSession().Load<LocalRepository>(id);
         }
+
+        public List<LocalRepository> AllActived
+        {
+            get
+            {
+                return DataDocumentStore.Instance.OpenSession().Query<LocalRepository>().Where(lr => lr.Active != false).ToList();
+            }
+        }
     
     }
 }

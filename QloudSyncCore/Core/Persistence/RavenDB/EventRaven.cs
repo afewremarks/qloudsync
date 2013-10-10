@@ -110,6 +110,22 @@ namespace QloudSyncCore.Core.Persistence
             }
         }
 
+        public void IgnoreFromIgnordList(Event e)
+        {
+            RepositoryIgnoreRaven ignoreDato = new RepositoryIgnoreRaven();
+            List<RepositoryIgnore> ignores = ignoreDato.All(this.repo);
+            bool ignore = false;
+            foreach (RepositoryIgnore ignoreItem in ignores)
+            {
+                if (e.Item.Key.StartsWith(ignoreItem.Path) || (e.EventType == EventType.MOVE && e.Item.ResultItem.Key.StartsWith(ignoreItem.Path)))
+                {
+                    ignore = true;
+                }
+            }
+            if (ignore)
+                UpdateToSynchronized(e, RESPONSE.IGNORED);
+        }
+
         public void CombineMultipleMoves (Event e){
             Event toCombine = null;
             Event combineWith = null;
