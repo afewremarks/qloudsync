@@ -1,7 +1,6 @@
 using System;
 using GreenQloud.Model;
 using GreenQloud.Repository.Local;
-using GreenQloud.Persistence;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
@@ -9,8 +8,8 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json.Linq;
 using GreenQloud.Repository;
-using GreenQloud.Persistence.SQLite;
 using System.IO;
+using QloudSyncCore.Core.Persistence;
 
 namespace GreenQloud.Synchrony
 {
@@ -18,16 +17,16 @@ namespace GreenQloud.Synchrony
     {
         private bool eventsCreated;
         private IRemoteRepositoryController remoteController;
-        private SQLiteEventDAO eventDAO;
-        private RepositoryItemDAO repositoryItemDAO;
+        private EventRaven eventDAO;
+        private RepositoryItemRaven repositoryItemDAO;
         private IRemoteRepositoryController remoteRepository;
 
 
         public RemoteEventsSynchronizer (LocalRepository repo) : base (repo)
         {
             remoteController = new RemoteRepositoryController (repo);
-            eventDAO = new SQLiteEventDAO(repo);
-            repositoryItemDAO = new SQLiteRepositoryItemDAO();
+            eventDAO = new EventRaven(repo);
+            repositoryItemDAO = new RepositoryItemRaven();
             remoteRepository = new RemoteRepositoryController (repo);
         }
 
@@ -41,11 +40,11 @@ namespace GreenQloud.Synchrony
         public void AddEvents ()
         {
             string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
-            string time = eventDAO.LastSyncTime;
+            DateTime time = eventDAO.LastSyncTime;
             Logger.LogInfo("StorageQloud", "Looking for new changes on " + repo.RemoteFolder + " ["+time+"]");
 
             UrlEncode encoder = new UrlEncode();
-            string uri = string.Format ("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hashValue={2}&createdDate={3}", encoder.Encode (RuntimeSettings.DefaultBucketName), encoder.Encode (Credential.Username), encoder.Encode (hash), encoder.Encode (time));
+            string uri = string.Format("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hashValue={2}&createdDate={3}", encoder.Encode(RuntimeSettings.DefaultBucketName), encoder.Encode(Credential.Username), encoder.Encode(hash), encoder.Encode(time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'")));
 
             JArray jsonObjects = JSONHelper.GetInfoArray(uri);
             foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
@@ -61,7 +60,7 @@ namespace GreenQloud.Synchrony
                         e.DeviceId = (string)jsonObject["deviceId"];
                         e.OS = (string)jsonObject["os"];
                         e.Bucket = (string)jsonObject["bucket"];
-                        e.InsertTime = ((DateTime)jsonObject["createdDate"]).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                        e.InsertTime = ((DateTime)jsonObject["createdDate"]);
                         e.Item = RepositoryItem.CreateInstance (repo, key);
                         e.Item.BuildResultItem((string)jsonObject["resultObject"]);
                         e.Item.ETag = (string)jsonObject["hash"];

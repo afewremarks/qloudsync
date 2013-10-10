@@ -6,10 +6,10 @@ using System.Windows.Forms;
 using System.Drawing;
 using QloudSyncCore;
 using GreenQloud.Model;
-using GreenQloud.Persistence.SQLite;
 using GreenQloud.UI.Setup;
 using System.Threading;
 using System.Reflection;
+using QloudSyncCore.Core.Persistence;
 
 namespace GreenQloud.UI
 {
@@ -144,7 +144,7 @@ namespace GreenQloud.UI
 
             if (Program.Controller.DatabaseLoaded())
             {
-                SQLiteEventDAO eventDao = new SQLiteEventDAO();
+                EventRaven eventDao = new EventRaven();
                 List<Event> events = eventDao.LastEvents;
                 
                 foreach (Event e in events)

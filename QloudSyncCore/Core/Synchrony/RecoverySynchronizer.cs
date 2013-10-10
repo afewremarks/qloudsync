@@ -5,9 +5,8 @@ using System.Linq;
 using System.Xml;
 using System.Threading;
 using GreenQloud.Model;
-using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
-using GreenQloud.Persistence.SQLite;
+using QloudSyncCore.Core.Persistence;
 
  namespace GreenQloud.Synchrony
 {
@@ -15,12 +14,12 @@ using GreenQloud.Persistence.SQLite;
     {
         private IRemoteRepositoryController remoteRepository;
         private IPhysicalRepositoryController localRepository;
-        private SQLiteEventDAO eventDAO;
+        private EventRaven eventDAO;
 
         public RecoverySynchronizer (LocalRepository repo) : base (repo) {
             remoteRepository = new RemoteRepositoryController (repo);
             localRepository = new StorageQloudPhysicalRepositoryController (repo);
-            eventDAO = new SQLiteEventDAO(repo);
+            eventDAO = new EventRaven(repo);
         }
 
         public override void Run() {
@@ -43,14 +42,18 @@ using GreenQloud.Persistence.SQLite;
 
         void CheckRemoteFolder ()
         {
-            Event e = new Event (repo);
-            RepositoryItem item1 = RepositoryItem.CreateInstance(repo, repo.RemoteFolder);
-            e.Item = item1;
-            e.RepositoryType = RepositoryType.LOCAL;
-            e.EventType = EventType.CREATE;
-            eventDAO.Create (e);
-            if (remoteRepository.Exists (item1)) {
-                eventDAO.UpdateToSynchronized (e, RESPONSE.IGNORED);
+            if (repo.RemoteFolder.Length > 0)
+            {
+                Event e = new Event(repo);
+                RepositoryItem item1 = RepositoryItem.CreateInstance(repo, repo.RemoteFolder);
+                e.Item = item1;
+                e.RepositoryType = RepositoryType.LOCAL;
+                e.EventType = EventType.CREATE;
+                eventDAO.Create(e);
+                if (remoteRepository.Exists(item1))
+                {
+                    eventDAO.UpdateToSynchronized(e, RESPONSE.IGNORED);
+                }
             }
         }
 

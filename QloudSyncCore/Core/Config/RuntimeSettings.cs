@@ -7,7 +7,6 @@ namespace GreenQloud
     public class RuntimeSettings : Settings
     {
         private static string homePath = null;
-        private static string backlogFile = null;
         private static string configPath = null;
 
 

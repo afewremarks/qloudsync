@@ -1,6 +1,7 @@
 #if __MonoCS__
 #else
 using Community.CsharpSqlite.SQLiteClient;
+using QloudSyncCore.Core.Persistence.RavenDB;
 using System;
 using System.Collections.Generic;
 using System.Data;

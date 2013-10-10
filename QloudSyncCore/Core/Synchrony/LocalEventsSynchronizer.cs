@@ -1,9 +1,8 @@
 using System;
 using GreenQloud.Repository.Local;
-using GreenQloud.Persistence;
 using GreenQloud.Model;
 using System.Threading;
-using GreenQloud.Persistence.SQLite;
+using QloudSyncCore.Core.Persistence;
 using System.Collections.Generic;
 using System.IO;
 using GreenQloud.Repository;
@@ -12,9 +11,8 @@ namespace GreenQloud.Synchrony
 {
     public class LocalEventsSynchronizer : AbstractSynchronizer<LocalEventsSynchronizer>
     {
-        private Dictionary<string, QloudSyncFileSystemWatcher> watchers;
-        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
-        private SQLiteEventDAO eventDAO;
+        private RepositoryRaven repositoryDAO = new RepositoryRaven();
+        private EventRaven eventDAO;
         private Thread watcherThread;
         private QloudSyncFileSystemWatcher watcher;
         public delegate void FinishedEventHandler ();
@@ -22,7 +20,7 @@ namespace GreenQloud.Synchrony
 
         public LocalEventsSynchronizer (LocalRepository repo) : base (repo)
         {
-            eventDAO = new SQLiteEventDAO(repo);
+            eventDAO = new EventRaven(repo);
         }
 
         public override void Run(){

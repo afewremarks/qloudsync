@@ -3,7 +3,6 @@ using System.IO;
 using System.Collections.Generic;
 using GreenQloud.Model;
 using System.Linq;
-using GreenQloud.Persistence.SQLite;
 using GreenQloud.Synchrony;
 using System.Threading;
 

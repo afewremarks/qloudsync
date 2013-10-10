@@ -59,7 +59,9 @@ namespace GreenQloud.Repository
                 S3Service service = connection.Connect ();
 
                 var request = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, item.Key, true);
-                using (GetObjectResponse response = request.GetResponse());
+                using (GetObjectResponse response = request.GetResponse()) { 
+                    //todo...
+                }
             } catch (WebException webx) {
                 if (((HttpWebResponse)webx.Response).StatusCode == HttpStatusCode.NotFound)
                     return false;

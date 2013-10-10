@@ -11,7 +11,6 @@ using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Repository;
 using GreenQloud.Util;
-using GreenQloud.Persistence;
 using GreenQloud.Repository.Local;
 using System.Net.Sockets;
 using GreenQloud.Core;
