@@ -16,7 +16,6 @@ namespace QloudSyncCore.Core.Util
         public NetworkTraffic(int processID)
         {
             pid = processID;
-            Console.WriteLine(processID);
             TryToInitializeCounters();
         }
 
@@ -30,7 +29,6 @@ namespace QloudSyncCore.Core.Util
 
                 if (instanceNames.Any())
                 {
-                    Console.WriteLine("Entrou aqui?"); 
                     bytesSentPerformanceCounter = new PerformanceCounter();
                     bytesSentPerformanceCounter.CategoryName = ".NET CLR Networking 4.0.0.0";
                     bytesSentPerformanceCounter.CounterName = "Bytes Sent";
