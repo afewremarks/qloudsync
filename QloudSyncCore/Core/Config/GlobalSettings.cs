@@ -87,7 +87,18 @@ namespace GreenQloud
         
         public static string AuthenticationURL {
             get {
-                return ConfigFile.GetInstance().Read ("AuthenticationURL");
+                if (UseAsReseller)
+                    return ConfigFile.GetInstance().Read("AuthenticationURLReseller");
+                else
+                    return ConfigFile.GetInstance().Read ("AuthenticationURL");
+            }
+        }
+
+        public static bool UseAsReseller
+        {
+            get
+            {
+                return bool.Parse(ConfigFile.GetInstance().Read("UseAsReseller"));
             }
         }
         
