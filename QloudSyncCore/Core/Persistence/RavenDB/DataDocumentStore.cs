@@ -1,6 +1,7 @@
 ﻿using GreenQloud;
 using Raven.Abstractions.Data;
 using Raven.Client;
+using Raven.Client.Document;
 using Raven.Client.Embedded;
 using Raven.Client.Indexes;
 using System;
@@ -31,6 +32,9 @@ namespace QloudSyncCore.Core.Persistence
             instance = new EmbeddableDocumentStore { DataDirectory = RuntimeSettings.ConfigPath + Path.DirectorySeparatorChar + "qloudSync_db" };
             instance.Conventions.IdentityPartsSeparator = "-";
             instance.Initialize();
+            instance.DisableAggressiveCaching();
+            instance.DatabaseCommands.DisableAllCaching();
+            //instance.Conventions.DefaultQueryingConsistency = ConsistencyOptions.QueryYourWrites;
             return instance;
         }
 

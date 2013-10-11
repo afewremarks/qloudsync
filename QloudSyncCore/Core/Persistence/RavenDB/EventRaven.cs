@@ -219,7 +219,7 @@ namespace QloudSyncCore.Core.Persistence
         public List<Event> EventsNotSynchronized {
             get {
                 List<Event> list = DataDocumentStore.Instance.OpenSession().Query<Event>().Where
-                    (ev => ev.Synchronized == false && ev.InsertTime < GlobalDateTime.Now.AddSeconds(-10) && ev.RepositoryId == repo.Id).ToList();
+                    (ev => ev.Synchronized == false && ev.RepositoryId == repo.Id).ToList();
                 return list;
             }
         }
