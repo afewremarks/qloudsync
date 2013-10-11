@@ -111,7 +111,7 @@ namespace GreenQloud.UI
             this.trayMenu.Items.Add("Network Status", null, OpenNetworkManager);
             this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
             this.trayMenu.Items.Add(pauseSync);
-            this.trayMenu.Items.Add("Check for Updates", null);
+            this.trayMenu.Items.Add("Check for Updates", null, CheckForUpdates);
             this.trayMenu.Items.Add("-", null);
             this.trayMenu.Items.Add("Quit", null, OnExit);
 
@@ -223,6 +223,11 @@ namespace GreenQloud.UI
         public void OpenStorageQloudFolder(Object sender, EventArgs e)
         {
             Program.Controller.OpenSparkleShareFolder();
+        }
+
+        public void CheckForUpdates(Object sender, EventArgs e)
+        {
+            MessageBox.Show("Your Current Version is up to date");
         }
 
         public void OpenNetworkManager(Object sender, EventArgs e)

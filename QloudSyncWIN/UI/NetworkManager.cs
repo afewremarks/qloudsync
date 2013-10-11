@@ -1,4 +1,6 @@
-﻿using QloudSyncCore.Core.Util;
+﻿using GreenQloud.Model;
+using QloudSyncCore.Core.Persistence;
+using QloudSyncCore.Core.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,6 +22,8 @@ namespace GreenQloud.UI
         Timer bandwidthCalcTimer = new Timer();
         float lastAmountOfBytesReceived;
 
+        
+
         public NetworkManager()
         {
             InitializeComponent();
@@ -32,10 +36,20 @@ namespace GreenQloud.UI
 
         void bandwidthCalcTimer_Tick(object sender, EventArgs e)
         {
+            EventRaven eventDao = new EventRaven();
+            List<Event> events = eventDao.LastEvents;
+
             float currentAmountOfBytesReceived = trafficMonitor.GetBytesReceived();
             totalBandwidthConsumptionLabel.Text = string.Format("Total Bandwidth Consumption: {0} kb", (currentAmountOfBytesReceived / 1024).ToString("0.00"));
             currentBandwidthConsumptionLabel.Text = string.Format("Current Bandwidth Consumption: {0} kb/sec", (((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024)).ToString("0.00"));
-            //TODO Items remaining
+            if (((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024) > 1)
+            {
+                numberofitems.Text = string.Format("Items in Process: {0}", 1);
+            }
+            else
+            {
+                numberofitems.Text = string.Format("Items in Process: {0}", 0);
+            }
             //Progress Bar
             lastAmountOfBytesReceived = currentAmountOfBytesReceived;
         }

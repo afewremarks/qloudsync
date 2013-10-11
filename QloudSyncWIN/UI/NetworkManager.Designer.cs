@@ -32,7 +32,7 @@
             this.totalBandwidthConsumptionLabel = new System.Windows.Forms.Label();
             this.currentBandwidthConsumptionLabel = new System.Windows.Forms.Label();
             this.numberofitems = new System.Windows.Forms.Label();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.listView1 = new System.Windows.Forms.ListView();
             this.SuspendLayout();
             // 
             // totalBandwidthConsumptionLabel
@@ -67,18 +67,19 @@
             this.numberofitems.BackColor = System.Drawing.Color.Transparent;
             this.numberofitems.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.numberofitems.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.numberofitems.Location = new System.Drawing.Point(502, 9);
+            this.numberofitems.Location = new System.Drawing.Point(479, 9);
             this.numberofitems.Name = "numberofitems";
             this.numberofitems.Size = new System.Drawing.Size(104, 13);
             this.numberofitems.TabIndex = 3;
             this.numberofitems.Text = "Items in Process:";
             // 
-            // progressBar1
+            // listView1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(13, 59);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(593, 23);
-            this.progressBar1.TabIndex = 4;
+            this.listView1.Location = new System.Drawing.Point(15, 66);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(591, 168);
+            this.listView1.TabIndex = 4;
+            this.listView1.UseCompatibleStateImageBehavior = false;
             // 
             // NetworkManager
             // 
@@ -86,7 +87,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = global::GreenQloud.Properties.Resources.Network;
             this.ClientSize = new System.Drawing.Size(624, 266);
-            this.Controls.Add(this.progressBar1);
+            this.Controls.Add(this.listView1);
             this.Controls.Add(this.numberofitems);
             this.Controls.Add(this.currentBandwidthConsumptionLabel);
             this.Controls.Add(this.totalBandwidthConsumptionLabel);
@@ -108,6 +109,6 @@
         private System.Windows.Forms.Label totalBandwidthConsumptionLabel;
         private System.Windows.Forms.Label currentBandwidthConsumptionLabel;
         private System.Windows.Forms.Label numberofitems;
-        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.ListView listView1;
     }
 }
