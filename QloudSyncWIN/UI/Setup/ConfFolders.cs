@@ -73,8 +73,6 @@ namespace GreenQloud.UI.Setup
             LocalRepository repo = new LocalRepository(this.label2.Text, "", true);
             repoDao.Create(repo);
             createIgnoredList(repo);
-            Directory.CreateDirectory(this.label2.Text);
-            //TODO COLOCAR O ICON....
             UIManager.GetInstance().ReadyToSync();
         }
 
