@@ -200,6 +200,7 @@ namespace GreenQloud
             List<LocalRepository> repos = repoRaven.AllActived;
             foreach (LocalRepository repo in repos)
             {
+                CreateRepoFolder(repo);
                 InitializeSynchronizers(repo, initRecovery || repo.Recovering);
             }
         }
@@ -401,17 +402,11 @@ namespace GreenQloud
             ConfigFile.GetInstance().UpdateConfigFile();
         }
 
-        public bool CreateHomeFolder()
+        public void CreateRepoFolder(LocalRepository repo)
         {
-            if (!Directory.Exists(RuntimeSettings.HomePath))
+            if (!Directory.Exists(repo.Path))
             {
-                Directory.CreateDirectory(RuntimeSettings.HomePath);
-                return true;
-
-            }
-            else
-            {
-                return false;
+                Directory.CreateDirectory(repo.Path);
             }
         }
 
