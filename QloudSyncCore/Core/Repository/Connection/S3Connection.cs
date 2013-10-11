@@ -4,6 +4,7 @@ using System.Net;
 using System.IO;
 using System.Text;
 using LitS3;
+using System.Collections.Specialized;
 
 namespace QloudSync.Repository
 {
@@ -15,14 +16,28 @@ namespace QloudSync.Repository
 
         public static void Authenticate (string username, string password)
         {
-            Uri uri = new Uri (GlobalSettings.AuthenticationURL);
+            Uri uri;
 
-            WebRequest myReq = WebRequest.Create (uri);
-            string usernamePassword = username + ":" + password;
-            CredentialCache mycache = new CredentialCache ();
-            mycache.Add (uri, "Basic", new NetworkCredential (username, password));
-            myReq.Credentials = mycache;
-            myReq.Headers.Add ("Authorization", "Basic " + Convert.ToBase64String (new ASCIIEncoding ().GetBytes (usernamePassword)));
+            WebRequest myReq;
+            if (GlobalSettings.UseAsReseller)
+            {
+                NameValueCollection queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
+                queryString["username"] =  username;
+                queryString["password"] = password;
+
+                uri = new Uri(GlobalSettings.AuthenticationURL + "?" + queryString.ToString());
+                myReq = WebRequest.Create(uri);
+            }
+            else 
+            {
+                uri = new Uri(GlobalSettings.AuthenticationURL);
+                myReq = WebRequest.Create(uri);
+                string usernamePassword = username + ":" + password;
+                CredentialCache mycache = new CredentialCache();
+                mycache.Add(uri, "Basic", new NetworkCredential(username, password));
+                myReq.Credentials = mycache;
+                myReq.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(new ASCIIEncoding().GetBytes(usernamePassword)));
+            }
             using (WebResponse wr = myReq.GetResponse ()){
                 Stream receiveStream = wr.GetResponseStream ();
                 StreamReader reader = new StreamReader (receiveStream, Encoding.UTF8);
