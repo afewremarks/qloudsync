@@ -18,7 +18,7 @@ namespace GreenQloud.Synchrony
         public delegate void FinishedEventHandler ();
         object _lock = new object();
 
-        public LocalEventsSynchronizer (LocalRepository repo) : base (repo)
+        public LocalEventsSynchronizer (LocalRepository repo, SynchronizerUnit unit) : base (repo, unit)
         {
             eventDAO = new SQLiteEventDAO(repo);
         }
@@ -30,6 +30,7 @@ namespace GreenQloud.Synchrony
                     watcher.Changed += delegate(Event e) {
                         lock(_lock){
                             CreateEvent (e);
+                            canChange = true;
                         }
                     };
                 });
@@ -51,6 +52,7 @@ namespace GreenQloud.Synchrony
             e.RepositoryType = RepositoryType.LOCAL;
             eventDAO.Create (e);
         }
+
     }
 }
 

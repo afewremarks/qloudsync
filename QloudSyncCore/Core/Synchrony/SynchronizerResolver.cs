@@ -39,7 +39,7 @@ namespace GreenQloud.Synchrony
         public delegate void SyncStatusChangedHandler (SyncStatus status);
         public event SyncStatusChangedHandler SyncStatusChanged = delegate {};
 
-        public SynchronizerResolver (LocalRepository repo) : base (repo)
+        public SynchronizerResolver (LocalRepository repo, SynchronizerUnit unit) : base (repo, unit)
         {
             eventDAO = new SQLiteEventDAO(repo);
             repositoryItemDAO = new SQLiteRepositoryItemDAO();

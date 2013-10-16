@@ -15,14 +15,13 @@ namespace GreenQloud.Synchrony
 {
     public class RemoteEventsSynchronizer : AbstractSynchronizer<RemoteEventsSynchronizer>
     {
-        private bool eventsCreated;
         private IRemoteRepositoryController remoteController;
         private SQLiteEventDAO eventDAO;
         private SQLiteRepositoryItemDAO repositoryItemDAO;
         private IRemoteRepositoryController remoteRepository;
 
 
-        public RemoteEventsSynchronizer (LocalRepository repo) : base (repo)
+        public RemoteEventsSynchronizer (LocalRepository repo, SynchronizerUnit unit) : base (repo, unit)
         {
             remoteController = new RemoteRepositoryController (repo);
             eventDAO = new SQLiteEventDAO(repo);
@@ -31,9 +30,13 @@ namespace GreenQloud.Synchrony
         }
 
         public override void Run(){
+            Stop();
+            this.unit.RecoverySynchronizer.WaitForChanges(0);
+            Start();
+
             while (!_stoped){
                 AddEvents();
-                Thread.Sleep (5000);
+                Thread.Sleep (1000);
             }
         }
 
@@ -70,14 +73,9 @@ namespace GreenQloud.Synchrony
                     }
                 }
             }
-            eventsCreated = true;
+            canChange = true;
         }
 
-        public bool HasInit {
-            get {
-                return eventsCreated;
-            }
-        }
     }
 }
 
