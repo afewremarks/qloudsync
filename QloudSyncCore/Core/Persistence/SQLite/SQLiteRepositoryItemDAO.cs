@@ -34,13 +34,13 @@ namespace GreenQloud.Persistence.SQLite
 
         public override void Create (RepositoryItem item)
         {
-            item.Id = (int) database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (Key, RepositoryId, IsFolder, ResultItemId, eTag, eTagLocal, Moved, UpdatedAt) VALUES (\"{0}\", \"{1}\",\"{2}\",\"{3}\",'{4}','{5}', '{6}', '{7}')", item.Key, item.Repository.Id, item.IsFolder, ((item.ResultItem == null) ? "" : item.ResultItemId.ToString()), item.ETag, item.LocalETag, item.Moved, item.UpdatedAt), true);
+            item.Id = (int)database.ExecuteNonQuery(string.Format("INSERT INTO REPOSITORYITEM (RepositoryItemKey, RepositoryId, IsFolder, ResultItemId, eTag, eTagLocal, Moved, UpdatedAt) VALUES ('{0}', '{1}','{2}','{3}','{4}','{5}', '{6}', '{7}')", item.Key, item.Repository.Id, item.IsFolder, ((item.ResultItem == null) ? "" : item.ResultItemId.ToString()), item.ETag, item.LocalETag, item.Moved, item.UpdatedAt), true);
         }
 
 
         public override void Update (RepositoryItem i)
-        {            
-            database.ExecuteNonQuery (string.Format("UPDATE REPOSITORYITEM SET  Key='{1}', RepositoryId='{2}', IsFolder='{3}', ResultItemId = '{4}', eTag = '{5}', eTagLocal = '{6}', Moved = '{7}', UpdatedAt = '{8}' WHERE RepositoryItemID =\"{0}\"", i.Id, i.Key, i.Repository.Id, i.IsFolder, ((i.ResultItem == null) ? "" : i.ResultItemId.ToString()), i.ETag, i.LocalETag, i.Moved, i.UpdatedAt));
+        {
+            database.ExecuteNonQuery(string.Format("UPDATE REPOSITORYITEM SET  RepositoryItemKey='{1}', RepositoryId='{2}', IsFolder='{3}', ResultItemId = '{4}', eTag = '{5}', eTagLocal = '{6}', Moved = '{7}', UpdatedAt = '{8}' WHERE RepositoryItemID ='{0}'", i.Id, i.Key, i.Repository.Id, i.IsFolder, ((i.ResultItem == null) ? "" : i.ResultItemId.ToString()), i.ETag, i.LocalETag, i.Moved, i.UpdatedAt));
         }
 
         public override List<RepositoryItem> All {
@@ -62,34 +62,34 @@ namespace GreenQloud.Persistence.SQLite
 
         public bool Exists (RepositoryItem item)
         {
-            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE Key = \"{0}\"", item.Key);
+            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE RepositoryItemKey = '{0}'", item.Key);
             int i = int.Parse(database.ExecuteScalar (sql));
             return i > 0;
         }
 
         public bool ExistsUnmoved (RepositoryItem item)
         {
-            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND Moved <> '{1}'", item.Key, bool.TrueString);
+            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE RepositoryItemKey = '{0}' AND Moved <> '{1}'", item.Key, bool.TrueString);
             int i = int.Parse(database.ExecuteScalar (sql));
             return i > 0;
         }
 
         public RepositoryItem GetFomDatabase (RepositoryItem item)
         {
-            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE Key = \"{0}\"", item.Key);
+            string sql = string.Format("SELECT * FROM REPOSITORYITEM WHERE RepositoryItemKey = '{0}'", item.Key);
             return Select(sql).Last();
         }
 
         public bool ExistsUnmoved(string key, LocalRepository repo)
         {
-            string sql = string.Format("SELECT COUNT(*) FROM REPOSITORYITEM WHERE Key = \"{0}\" AND Moved <> '{1}'", key, bool.TrueString);
+            string sql = string.Format("SELECT COUNT(*) FROM REPOSITORYITEM WHERE RepositoryItemKey = '{0}' AND Moved <> '{1}'", key, bool.TrueString);
             return int.Parse(database.ExecuteScalar(sql)) > 0;
         }
 
         //TODO DONT NEED
         public void Remove (RepositoryItem item)
         {
-            //string sql = string.Format("UPDATE REPOSITORYITEM SET DELETED = \"{0}\" WHERE NAME = \"{1}\" AND RELATIVEPATH = \"{2}\" AND REPOPATH = \"{3}\"", bool.TrueString, item.Name, item.RelativePath, item.Repository.Path);
+            //string sql = string.Format("UPDATE REPOSITORYITEM SET DELETED = '{0}' WHERE NAME = '{1}' AND RELATIVEPATH = '{2}' AND REPOPATH = '{3}'", bool.TrueString, item.Name, item.RelativePath, item.Repository.Path);
             //database.ExecuteNonQuery (sql);
         }
 
@@ -98,19 +98,19 @@ namespace GreenQloud.Persistence.SQLite
             item.Moved = true;
             string sql;
             if(item.IsFolder)
-                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryId = \"{1}\" AND Key LIKE '{2}%' ", bool.TrueString, item.Repository.Id, item.Key);
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryId = '{1}' AND RepositoryItemKey LIKE '{2}%' ", bool.TrueString, item.Repository.Id, item.Key);
             else
-                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryId = \"{1}\" AND Key = '{2}' ", bool.TrueString, item.Repository.Id,  item.Key);
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryId = '{1}' AND RepositoryItemKey = '{2}' ", bool.TrueString, item.Repository.Id, item.Key);
 
             database.ExecuteNonQuery (sql);
         }
 
         public override void ActualizeUpdatedAt (RepositoryItem item){
-            string sql = string.Format("UPDATE REPOSITORYITEM SET UpdatedAt = \"{0}\" WHERE RepositoryItemID = \"{1}\" ", item.UpdatedAt, item.Id);
+            string sql = string.Format("UPDATE REPOSITORYITEM SET UpdatedAt = '{0}' WHERE RepositoryItemID = '{1}' ", item.UpdatedAt, item.Id);
             database.ExecuteNonQuery (sql);
         }
         public override void UpdateETAG (RepositoryItem item){
-            string sql = string.Format("UPDATE REPOSITORYITEM SET  eTag = '{0}', eTagLocal = '{1}' WHERE RepositoryItemID = \"{1}\" ", item.ETag, item.LocalETag, item.Id);
+            string sql = string.Format("UPDATE REPOSITORYITEM SET  eTag = '{0}', eTagLocal = '{1}' WHERE RepositoryItemID = '{2}' ", item.ETag, item.LocalETag, item.Id);
             database.ExecuteNonQuery (sql);
         }
         public override void MarkAsUnmoved (RepositoryItem item)
@@ -118,9 +118,9 @@ namespace GreenQloud.Persistence.SQLite
             item.Moved = true;
             string sql;
             if(item.IsFolder)
-                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" AND Key LIKE '{2}%' ", bool.FalseString, item.Id, item.Key);
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryItemID = '{1}' AND RepositoryItemKey LIKE '{2}%' ", bool.FalseString, item.Id, item.Key);
             else
-                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = \"{0}\" WHERE RepositoryItemID = \"{1}\" ", bool.FalseString, item.Id);
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryItemID = '{1}' ", bool.FalseString, item.Id);
             database.ExecuteNonQuery (sql);
         }
         public int GetId (RepositoryItem item)
@@ -129,7 +129,7 @@ namespace GreenQloud.Persistence.SQLite
                 //if (item.Id != 0)
                 //    return item.Id;
                 //else
-                    return Select(string.Format("SELECT * FROM REPOSITORYITEM WHERE  Key = \"{0}\" AND RepositoryId = \"{1}\"", item.Key, item.Repository.Id)).Last().Id;
+                return Select(string.Format("SELECT * FROM REPOSITORYITEM WHERE  RepositoryItemKey = '{0}' AND RepositoryId = '{1}'", item.Key, item.Repository.Id)).Last().Id;
             }
             return 0;
         }

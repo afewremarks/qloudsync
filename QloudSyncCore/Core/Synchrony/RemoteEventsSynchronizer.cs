@@ -1,6 +1,6 @@
 using System;
 using GreenQloud.Model;
-using GreenQloud.Repository.Local;
+using GreenQloud.Repository;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
@@ -9,31 +9,34 @@ using System.Runtime.CompilerServices;
 using Newtonsoft.Json.Linq;
 using GreenQloud.Repository;
 using System.IO;
-using QloudSyncCore.Core.Persistence;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Synchrony
 {
     public class RemoteEventsSynchronizer : AbstractSynchronizer<RemoteEventsSynchronizer>
     {
-        private bool eventsCreated;
         private IRemoteRepositoryController remoteController;
-        private EventRaven eventDAO;
-        private RepositoryItemRaven repositoryItemDAO;
+        private SQLiteEventDAO eventDAO;
+        private SQLiteRepositoryItemDAO repositoryItemDAO;
         private IRemoteRepositoryController remoteRepository;
 
 
-        public RemoteEventsSynchronizer (LocalRepository repo) : base (repo)
+        public RemoteEventsSynchronizer (LocalRepository repo, SynchronizerUnit unit) : base (repo, unit)
         {
             remoteController = new RemoteRepositoryController (repo);
-            eventDAO = new EventRaven(repo);
-            repositoryItemDAO = new RepositoryItemRaven();
+            eventDAO = new SQLiteEventDAO(repo);
+            repositoryItemDAO = new SQLiteRepositoryItemDAO();
             remoteRepository = new RemoteRepositoryController (repo);
         }
 
         public override void Run(){
+            Stop();
+            this.unit.RecoverySynchronizer.WaitForChanges(0);
+            Start();
+
             while (!_stoped){
                 AddEvents();
-                Thread.Sleep (5000);
+                Thread.Sleep (1000);
             }
         }
 
@@ -70,14 +73,9 @@ namespace GreenQloud.Synchrony
                     }
                 }
             }
-            eventsCreated = true;
+            canChange = true;
         }
 
-        public bool HasInit {
-            get {
-                return eventsCreated;
-            }
-        }
     }
 }
 

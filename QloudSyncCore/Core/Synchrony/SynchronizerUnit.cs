@@ -11,7 +11,7 @@ using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Repository;
 using GreenQloud.Util;
-using GreenQloud.Repository.Local;
+using GreenQloud.Repository;
 using System.Net.Sockets;
 using LitS3;
 using GreenQloud.Core;
@@ -33,6 +33,20 @@ namespace GreenQloud.Synchrony
 			get {
 				return localSynchronizer;
 			}
+        }
+        public RemoteEventsSynchronizer RemoteEventsSynchronizer
+        {
+            get
+            {
+                return remoteSynchronizer;
+            }
+        }
+        public RecoverySynchronizer RecoverySynchronizer
+        {
+            get
+            {
+                return recoverySynchronizer;
+            }
         }
 
         public static SynchronizerUnit GetByRepo (LocalRepository repo)
@@ -111,26 +125,16 @@ namespace GreenQloud.Synchrony
         public SynchronizerUnit (LocalRepository repo)
         {
             this.repo = repo;
-            synchronizerResolver = SynchronizerResolver.NewInstance (this.repo);
-            recoverySynchronizer = RecoverySynchronizer.NewInstance (this.repo);
-            remoteSynchronizer = RemoteEventsSynchronizer.NewInstance (this.repo);
-            localSynchronizer = LocalEventsSynchronizer.NewInstance (this.repo);
+            synchronizerResolver = SynchronizerResolver.NewInstance (this.repo, this);
+            recoverySynchronizer = RecoverySynchronizer.NewInstance (this.repo, this);
+            remoteSynchronizer = RemoteEventsSynchronizer.NewInstance (this.repo, this);
+            localSynchronizer = LocalEventsSynchronizer.NewInstance (this.repo, this);
         }
 
-        public void InitializeSynchronizers (bool initRecovery)
+        public void InitializeSynchronizers ()
         {
-            if (initRecovery) {
-                recoverySynchronizer.Start ();
-                while (!((RecoverySynchronizer)recoverySynchronizer).StartedSync)
-                    Thread.Sleep (1000);
-                synchronizerResolver.Start (); 
-
-                while (!recoverySynchronizer.FinishedSync) {
-                    Thread.Sleep (1000);
-                }
-            } else {
-                synchronizerResolver.Start ();
-            }
+            recoverySynchronizer.Start ();
+            synchronizerResolver.Start (); 
             localSynchronizer.Start ();
             remoteSynchronizer.Start ();
         }
@@ -160,6 +164,8 @@ namespace GreenQloud.Synchrony
 				remoteSynchronizer.Start ();
 			if(synchronizerResolver != null)
 				synchronizerResolver.Start ();
+            if (recoverySynchronizer != null)
+                recoverySynchronizer.Start();
         }
 
         public void SuspendResolver(){
@@ -174,6 +180,8 @@ namespace GreenQloud.Synchrony
 				remoteSynchronizer.Stop ();
 			if(synchronizerResolver != null)
 				synchronizerResolver.Stop ();
+            if (recoverySynchronizer != null)
+                recoverySynchronizer.Stop();
         }
 
         public bool IsWorking {

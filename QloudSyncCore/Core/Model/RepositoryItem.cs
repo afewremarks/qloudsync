@@ -6,7 +6,7 @@ using GreenQloud.Repository;
 using GreenQloud.Util;
 using LitS3;
 using System.Linq;
-using QloudSyncCore.Core.Persistence;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Model
 {
@@ -22,7 +22,7 @@ namespace GreenQloud.Model
 
     public class RepositoryItem
     {
-        private static readonly RepositoryItemRaven dao =  new RepositoryItemRaven ();
+        private static readonly SQLiteRepositoryItemDAO dao = new SQLiteRepositoryItemDAO();
 
         public RepositoryItem (LocalRepository repo)
         {

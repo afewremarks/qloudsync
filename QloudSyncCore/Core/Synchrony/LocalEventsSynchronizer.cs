@@ -1,26 +1,26 @@
 using System;
-using GreenQloud.Repository.Local;
+using GreenQloud.Repository;
 using GreenQloud.Model;
 using System.Threading;
-using QloudSyncCore.Core.Persistence;
 using System.Collections.Generic;
 using System.IO;
 using GreenQloud.Repository;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Synchrony
 {
     public class LocalEventsSynchronizer : AbstractSynchronizer<LocalEventsSynchronizer>
     {
-        private RepositoryRaven repositoryDAO = new RepositoryRaven();
-        private EventRaven eventDAO;
+        private SQLiteRepositoryDAO repositoryDAO = new SQLiteRepositoryDAO();
+        private SQLiteEventDAO eventDAO;
         private Thread watcherThread;
         private QloudSyncFileSystemWatcher watcher;
         public delegate void FinishedEventHandler ();
         object _lock = new object();
 
-        public LocalEventsSynchronizer (LocalRepository repo) : base (repo)
+        public LocalEventsSynchronizer (LocalRepository repo, SynchronizerUnit unit) : base (repo, unit)
         {
-            eventDAO = new EventRaven(repo);
+            eventDAO = new SQLiteEventDAO(repo);
         }
 
         public override void Run(){
@@ -30,6 +30,7 @@ namespace GreenQloud.Synchrony
                     watcher.Changed += delegate(Event e) {
                         lock(_lock){
                             CreateEvent (e);
+                            canChange = true;
                         }
                     };
                 });
@@ -51,6 +52,7 @@ namespace GreenQloud.Synchrony
             e.RepositoryType = RepositoryType.LOCAL;
             eventDAO.Create (e);
         }
+
     }
 }
 

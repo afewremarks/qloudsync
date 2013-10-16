@@ -11,11 +11,11 @@ using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Repository;
 using GreenQloud.Util;
-using GreenQloud.Repository.Local;
+using GreenQloud.Repository;
 using System.Net.Sockets;
 using LitS3;
 using GreenQloud.Core;
-using QloudSyncCore.Core.Persistence;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Synchrony
 {
@@ -30,8 +30,8 @@ namespace GreenQloud.Synchrony
     public class SynchronizerResolver : AbstractSynchronizer<SynchronizerResolver>
     {
         private SyncStatus status;
-        protected EventRaven eventDAO;
-        protected RepositoryItemRaven repositoryItemDAO;
+        protected SQLiteEventDAO eventDAO;
+        protected SQLiteRepositoryItemDAO repositoryItemDAO;
         protected IPhysicalRepositoryController physicalLocalRepository;
         protected RemoteRepositoryController remoteRepository;
 
@@ -39,11 +39,11 @@ namespace GreenQloud.Synchrony
         public delegate void SyncStatusChangedHandler (SyncStatus status);
         public event SyncStatusChangedHandler SyncStatusChanged = delegate {};
 
-        public SynchronizerResolver (LocalRepository repo) : base (repo)
+        public SynchronizerResolver (LocalRepository repo, SynchronizerUnit unit) : base (repo, unit)
         {
-            eventDAO = new EventRaven(repo);
-            repositoryItemDAO = new RepositoryItemRaven ();
-            physicalLocalRepository = new StorageQloudPhysicalRepositoryController (repo);
+            eventDAO = new SQLiteEventDAO(repo);
+            repositoryItemDAO = new SQLiteRepositoryItemDAO();
+            physicalLocalRepository = new PhysicalRepositoryController (repo);
             remoteRepository = new RemoteRepositoryController(repo);
         }
 
@@ -75,7 +75,7 @@ namespace GreenQloud.Synchrony
 
         public override void Run(){
             while (!_stoped){
-                SolveAll ();
+                SolveAll();
             }
         }
 
