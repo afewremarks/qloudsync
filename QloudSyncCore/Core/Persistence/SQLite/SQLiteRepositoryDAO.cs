@@ -16,12 +16,12 @@ namespace GreenQloud.Persistence.SQLite
 
         public override void Create (LocalRepository e)
         {
-           e.Id = database.ExecuteNonQuery(string.Format("INSERT INTO Repository (Path, RECOVERING, RemoteFolder, Active) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\")", e.Path, e.Recovering.ToString(), e.RemoteFolder, e.Active), true);
+           e.Id = database.ExecuteNonQuery(string.Format("INSERT INTO Repository (Path, RECOVERING, RemoteFolder, Active) VALUES ('{0}', '{1}', '{2}', '{3}')", e.Path, e.Recovering.ToString(), e.RemoteFolder, e.Active), true);
         }
 
         public void Update (LocalRepository repo)
         {
-            database.ExecuteNonQuery(string.Format("UPDATE Repository SET Path=\"{0}\", RECOVERING=\"{1}\", RemoteFolder = \"{2}\", Active=\"{3}\" WHERE RepositoryID='{4}'", repo.Path, repo.Recovering.ToString(), repo.RemoteFolder, repo.Active, repo.Id));
+            database.ExecuteNonQuery(string.Format("UPDATE Repository SET Path='{0}', RECOVERING='{1}', RemoteFolder = '{2}', Active='{3}' WHERE RepositoryID='{4}'", repo.Path, repo.Recovering.ToString(), repo.RemoteFolder, repo.Active, repo.Id));
         }
 
         public List<LocalRepository> AllActived {
