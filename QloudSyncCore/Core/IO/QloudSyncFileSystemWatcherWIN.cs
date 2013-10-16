@@ -6,7 +6,7 @@ using System.IO;
 using System.Timers;
 using System.Collections;
 using GreenQloud.Model;
-using QloudSyncCore.Core.Persistence;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud
 {
@@ -17,7 +17,7 @@ namespace GreenQloud
         public delegate void ChangedEventHandler(Event e);
         public event ChangedEventHandler Changed;
         private LocalRepository repo;
-        private RepositoryItemRaven repositoryItemDAO = new RepositoryItemRaven();
+        private SQLiteRepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO();
 
         private FileSystemWatcher parentFolderWatcher = null, subfolderWatcher = null;
         private System.Object lockThis = new System.Object(), processChangesLock = new System.Object();

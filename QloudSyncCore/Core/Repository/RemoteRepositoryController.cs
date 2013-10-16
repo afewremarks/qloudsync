@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GreenQloud.Util;
 using GreenQloud.Model;
-using GreenQloud.Repository.Local;
+using GreenQloud.Repository;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
 using System.IO;
@@ -18,39 +18,21 @@ namespace GreenQloud.Repository
 {
     public class RemoteRepositoryController : AbstractController, IRemoteRepositoryController
     {
-        private StorageQloudPhysicalRepositoryController physicalController;
+        private PhysicalRepositoryController physicalController;
         private S3Connection connection;
         public RemoteRepositoryController (LocalRepository repo) : base(repo){
             HttpEncoder.Current = HttpEncoder.Default;
             connection = new S3Connection ();
-            physicalController = new StorageQloudPhysicalRepositoryController (repo);
+            physicalController = new PhysicalRepositoryController (repo);
         }
        
-        public List<GreenQloud.Model.RepositoryItem> Items {
-            get {
-                return GetInstancesOfItems(GetS3Objects().Where(i => Key(i).StartsWith(repo.RemoteFolder) && !Key(i).Equals(repo.RemoteFolder) && !Key(i).StartsWith(".trash")).ToList());
-            }
+        public List<GreenQloud.Model.RepositoryItem> GetItems(string prefix) {
+            return GetInstancesOfItems(GetS3Objects(prefix).Where(i =>!Key(i).StartsWith(".trash")).ToList());
         }
         public List<GreenQloud.Model.RepositoryItem> RootFolders {
             get {
                 return GetInstancesOfItems(GetRootFoldersS3Objects().Where(i => !Key(i).StartsWith(".trash")).ToList());
             }
-        }
-
-        public List<GreenQloud.Model.RepositoryItem> TrashItems {
-            get {
-                return GetInstancesOfItems (GetS3Objects().Where(i => Key(i).StartsWith(Constant.TRASH)).ToList());
-            }
-        }
-
-        public List<GreenQloud.Model.RepositoryItem> GetCopys (RepositoryItem item)
-        {
-            return Items.Where (rf => rf.ETag == item.LocalETag && rf.Key != item.Key).ToList<RepositoryItem> ();
-        }
-
-        public bool ExistsCopies (RepositoryItem item)
-        {
-            return GetCopys(item).Count > 0;
         }
 
         public bool Exists (RepositoryItem item)
@@ -190,7 +172,8 @@ namespace GreenQloud.Repository
                 {
                     try {
                         //METADATA NOT FOUND, recover it (if is folder)!
-                        if(key.EndsWith("/")){
+                        //If recovery, delete remote is not detected!
+                        /*if(key.EndsWith("/")){
                             GenericCreateFolder(key);
                             Logger.LogInfo("INFO", "METADATA FOR "+ key +" NOT FOUND, trying to recover it!");
                             GetObjectRequest request2 = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, key, true);
@@ -201,7 +184,7 @@ namespace GreenQloud.Repository
                         }
 
                         Logger.LogInfo("INFO", "METADATA FOR "+ key +" CANNOT BE RECOVERED!");
-                        return null;
+                        */return null;
                     } catch {
                         Logger.LogInfo("INFO", "METADATA FOR "+ key +" CANNOT BE RECOVERED!");
                         return null;
@@ -280,34 +263,14 @@ namespace GreenQloud.Repository
             return entries;
         }
 
-        public IEnumerable<ListEntry> GetS3Objects ()
+        private IEnumerable<ListEntry> GetS3Objects (string prefix)
         {
             HttpEncoder.Current = HttpEncoder.Default;
-            List<ListEntry> entries = new List<ListEntry> ();
-            List<ListEntry> subEntries = new List<ListEntry> ();
-            entries = connection.Connect ().ListAllObjects (RuntimeSettings.DefaultBucketName).ToList();
-            foreach (ListEntry entry in entries) {
-                if (entry is CommonPrefix) {
-                    subEntries.AddRange(GetSubS3Objects ((CommonPrefix) entry));
-                }
-            }
-            entries.AddRange (subEntries);
-
-            return entries;
-        }
-
-        private IEnumerable<ListEntry> GetSubS3Objects (CommonPrefix prefix)
-        {
-            HttpEncoder.Current = HttpEncoder.Default;
-            IEnumerable<ListEntry> subEntries = connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, prefix.Prefix).ToList();
+            IEnumerable<ListEntry> subEntries = connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, prefix).ToList();
             List<ListEntry> entries = new List<ListEntry> ();
             foreach (ListEntry entry in subEntries) {
-                if (Key (entry) != string.Empty && Key (entry) != Key (prefix)) {
+                if (Key (entry) != string.Empty && Key (entry) != prefix) {
                     entries.Add (entry);
-                }
-
-                if (entry is CommonPrefix) {
-                    entries.AddRange (GetSubS3Objects((CommonPrefix) entry));
                 }
             }
             return entries;

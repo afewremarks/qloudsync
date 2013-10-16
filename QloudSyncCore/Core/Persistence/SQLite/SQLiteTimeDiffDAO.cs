@@ -18,7 +18,7 @@ namespace GreenQloud.Persistence.SQLite
         }
         public override double Last {
             get {        
-                return Select("SELECT Diff FROM TimeDiff ORDER BY TimeDiffID DESC LIMIT 1");
+                return Select("SELECT TOP 1 Diff FROM TimeDiff ORDER BY TimeDiffID DESC");
             }
         }
         public override double Count {
