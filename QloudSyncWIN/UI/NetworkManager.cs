@@ -1,4 +1,7 @@
-﻿using QloudSyncCore.Core.Util;
+﻿using GreenQloud.Model;
+using GreenQloud.Repository;
+using LitS3;
+using QloudSyncCore.Core.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,8 +23,18 @@ namespace GreenQloud.UI
         Timer bandwidthCalcTimer = new Timer();
         float lastAmountOfBytesReceived;
         float lastAmountOfBytesSent;
+        private static NetworkManager instance;
+        List<RepositoryItem> items;
+        RemoteRepositoryController remoteRepositoryController;
+        private bool makeStep;
 
-        
+        public static NetworkManager GetInstance()
+        {
+            if (instance == null)
+                instance = new NetworkManager();
+
+            return instance;
+        }
 
         public NetworkManager()
         {
@@ -31,16 +44,18 @@ namespace GreenQloud.UI
             bandwidthCalcTimer.Interval = 1000;
             bandwidthCalcTimer.Tick += new EventHandler(bandwidthCalcTimer_Tick);
             bandwidthCalcTimer.Enabled = true;
+            items = new List<RepositoryItem>();
+            makeStep = false;
+        
         }
 
         void bandwidthCalcTimer_Tick(object sender, EventArgs e)
         {
-
             float currentAmountOfBytesReceived = trafficMonitor.GetBytesReceived();
             float currentAmountofBytesSent = trafficMonitor.GetBytesSent();
             totalBandwidthConsumptionLabel.Text = string.Format("Total Bandwidth Consumption: {0} kb", (currentAmountOfBytesReceived / 1024).ToString("0.00"));
             currentBandwidthDownloadLabel.Text = string.Format("Current Download Bandwidth: {0} kb/sec", (((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024)).ToString("0.00"));
-            currentBandwidthUploadLabel.Text = string.Format("Current Upload Bandwidth: {0} kb/sec", Math.Abs(((currentAmountofBytesSent - lastAmountOfBytesSent) / 1024)).ToString("0.00"));
+            currentBandwidthUploadLabel.Text = string.Format("Current Upload Bandwidth: {0} kb/sec", Math.Abs(((currentAmountofBytesSent - lastAmountOfBytesSent) / 1024)).ToString("0.00"));   
             if (((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024) > 1)
             {
                 numberofitems.Text = string.Format("Items in Process: {0}", 1);
@@ -49,8 +64,15 @@ namespace GreenQloud.UI
             {
                 numberofitems.Text = string.Format("Items in Process: {0}", 0);
             }
+            OnItemEvent();
+            if (makeStep)
+            {
+                progressBar1.Step = (int)(currentAmountOfBytesReceived - lastAmountOfBytesReceived);
+                progressBar1.PerformStep();
+            }
             lastAmountOfBytesReceived = currentAmountOfBytesReceived;
             lastAmountOfBytesSent = currentAmountofBytesSent;
+            
         }
 
         private void downloadSampleFileButton_Click_1(object sender, EventArgs e)
@@ -66,5 +88,35 @@ namespace GreenQloud.UI
 
         }
 
+        private void progressBar1_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private RepositoryItem GetCurrentItem()
+        {
+            return Program.Controller.GetCurrentItemDownload();
+        }
+
+        public void OnItemEvent()
+        {
+            RepositoryItem item = Program.Controller.GetCurrentItemDownload();
+           // makeStep = false;
+            if (item != null)
+            {
+                if (!items.Contains(item))
+                {
+                    remoteRepositoryController = new RemoteRepositoryController(item.Repository);
+                    GetObjectResponse meta = remoteRepositoryController.GetMetadata(item.Key);
+                    items.Add(item);
+                    ListViewItem i = new ListViewItem(item.Name);
+                    listView1.Items.Add(i);
+                    progressBar1.Maximum = (int)meta.ContentLength;
+                    makeStep = true;
+                }
+            }
+
+          
+        }
     }
 }

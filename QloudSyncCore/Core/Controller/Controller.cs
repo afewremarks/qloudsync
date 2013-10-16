@@ -16,5 +16,6 @@ namespace GreenQloud {
         void HandleError(LocalRepository repo);
         void HandleSyncStatusChanged();
         bool DatabaseLoaded();
+        void HandleDownloading(RepositoryItem item);
     }
 }
