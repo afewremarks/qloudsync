@@ -5,8 +5,9 @@ using System.Linq;
 using System.Xml;
 using System.Threading;
 using GreenQloud.Model;
-using GreenQloud.Repository.Local;
-using QloudSyncCore.Core.Persistence;
+using GreenQloud.Repository;
+using GreenQloud.Persistence.SQLite;
+using System.IO;
 
  namespace GreenQloud.Synchrony
 {
@@ -14,30 +15,21 @@ using QloudSyncCore.Core.Persistence;
     {
         private IRemoteRepositoryController remoteRepository;
         private IPhysicalRepositoryController localRepository;
-        private EventRaven eventDAO;
+        private SQLiteEventDAO eventDAO;
+        private Dictionary<string, Thread> executingThreads;
+        private Object lokkThreads = new object();
+
 
         public RecoverySynchronizer (LocalRepository repo) : base (repo) {
             remoteRepository = new RemoteRepositoryController (repo);
-            localRepository = new StorageQloudPhysicalRepositoryController (repo);
-            eventDAO = new EventRaven(repo);
+            localRepository = new PhysicalRepositoryController (repo);
+            eventDAO = new SQLiteEventDAO(repo);
+            this.executingThreads = new Dictionary<string, Thread>();
         }
 
         public override void Run() {
+            CheckRemoteFolder();
             Synchronize ();
-        }
-
-        private bool startedSync = false;
-        public bool StartedSync{
-            get {
-                return startedSync;
-            }
-        }
-        
-        private bool finishedSync = false;
-        public bool FinishedSync{
-            get {
-                return finishedSync;
-            }
         }
 
         void CheckRemoteFolder ()
@@ -57,20 +49,43 @@ using QloudSyncCore.Core.Persistence;
             }
         }
 
-        public void Synchronize (){
-            eventDAO.RemoveAllUnsynchronized();
-            startedSync = true; //only after remove all unsync events.
-
-            CheckRemoteFolder ();
-
-            List<RepositoryItem> localItems = localRepository.Items;
-            List<RepositoryItem> remoteItems = remoteRepository.Items;
-            SolveItems (localItems, remoteItems);
-
-            finishedSync = true;
+        private void SolveFromPrefix(string prefix) {
+            Thread t = new Thread(delegate()
+            {
+                List<RepositoryItem> localItems = localRepository.GetItems(Path.Combine(repo.Path, prefix));
+                List<RepositoryItem> remoteItems = remoteRepository.GetItems(prefix);
+                SolveItems(localItems, remoteItems, prefix);
+            });
+            lock (lokkThreads)
+            {
+                if (!this.executingThreads.ContainsKey(prefix))
+                {
+                    this.executingThreads.Add(prefix, t);
+                    t.Start();
+                }
+            }
+            
         }
 
-        void SolveItems (List<RepositoryItem> localItems, List<RepositoryItem> remoteItems)
+        public void Synchronize (){
+            while (!_stoped){
+               string prefix = repo.RemoteFolder;
+               SolveFromPrefix(repo.RemoteFolder);
+               int count = 0;
+               do {
+                   Thread.Sleep(5000);
+                   Console.WriteLine("Executando com " + executingThreads.Count + " Threads");
+                   lock (lokkThreads)
+                   {
+                       count = executingThreads.Count;
+                   }
+               } while (!_stoped &&  count > 0) ;
+               Thread.Sleep(10000);
+               Console.WriteLine("Iniciando de novo! " + executingThreads.Count + " Threads");  
+            }
+        }
+
+        void SolveItems (List<RepositoryItem> localItems, List<RepositoryItem> remoteItems, string prefix)
         {
             //items exists on remote...
             for (int i = 0; i < remoteItems.Count; i++) {
@@ -82,8 +97,10 @@ using QloudSyncCore.Core.Persistence;
                         localItems.RemoveAll( it => it.Key.StartsWith(item1.Key));
                         remoteItems.RemoveAll( it => it.Key.StartsWith(item1.Key));
                     }
-                    eventDAO.Create (e);
+                    eventDAO.CreateIfNotExistsAny (e);
                 }
+                if (item1.IsFolder)
+                    SolveFromPrefix(item1.Key);
             }
 
             //Items here is not on remote.... so, it only can be created or removed remote
@@ -95,8 +112,14 @@ using QloudSyncCore.Core.Persistence;
                         localItems.RemoveAll( it => it.Key.StartsWith(item2.Key));
                         remoteItems.RemoveAll( it => it.Key.StartsWith(item2.Key));
                     }
-                    eventDAO.Create (e);
+                    eventDAO.CreateIfNotExistsAny(e);
                 }
+                if (item2.IsFolder)
+                    SolveFromPrefix(item2.Key);
+            }
+            lock (lokkThreads)
+            {
+                this.executingThreads.Remove(prefix);
             }
         }
 

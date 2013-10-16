@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GreenQloud.Repository;
-using QloudSyncCore.Core.Persistence;
+using GreenQloud.Persistence.SQLite;
 
 
 namespace GreenQloud.UI.Setup
@@ -69,7 +69,7 @@ namespace GreenQloud.UI.Setup
         private void button1_Click(object sender, EventArgs e)
         {
             this.Hide();
-            RepositoryRaven repoDao = new RepositoryRaven();
+            SQLiteRepositoryDAO repoDao = new SQLiteRepositoryDAO();
             LocalRepository repo = new LocalRepository(this.label2.Text, "", true);
             repoDao.Create(repo);
             createIgnoredList(repo);
@@ -78,7 +78,7 @@ namespace GreenQloud.UI.Setup
 
         private void createIgnoredList(LocalRepository repo)
         {
-            RepositoryIgnoreRaven repoIgnoreDao = new RepositoryIgnoreRaven();
+            SQLiteRepositoryIgnoreDAO repoIgnoreDao = new SQLiteRepositoryIgnoreDAO();
             foreach (CheckBox check in remoteFoldersCheckboxes) {
                 if(!check.Checked)
                     repoIgnoreDao.Create(repo, check.Text);

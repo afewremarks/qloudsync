@@ -1,7 +1,7 @@
 ﻿using GreenQloud;
 using GreenQloud.Model;
+using GreenQloud.Persistence.SQLite;
 using GreenQloud.Synchrony;
-using QloudSyncCore.Core.Persistence;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -87,20 +87,15 @@ namespace GreenQloud
                     try{
                         bool hasCon = CheckConnection();
                         if(hasCon){
-                            if(disconected || ErrorType == ERROR_TYPE.DISCONNECTION){
-                                if(loadedSynchronizers){
-                                    disconected = false;
-                                    HandleReconnection(); 
-                                    ErrorType = ERROR_TYPE.NULL;
-                                } else {
-                                    disconected = false;
-                                    InitializeSynchronizers();
-                                    ErrorType = ERROR_TYPE.NULL;                                 
-
-                                }
+                            if (disconected || ErrorType == ERROR_TYPE.DISCONNECTION)
+                            {
+                                disconected = false;
+                                HandleReconnection();
+                                ErrorType = ERROR_TYPE.NULL;
                             }
                         } else {
-                            if(!disconected) {
+                            if (!disconected)
+                            {
                                 disconected = true;
                                 HandleDisconnection();
                             }
@@ -124,7 +119,7 @@ namespace GreenQloud
                 }
                 catch
                 {
-                    TimeDiffRaven dao = new TimeDiffRaven();
+                    SQLiteTimeDiffDAO dao = new SQLiteTimeDiffDAO();
                     if (dao.Count == 0)
                     {
                         Logger.LogInfo("ERROR", "Failed to load server time... attempt to try again.");
@@ -139,16 +134,9 @@ namespace GreenQloud
             }
         }
 
-        public void InitializeSynchronizers(LocalRepository repo, bool initRecovery = false)
+        public void InitializeSynchronizers(LocalRepository repo)
         {
-            RepositoryRaven repoDAO = new RepositoryRaven();
-            if (initRecovery || repo.Recovering)
-            {
-                initRecovery = true;
-                repo.Recovering = true;
-                repoDAO.Update(repo);
-            }
-            Thread.Sleep(5000);
+            SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO();
             Thread startSync;
             startSync = new Thread(delegate()
             {
@@ -161,14 +149,9 @@ namespace GreenQloud
                         unit = new SynchronizerUnit(repo);
                         SynchronizerUnit.Add(repo, unit);
                     }
-                    unit.InitializeSynchronizers(initRecovery);
+                    unit.InitializeSynchronizers();
                     loadedSynchronizers = true;
                     Logger.LogInfo("INFO", "Synchronizers Ready!");
-                    if (initRecovery || repo.Recovering)
-                    {
-                        repo.Recovering = false;
-                        repoDAO.Update(repo);
-                    }
                     ErrorType = ERROR_TYPE.NULL;
                     OnIdle();
                 }
@@ -194,14 +177,14 @@ namespace GreenQloud
             }
         }
 
-        public void InitializeSynchronizers(bool initRecovery = false)
+        public void InitializeSynchronizers()
         {
-            RepositoryRaven repoRaven = new RepositoryRaven();
+            SQLiteRepositoryDAO repoRaven = new SQLiteRepositoryDAO();
             List<LocalRepository> repos = repoRaven.AllActived;
             foreach (LocalRepository repo in repos)
             {
                 CreateRepoFolder(repo);
-                InitializeSynchronizers(repo, initRecovery || repo.Recovering);
+                InitializeSynchronizers(repo);
             }
         }
 
@@ -215,7 +198,7 @@ namespace GreenQloud
             {
                 if (!Directory.Exists(RuntimeSettings.DatabaseFolder))
                     Directory.CreateDirectory(RuntimeSettings.DatabaseFolder);
-                DataDocumentStore.Initialize();
+                SQLiteDatabase.Instance().CreateDataBase();
                 File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
             }
             else
@@ -235,7 +218,7 @@ namespace GreenQloud
                 }
                 if (!File.Exists(RuntimeSettings.DatabaseFile))
                 {
-                    DataDocumentStore.Initialize();
+                    SQLiteDatabase.Instance().CreateDataBase();
                     File.WriteAllText(RuntimeSettings.DatabaseInfoFile, RuntimeSettings.DatabaseVersion);
                 }
             }
@@ -247,7 +230,7 @@ namespace GreenQloud
             }
             else
             {
-                RepositoryRaven rpoDAO = new RepositoryRaven();
+                SQLiteRepositoryDAO rpoDAO = new SQLiteRepositoryDAO();
                 if (rpoDAO.AllActived.Count == 0)
                 {
                     ShowSetupWindow(PageType.ConfigureFolders);
@@ -327,7 +310,7 @@ namespace GreenQloud
         {
             try
             {
-                InitializeSynchronizers(true);
+                InitializeSynchronizers();
             }
             catch (Exception e)
             {
@@ -387,7 +370,7 @@ namespace GreenQloud
             OnError();
             StopSynchronizers(repo);
             Thread.Sleep(5000);
-            InitializeSynchronizers(repo, true);
+            InitializeSynchronizers(repo);
         }
 
         public void CreateConfigFolder()

@@ -32,84 +32,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AWS.Extensions">
-      <HintPath>lib\Raven\AWS.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK">
-      <HintPath>lib\Raven\AWSSDK.dll</HintPath>
-    </Reference>
-    <Reference Include="Esent.Interop">
-      <HintPath>lib\Raven\Esent.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="GeoAPI">
-      <HintPath>lib\Raven\GeoAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.NRefactory">
-      <HintPath>lib\Raven\ICSharpCode.NRefactory.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.NRefactory.CSharp">
-      <HintPath>lib\Raven\ICSharpCode.NRefactory.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Jint.Raven">
-      <HintPath>lib\Raven\Jint.Raven.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net">
-      <HintPath>lib\Raven\Lucene.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net.Contrib.Spatial.NTS">
-      <HintPath>lib\Raven\Lucene.Net.Contrib.Spatial.NTS.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CompilerServices.AsyncTargetingPack.Net4">
-      <HintPath>lib\Raven\Microsoft.CompilerServices.AsyncTargetingPack.Net4.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Data.Edm, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="LitS3, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Raven\Microsoft.Data.Edm.dll</HintPath>
+      <HintPath>lib\LitS3.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Data.OData, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Raven\Microsoft.Data.OData.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Raven\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Storage">
-      <HintPath>lib\Raven\Microsoft.WindowsAzure.Storage.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>lib\Raven\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="NetTopologySuite">
-      <HintPath>lib\Raven\NetTopologySuite.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog">
-      <HintPath>lib\Raven\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="PowerCollections">
-      <HintPath>lib\Raven\PowerCollections.dll</HintPath>
-    </Reference>
-    <Reference Include="Raven.Abstractions, Version=2.5.0.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Raven\Raven.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Raven.Client.Embedded, Version=2.5.0.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Raven\Raven.Client.Embedded.dll</HintPath>
-    </Reference>
-    <Reference Include="Raven.Client.Lightweight, Version=2.5.0.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Raven\Raven.Client.Lightweight.dll</HintPath>
-    </Reference>
-    <Reference Include="Raven.Client.MvcIntegration">
-      <HintPath>lib\Raven\Raven.Client.MvcIntegration.dll</HintPath>
-    </Reference>
-    <Reference Include="Raven.Database, Version=2.5.0.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Raven\Raven.Database.dll</HintPath>
-    </Reference>
-    <Reference Include="Spatial4n.Core.NTS">
-      <HintPath>lib\Raven\Spatial4n.Core.NTS.dll</HintPath>
+      <HintPath>lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -121,14 +50,9 @@
     <Reference Include="System.Net" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>lib\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="LitS3">
-      <HintPath>lib\LitS3.dll</HintPath>
-    </Reference>
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="VistaDB.4, Version=4.1.0.0, Culture=neutral, PublicKeyToken=dfc935afe2125461, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Config\AbstractConfigFile.cs" />
@@ -136,12 +60,7 @@
     <Compile Include="Core\IO\QloudSyncFileSystemWatcherWIN.cs" />
     <Compile Include="Core\Model\RepositoryRavens.cs" />
     <Compile Include="Core\Model\TimeDiff.cs" />
-    <Compile Include="Core\Persistence\RavenDB\DataDocumentStore.cs" />
-    <Compile Include="Core\Persistence\RavenDB\EventRaven.cs" />
-    <Compile Include="Core\Persistence\RavenDB\RepositoryIgnoreRaven.cs" />
-    <Compile Include="Core\Persistence\RavenDB\RepositoryItemRaven.cs" />
-    <Compile Include="Core\Persistence\RavenDB\RepositoryRaven.cs" />
-    <Compile Include="Core\Persistence\RavenDB\TimeDiffRaven.cs" />
+    <Compile Include="Core\Persistence\EventDAO.cs" />
     <Compile Include="Core\Model\RepositoryIgnore.cs" />
     <Compile Include="Core\Exception\DisconnectionException.cs" />
     <Compile Include="Core\Exception\AccessDeniedException.cs" />
@@ -153,7 +72,17 @@
     <Compile Include="Core\Model\Event.cs" />
     <Compile Include="Core\Model\RepositoryItem.cs" />
     <Compile Include="Core\Model\CO2Savings.cs" />
-    <Compile Include="Core\Repository\Local\StorageQloud\StorageQloudPhysicalRepositoryController.cs" />
+    <Compile Include="Core\Persistence\RepositoryDAO.cs" />
+    <Compile Include="Core\Persistence\RepositoryIgnoreDAO.cs" />
+    <Compile Include="Core\Persistence\RepositoryItemDAO.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteEventDAO.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryDAO.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryIgnoreDAO.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryItemDAO.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteTimeDiffDAO.cs" />
+    <Compile Include="Core\Persistence\TimeDiffDAO.cs" />
+    <Compile Include="Core\Repository\PhysicalRepositoryController.cs" />
     <Compile Include="Core\Synchrony\RemoteEventsSynchronizer.cs" />
     <Compile Include="Core\Synchrony\AbstractSynchronizer.cs" />
     <Compile Include="Core\Synchrony\SynchronizerResolver.cs" />
@@ -170,7 +99,7 @@
     <Compile Include="Core\Repository\IRemoteRepositoryController.cs" />
     <Compile Include="Core\Repository\Connection\S3Connection.cs" />
     <Compile Include="Core\Repository\AbstractController.cs" />
-    <Compile Include="Core\Repository\Local\IPhysicalRepositoryController.cs" />
+    <Compile Include="Core\Repository\IPhysicalRepositoryController.cs" />
     <Compile Include="Core\Synchrony\RecoverySynchronizer.cs" />
     <Compile Include="Core\Synchrony\LocalEventsSynchronizer.cs" />
     <Compile Include="Core\Config\ConfigFile.cs" />
@@ -193,32 +122,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib\Community.CsharpSqlite.dll" />
-    <Content Include="lib\Community.CsharpSqlite.SQLiteClient.dll" />
-    <Content Include="lib\Raven\AWS.Extensions.dll" />
-    <Content Include="lib\Raven\AWSSDK.dll" />
-    <Content Include="lib\Raven\Esent.Interop.dll" />
-    <Content Include="lib\Raven\GeoAPI.dll" />
-    <Content Include="lib\Raven\ICSharpCode.NRefactory.CSharp.dll" />
-    <Content Include="lib\Raven\ICSharpCode.NRefactory.dll" />
-    <Content Include="lib\Raven\Jint.Raven.dll" />
-    <Content Include="lib\Raven\Lucene.Net.Contrib.Spatial.NTS.dll" />
-    <Content Include="lib\Raven\Lucene.Net.dll" />
-    <Content Include="lib\Raven\Microsoft.CompilerServices.AsyncTargetingPack.Net4.dll" />
-    <Content Include="lib\Raven\Microsoft.Data.Edm.dll" />
-    <Content Include="lib\Raven\Microsoft.Data.OData.dll" />
-    <Content Include="lib\Raven\Microsoft.Web.Infrastructure.dll" />
-    <Content Include="lib\Raven\Microsoft.WindowsAzure.Storage.dll" />
-    <Content Include="lib\Raven\Mono.Cecil.dll" />
-    <Content Include="lib\Raven\NetTopologySuite.dll" />
-    <Content Include="lib\Raven\NLog.dll" />
-    <Content Include="lib\Raven\PowerCollections.dll" />
-    <Content Include="lib\Raven\Raven.Abstractions.dll" />
-    <Content Include="lib\Raven\Raven.Client.Embedded.dll" />
-    <Content Include="lib\Raven\Raven.Client.Lightweight.dll" />
-    <Content Include="lib\Raven\Raven.Client.MvcIntegration.dll" />
-    <Content Include="lib\Raven\Raven.Database.dll" />
-    <Content Include="lib\Raven\Spatial4n.Core.NTS.dll" />
     <Content Include="x64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

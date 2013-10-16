@@ -1,10 +1,10 @@
 using System;
-using GreenQloud.Repository.Local;
+using GreenQloud.Repository;
 using GreenQloud.Model;
 using System.Threading;
 using System.Collections.Generic;
 using System.IO;
-using QloudSyncCore.Core.Persistence;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud
 {
@@ -20,7 +20,7 @@ namespace GreenQloud
         public static DateTime NowFromDiff {
             get {
                 if (!loadedDiff) {
-                    diff = new TimeDiffRaven ().Last;
+                    diff = new SQLiteTimeDiffDAO ().Last;
                     loadedDiff = true;
                 }
                 DateTime local = DateTime.Now;
@@ -89,7 +89,7 @@ namespace GreenQloud
         }
 
         public static void CalcTimeDiff() {
-            TimeDiffRaven dao = new TimeDiffRaven ();
+            SQLiteTimeDiffDAO dao = new SQLiteTimeDiffDAO();
             DateTime remoteDate = GlobalDateTime.NowRemote;
             DateTime localDate = DateTime.Now;
             double diff = (remoteDate - localDate).TotalMilliseconds;

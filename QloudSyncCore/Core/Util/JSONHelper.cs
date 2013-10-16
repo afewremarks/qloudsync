@@ -14,7 +14,7 @@ using Newtonsoft;
 using GreenQloud.Model;
 using GreenQloud.Repository;
 using GreenQloud.Util;
-using GreenQloud.Repository.Local;
+using GreenQloud.Repository;
 
 
 namespace GreenQloud
