@@ -34,6 +34,20 @@ namespace GreenQloud.Synchrony
 				return localSynchronizer;
 			}
         }
+        public RemoteEventsSynchronizer RemoteEventsSynchronizer
+        {
+            get
+            {
+                return remoteSynchronizer;
+            }
+        }
+        public RecoverySynchronizer RecoverySynchronizer
+        {
+            get
+            {
+                return recoverySynchronizer;
+            }
+        }
 
         public static SynchronizerUnit GetByRepo (LocalRepository repo)
         {
@@ -111,10 +125,10 @@ namespace GreenQloud.Synchrony
         public SynchronizerUnit (LocalRepository repo)
         {
             this.repo = repo;
-            synchronizerResolver = SynchronizerResolver.NewInstance (this.repo);
-            recoverySynchronizer = RecoverySynchronizer.NewInstance (this.repo);
-            remoteSynchronizer = RemoteEventsSynchronizer.NewInstance (this.repo);
-            localSynchronizer = LocalEventsSynchronizer.NewInstance (this.repo);
+            synchronizerResolver = SynchronizerResolver.NewInstance (this.repo, this);
+            recoverySynchronizer = RecoverySynchronizer.NewInstance (this.repo, this);
+            remoteSynchronizer = RemoteEventsSynchronizer.NewInstance (this.repo, this);
+            localSynchronizer = LocalEventsSynchronizer.NewInstance (this.repo, this);
         }
 
         public void InitializeSynchronizers ()
@@ -122,7 +136,7 @@ namespace GreenQloud.Synchrony
             recoverySynchronizer.Start ();
             synchronizerResolver.Start (); 
             localSynchronizer.Start ();
-            //remoteSynchronizer.Start ();
+            remoteSynchronizer.Start ();
         }
 
         public void StopAll ()
@@ -147,7 +161,7 @@ namespace GreenQloud.Synchrony
         public void Reconnect ()
         {
 			if(remoteSynchronizer != null)
-				//remoteSynchronizer.Start ();
+				remoteSynchronizer.Start ();
 			if(synchronizerResolver != null)
 				synchronizerResolver.Start ();
             if (recoverySynchronizer != null)

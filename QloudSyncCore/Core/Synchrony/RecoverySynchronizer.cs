@@ -15,12 +15,16 @@ using System.IO;
     {
         private IRemoteRepositoryController remoteRepository;
         private IPhysicalRepositoryController localRepository;
+        RemoteEventsSynchronizer remoteSynchronizer;
+        LocalEventsSynchronizer localSynchronizer;
         private SQLiteEventDAO eventDAO;
         private Dictionary<string, Thread> executingThreads;
         private Object lokkThreads = new object();
 
 
-        public RecoverySynchronizer (LocalRepository repo) : base (repo) {
+        public RecoverySynchronizer(LocalRepository repo, SynchronizerUnit unit)
+            : base(repo, unit)
+        {
             remoteRepository = new RemoteRepositoryController (repo);
             localRepository = new PhysicalRepositoryController (repo);
             eventDAO = new SQLiteEventDAO(repo);
@@ -50,25 +54,27 @@ using System.IO;
         }
 
         private void SolveFromPrefix(string prefix) {
-            Thread t = new Thread(delegate()
+            if (!_stoped)
             {
-                List<RepositoryItem> localItems = localRepository.GetItems(Path.Combine(repo.Path, prefix));
-                List<RepositoryItem> remoteItems = remoteRepository.GetItems(prefix);
-                SolveItems(localItems, remoteItems, prefix);
-            });
-            lock (lokkThreads)
-            {
-                if (!this.executingThreads.ContainsKey(prefix))
+                Thread t = new Thread(delegate()
                 {
-                    this.executingThreads.Add(prefix, t);
-                    t.Start();
+                    List<RepositoryItem> localItems = localRepository.GetItems(Path.Combine(repo.Path, prefix));
+                    List<RepositoryItem> remoteItems = remoteRepository.GetItems(prefix);
+                    SolveItems(localItems, remoteItems, prefix);
+                });
+                lock (lokkThreads)
+                {
+                    if (!this.executingThreads.ContainsKey(prefix))
+                    {
+                        this.executingThreads.Add(prefix, t);
+                        t.Start();
+                    }
                 }
             }
-            
         }
 
         public void Synchronize (){
-            while (!_stoped){
+            while (true){
                string prefix = repo.RemoteFolder;
                SolveFromPrefix(repo.RemoteFolder);
                int count = 0;
@@ -81,7 +87,8 @@ using System.IO;
                    }
                } while (!_stoped &&  count > 0) ;
                Thread.Sleep(10000);
-               Console.WriteLine("Iniciando de novo! " + executingThreads.Count + " Threads");  
+               Console.WriteLine("Iniciando de novo! " + executingThreads.Count + " Threads");
+               canChange = true;
             }
         }
 
@@ -97,7 +104,8 @@ using System.IO;
                         localItems.RemoveAll( it => it.Key.StartsWith(item1.Key));
                         remoteItems.RemoveAll( it => it.Key.StartsWith(item1.Key));
                     }
-                    eventDAO.CreateIfNotExistsAny (e);
+                    if(RequestForChange())
+                        eventDAO.CreateIfNotExistsAny (e);
                 }
                 if (item1.IsFolder)
                     SolveFromPrefix(item1.Key);
@@ -112,7 +120,8 @@ using System.IO;
                         localItems.RemoveAll( it => it.Key.StartsWith(item2.Key));
                         remoteItems.RemoveAll( it => it.Key.StartsWith(item2.Key));
                     }
-                    eventDAO.CreateIfNotExistsAny(e);
+                    if (RequestForChange())
+                        eventDAO.CreateIfNotExistsAny(e);
                 }
                 if (item2.IsFolder)
                     SolveFromPrefix(item2.Key);
@@ -121,6 +130,26 @@ using System.IO;
             {
                 this.executingThreads.Remove(prefix);
             }
+        }
+
+        private bool RequestForChange()
+        {
+            if (!_stoped)
+            {
+                //Ask local if can make the change
+                if (!unit.LocalEventsSynchronizer.IsStoped())
+                {
+                    unit.LocalEventsSynchronizer.WaitForChanges(10000);
+                }
+                if (!unit.RemoteEventsSynchronizer.IsStoped())
+                {
+                    unit.RemoteEventsSynchronizer.WaitForChanges(10000);
+                }
+                //Ask remote if can make the change
+                return true;
+            }
+
+            return false;
         }
 
 
