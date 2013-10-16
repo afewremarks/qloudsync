@@ -163,6 +163,7 @@ namespace GreenQloud.Synchrony
                         }
                        
                         Logger.LogEvent ("Event Synchronizing (try "+(e.TryQnt+1)+")", e );
+                        Program.Controller.HandleDownloading(e.Item);
                         if (e.RepositoryType == RepositoryType.LOCAL) {
                             SyncStatus = SyncStatus.UPLOADING;
                             Program.Controller.HandleSyncStatusChanged ();

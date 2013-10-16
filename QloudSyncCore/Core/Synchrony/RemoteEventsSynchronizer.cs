@@ -45,7 +45,7 @@ namespace GreenQloud.Synchrony
 
             UrlEncode encoder = new UrlEncode();
             string uri = string.Format("https://my.greenqloud.com/qloudsync/history/{0}/?username={1}&hashValue={2}&createdDate={3}", encoder.Encode(RuntimeSettings.DefaultBucketName), encoder.Encode(Credential.Username), encoder.Encode(hash), encoder.Encode(time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'")));
-
+           
             JArray jsonObjects = JSONHelper.GetInfoArray(uri);
             foreach(Newtonsoft.Json.Linq.JObject jsonObject in jsonObjects){
                 if(jsonObject["application"] != null && !((string)jsonObject["application"]).Equals(GlobalSettings.FullApplicationName)){

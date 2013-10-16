@@ -34,6 +34,8 @@ namespace GreenQloud
         public event Action OnSyncing = delegate { };
         public event Action OnError = delegate { };
         public event Action OnPaused = delegate { };
+      
+        private RepositoryItem currentItemDownloading;
 
 
         Thread checkConnection;
@@ -441,6 +443,17 @@ namespace GreenQloud
         public bool IsPaused()
         {
             return isPaused;
+        }
+
+        public RepositoryItem GetCurrentItemDownload()
+        {
+            return currentItemDownloading;
+        }
+
+        public void HandleDownloading(RepositoryItem item)
+        {
+            if(!item.IsFolder)
+                currentItemDownloading = item;
         }
   
     }

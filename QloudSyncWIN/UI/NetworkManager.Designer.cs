@@ -91,6 +91,7 @@
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(591, 23);
             this.progressBar1.TabIndex = 6;
+            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click_1);
             // 
             // processLine
             // 
