@@ -5,7 +5,6 @@ using System.Linq;
 using System.Xml;
 using System.Threading;
 using GreenQloud.Model;
-using GreenQloud.Repository;
 using GreenQloud.Persistence.SQLite;
 using System.IO;
 

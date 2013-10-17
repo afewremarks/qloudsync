@@ -35,8 +35,8 @@ namespace GreenQloud
         public event Action OnError = delegate { };
         public event Action OnPaused = delegate { };
       
+        private Event currentEventDownloading;
         private RepositoryItem currentItemDownloading;
-
 
         Thread checkConnection;
         bool firstRun = RuntimeSettings.FirstRun;
@@ -428,15 +428,23 @@ namespace GreenQloud
             return isPaused;
         }
 
-        public RepositoryItem GetCurrentItemDownload()
+        public RepositoryItem GetCurrentEventItem()
         {
             return currentItemDownloading;
         }
 
-        public void HandleDownloading(RepositoryItem item)
+        public Event GetCurrentEvent()
         {
-            if(!item.IsFolder)
-                currentItemDownloading = item;
+            return currentEventDownloading;
+        }
+
+        public void HandleItemEvent(Event e)
+        {
+            if (!e.Item.IsFolder)
+            {
+                currentItemDownloading = e.Item;
+                currentEventDownloading = e;
+            }
         }
   
     }

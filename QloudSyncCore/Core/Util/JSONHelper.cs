@@ -9,12 +9,10 @@ using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Threading;
 using Newtonsoft;
-
-
 using GreenQloud.Model;
 using GreenQloud.Repository;
 using GreenQloud.Util;
-using GreenQloud.Repository;
+
 
 
 namespace GreenQloud

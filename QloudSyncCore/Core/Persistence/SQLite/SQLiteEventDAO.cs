@@ -1,7 +1,6 @@
 using System;
 using GreenQloud.Repository;
 using GreenQloud.Persistence;
-using GreenQloud.Repository;
 using GreenQloud.Model;
 using System.Collections.Generic;
 using GreenQloud.Persistence.SQLite;
