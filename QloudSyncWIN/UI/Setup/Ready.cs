@@ -22,7 +22,7 @@ namespace GreenQloud.UI.Setup
         private void button1_Click(object sender, EventArgs e)
         {
             Program.Controller.OpenStorageQloudWebSite();
-            Program.Controller.OpenSparkleShareFolder();
+            Program.Controller.OpenStorageFolder();
             this.Hide();
             this.Close();
         }

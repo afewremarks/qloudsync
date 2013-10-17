@@ -222,7 +222,7 @@ namespace GreenQloud.UI
       
         public void OpenStorageQloudFolder(Object sender, EventArgs e)
         {
-            Program.Controller.OpenSparkleShareFolder();
+            Program.Controller.OpenStorageFolder();
         }
 
         public void CheckForUpdates(Object sender, EventArgs e)
@@ -295,18 +295,18 @@ namespace GreenQloud.UI
 
         internal void OnIdle()
         {
-            if (Program.Controller.ErrorType == GreenQloud.AbstractApplicationController.ERROR_TYPE.DISCONNECTION)
-            {
-                Console.WriteLine("DISCONNECTION!!!!!!!");
-                this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
-            }
-            else {
-                this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
-            }
+            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_idle_active")).GetHicon());
         }
         internal void OnError()
         {
-            this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
+            if (Program.Controller.ErrorType == GreenQloud.AbstractApplicationController.ERROR_TYPE.DISCONNECTION)
+            {
+                this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
+            }
+            else
+            {
+                this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
+            }
         }
         internal void OnSyncing()
         {

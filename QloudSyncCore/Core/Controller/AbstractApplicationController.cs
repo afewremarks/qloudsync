@@ -92,8 +92,8 @@ namespace GreenQloud
                             if (disconected || ErrorType == ERROR_TYPE.DISCONNECTION)
                             {
                                 disconected = false;
-                                HandleReconnection();
                                 ErrorType = ERROR_TYPE.NULL;
+                                HandleReconnection();
                             }
                         } else {
                             if (!disconected)
@@ -395,9 +395,10 @@ namespace GreenQloud
             }
         }
 
-        public void OpenSparkleShareFolder()
+        public void OpenStorageFolder()
         {
-            OpenFolder(RuntimeSettings.HomePath);
+            string mainPath = new SQLiteRepositoryDAO().MainActive.Path;
+            OpenFolder(mainPath);
         }
 
         public void OpenStorageQloudWebSite()
