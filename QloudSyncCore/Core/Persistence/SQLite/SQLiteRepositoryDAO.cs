@@ -30,6 +30,14 @@ namespace GreenQloud.Persistence.SQLite
             }
         }
 
+        public LocalRepository MainActive
+        {
+            get
+            {
+                return Select(string.Format("SELECT * FROM REPOSITORY WHERE Active <> '{0}' AND RemoteFolder = '{1}'", bool.FalseString, "")).First();
+            }
+        }
+
         public override List<LocalRepository> All
         {
             get
