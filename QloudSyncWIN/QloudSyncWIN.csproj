@@ -72,9 +72,6 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LitS3">
-      <HintPath>lib\LitS3.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="MonoMac">
@@ -260,7 +257,6 @@
     <None Include="Resources\side-splash.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib\LitS3.dll" />
     <Content Include="lib\MonoMac.dll" />
     <Content Include="lib\Newtonsoft.Json.dll" />
     <Content Include="lib\XamaMac.dll" />
