@@ -89,7 +89,8 @@ namespace GreenQloud.UI
         {
             Event e = Program.Controller.GetCurrentEvent();
             ResetProgressBar();
-            if (e.Item != null)
+            ResetItemList();
+            if (e != null && e.Item != null)
             {
                 if (!items.Contains(e.Item))
                 {
@@ -120,6 +121,14 @@ namespace GreenQloud.UI
             }
 
           
+        }
+
+        private void ResetItemList()
+        {
+            if (items.Count == 50)
+            {
+                items.Clear();
+            }
         }
 
         private void ResetProgressBar()
