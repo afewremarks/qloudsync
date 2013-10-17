@@ -98,9 +98,9 @@ namespace GreenQloud.Synchrony
             //Ignore events without metadata....
             if(remoteEvent.EventType != EventType.DELETE) {
                 if (remoteEvent.HaveResultItem) { 
-                    meta = remoteRepository.GetMetadata (remoteEvent.Item.ResultItem.Key);
+                    meta = remoteRepository.GetMetadata (remoteEvent.Item.ResultItem.Key, true);
                 } else {
-                    meta = remoteRepository.GetMetadata (remoteEvent.Item.Key);
+                    meta = remoteRepository.GetMetadata (remoteEvent.Item.Key, true);
                 }
                 if(meta == null){
                     Logger.LogInfo("ERROR", "File " + (remoteEvent.HaveResultItem ? remoteEvent.Item.ResultItem.Key : remoteEvent.Item.Key) + " ignored. Metadata not found!");
