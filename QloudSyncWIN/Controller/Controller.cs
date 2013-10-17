@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using GreenQloud.Model;
 using GreenQloud.UI;
+using System.Windows.Forms;
 
  
 
@@ -50,6 +51,20 @@ namespace GreenQloud {
         public override void OpenWebsite(string url)
         {
             Process.Start(url);
+        }
+
+        public override void CheckForUpdates()
+        {
+            new Thread(delegate() {
+            Process p = Process.Start(RuntimeSettings.AutoUpdaterPath, "--mode unattended");
+            p.WaitForExit();
+
+            if (p.ExitCode == 0)
+            {
+                MessageBox.Show("New version available, or is it?.");
+            } else {
+                MessageBox.Show("QloudSync is up to date!");
+            }}).Start();
         }
     }
 }

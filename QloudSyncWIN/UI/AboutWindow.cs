@@ -15,16 +15,6 @@ namespace GreenQloud.UI
         {
 
             InitializeComponent();
-            UpdateLabelTextColor();
-
-        }
-
-        private void UpdateLabelTextColor()
-        {
-            if (RuntimeSettings.IsLastestVersion)
-                this.label2.ForeColor = System.Drawing.Color.Aqua;
-            else
-                this.label2.ForeColor = System.Drawing.Color.Green;
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

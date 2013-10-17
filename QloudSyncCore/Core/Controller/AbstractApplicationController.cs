@@ -21,6 +21,7 @@ namespace GreenQloud
         public abstract void OpenFolder(string path);
         public abstract void OpenWebsite(string url);
         public abstract void CreateStartupItem();
+        public abstract void CheckForUpdates();
 
         public event Action ShowAboutWindowEvent = delegate { };
         public event Action ShowEventLogWindowEvent = delegate { };
