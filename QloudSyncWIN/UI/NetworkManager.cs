@@ -46,8 +46,10 @@ namespace GreenQloud.UI
             bandwidthCalcTimer.Tick += new EventHandler(bandwidthCalcTimer_Tick);
             bandwidthCalcTimer.Enabled = true;
             items = new List<RepositoryItem>();
+            numberofitems.Text = string.Format("Items in Process: {0}", 0);
             makeStep = false;
             isUpload = false;
+
         
         }
 
@@ -58,14 +60,6 @@ namespace GreenQloud.UI
             totalBandwidthConsumptionLabel.Text = string.Format("Total Bandwidth Consumption: {0} kb", (currentAmountOfBytesReceived / 1024).ToString("0.00"));
             currentBandwidthDownloadLabel.Text = string.Format("Current Download Bandwidth: {0} kb/sec", (((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024)).ToString("0.00"));
             currentBandwidthUploadLabel.Text = string.Format("Current Upload Bandwidth: {0} kb/sec", Math.Abs(((currentAmountofBytesSent - lastAmountOfBytesSent) / 1024)).ToString("0.00"));   
-            if (((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024) > 1)
-            {
-                numberofitems.Text = string.Format("Items in Process: {0}", 1);
-            }
-            else
-            {
-                numberofitems.Text = string.Format("Items in Process: {0}", 0);
-            }
             OnItemEvent();
             UpdateProgressBar();
             lastAmountOfBytesReceived = currentAmountOfBytesReceived;
@@ -93,27 +87,33 @@ namespace GreenQloud.UI
 
         public void OnItemEvent()
         {
-            RepositoryItem item = Program.Controller.GetCurrentEventItem();
             Event e = Program.Controller.GetCurrentEvent();
             ResetProgressBar();
-            if (item != null)
+            if (e.Item != null)
             {
-                if (!items.Contains(item))
+                if (!items.Contains(e.Item))
                 {
-                    remoteRepositoryController = new RemoteRepositoryController(item.Repository);
-                    GetObjectResponse meta = remoteRepositoryController.GetMetadata(item.Key);
-                    items.Add(item);
-                    ListViewItem i = new ListViewItem(item.Name);
-                    listView1.Items.Add(i);
-                    progressBar1.Maximum = (int)meta.ContentLength;
+                    numberofitems.Text = string.Format("Items in Process: {0}", 1);
+                    items.Add(e.Item);
                     makeStep = true;
                     if (e.RepositoryType == RepositoryType.LOCAL)
                     {
+                        FileInfo fi = new FileInfo(e.Item.LocalAbsolutePath);
+
+                        if (e.EventType == EventType.MOVE)
+                            fi = new FileInfo(e.Item.ResultItem.LocalAbsolutePath);
+                        progressBar1.Maximum = (int)fi.Length;
+
                         isUpload = true;
+                        textBox1.AppendText(" -> Upload: " + e.Item.Name + " ... "); 
                     }
                     else
                     {
+                        remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
+                        GetObjectResponse meta = remoteRepositoryController.GetMetadata(e.Item.Key);
                         isUpload = false;
+                        progressBar1.Maximum = (int)meta.ContentLength;
+                        textBox1.AppendText(" -> Download: " + e.Item.Name + " ... "); 
                     }
                  
                 }
@@ -128,6 +128,8 @@ namespace GreenQloud.UI
             {
                 progressBar1.Value = 0;
                 makeStep = false;
+                textBox1.AppendText(" Done " + Environment.NewLine);
+                numberofitems.Text = string.Format("Items in Process: {0}", 0);
             }
         }
 
