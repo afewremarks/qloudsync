@@ -212,28 +212,18 @@ namespace GreenQloud.Persistence.SQLite
         
         public override DateTime LastSyncTime{
             get{
-                List<Event> events = Select(string.Format("SELECT TOP 1 * FROM EVENT WHERE REPOSITORY = 'REMOTE' AND RepositoryId = '{0}' ORDER BY INSERTTIME", repo.Id));
+                List<Event> events = Select(string.Format("SELECT TOP 1 * FROM EVENT WHERE REPOSITORY = 'REMOTE' AND RepositoryId = '{0}' ORDER BY INSERTTIME DESC", repo.Id));
                 if (events.Count == 0)
                     events = Select(string.Format("SELECT TOP 1 * FROM EVENT WHERE REPOSITORY = 'LOCAL' AND RepositoryId = '{0}' ORDER BY INSERTTIME DESC", repo.Id));
 
-                DateTime time;
                 if (events.Count > 0)
                 {
-                    time = events[0].InsertTime;
+                    return  events[0].InsertTime;
                 }
                 else
                 {
                     return DateTime.MinValue.ToUniversalTime();
                 }
-                try{
-
-                    DateTime dtime =  Convert.ToDateTime(time);// DateTime.ParseExact(time, "dd/MM/yyyy hh:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                    return dtime.AddSeconds(1).ToUniversalTime();
-                }catch(Exception e )
-                {
-                    Logger.LogInfo("ERROR", e.Message);
-                }
-                return DateTime.MaxValue.ToUniversalTime();
             }
         }
 

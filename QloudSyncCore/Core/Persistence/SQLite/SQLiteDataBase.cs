@@ -20,13 +20,6 @@ namespace GreenQloud.Persistence.SQLite
         private SQLiteDatabase()
         {
             cnn = new VistaDBConnection(ConnectionString);
-            try
-            {
-                cnn.Open();
-            } catch (Exception) {
-                new VistaDBCommand("CREATE DATABASE QloudSync", cnn).ExecuteNonQuery();
-                cnn.Open();
-            }
         }
 
         public static SQLiteDatabase Instance()
@@ -47,6 +40,16 @@ namespace GreenQloud.Persistence.SQLite
 
         public void CreateDataBase()
         {
+            if (!File.Exists(RuntimeSettings.DatabaseFile))
+            {
+                string pathFromDatabase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".." + Path.DirectorySeparatorChar.ToString() + "Resources" + Path.DirectorySeparatorChar.ToString() + ConfigFile.GetInstance().Read("DatabaseFile"));
+                if (!File.Exists(pathFromDatabase))
+                {
+                    pathFromDatabase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigFile.GetInstance().Read("DatabaseFile"));
+                }
+                File.Copy(pathFromDatabase, RuntimeSettings.DatabaseFile);
+            }
+            cnn.Open();
             ExecuteNonQuery("CREATE TABLE Repository (RepositoryID int IDENTITY(1,1) PRIMARY KEY, Path ntext, RECOVERING ntext, RemoteFolder ntext, Active ntext)");
             ExecuteNonQuery("CREATE TABLE RepositoryItem (RepositoryItemID int IDENTITY(1,1) PRIMARY KEY, RepositoryItemKey ntext, RepositoryId ntext, IsFolder ntext, ResultItemId ntext, eTag ntext, eTagLocal ntext,  Moved ntext, UpdatedAt ntext)");
             ExecuteNonQuery("CREATE TABLE EVENT (EventID int IDENTITY(1,1) PRIMARY KEY, ItemId ntext, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext, USER ntext, APPLICATION ntext, APPLICATION_VERSION ntext, DEVICE_ID ntext, OS ntext, BUCKET ntext, TRY_QNT ntext, RESPONSE ntext, RepositoryId ntext)");
@@ -62,6 +65,7 @@ namespace GreenQloud.Persistence.SQLite
         /// <returns>A DataTable containing the result set.</returns>
         public DataTable GetDataTable(string sql)
         {
+            cnn.Open();
             DataTable dt = new DataTable();
             using (VistaDBCommand mycommand = new VistaDBCommand(sql, cnn))
             {
@@ -156,7 +160,7 @@ namespace GreenQloud.Persistence.SQLite
         }
         public int ExecuteNonQuery(string sql, bool returnId)
         {
- 
+            cnn.Open();
             int result = 0;
             using (VistaDBCommand mycommand = new VistaDBCommand(sql, cnn))
             {
@@ -180,6 +184,7 @@ namespace GreenQloud.Persistence.SQLite
         /// <returns>A string.</returns>
         public string ExecuteScalar(string sql)
         {
+            cnn.Open();
             object value;
             using (VistaDBCommand mycommand = new VistaDBCommand(sql, cnn))
             {
