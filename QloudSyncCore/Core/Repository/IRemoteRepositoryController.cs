@@ -15,7 +15,7 @@ namespace GreenQloud.Repository
         void Delete(RepositoryItem request);
         void Copy (RepositoryItem item);
         bool Exists (RepositoryItem sqObject);
-        GetObjectResponse GetMetadata (string key);
+        GetObjectResponse GetMetadata (string key, bool recoveryFolder);
         List<RepositoryItem> GetItems(string prefix);
     }
 }
