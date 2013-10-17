@@ -140,7 +140,7 @@ using System.IO;
                 //Ask local if can make the change
                 if (!unit.LocalEventsSynchronizer.IsStoped())
                 {
-                    unit.LocalEventsSynchronizer.WaitForChanges(10000);
+                    unit.LocalEventsSynchronizer.WaitForChanges(2000);
                 }
                 if (!unit.RemoteEventsSynchronizer.IsStoped())
                 {

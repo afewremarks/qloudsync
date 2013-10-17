@@ -266,7 +266,7 @@ namespace GreenQloud.Repository
         private IEnumerable<ListEntry> GetS3Objects (string prefix)
         {
             HttpEncoder.Current = HttpEncoder.Default;
-            IEnumerable<ListEntry> subEntries = connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, prefix).ToList();
+            IEnumerable<ListEntry> subEntries = connection.Connect ().ListAllObjects (RuntimeSettings.DefaultBucketName, prefix).ToList();
             List<ListEntry> entries = new List<ListEntry> ();
             foreach (ListEntry entry in subEntries) {
                 if (Key (entry) != string.Empty && Key (entry) != prefix) {
@@ -292,14 +292,8 @@ namespace GreenQloud.Repository
         {
             string key = Key (s3item);
             if (key != string.Empty) {
-                GetObjectResponse meta = GetMetadata (key);
-                if(meta != null){
-                    RepositoryItem item = RepositoryItem.CreateInstance (repo, s3item);
-                    return item;
-                } else {
-                    Logger.LogInfo("ERROR", "File " + key + " ignored. Metadata not found!");
-                    return null;
-                }
+                RepositoryItem item = RepositoryItem.CreateInstance (repo, s3item);
+                return item;
             }
             return null;
         }
