@@ -32,10 +32,10 @@
             this.totalBandwidthConsumptionLabel = new System.Windows.Forms.Label();
             this.currentBandwidthDownloadLabel = new System.Windows.Forms.Label();
             this.numberofitems = new System.Windows.Forms.Label();
-            this.listView1 = new System.Windows.Forms.ListView();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.processLine = new System.Windows.Forms.Label();
             this.currentBandwidthUploadLabel = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // totalBandwidthConsumptionLabel
@@ -76,15 +76,6 @@
             this.numberofitems.TabIndex = 3;
             this.numberofitems.Text = "Items in Process:";
             // 
-            // listView1
-            // 
-            this.listView1.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.listView1.Location = new System.Drawing.Point(12, 152);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(591, 78);
-            this.listView1.TabIndex = 4;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            // 
             // progressBar1
             // 
             this.progressBar1.Location = new System.Drawing.Point(12, 85);
@@ -119,16 +110,26 @@
             this.currentBandwidthUploadLabel.TabIndex = 5;
             this.currentBandwidthUploadLabel.Text = "Current Upload Bandwidth:";
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(12, 152);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox1.Size = new System.Drawing.Size(591, 77);
+            this.textBox1.TabIndex = 8;
+            // 
             // NetworkManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = global::GreenQloud.Properties.Resources.Network;
             this.ClientSize = new System.Drawing.Size(624, 241);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.processLine);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.currentBandwidthUploadLabel);
-            this.Controls.Add(this.listView1);
             this.Controls.Add(this.numberofitems);
             this.Controls.Add(this.currentBandwidthDownloadLabel);
             this.Controls.Add(this.totalBandwidthConsumptionLabel);
@@ -150,9 +151,9 @@
         private System.Windows.Forms.Label totalBandwidthConsumptionLabel;
         private System.Windows.Forms.Label currentBandwidthDownloadLabel;
         private System.Windows.Forms.Label numberofitems;
-        private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label processLine;
         private System.Windows.Forms.Label currentBandwidthUploadLabel;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
