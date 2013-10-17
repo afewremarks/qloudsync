@@ -4,7 +4,6 @@ using GreenQloud.Model;
 using System.Threading;
 using System.Collections.Generic;
 using System.IO;
-using GreenQloud.Repository;
 using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Synchrony

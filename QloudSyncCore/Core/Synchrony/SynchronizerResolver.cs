@@ -11,7 +11,6 @@ using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Repository;
 using GreenQloud.Util;
-using GreenQloud.Repository;
 using System.Net.Sockets;
 using LitS3;
 using GreenQloud.Core;
@@ -163,7 +162,7 @@ namespace GreenQloud.Synchrony
                         }
                        
                         Logger.LogEvent ("Event Synchronizing (try "+(e.TryQnt+1)+")", e );
-                        Program.Controller.HandleDownloading(e.Item);
+                        Program.Controller.HandleItemEvent(e);
                         if (e.RepositoryType == RepositoryType.LOCAL) {
                             SyncStatus = SyncStatus.UPLOADING;
                             Program.Controller.HandleSyncStatusChanged ();

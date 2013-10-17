@@ -27,6 +27,7 @@ namespace GreenQloud.UI
         List<RepositoryItem> items;
         RemoteRepositoryController remoteRepositoryController;
         private bool makeStep;
+        private bool isUpload;
 
         public static NetworkManager GetInstance()
         {
@@ -46,6 +47,7 @@ namespace GreenQloud.UI
             bandwidthCalcTimer.Enabled = true;
             items = new List<RepositoryItem>();
             makeStep = false;
+            isUpload = false;
         
         }
 
@@ -65,11 +67,7 @@ namespace GreenQloud.UI
                 numberofitems.Text = string.Format("Items in Process: {0}", 0);
             }
             OnItemEvent();
-            if (makeStep)
-            {
-                progressBar1.Step = (int)(currentAmountOfBytesReceived - lastAmountOfBytesReceived);
-                progressBar1.PerformStep();
-            }
+            UpdateProgressBar();
             lastAmountOfBytesReceived = currentAmountOfBytesReceived;
             lastAmountOfBytesSent = currentAmountofBytesSent;
             
@@ -93,15 +91,11 @@ namespace GreenQloud.UI
 
         }
 
-        private RepositoryItem GetCurrentItem()
-        {
-            return Program.Controller.GetCurrentItemDownload();
-        }
-
         public void OnItemEvent()
         {
-            RepositoryItem item = Program.Controller.GetCurrentItemDownload();
-           // makeStep = false;
+            RepositoryItem item = Program.Controller.GetCurrentEventItem();
+            Event e = Program.Controller.GetCurrentEvent();
+            ResetProgressBar();
             if (item != null)
             {
                 if (!items.Contains(item))
@@ -113,10 +107,42 @@ namespace GreenQloud.UI
                     listView1.Items.Add(i);
                     progressBar1.Maximum = (int)meta.ContentLength;
                     makeStep = true;
+                    if (e.RepositoryType == RepositoryType.LOCAL)
+                    {
+                        isUpload = true;
+                    }
+                    else
+                    {
+                        isUpload = false;
+                    }
+                 
                 }
             }
 
           
+        }
+
+        private void ResetProgressBar()
+        {
+            if (progressBar1.Value == progressBar1.Maximum)
+            {
+                progressBar1.Value = 0;
+                makeStep = false;
+            }
+        }
+
+        private void UpdateProgressBar()
+        {
+            if (makeStep)
+            {
+                progressBar1.Step = (int)(trafficMonitor.GetBytesReceived() - lastAmountOfBytesReceived);
+                if (isUpload)
+                {
+                    progressBar1.Step = (int)(trafficMonitor.GetBytesSent() - lastAmountOfBytesSent);
+                }
+
+                progressBar1.PerformStep();
+            }
         }
     }
 }

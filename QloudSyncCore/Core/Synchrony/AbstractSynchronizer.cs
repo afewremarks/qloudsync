@@ -7,11 +7,9 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Threading;
-
 using GreenQloud.Model;
 using GreenQloud.Repository;
 using GreenQloud.Util;
-using GreenQloud.Repository;
 using System.Net.Sockets;
 using GreenQloud.Core;
 
