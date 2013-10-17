@@ -49,7 +49,8 @@
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="VistaDB.4, Version=4.1.0.0, Culture=neutral, PublicKeyToken=dfc935afe2125461, processorArchitecture=MSIL">
-      <HintPath>\\vmware-host\Shared Folders\Downloads\VistaDB.4.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\VistaDB.4.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +139,7 @@
   <ItemGroup>
     <None Include="Core\Config\.DS_Store" />
     <Content Include="Core\LitS3\LitS3.csproj" />
+    <Content Include="lib\VistaDB.4.dll" />
     <Content Include="QloudSync.vdb4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
