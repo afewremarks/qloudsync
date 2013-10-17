@@ -43,6 +43,7 @@ namespace GreenQloud.Synchrony
         {
             string hash = Crypto.GetHMACbase64(Credential.SecretKey,Credential.PublicKey, false);
             DateTime time = eventDAO.LastSyncTime;
+            time = time.AddSeconds(1);
             Logger.LogInfo("StorageQloud", "Looking for new changes on " + repo.RemoteFolder + " ["+time+"]");
 
             UrlEncode encoder = new UrlEncode();

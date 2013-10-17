@@ -79,15 +79,16 @@ using System.IO;
                int count = 0;
                do {
                    Thread.Sleep(5000);
-                   Console.WriteLine("Executando com " + executingThreads.Count + " Threads");
                    lock (lokkThreads)
                    {
                        count = executingThreads.Count;
                    }
                } while (!_stoped &&  count > 0) ;
+               
+               if(!_stoped)
+                    canChange = true;
+               
                Thread.Sleep(10000);
-               Console.WriteLine("Iniciando de novo! " + executingThreads.Count + " Threads");
-               canChange = true;
             }
         }
 
@@ -138,7 +139,7 @@ using System.IO;
                 //Ask local if can make the change
                 if (!unit.LocalEventsSynchronizer.IsStoped())
                 {
-                    unit.LocalEventsSynchronizer.WaitForChanges(10000);
+                    unit.LocalEventsSynchronizer.WaitForChanges(2000);
                 }
                 if (!unit.RemoteEventsSynchronizer.IsStoped())
                 {
