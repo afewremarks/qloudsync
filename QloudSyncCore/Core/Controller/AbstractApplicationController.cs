@@ -91,8 +91,8 @@ namespace GreenQloud
                             if (disconected || ErrorType == ERROR_TYPE.DISCONNECTION)
                             {
                                 disconected = false;
-                                HandleReconnection();
                                 ErrorType = ERROR_TYPE.NULL;
+                                HandleReconnection();
                             }
                         } else {
                             if (!disconected)
