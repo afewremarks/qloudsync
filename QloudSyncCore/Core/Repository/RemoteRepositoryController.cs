@@ -159,7 +159,7 @@ namespace GreenQloud.Repository
             return meta.ETag.Replace("\"", "");
         }
 
-        public GetObjectResponse GetMetadata (string key)
+        public GetObjectResponse GetMetadata (string key, bool recoveryIfFolderBroken = false)
         {
             S3Service service = connection.Connect ();
             try{
@@ -172,19 +172,19 @@ namespace GreenQloud.Repository
                 {
                     try {
                         //METADATA NOT FOUND, recover it (if is folder)!
-                        //If recovery, delete remote is not detected!
-                        /*if(key.EndsWith("/")){
-                            GenericCreateFolder(key);
-                            Logger.LogInfo("INFO", "METADATA FOR "+ key +" NOT FOUND, trying to recover it!");
-                            GetObjectRequest request2 = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, key, true);
-                            using (GetObjectResponse response2 = request2.GetResponse()){
-                                Logger.LogInfo("INFO", "METADATA FOR "+ key +" RECOVERED, folder created!");
-                                return response2;
+                        if(recoveryIfFolderBroken){
+                            if(key.EndsWith("/")){
+                                GenericCreateFolder(key);
+                                Logger.LogInfo("INFO", "METADATA FOR "+ key +" NOT FOUND, trying to recover it!");
+                                GetObjectRequest request2 = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, key, true);
+                                using (GetObjectResponse response2 = request2.GetResponse()){
+                                    Logger.LogInfo("INFO", "METADATA FOR "+ key +" RECOVERED, folder created!");
+                                    return response2;
+                                }
                             }
                         }
-
                         Logger.LogInfo("INFO", "METADATA FOR "+ key +" CANNOT BE RECOVERED!");
-                        */return null;
+                        return null;
                     } catch {
                         Logger.LogInfo("INFO", "METADATA FOR "+ key +" CANNOT BE RECOVERED!");
                         return null;
