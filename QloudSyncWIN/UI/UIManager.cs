@@ -52,10 +52,7 @@ namespace GreenQloud.UI
             {
                 this.isLoged = true;
                 this.LoginWindow.Done();
-                this.About = new AboutWindow();
                 this.confFoldersWindow = new ConfFolders();
-                Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
-               
                 this.confFoldersWindow.ShowDialog();
             });
             this.LoginWindow.FormClosed += ((sender, args) =>
@@ -65,6 +62,10 @@ namespace GreenQloud.UI
                     Application.DoEvents();
                 }
             });
+
+
+            this.About = new AboutWindow();
+            Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
         }
 
         public void Run() {
@@ -227,7 +228,7 @@ namespace GreenQloud.UI
 
         public void CheckForUpdates(Object sender, EventArgs e)
         {
-            MessageBox.Show("Your Current Version is up to date");
+            Program.Controller.CheckForUpdates();
         }
 
         public void OpenNetworkManager(Object sender, EventArgs e)
