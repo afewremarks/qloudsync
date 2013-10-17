@@ -48,9 +48,7 @@ namespace GreenQloud.UI
             items = new List<RepositoryItem>();
             numberofitems.Text = string.Format("Items in Process: {0}", 0);
             makeStep = false;
-            isUpload = false;
-
-        
+            isUpload = false;        
         }
 
         void bandwidthCalcTimer_Tick(object sender, EventArgs e)
@@ -95,14 +93,22 @@ namespace GreenQloud.UI
                 if (!items.Contains(e.Item))
                 {
                     numberofitems.Text = string.Format("Items in Process: {0}", 1);
-                    items.Add(e.Item);
+                    
                     makeStep = true;
                     if (e.RepositoryType == RepositoryType.LOCAL)
                     {
                         FileInfo fi = new FileInfo(e.Item.LocalAbsolutePath);
 
                         if (e.EventType == EventType.MOVE)
+                        {
                             fi = new FileInfo(e.Item.ResultItem.LocalAbsolutePath);
+                            items.Add(e.Item.ResultItem);
+                        }
+                        else
+                        {
+                            items.Add(e.Item);
+                        }
+                        
                         progressBar1.Maximum = (int)fi.Length;
 
                         isUpload = true;
@@ -110,6 +116,7 @@ namespace GreenQloud.UI
                     }
                     else
                     {
+                        items.Add(e.Item);
                         remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
                         GetObjectResponse meta = remoteRepositoryController.GetMetadata(e.Item.Key);
                         isUpload = false;
@@ -118,9 +125,7 @@ namespace GreenQloud.UI
                     }
                  
                 }
-            }
-
-          
+            }       
         }
 
         private void ResetItemList()
@@ -137,8 +142,8 @@ namespace GreenQloud.UI
             {
                 progressBar1.Value = 0;
                 makeStep = false;
-                textBox1.AppendText(" Done " + Environment.NewLine);
                 numberofitems.Text = string.Format("Items in Process: {0}", 0);
+                textBox1.AppendText(" Done " + Environment.NewLine);
             }
         }
 
