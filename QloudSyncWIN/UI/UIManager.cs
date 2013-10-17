@@ -222,7 +222,7 @@ namespace GreenQloud.UI
       
         public void OpenStorageQloudFolder(Object sender, EventArgs e)
         {
-            Program.Controller.OpenSparkleShareFolder();
+            Program.Controller.OpenStorageFolder();
         }
 
         public void CheckForUpdates(Object sender, EventArgs e)

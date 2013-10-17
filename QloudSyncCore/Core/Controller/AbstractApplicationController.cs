@@ -394,9 +394,10 @@ namespace GreenQloud
             }
         }
 
-        public void OpenSparkleShareFolder()
+        public void OpenStorageFolder()
         {
-            OpenFolder(RuntimeSettings.HomePath);
+            string mainPath = new SQLiteRepositoryDAO().MainActive.Path;
+            OpenFolder(mainPath);
         }
 
         public void OpenStorageQloudWebSite()
