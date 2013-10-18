@@ -233,12 +233,13 @@ namespace GreenQloud.Synchrony
                 }
 
                 if(currentException != null){
-                    Thread.Sleep(5000);
+                    Thread.Sleep(10000);
                 }
 
             } while (currentException != null && e.TryQnt < 5 && !_stoped);
 
             if (currentException != null) {
+                eventDAO.UpdateToSynchronized(e, RESPONSE.FAILURE);
                 throw currentException;
             }
         }
