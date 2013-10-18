@@ -61,7 +61,7 @@ namespace GreenQloud {
 
             if (p.ExitCode == 0)
             {
-                MessageBox.Show("New version available, or is it?.");
+                MessageBox.Show("New version available!");
             } else {
                 MessageBox.Show("QloudSync is up to date!");
             }}).Start();

@@ -306,7 +306,7 @@ namespace GreenQloud.UI
             }
             else
             {
-                this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_error_active")).GetHicon());
+                this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_syncing_idle_active")).GetHicon());
             }
         }
         internal void OnSyncing()

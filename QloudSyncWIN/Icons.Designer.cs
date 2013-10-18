@@ -63,6 +63,16 @@ namespace GreenQloud {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap disconnectnew {
+            get {
+                object obj = ResourceManager.GetObject("disconnectnew", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap folder_default {
             get {
                 object obj = ResourceManager.GetObject("folder_default", resourceCulture);
