@@ -25,6 +25,28 @@ namespace GreenQloud
             }
         }
 
+        public static string ResourcesPath  
+        {
+            get
+            {
+                string resourcePath = AppDomain.CurrentDomain.BaseDirectory;
+                string resourcePathMono = Path.Combine(resourcePath, ".." + Path.DirectorySeparatorChar.ToString() + "Resources" + Path.DirectorySeparatorChar.ToString()); 
+                if(Directory.Exists(resourcePathMono))
+                    resourcePath = resourcePathMono;
+                
+                return resourcePath;
+            }
+        }
+
+        public static string AutoUpdaterPath
+        {
+            get
+            {
+                return ResourcesPath + "Updater" + Path.DirectorySeparatorChar.ToString() + "autoupdate.exe";
+            }
+        }
+
+
         public static string HomePath{
             get {
                 if (homePath == null)
