@@ -86,9 +86,10 @@ namespace GreenQloud.UI
         public void OnItemEvent()
         {
             Event e = Program.Controller.GetCurrentEvent();
+            EventType eventType = e.EventType;
             ResetProgressBar();
             ResetItemList();
-            if (e != null && e.Item != null)
+            if (e != null && e.Item != null && eventType != EventType.DELETE)
             {
                 if (!items.Contains(e.Item))
                 {
