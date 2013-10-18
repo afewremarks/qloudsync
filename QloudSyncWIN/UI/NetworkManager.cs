@@ -86,48 +86,52 @@ namespace GreenQloud.UI
         public void OnItemEvent()
         {
             Event e = Program.Controller.GetCurrentEvent();
-            EventType eventType = e.EventType;
-            ResetProgressBar();
-            ResetItemList();
-            if (e != null && e.Item != null && eventType != EventType.DELETE)
+            if (e != null)
             {
-                if (!items.Contains(e.Item))
+                EventType eventType = e.EventType;
+                ResetProgressBar();
+                ResetItemList();
+                if (e.Item != null && eventType != EventType.DELETE)
                 {
-                    numberofitems.Text = string.Format("Items in Process: {0}", 1);
-                    
-                    makeStep = true;
-                    if (e.RepositoryType == RepositoryType.LOCAL)
+                    if (!items.Contains(e.Item))
                     {
-                        FileInfo fi = new FileInfo(e.Item.LocalAbsolutePath);
+                        numberofitems.Text = string.Format("Items in Process: {0}", 1);
 
-                        if (e.EventType == EventType.MOVE)
+                        makeStep = true;
+                        if (e.RepositoryType == RepositoryType.LOCAL)
                         {
-                            fi = new FileInfo(e.Item.ResultItem.LocalAbsolutePath);
-                            items.Add(e.Item.ResultItem);
+                            FileInfo fi = new FileInfo(e.Item.LocalAbsolutePath);
+
+                            if (e.EventType == EventType.MOVE)
+                            {
+                                fi = new FileInfo(e.Item.ResultItem.LocalAbsolutePath);
+                                items.Add(e.Item.ResultItem);
+                            }
+                            else
+                            {
+                                items.Add(e.Item);
+                            }
+
+                            progressBar1.Maximum = (int)fi.Length;
+
+                            isUpload = true;
+                            textBox1.AppendText(" -> Upload: " + e.Item.Name + " ... ");
                         }
                         else
                         {
                             items.Add(e.Item);
+                            remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
+                            GetObjectResponse meta = remoteRepositoryController.GetMetadata(e.Item.Key);
+                            isUpload = false;
+                            progressBar1.Maximum = (int)meta.ContentLength;
+                            textBox1.AppendText(" -> Download: " + e.Item.Name + " ... ");
                         }
-                        
-                        progressBar1.Maximum = (int)fi.Length;
 
-                        isUpload = true;
-                        textBox1.AppendText(" -> Upload: " + e.Item.Name + " ... "); 
                     }
-                    else
-                    {
-                        items.Add(e.Item);
-                        remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
-                        GetObjectResponse meta = remoteRepositoryController.GetMetadata(e.Item.Key);
-                        isUpload = false;
-                        progressBar1.Maximum = (int)meta.ContentLength;
-                        textBox1.AppendText(" -> Download: " + e.Item.Name + " ... "); 
-                    }
-                 
                 }
-            }       
+            }
         }
+        
 
         private void ResetItemList()
         {
