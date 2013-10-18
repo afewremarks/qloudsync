@@ -139,7 +139,7 @@
   <ItemGroup>
     <None Include="Core\Config\.DS_Store" />
     <Content Include="Core\LitS3\LitS3.csproj" />
-    <Content Include="lib\VistaDB.4.dll" />
+    <None Include="lib\VistaDB.4.dll" />
     <Content Include="QloudSync.vdb4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
