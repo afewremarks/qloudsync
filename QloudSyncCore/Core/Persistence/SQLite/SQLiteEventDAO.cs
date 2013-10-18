@@ -22,55 +22,47 @@ namespace GreenQloud.Persistence.SQLite
         public SQLiteEventDAO(){
         }
 
-        public void CreateIfNotExistsAny(Event e) {
-            if (!ExistsAny(e)) {
-                Create(e);
-            }            
-        }
-
         public override void Create (Event e)
         {
             if (e == null)
                 return;
-            bool noConflicts = !ExistsConflict(e);
 
-           if (noConflicts){
-                try{
-                    repositoryItemDAO.Create (e);
+            try{
+                repositoryItemDAO.Create (e);
 
-                    DateTime dateOfEvent =  e.InsertTime;
-                    if(dateOfEvent==DateTime.MinValue){
-                        dateOfEvent = GlobalDateTime.Now;
-                    }
+                DateTime dateOfEvent =  e.InsertTime;
+                if(dateOfEvent==DateTime.MinValue){
+                    dateOfEvent = GlobalDateTime.Now;
+                }
 
-                    //Verify ignore
-                    RepositoryIgnoreDAO ignoreDato = new SQLiteRepositoryIgnoreDAO();
-                    List<RepositoryIgnore> ignores = ignoreDato.All(this.repo);
-                    foreach (RepositoryIgnore ignoreItem in ignores)
+                //Verify ignore
+                RepositoryIgnoreDAO ignoreDato = new SQLiteRepositoryIgnoreDAO();
+                List<RepositoryIgnore> ignores = ignoreDato.All(this.repo);
+                foreach (RepositoryIgnore ignoreItem in ignores)
+                {
+                    if (e.Item.Key.StartsWith(ignoreItem.Path))
                     {
-                        if (e.Item.Key.StartsWith(ignoreItem.Path))
-                        {
-                            e.Synchronized = true;
-                            e.Response = RESPONSE.IGNORED;
-                        }
+                        e.Synchronized = true;
+                        e.Response = RESPONSE.IGNORED;
                     }
+                }
                     
 
 
-                    string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET, TRY_QNT, RESPONSE, RepositoryId) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}')", 
-                                              e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), e.Synchronized.ToString(), dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket, e.TryQnt, e.Response.ToString(), e.Repository.Id);
+                string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET, TRY_QNT, RESPONSE, RepositoryId) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}')", 
+                                            e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), e.Synchronized.ToString(), dateOfEvent, e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket, e.TryQnt, e.Response.ToString(), e.Repository.Id);
 
-                    e.Id = (int) database.ExecuteNonQuery (sql, true);
+                e.Id = (int) database.ExecuteNonQuery (sql, true);
 
-                    Logger.LogEvent("EVENT CREATED", e);
-                    if (e.Response == RESPONSE.IGNORED) {
-                        Logger.LogEvent("EVENT MARKED TO IGNORE", e);
-                    }
-
-                }catch(Exception err){
-                    Logger.LogInfo("ERROR", err);
+                Logger.LogEvent("EVENT CREATED", e);
+                if (e.Response == RESPONSE.IGNORED) {
+                    Logger.LogEvent("EVENT MARKED TO IGNORE", e);
                 }
+
+            }catch(Exception err){
+                Logger.LogInfo("ERROR", err);
             }
+            
         }
 
         public override List<Event> All
@@ -227,36 +219,24 @@ namespace GreenQloud.Persistence.SQLite
             }
         }
 
-        public bool ExistsAny(Event e)
+        public bool ExistsAnyConflict(string itemKey)
         {
-            System.Object temp = database.ExecuteScalar(
-                string.Format("SELECT count(*) FROM EVENT WHERE SYNCHRONIZED <> '{0}' AND (ItemId='{1}' OR ItemId='{2}')  AND RepositoryId = '{3}'", bool.TrueString, e.Item.Id, (e.HaveResultItem ? e.Item.ResultItemId : 0), repo.Id)
-            );
+            string sql = string.Format("SELECT count(*) FROM EVENT e " +
+                " LEFT JOIN RepositoryItem it on e.ItemId = it.RepositoryItemID" +
+                " LEFT JOIN RepositoryItem ri on it.ResultItemId = ri.RepositoryItemID" +
+                " WHERE SYNCHRONIZED <> '{0}' AND " +
+                " (it.RepositoryItemKey LIKE '{1}%' OR  it.RepositoryItemKey LIKE '%{1}' OR ri.RepositoryItemKey LIKE '{1}%' OR  ri.RepositoryItemKey LIKE '%{1}') AND e.RepositoryId = '{2}'", bool.TrueString, itemKey, repo.Id);
+            
+            System.Object temp = database.ExecuteScalar(sql);
             int count = int.Parse(temp.ToString());
 
             if (count > 0)
             {
                 return true;
             }
-
             return false;
         }
 
-        public bool ExistsConflict (Event e)
-        {
-            System.Object temp = database.ExecuteScalar (
-                string.Format ("SELECT count(*) FROM EVENT WHERE ItemId ='{0}' AND TYPE = '{1}' AND SYNCHRONIZED <> '{2}'  AND RepositoryId = '{3}'", e.Item.Id, e.EventType.ToString(), bool.TrueString, repo.Id)
-                        );
-            int count = int.Parse (temp.ToString());
-
-            if (count > 0) {
-                return true;
-            }
-
-            return false;
-        }
-
-        
         public bool Exists (Event e)
         {
             return All.Count!=0;

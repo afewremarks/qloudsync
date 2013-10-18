@@ -14,8 +14,6 @@ using System.IO;
     {
         private IRemoteRepositoryController remoteRepository;
         private IPhysicalRepositoryController localRepository;
-        RemoteEventsSynchronizer remoteSynchronizer;
-        LocalEventsSynchronizer localSynchronizer;
         private SQLiteEventDAO eventDAO;
         private Dictionary<string, Thread> executingThreads;
         private Object lokkThreads = new object();
@@ -104,8 +102,9 @@ using System.IO;
                         localItems.RemoveAll( it => it.Key.StartsWith(item1.Key));
                         remoteItems.RemoveAll( it => it.Key.StartsWith(item1.Key));
                     }
-                    if(RequestForChange())
-                        eventDAO.CreateIfNotExistsAny (e);
+                    if (RequestForChange())
+                        eventDAO.Create(e);
+                    
                 }
                 if (item1.IsFolder)
                     SolveFromPrefix(item1.Key);
@@ -121,7 +120,8 @@ using System.IO;
                         remoteItems.RemoveAll( it => it.Key.StartsWith(item2.Key));
                     }
                     if (RequestForChange())
-                        eventDAO.CreateIfNotExistsAny(e);
+                        eventDAO.Create(e);
+                    
                 }
                 if (item2.IsFolder)
                     SolveFromPrefix(item2.Key);
@@ -155,6 +155,11 @@ using System.IO;
 
         private Event SolveFromRemote (RepositoryItem item)
         {
+            if (eventDAO.ExistsAnyConflict(item.Key) || !remoteRepository.Exists(item))
+            {
+                return null;
+            }
+
             Event e = new Event (repo);
             e.Item = item;
             if (localRepository.Exists (e.Item)) {
@@ -191,6 +196,12 @@ using System.IO;
 
         private Event SolveFromLocal (RepositoryItem item)
         {
+            if (eventDAO.ExistsAnyConflict(item.Key) || !localRepository.Exists(item))
+            {
+                return null;
+            }
+
+
             Event e = new Event (repo);
             e.Item = item;
             if (localRepository.Exists (e.Item)) {
