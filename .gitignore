@@ -1,5 +1,4 @@
 .DS_Store
-*.exe
 *.exe.mdb
 *.userprefs
 bin/
@@ -9,6 +8,7 @@ obj/
 *.tiff
 *.psd
 *.am
+*.suo
 
 QloudSync/test-results/
 QloudSyncMAC/test-results/QloudSyncMAC.csproj.test-cache
