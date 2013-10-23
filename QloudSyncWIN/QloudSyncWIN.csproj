@@ -212,7 +212,6 @@
     <Content Include="lib\VistaDB.4.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\%24RLWCE6O.txt" />
     <Content Include="Resources\process-pause-active.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
