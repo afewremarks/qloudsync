@@ -6,6 +6,8 @@ using System.Linq;
 using QloudSyncCore;
 using System.Diagnostics;
 using System.Web.Util;
+using System.Net;
+using System.Net.Sockets;
 
 namespace GreenQloud.Core {
 
@@ -18,27 +20,20 @@ namespace GreenQloud.Core {
         #endif
         public static void Run (ApplicationController controller, ApplicationUI ui)
         {
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(GeneralUnhandledExceptionHandler);
+
             HttpEncoder.Current = HttpEncoder.Default;
             Controller = controller;
             UI = ui;
-            try {
-                if (PriorProcess() != null)
-                {
-                    throw new AbortedOperationException("Another instance of the app is already running.");
-                }
-
-                Controller.Initialize ();
-                try{
-                    UI.Run ();
-                }catch (AbortedOperationException){
-                    Logger.LogInfo ("Init", "Operation aborted. Sending a QloudSync Kill.");
-                    PriorProcess().Kill();
-                }
-            } catch (Exception e){
-                Logger.LogInfo ("Init", e);
-                Console.WriteLine (e.StackTrace);
-                Environment.Exit (-1);
+            
+            if (PriorProcess() != null)
+            {
+                throw new AbortedOperationException("Another instance of the app is already running.");
             }
+
+            Controller.Initialize ();
+            UI.Run ();
+                 
             #if !__MonoCS__
             // Suppress assertion messages in debug mode
             GC.Collect (GC.MaxGeneration, GCCollectionMode.Forced);
@@ -46,6 +41,38 @@ namespace GreenQloud.Core {
             #endif
         }
 
+        public static void GeneralUnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+            try
+            {
+                throw e;
+            } 
+            catch (WebException webx) 
+            {
+                if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
+                    Logger.LogInfo ("LOST CONNECTION", webx);
+                    Program.Controller.HandleDisconnection ();
+                } else {
+                    Logger.LogInfo ("SYNCHRONIZER ERROR", webx);
+                    Program.Controller.HandleError ();
+                }
+            }
+            catch (SocketException sock) 
+            {
+                Logger.LogInfo ("LOST CONNECTION", sock);
+                Program.Controller.HandleDisconnection ();
+            }
+            catch (AbortedOperationException aex)
+            {
+                Logger.LogInfo("Init", "Operation aborted. Sending a QloudSync Kill.");
+                Logger.LogInfo("ABORTED", aex); 
+                PriorProcess().Kill();
+            } catch (Exception ex) {
+                Logger.LogInfo("Unexpected Exception", ex);
+                Program.Controller.HandleError();
+            }
+        }
 
         public static Process PriorProcess()
             // Returns a System.Diagnostics.Process pointing to

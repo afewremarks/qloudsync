@@ -33,9 +33,10 @@ namespace GreenQloud.Synchrony
             this.unit.RecoverySynchronizer.WaitForChanges(0);
             Start();
 
-            while (!_stoped){
+            while (!_stoped)
+            {
                 AddEvents();
-                Thread.Sleep (1000);
+                Thread.Sleep(1000);
             }
         }
 

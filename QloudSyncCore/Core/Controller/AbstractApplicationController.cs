@@ -165,6 +165,16 @@ namespace GreenQloud
             startSync.Start();
         }
 
+        public void StopSynchronizers()
+        {
+            SQLiteRepositoryDAO repoRaven = new SQLiteRepositoryDAO();
+            List<LocalRepository> repos = repoRaven.AllActived;
+            foreach (LocalRepository repo in repos)
+            {
+                StopSynchronizers(repo);
+            }
+        }
+
         public void StopSynchronizers(LocalRepository repo)
         {
             SynchronizerUnit unit = SynchronizerUnit.GetByRepo(repo);
@@ -373,6 +383,15 @@ namespace GreenQloud
             StopSynchronizers(repo);
             Thread.Sleep(5000);
             InitializeSynchronizers(repo);
+        }
+
+        public void HandleError()
+        {
+            ErrorType = ERROR_TYPE.FATAL_ERROR;
+            OnError();
+            StopSynchronizers();
+            Thread.Sleep(5000);
+            InitializeSynchronizers();
         }
 
         public void CreateConfigFolder()

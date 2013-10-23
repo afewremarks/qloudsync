@@ -35,6 +35,7 @@ namespace GreenQloud.Synchrony
                 });
                 watcherThread.Start ();
             }
+            Thread.Sleep(1000);
         }
 
         public QloudSyncFileSystemWatcher GetWatcher(){
