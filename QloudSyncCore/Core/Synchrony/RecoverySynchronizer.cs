@@ -7,6 +7,7 @@ using System.Threading;
 using GreenQloud.Model;
 using GreenQloud.Persistence.SQLite;
 using System.IO;
+using GreenQloud.Core;
 
  namespace GreenQloud.Synchrony
 {
@@ -29,8 +30,11 @@ using System.IO;
         }
 
         public override void Run() {
-            CheckRemoteFolder();
-            Synchronize ();
+            while (!_stoped)
+            {
+                CheckRemoteFolder();
+                Synchronize();
+            }
         }
 
         void CheckRemoteFolder ()
@@ -55,9 +59,14 @@ using System.IO;
             {
                 Thread t = new Thread(delegate()
                 {
-                    List<RepositoryItem> localItems = localRepository.GetItems(Path.Combine(repo.Path, prefix));
-                    List<RepositoryItem> remoteItems = remoteRepository.GetItems(prefix);
-                    SolveItems(localItems, remoteItems, prefix);
+                    try
+                    {
+                        List<RepositoryItem> localItems = localRepository.GetItems(Path.Combine(repo.Path, prefix));
+                        List<RepositoryItem> remoteItems = remoteRepository.GetItems(prefix);
+                        SolveItems(localItems, remoteItems, prefix);
+                    } catch (Exception e){
+                        Program.GeneralUnhandledExceptionHandler(this, new UnhandledExceptionEventArgs(e, false)); 
+                    }
                 });
                 lock (lokkThreads)
                 {
@@ -71,23 +80,21 @@ using System.IO;
         }
 
         public void Synchronize (){
-            while (true){
-               string prefix = repo.RemoteFolder;
-               SolveFromPrefix(repo.RemoteFolder);
-               int count = 0;
-               do {
-                   Thread.Sleep(5000);
-                   lock (lokkThreads)
-                   {
-                       count = executingThreads.Count;
-                   }
-               } while (!_stoped &&  count > 0) ;
+            string prefix = repo.RemoteFolder;
+            SolveFromPrefix(repo.RemoteFolder);
+            int count = 0;
+            do {
+                Thread.Sleep(5000);
+                lock (lokkThreads)
+                {
+                    count = executingThreads.Count;
+                }
+            } while (!_stoped &&  count > 0) ;
                
-               if(!_stoped)
-                    canChange = true;
+            if(!_stoped)
+                canChange = true;
                
-               Thread.Sleep(10000);
-            }
+            Thread.Sleep(10000);
         }
 
         void SolveItems (List<RepositoryItem> localItems, List<RepositoryItem> remoteItems, string prefix)

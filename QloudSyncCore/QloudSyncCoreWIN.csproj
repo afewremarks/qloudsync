@@ -32,6 +32,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LitS3, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\LitS3.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
@@ -57,28 +61,6 @@
     <Compile Include="Core\Config\AbstractConfigFile.cs" />
     <Compile Include="Core\Controller\AbstractApplicationController.cs" />
     <Compile Include="Core\IO\QloudSyncFileSystemWatcherWIN.cs" />
-    <Compile Include="Core\LitS3\AccessControl.cs" />
-    <Compile Include="Core\LitS3\AddObject.cs" />
-    <Compile Include="Core\LitS3\Bucket.cs" />
-    <Compile Include="Core\LitS3\BucketAccess.cs" />
-    <Compile Include="Core\LitS3\CopyObject.cs" />
-    <Compile Include="Core\LitS3\CreateBucket.cs" />
-    <Compile Include="Core\LitS3\DeleteBucket.cs" />
-    <Compile Include="Core\LitS3\DeleteObject.cs" />
-    <Compile Include="Core\LitS3\GetAllBuckets.cs" />
-    <Compile Include="Core\LitS3\GetBucketLocation.cs" />
-    <Compile Include="Core\LitS3\GetObject.cs" />
-    <Compile Include="Core\LitS3\Identity.cs" />
-    <Compile Include="Core\LitS3\ListEntries.cs" />
-    <Compile Include="Core\LitS3\ListObjects.cs" />
-    <Compile Include="Core\LitS3\ObjectTransfer.cs" />
-    <Compile Include="Core\LitS3\S3Authorizer.cs" />
-    <Compile Include="Core\LitS3\S3ErrorCode.cs" />
-    <Compile Include="Core\LitS3\S3Exception.cs" />
-    <Compile Include="Core\LitS3\S3Headers.cs" />
-    <Compile Include="Core\LitS3\S3Request.cs" />
-    <Compile Include="Core\LitS3\S3Response.cs" />
-    <Compile Include="Core\LitS3\S3Service.cs" />
     <Compile Include="Core\Model\RepositoryRavens.cs" />
     <Compile Include="Core\Model\TimeDiff.cs" />
     <Compile Include="Core\Persistence\EventDAO.cs" />
@@ -138,8 +120,8 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="Core\Config\.DS_Store" />
-    <Content Include="Core\LitS3\LitS3.csproj" />
     <None Include="lib\VistaDB.4.dll" />
+    <Content Include="lib\LitS3.dll" />
     <Content Include="QloudSync.vdb4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -49,8 +49,7 @@ namespace GreenQloud.Synchrony
                         _thread = new Thread(new ThreadStart(this.GenericRun));
                     }
                     _thread.Start ();
-                }
-                    
+                }   
             }
         }
         public void Join() { _thread.Join(); }
@@ -59,7 +58,6 @@ namespace GreenQloud.Synchrony
             lock (lockk) {
                 if (!_stoped) {
                     _stoped = true;
-                    //_thread = null;
                 }
             }
         }
@@ -69,24 +67,20 @@ namespace GreenQloud.Synchrony
         }
         void GenericRun ()
         {
-            try {
-                Run();
-            } catch (WebException webx) {
-                if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
-                    Logger.LogInfo ("LOST CONNECTION", webx);
-                    Program.Controller.HandleDisconnection ();
-                } else {
-                    Logger.LogInfo ("SYNCHRONIZER ERROR", webx);
-                    Logger.LogInfo ("INFO", "Preparing to run rescue mode...");
-                    Program.Controller.HandleError (repo);
+            try
+            {
+                while (true)
+                {
+                    while (_stoped)
+                    {
+                        Thread.Sleep(1000);
+                    }
+                    Run();
                 }
-            } catch (SocketException sock) {
-                Logger.LogInfo ("LOST CONNECTION", sock);
-                Program.Controller.HandleDisconnection ();
-            } catch (Exception e) {
-                Logger.LogInfo ("ERROR", e);
-                Logger.LogInfo ("INFO", "Preparing to run rescue mode...");
-                Program.Controller.HandleError (repo);
+            }
+            catch (Exception e)
+            {
+                Program.GeneralUnhandledExceptionHandler(this, new UnhandledExceptionEventArgs(e, false));
             }
         }
 
