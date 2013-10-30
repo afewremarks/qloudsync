@@ -18,5 +18,6 @@ namespace GreenQloud {
         void HandleSyncStatusChanged();
         bool DatabaseLoaded();
         void HandleItemEvent(Event e);
+        void Alert(string message);
     }
 }

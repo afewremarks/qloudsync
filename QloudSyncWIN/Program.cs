@@ -24,20 +24,11 @@ namespace GreenQloud
 #endif
         public static void Main(string[] args)
         {
-            try
-            {
-                Controller = new Controller();                
-                UI = UIManager.GetInstance();
-                GreenQloud.Core.Program.Run(Controller, UI);
-                Application.Run(UI);
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.StackTrace);
-                Logger.LogInfo("Init", e);
-                Exit();
-            }
+            
+            Controller = new Controller();                
+            UI = UIManager.GetInstance();
+            GreenQloud.Core.Program.Run(Controller, UI);
+            Application.Run(UI);
 
 #if !__MonoCS__
             // Suppress assertion messages in debug mode
