@@ -30,6 +30,10 @@ namespace GreenQloud.UI
         private void linkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Program.Controller.OpenWebsite(string.Format("https://github.com/greenqloud/qloudsync/issues"));
+
+
+            string explanation = "Eu estava apenas usando =[";
+            Program.Controller.SendBugMessage( explanation);
         }
 
         private void linkLabel4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

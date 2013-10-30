@@ -68,6 +68,8 @@ namespace GreenQloud.Core {
                 Logger.LogInfo("Init", "Operation aborted. Sending a QloudSync Kill.");
                 Logger.LogInfo("ABORTED", aex); 
                 PriorProcess().Kill();
+            } catch (WarningException warningException){
+                Program.Controller.Alert(warningException.Message);
             } catch (Exception ex) {
                 Logger.LogInfo("Unexpected Exception", ex);
                 Program.Controller.HandleError();

@@ -66,5 +66,21 @@ namespace GreenQloud {
                 MessageBox.Show("QloudSync is up to date!");
             }}).Start();
         }
+
+        public void SendBugMessage(string explanation)
+        {
+            try
+            {
+                new SendMail().SendBugMessage(explanation);
+            }
+            catch
+            {
+                Alert("Could not send the message, check your internet connection."); 
+            }
+        }
+
+        public override void Alert(string message) {
+            MessageBox.Show(message);
+        }
     }
 }

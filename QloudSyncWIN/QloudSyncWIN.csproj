@@ -130,6 +130,12 @@
     <Compile Include="UI\AboutWindow.Designer.cs">
       <DependentUpon>AboutWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\BugReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\BugReport.Designer.cs">
+      <DependentUpon>BugReport.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\NetworkManager.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -178,6 +184,9 @@
     </Compile>
     <EmbeddedResource Include="UI\AboutWindow.resx">
       <DependentUpon>AboutWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\BugReport.resx">
+      <DependentUpon>BugReport.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\NetworkManager.resx">
       <DependentUpon>NetworkManager.cs</DependentUpon>
