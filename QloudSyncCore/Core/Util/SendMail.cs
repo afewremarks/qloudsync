@@ -17,12 +17,21 @@ namespace GreenQloud
             mail.To.Add("qloudsync.bugs@greenqloud.com");
             mail.Subject = "Bug Report";
             mail.Body = explanation;
-            string snapshot = RuntimeSettings.ConfigPath + Path.DirectorySeparatorChar + "log_snapshot.txt";
-            File.Delete(snapshot);
-            File.Copy(RuntimeSettings.LogFilePath, snapshot);
-            System.Net.Mail.Attachment attachment;
-            attachment = new System.Net.Mail.Attachment(snapshot);
-            mail.Attachments.Add(attachment);
+            
+            //log snapshot
+            string log_snapshot = RuntimeSettings.ConfigPath + Path.DirectorySeparatorChar + "log_snapshot.txt";
+            File.Delete(log_snapshot);
+            File.Copy(RuntimeSettings.LogFilePath, log_snapshot);
+            System.Net.Mail.Attachment log_attachment;
+            log_attachment = new System.Net.Mail.Attachment(log_snapshot);
+            mail.Attachments.Add(log_attachment);
+
+            //machine snapshot
+            string machine_snapshot = RuntimeSettings.ConfigPath + Path.DirectorySeparatorChar + "machine_snapshot.txt";
+            RuntimeSettings.BuildMachineSnapshotFile(machine_snapshot);
+            System.Net.Mail.Attachment machine_attachment;
+            machine_attachment = new System.Net.Mail.Attachment(machine_snapshot);
+            mail.Attachments.Add(machine_attachment);
 
             SmtpServer.Port = 587;
             SmtpServer.Credentials = new System.Net.NetworkCredential(ConfigFile.GetInstance().Read("email_sender"), ConfigFile.GetInstance().Read("email_password"));

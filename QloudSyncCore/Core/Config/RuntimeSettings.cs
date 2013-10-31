@@ -142,6 +142,21 @@ namespace GreenQloud
 
             return latestversion;
         }
+
+        public static void BuildMachineSnapshotFile(string file){
+            File.Delete(file);
+            File.AppendAllText(file, "\nStorageQloud user: " + Credential.Username);
+            File.AppendAllText(file, "\nQloudSync running version: " + GlobalSettings.RunningVersion);
+
+
+            File.AppendAllText(file, "\nMachine name: " + Environment.MachineName);
+            File.AppendAllText(file, "\nCommon language runtime: " + Environment.Version);
+
+            File.AppendAllText(file, "\nOSVersion: " + Environment.OSVersion.VersionString);
+            File.AppendAllText(file, "\nOSVersion platform: " + Environment.OSVersion.Platform);
+            File.AppendAllText(file, "\nOSVersion Service Pack: " + Environment.OSVersion.ServicePack);
+           
+        }
     }
 }
 
