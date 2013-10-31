@@ -13,9 +13,17 @@ namespace GreenQloud.Persistence.SQLite
 
         SQLiteDatabase database = SQLiteDatabase.Instance();
 
-        public override void Create (LocalRepository repo, string path)
+        public override void Create(LocalRepository repo, string path)
         {
-            database.ExecuteNonQuery(string.Format("INSERT INTO RepositoryIgnore (RepositoryId, Path) VALUES ('{0}', '{1}')", repo.Id, path));
+            if (!All(repo).Exists(ri => ri.Path.Equals(path)))
+            {
+                database.ExecuteNonQuery(string.Format("INSERT INTO RepositoryIgnore (RepositoryId, Path) VALUES ('{0}', '{1}')", repo.Id, path));
+            }
+        }
+
+        public void Remove(LocalRepository repo, string path)
+        {
+            database.ExecuteNonQuery(string.Format("DELETE FROM RepositoryIgnore where RepositoryId = '{0}' AND Path = '{1}'", repo.Id, path));
         }
 
         public override List<RepositoryIgnore> All(LocalRepository repo)
