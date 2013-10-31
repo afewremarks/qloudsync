@@ -154,6 +154,7 @@
             this.Name = "AboutWindow";
             this.ShowIcon = false;
             this.Text = "About Window";
+            this.Load += new System.EventHandler(this.AboutWindow_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

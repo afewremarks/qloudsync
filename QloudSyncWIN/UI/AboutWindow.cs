@@ -38,5 +38,10 @@ namespace GreenQloud.UI
             Program.Controller.OpenWebsite(string.Format("file://" + RuntimeSettings.LogFilePath));
         }
 
+        private void AboutWindow_Load(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }

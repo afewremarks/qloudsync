@@ -108,7 +108,7 @@ namespace GreenQloud.UI
             ToolStripSeparator recentlyChangedFinalSeparator = new ToolStripSeparator();
             this.trayMenu.Items.Add(recentlyChangedFinalSeparator);
             
-            this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
+            this.trayMenu.Items.Add("Help Center", null, OpenBugReport);
             this.trayMenu.Items.Add("Network Status", null, OpenNetworkManager);
             this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
             this.trayMenu.Items.Add(pauseSync);
@@ -235,6 +235,13 @@ namespace GreenQloud.UI
         {
             NetworkManager manager = new NetworkManager();
             manager.ShowDialog();
+
+        }
+
+        public void OpenBugReport(Object sender, EventArgs e)
+        {
+            BugReport report = new BugReport();
+            report.ShowDialog();
 
         }
 
