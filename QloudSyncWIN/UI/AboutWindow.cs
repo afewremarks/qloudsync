@@ -15,6 +15,7 @@ namespace GreenQloud.UI
         {
 
             InitializeComponent();
+            this.label1.Text = "Version: "+ GlobalSettings.RunningVersion;
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -27,10 +28,13 @@ namespace GreenQloud.UI
             Program.Controller.OpenWebsite(string.Format("https://github.com/greenqloud/qloudsync/tree/master/legal/Authors.txt"));
         }
 
+        BugReport report = new BugReport();
         private void linkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            string explanation = "Eu estava apenas usando =[";
-            Program.Controller.SendBugMessage( explanation);
+          if (!report.Visible) 
+          {
+            report.ShowDialog();
+          }
         }
 
         private void linkLabel4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
