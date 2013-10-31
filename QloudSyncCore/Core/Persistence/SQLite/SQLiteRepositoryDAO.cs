@@ -72,6 +72,11 @@ namespace GreenQloud.Persistence.SQLite
             return repos.First();
         }
 
+        public LocalRepository RootRepo()
+        {
+            return Select(string.Format("SELECT * FROM REPOSITORY WHERE RemoteFolder = '{0}'", "")).FirstOrDefault();
+        }
+
         public LocalRepository GetById (int id)
         {
             List<LocalRepository> repos = Select(string.Format("SELECT * FROM REPOSITORY WHERE RepositoryID = '{0}'", id));
