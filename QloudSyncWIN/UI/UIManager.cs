@@ -109,10 +109,13 @@ namespace GreenQloud.UI
             this.trayMenu.Items.Add(recentlyChangedFinalSeparator);
             
             this.trayMenu.Items.Add("Help Center", null, OpenBugReport);
-            this.trayMenu.Items.Add("Network Status", null, OpenNetworkManager);
+            //ADD to preferences
+            //this.trayMenu.Items.Add("Network Status", null, OpenNetworkManager);
             this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
             this.trayMenu.Items.Add(pauseSync);
-            this.trayMenu.Items.Add("Check for Updates", null, CheckForUpdates);
+            this.trayMenu.Items.Add("Preferences", null, ShowPreferencesWindow);
+            //TODO MOVE TO ABOUT
+            //this.trayMenu.Items.Add("Check for Updates", null, CheckForUpdates);
             this.trayMenu.Items.Add("-", null);
             this.trayMenu.Items.Add("Quit", null, OnExit);
 
@@ -236,6 +239,16 @@ namespace GreenQloud.UI
         {
             if (!manager.Visible) {
             manager.ShowDialog();
+            }
+
+        }
+
+        Preferences preferences = new Preferences();
+        public void ShowPreferencesWindow(Object sender, EventArgs e)
+        {
+            if (!preferences.Visible)
+            {
+                preferences.ShowDialog();
             }
 
         }
