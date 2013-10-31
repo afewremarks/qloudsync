@@ -72,6 +72,12 @@ namespace GreenQloud.Core {
                 Program.Controller.Alert(warningException.Message);
             } catch (Exception ex) {
                 Logger.LogInfo("Unexpected Exception", ex);
+                try
+                {
+                    new SendMail().SendBugMessage(ex.Message);
+                } catch {
+                
+                }
                 Program.Controller.HandleError();
             }
         }
