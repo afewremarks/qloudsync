@@ -15,7 +15,7 @@ namespace GreenQloud
             SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
             mail.From = new MailAddress(ConfigFile.GetInstance().Read("email_sender"));
             mail.To.Add("qloudsync.bugs@greenqloud.com");
-            mail.Subject = "Bug Report";
+            mail.Subject = "Bug Report from "+ Credential.Username + " - " + GlobalDateTime.NowUniversalString;
             mail.Body = explanation;
             
             //log snapshot
