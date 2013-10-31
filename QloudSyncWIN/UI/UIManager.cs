@@ -231,18 +231,21 @@ namespace GreenQloud.UI
             Program.Controller.CheckForUpdates();
         }
 
+        NetworkManager manager = new NetworkManager();
         public void OpenNetworkManager(Object sender, EventArgs e)
         {
-            NetworkManager manager = new NetworkManager();
+            if (!manager.Visible) {
             manager.ShowDialog();
+            }
 
         }
 
+        BugReport report = new BugReport();
         public void OpenBugReport(Object sender, EventArgs e)
         {
-            BugReport report = new BugReport();
+            if (!report.Visible) {
             report.ShowDialog();
-
+            }
         }
 
         public void OpenStorageQloudRegistration(Object sender, EventArgs e)
@@ -265,7 +268,10 @@ namespace GreenQloud.UI
 
         public void ShowAboutWindow(Object sender, EventArgs e)
         {
-            Program.Controller.ShowAboutWindow();
+            if (!About.Visible)
+            {
+                Program.Controller.ShowAboutWindow();
+            }
         }
 
         protected override void OnLoad(EventArgs e)
