@@ -153,14 +153,15 @@ namespace GreenQloud.Repository
             }
         }
 
-        private void MoveFile(string path, string toPath){
+        public void MoveFile(string path, string toPath)
+        {
             BlockWatcher (path);
             BlockWatcher (toPath);
             File.Move(path, toPath);
             UnblockWatcher (path);
             UnblockWatcher (toPath);
         }
-        private void MoveDir(string path, string toPath){
+        public void MoveDir(string path, string toPath){
             BlockWatcher (path);
             BlockWatcher (toPath);
             Directory.Move(path, toPath);
@@ -168,12 +169,14 @@ namespace GreenQloud.Repository
             UnblockWatcher (toPath);
         }
 
-        private void CopyFile(string path, string toPath){
+        public void CopyFile(string path, string toPath)
+        {
             BlockWatcher (toPath);
             File.Copy(path, toPath);
             UnblockWatcher (toPath);
         }
-        private void CopyDir(DirectoryInfo dir, string to){
+        public void CopyDir(DirectoryInfo dir, string to)
+        {
             if(!Directory.Exists(to)){
                 BlockWatcher (to);
                 DirectoryInfo di = Directory.CreateDirectory (to);
@@ -187,12 +190,14 @@ namespace GreenQloud.Repository
             }
         }
 
-        private void DeleteFile(string path){
+        public void DeleteFile(string path)
+        {
             BlockWatcher (path);
             File.Delete (path);
             UnblockWatcher (path);
         }
-        private void DeleteDir(DirectoryInfo dir){
+        public void DeleteDir(DirectoryInfo dir)
+        {
             dir.GetDirectories().ToList().ForEach(directory=>DeleteDir(directory));
 
             List<FileInfo> files = dir.GetFiles ("*", SearchOption.AllDirectories).ToList ();

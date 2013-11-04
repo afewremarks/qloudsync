@@ -136,6 +136,7 @@
     <Compile Include="UI\BugReport.Designer.cs">
       <DependentUpon>BugReport.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Invoker.cs" />
     <Compile Include="UI\NetworkManager.cs">
       <SubType>Form</SubType>
     </Compile>

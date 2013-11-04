@@ -1,6 +1,8 @@
 ﻿using GreenQloud;
+using GreenQloud.Core;
 using GreenQloud.Model;
 using GreenQloud.Persistence.SQLite;
+using GreenQloud.Repository;
 using GreenQloud.Synchrony;
 using System;
 using System.Collections;
@@ -109,6 +111,17 @@ namespace GreenQloud
             });
         }
 
+        public void MoveSQFolder(string pathTo)
+        {
+            SQLiteRepositoryDAO repoDao = new SQLiteRepositoryDAO();
+            LocalRepository repo = repoDao.RootRepo();
+            PhysicalRepositoryController controller = new PhysicalRepositoryController(repo);
+            StopSynchronizers();
+            controller.MoveDir(repo.Path, pathTo);
+            repo.Path = pathTo;
+            repoDao.Update(repo);
+            InitializeSynchronizers();
+        }
 
         void CalcTimeDiff()
         {
