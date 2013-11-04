@@ -8,8 +8,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -53,6 +55,52 @@ namespace GreenQloud.UI
                     repoIgnore.Remove(repo, this.checkedListBox1.Items[i].ToString());
                 }
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if ((new Invoker(folderBrowserDialog1).Invoke()) == DialogResult.OK)
+            {
+                string pathTo = Path.Combine(folderBrowserDialog1.SelectedPath, GlobalSettings.HomeFolderName) + Path.DirectorySeparatorChar;
+                if (MessageBox.Show("Are you sure of this? All files will be moved", "Confirm", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    try
+                    {
+                        Program.Controller.MoveSQFolder(pathTo);
+                    }
+                    catch {
+                        Program.Controller.Alert("Cannot move StoraQloud folder while making changes on directory");
+                    }
+                }
+            }  
+        }
+    }
+
+    class Invoker
+    {
+        public CommonDialog InvokeDialog;
+        private Thread InvokeThread;
+        private DialogResult InvokeResult;
+
+        public Invoker(CommonDialog dialog)
+        {
+            InvokeDialog = dialog;
+            InvokeThread = new Thread(new ThreadStart(InvokeMethod));
+            InvokeThread.SetApartmentState(ApartmentState.STA);
+            InvokeResult = DialogResult.None;
+        }
+
+        public DialogResult Invoke()
+        {
+            InvokeThread.Start();
+            InvokeThread.Join();
+            return InvokeResult;
+        }
+
+        private void InvokeMethod()
+        {
+            InvokeResult = InvokeDialog.ShowDialog();
+
         }
     }
 }
