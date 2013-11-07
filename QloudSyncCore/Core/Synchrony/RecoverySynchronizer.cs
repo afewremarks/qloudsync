@@ -162,7 +162,7 @@ using GreenQloud.Core;
 
         private Event SolveFromRemote (RepositoryItem item)
         {
-            if (eventDAO.ExistsAnyConflict(item.Key) || !remoteRepository.Exists(item))
+            if (!remoteRepository.Exists(item))
             {
                 return null;
             }
@@ -203,7 +203,7 @@ using GreenQloud.Core;
 
         private Event SolveFromLocal (RepositoryItem item)
         {
-            if (eventDAO.ExistsAnyConflict(item.Key) || !localRepository.Exists(item))
+            if (!localRepository.Exists(item))
             {
                 return null;
             }
