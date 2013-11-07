@@ -150,6 +150,44 @@ namespace GreenQloud.Synchrony
                 remoteSynchronizer.Stop();
         }
 
+        public void KillAll()
+        {
+            remoteSynchronizer.Kill();
+            localSynchronizer.Kill();
+            recoverySynchronizer.Kill();
+            synchronizerResolver.Kill();
+            
+            if (remoteSynchronizer != null)
+            {
+                while (!remoteSynchronizer.Killed)
+                    Thread.Sleep(1000);
+
+                Logger.LogInfo("STOP THREAD", "Remote Synchronizer killed nicelly");
+            }
+            if (localSynchronizer != null)
+            {
+                while (!localSynchronizer.Killed)
+                    Thread.Sleep(1000);
+
+                Logger.LogInfo("STOP THREAD", "Local Synchronizer killed nicelly");
+            }
+            if (recoverySynchronizer != null)
+            {
+                while (!recoverySynchronizer.Killed)
+                    Thread.Sleep(1000);
+
+                Logger.LogInfo("STOP THREAD", "Recovery Synchronizer killed nicelly");
+            }
+            if (synchronizerResolver != null)
+            {
+                while (!synchronizerResolver.Killed)
+                    Thread.Sleep(1000);
+
+                Logger.LogInfo("STOP THREAD","Synchronizer Resolver killed nicelly");
+            }
+            synchronizerUnits.Remove(this.repo);
+        }
+
         public void ResumeResolver()
         {
             if (synchronizerResolver != null) {

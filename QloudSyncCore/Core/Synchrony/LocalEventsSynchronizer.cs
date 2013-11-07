@@ -44,7 +44,7 @@ namespace GreenQloud.Synchrony
 
         public void CreateEvent (Event e)
         {
-            if(!_stoped )
+            if(!_stoped)
                 Create(e);
         }
 

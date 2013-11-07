@@ -52,11 +52,14 @@ namespace GreenQloud.Persistence.SQLite
                 string sql =string.Format("INSERT INTO EVENT (ITEMID, TYPE, REPOSITORY, SYNCHRONIZED, INSERTTIME, USER, APPLICATION, APPLICATION_VERSION, DEVICE_ID, OS, BUCKET, TRY_QNT, RESPONSE, RepositoryId) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}')",
                                             e.Item.Id, e.EventType.ToString(), e.RepositoryType.ToString(), e.Synchronized.ToString(), dateOfEvent.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"), e.User, e.Application, e.ApplicationVersion, e.DeviceId, e.OS, e.Bucket, e.TryQnt, e.Response.ToString(), e.Repository.Id);
 
-                e.Id = (int) database.ExecuteNonQuery (sql, true);
-
-                Logger.LogEvent("EVENT CREATED", e);
-                if (e.Response == RESPONSE.IGNORED) {
-                    Logger.LogEvent("EVENT MARKED TO IGNORE", e);
+                if (e.Response != RESPONSE.IGNORED)
+                {
+                    e.Id = (int)database.ExecuteNonQuery(sql, true);
+                    Logger.LogEvent("EVENT CREATED", e);
+                }
+                else
+                {
+                    Logger.LogEvent("EVENT IGNORED", e);
                 }
 
             }catch(Exception err){

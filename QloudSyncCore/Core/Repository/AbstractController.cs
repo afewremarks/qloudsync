@@ -15,21 +15,30 @@ namespace GreenQloud.Repository
 
         protected void BlockWatcher (string path)
         {
-            QloudSyncFileSystemWatcher watcher = SynchronizerUnit.GetByRepo(repo).LocalEventsSynchronizer.GetWatcher();
-            if(watcher != null){
-                watcher.Block (path);
+            SynchronizerUnit unit = SynchronizerUnit.GetByRepo(repo);
+            if (unit != null)
+            {
+                QloudSyncFileSystemWatcher watcher = unit.LocalEventsSynchronizer.GetWatcher();
+                if (watcher != null)
+                {
+                    watcher.Block(path);
+                }
             }
 
         }
 
         protected void UnblockWatcher (string path)
         {
-            QloudSyncFileSystemWatcher watcher = SynchronizerUnit.GetByRepo(repo).LocalEventsSynchronizer.GetWatcher();
-            if (watcher != null) {
-                Thread.Sleep (2000);
-                watcher.Unblock (path);
+            SynchronizerUnit unit = SynchronizerUnit.GetByRepo(repo);
+            if (unit != null)
+            {
+                QloudSyncFileSystemWatcher watcher = unit.LocalEventsSynchronizer.GetWatcher();
+                if (watcher != null)
+                {
+                    Thread.Sleep(2000);
+                    watcher.Unblock(path);
+                }
             }
-
         }
 
     }
