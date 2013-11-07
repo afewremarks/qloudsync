@@ -22,6 +22,7 @@ namespace GreenQloud.Synchrony
         protected SynchronizerUnit unit;
         private Thread _thread;
         protected volatile bool _stoped;
+        protected volatile bool _killed, _wasKilled;
         protected Object lockk = new object();
 
         public AbstractSynchronizer(LocalRepository repo, SynchronizerUnit unit) 
@@ -40,24 +41,45 @@ namespace GreenQloud.Synchrony
 
         public void Start() {
             lock (lockk) {
-                _stoped = false;
-                if (_thread == null) {
-                    _thread = new Thread(new ThreadStart(this.GenericRun));
-                }
-                if (!_thread.IsAlive) {
-                    if (_thread.ThreadState == ThreadState.Stopped) {
+                if (!_killed)
+                {
+                    _stoped = false;
+                    _killed = false;
+                    _wasKilled = false;
+                    if (_thread == null)
+                    {
                         _thread = new Thread(new ThreadStart(this.GenericRun));
                     }
-                    _thread.Start ();
-                }   
+                    if (!_thread.IsAlive)
+                    {
+                        if (_thread.ThreadState == ThreadState.Stopped)
+                        {
+                            _thread = new Thread(new ThreadStart(this.GenericRun));
+                        }
+                        _thread.Start();
+                    }
+                }
             }
         }
         public void Join() { _thread.Join(); }
         public bool IsAlive { get { return _thread != null && _thread.IsAlive; } }
+        public bool Killed { get { return _wasKilled; } }
         public void Stop () { 
             lock (lockk) {
                 if (!_stoped) {
                     _stoped = true;
+                }
+            }
+        }
+
+        public void Kill()
+        {
+            Stop();
+            lock (lockk)
+            {
+                if (!_killed)
+                {
+                    _killed = true;
                 }
             }
         }
@@ -69,7 +91,7 @@ namespace GreenQloud.Synchrony
         {
             try
             {
-                while (true)
+                while (!_killed)
                 {
                     while (_stoped)
                     {
@@ -77,6 +99,7 @@ namespace GreenQloud.Synchrony
                     }
                     Run();
                 }
+                _wasKilled = true;
             }
             catch (Exception e)
             {
@@ -92,11 +115,14 @@ namespace GreenQloud.Synchrony
         protected object lockChange = new object();
         internal void WaitForChanges(int timeout)
         {
+            
             lock (lockChange)
             {
                 int elapsed = 0;
                 while (!canChange && (timeout == 0 || elapsed < timeout))
                 {
+                    if (_killed)
+                        canChange = true;
                     Thread.Sleep(1000);
                     elapsed += 1000;
                 }

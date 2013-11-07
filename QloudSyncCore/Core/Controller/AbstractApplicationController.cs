@@ -116,11 +116,12 @@ namespace GreenQloud
             SQLiteRepositoryDAO repoDao = new SQLiteRepositoryDAO();
             LocalRepository repo = repoDao.RootRepo();
             PhysicalRepositoryController controller = new PhysicalRepositoryController(repo);
-            StopSynchronizers();
+            KillSynchronizers();
             controller.MoveDir(repo.Path, pathTo);
             repo.Path = pathTo;
             repoDao.Update(repo);
             InitializeSynchronizers();
+            Program.Controller.Alert("SQFolder moved to "+ pathTo);
         }
 
         void CalcTimeDiff()
@@ -179,6 +180,16 @@ namespace GreenQloud
             startSync.Start();
         }
 
+        public void KillSynchronizers()
+        {
+            SQLiteRepositoryDAO repoRaven = new SQLiteRepositoryDAO();
+            List<LocalRepository> repos = repoRaven.AllActived;
+            foreach (LocalRepository repo in repos)
+            {
+                KillSynchronizers(repo);
+            }
+        }
+
         public void StopSynchronizers()
         {
             SQLiteRepositoryDAO repoRaven = new SQLiteRepositoryDAO();
@@ -196,6 +207,20 @@ namespace GreenQloud
             {
                 unit.StopAll();
                 Logger.LogInfo("INFO", "Synchronizers Stoped!");
+            }
+            else
+            {
+                Logger.LogInfo("INFO", "Cannot stop synchronizers! [repository not found]");
+            }
+        }
+
+        public void KillSynchronizers(LocalRepository repo)
+        {
+            SynchronizerUnit unit = SynchronizerUnit.GetByRepo(repo);
+            if (unit != null)
+            {
+                unit.KillAll();
+                Logger.LogInfo("INFO", "Synchronizers Killed nicely!");
             }
             else
             {

@@ -201,7 +201,8 @@ namespace GreenQloud.UI
                     {
                         Program.Controller.MoveSQFolder(pathTo);
                     }
-                    catch {
+                    catch (Exception ex){
+                        Logger.LogInfo("ERROR", ex);
                         Program.Controller.Alert("Cannot move StoraQloud folder while making changes on directory");
                     }
                 }
