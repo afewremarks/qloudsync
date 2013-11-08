@@ -52,7 +52,8 @@ namespace GreenQloud.UI
             items = new List<RepositoryItem>();
             numberofitems.Text = string.Format("Items in Process: {0}", 0);
             makeStep = false;
-            isUpload = false; 
+            isUpload = false;
+            LoadAccountInfo();
         }
 
         void bandwidthCalcTimer_Tick(object sender, EventArgs e)
@@ -138,6 +139,14 @@ namespace GreenQloud.UI
             }
         }
 
+        private void LoadAccountInfo()
+        {
+            greenusername.Text = string.Format("GreenQloud Username: {0}", Credential.Username);
+            qloudversion.Text = string.Format("QloudSync Version: {0}", GlobalSettings.RunningVersion);
+            localpath.Text = string.Format("Local StorageQloud Folder Path: {0}", RuntimeSettings.HomePath);
+        }
+
+
         private void UpdateProgressBar()
         {
             if (makeStep)
@@ -195,7 +204,7 @@ namespace GreenQloud.UI
             if ((new Invoker(folderBrowserDialog1).Invoke()) == DialogResult.OK)
             {
                 string pathTo = Path.Combine(folderBrowserDialog1.SelectedPath, GlobalSettings.HomeFolderName) + Path.DirectorySeparatorChar;
-                if (MessageBox.Show("Are you sure of this? All files will be moved", "Confirm", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show("Are you sure of this? All your files will be moved", "Confirm", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     try
                     {
@@ -207,6 +216,21 @@ namespace GreenQloud.UI
                     }
                 }
             }  
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to continue? You are unlinking your account to this computer", "Caution!", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                try
+                {
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogInfo("ERROR", ex);
+                    Program.Controller.Alert("Cannot unlink accounts, please check your internet connection and try again");
+                }
+            }
         }
     }
 
