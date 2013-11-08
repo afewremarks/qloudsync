@@ -198,16 +198,20 @@ namespace GreenQloud.Repository
         }
         public void DeleteDir(DirectoryInfo dir)
         {
-            dir.GetDirectories().ToList().ForEach(directory=>DeleteDir(directory));
+            if (dir != null)
+            {
+                dir.GetDirectories().ToList().ForEach(directory => DeleteDir(directory));
 
-            List<FileInfo> files = dir.GetFiles ("*", SearchOption.AllDirectories).ToList ();
-            foreach (FileInfo file in files) {
-                DeleteFile (file.FullName);
+                List<FileInfo> files = dir.GetFiles("*", SearchOption.AllDirectories).ToList();
+                foreach (FileInfo file in files)
+                {
+                    DeleteFile(file.FullName);
+                }
+
+                BlockWatcher(dir.FullName);
+                Directory.Delete(dir.FullName);
+                UnblockWatcher(dir.FullName);
             }
-
-            BlockWatcher (dir.FullName);
-            Directory.Delete (dir.FullName);
-            UnblockWatcher (dir.FullName);
         }
         #endregion
     }

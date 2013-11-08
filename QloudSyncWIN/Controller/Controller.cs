@@ -44,6 +44,7 @@ namespace GreenQloud {
         {
             Program.Exit();
         }
+       
         public override void OpenFolder(string path)
 		{
             Process.Start("explorer.exe", path); 

@@ -49,7 +49,7 @@ using System.IO;
 
         class XmlCredential: XmlDocument
 	    {
-            string credential_path = Path.Combine(RuntimeSettings.ConfigPath, "credentials.xml");
+            string credential_path = RuntimeSettings.CredentialPath;
 
             private void Create (){
                 if(!System.IO.File.Exists (credential_path))

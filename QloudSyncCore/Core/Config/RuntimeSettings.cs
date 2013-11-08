@@ -91,6 +91,11 @@ namespace GreenQloud
         }
 
         private static string defaultBucketName = null;
+        public static string CredentialPath {
+            get {
+                return Path.Combine(RuntimeSettings.ConfigPath, "credentials.xml");
+            }
+        }
         public static string DefaultBucketName {
             get{
                 if (defaultBucketName == null)
