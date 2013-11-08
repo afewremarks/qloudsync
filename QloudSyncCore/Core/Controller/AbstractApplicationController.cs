@@ -111,6 +111,15 @@ namespace GreenQloud
             });
         }
 
+        public void UnlinkAccount()
+        {
+            KillSynchronizers();
+            PhysicalRepositoryController controller = new PhysicalRepositoryController(null);
+            controller.DeleteFile(RuntimeSettings.CredentialPath);
+            Alert("Your account are now unlinked, you can run QloudSync again to login with your accout or a new one.");
+            Quit();
+        }
+
         public void MoveSQFolder(string pathTo)
         {
             SQLiteRepositoryDAO repoDao = new SQLiteRepositoryDAO();

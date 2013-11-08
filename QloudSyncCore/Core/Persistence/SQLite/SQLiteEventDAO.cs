@@ -222,10 +222,8 @@ namespace GreenQloud.Persistence.SQLite
             }
         }
 
-        private static int count = 0; 
         public bool ExistsAnyConflict(string itemKey)
         {
-            Console.WriteLine(DateTime.Now);
             string sql = string.Format("SELECT count(*) FROM EVENT e " +
                 " LEFT JOIN RepositoryItem it on e.ItemId = it.RepositoryItemID" +
                 " LEFT JOIN RepositoryItem ri on it.ResultItemId = ri.RepositoryItemID" +
@@ -234,11 +232,7 @@ namespace GreenQloud.Persistence.SQLite
             
             System.Object temp = database.ExecuteScalar(sql);
             int count = int.Parse(temp.ToString());
-            
-            Console.WriteLine(DateTime.Now);
-            Console.WriteLine(count++);
-            
-
+        
             if (count > 0)
             {
                 return true;

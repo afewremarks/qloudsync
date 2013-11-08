@@ -224,6 +224,7 @@ namespace GreenQloud.UI
             {
                 try
                 {
+                    Program.Controller.UnlinkAccount();
                 }
                 catch (Exception ex)
                 {

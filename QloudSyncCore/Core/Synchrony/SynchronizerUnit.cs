@@ -50,6 +50,8 @@ namespace GreenQloud.Synchrony
 
         public static SynchronizerUnit GetByRepo (LocalRepository repo)
         {
+            if (repo == null)
+                return null;
             SynchronizerUnit unit;
             if (synchronizerUnits.TryGetValue (repo, out unit)) {
                 return unit;
