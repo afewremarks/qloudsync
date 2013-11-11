@@ -141,7 +141,6 @@ namespace GreenQloud.UI
 
         private void LoadAccountInfo()
         {
-            greenusername.Text = string.Format("GreenQloud Username: {0}", Credential.Username);
             qloudversion.Text = string.Format("QloudSync Version: {0}", GlobalSettings.RunningVersion);
             localpath.Text = string.Format("Local StorageQloud Folder Path: {0}", RuntimeSettings.HomePath);
         }
@@ -232,6 +231,12 @@ namespace GreenQloud.UI
                     Program.Controller.Alert("Cannot unlink accounts, please check your internet connection and try again");
                 }
             }
+        }
+
+        private void tabControl1_Selected(object sender, TabControlEventArgs e)
+        {
+            greenusername.Text = string.Format("GreenQloud Username: {0}", Credential.Username);
+            
         }
     }
 
