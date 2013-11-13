@@ -18,7 +18,12 @@ using GreenQloud.Core;
         private SQLiteEventDAO eventDAO;
         private Dictionary<string, Thread> executingThreads;
         private Object lokkThreads = new object();
+        private DateTime lastReleased;
 
+        public DateTime LastReleased
+        {
+            get { return lastReleased; }
+        }
 
         public RecoverySynchronizer(LocalRepository repo, SynchronizerUnit unit)
             : base(repo, unit)
@@ -93,6 +98,8 @@ using GreenQloud.Core;
                
             if(!_stoped)
                 canChange = true;
+
+            lastReleased = GlobalDateTime.Now;
 
             //Only run one time...
             Stop();

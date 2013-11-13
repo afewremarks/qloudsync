@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using GreenQloud.Persistence.SQLite;
 using System.Linq;
 using System.Data;
+using GreenQloud.Synchrony;
 
 namespace GreenQloud.Persistence.SQLite
 {
@@ -207,7 +208,7 @@ namespace GreenQloud.Persistence.SQLite
                 }
                 else
                 {
-                    return DateTime.MinValue.ToUniversalTime();
+                    return SynchronizerUnit.GetByRepo(repo).RecoverySynchronizer.LastReleased;
                 }
             }
         }
