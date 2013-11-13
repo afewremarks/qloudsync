@@ -2,10 +2,10 @@
     <shortName>QloudSync</shortName>
     <fullName>QloudSync</fullName>
     <version>3.1.1</version>
-    <licenseFile>G:/Users/Carlos/Desktop/$RLWCE6O.txt</licenseFile>
+    <licenseFile>E:\Users\Maia\Downloads\license.xml</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
-    <leftImage>G:/Users/Carlos/Documents/GitHub/qloudsync/QloudSyncWIN/Resources/side-splash.png</leftImage>
-    <splashImage>G:/Users/Carlos/Documents/GitHub/qloudsync/QloudSyncWIN/Resources/about.png</splashImage>
+    <leftImage>E:\Users\Maia\Desktop\QloudSync Stuff\Images for QloudSync\side-splash.png</leftImage>
+    <splashImage>E:\Users\Maia\Desktop\QloudSync Stuff\Images for QloudSync\about.png</splashImage>
     <componentList>
         <component>
             <name>default</name>
@@ -23,9 +23,9 @@
                     <platforms>windows</platforms>
                     <runAsAdmin>0</runAsAdmin>
                     <runInTerminal>0</runInTerminal>
-                    <windowsExec>${installdir}/QloudSync/QloudSync.Windows.exe</windowsExec>
+                    <windowsExec>${installdir}/client/QloudSync.Windows.exe</windowsExec>
                     <windowsExecArgs></windowsExecArgs>
-                    <windowsIcon>${installdir}/QloudSync/Resources/qloudsync-ico.ico</windowsIcon>
+                    <windowsIcon>E:\Users\Maia\Desktop\QloudSync Stuff\Images for QloudSync\qloudsync-ico.ico</windowsIcon>
                     <windowsPath>${installdir}</windowsPath>
                 </shortcut>
             </desktopShortcutList>
@@ -70,7 +70,7 @@
                     <platforms>windows</platforms>
                     <distributionFileList>
                         <distributionDirectory>
-                            <origin>G:/Users/Carlos/Desktop/qloudsync</origin>
+                            <origin>E:\Users\Maia\Desktop\client</origin>
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
@@ -97,9 +97,9 @@
                     <name>QloudSync</name>
                     <runAsAdmin>1</runAsAdmin>
                     <runInTerminal>0</runInTerminal>
-                    <windowsExec>${installdir}/QloudSync/QloudSync.Windows.exe</windowsExec>
+                    <windowsExec>${installdir}/client/QloudSync.Windows.exe</windowsExec>
                     <windowsExecArgs>/systemstartup</windowsExecArgs>
-                    <windowsIcon>${installdir}/QloudSync/Resources/qloudsync-ico.ico</windowsIcon>
+                    <windowsIcon>E:\Users\Maia\Desktop\QloudSync Stuff\Images for QloudSync\qloudsync-ico.ico</windowsIcon>
                     <windowsPath>${installdir}/</windowsPath>
                 </startMenuShortcut>
             </startMenuShortcutList>
@@ -136,7 +136,7 @@
         <language>
             <code>en</code>
             <encoding>utf-8</encoding>
-            <file>G:/Users/Carlos/Desktop/new_lang.lng</file>
+            <file>E:\Users\Maia\Downloads\new_lang.lng</file>
         </language>
     </customLanguageFileList>
     <finalPageActionList>
