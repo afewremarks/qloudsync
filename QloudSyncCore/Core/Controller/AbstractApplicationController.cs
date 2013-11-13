@@ -428,7 +428,7 @@ namespace GreenQloud
         {
             ErrorType = ERROR_TYPE.FATAL_ERROR;
             OnError();
-            StopSynchronizers(repo);
+            KillSynchronizers(repo);
             Thread.Sleep(5000);
             InitializeSynchronizers(repo);
         }
@@ -437,7 +437,7 @@ namespace GreenQloud
         {
             ErrorType = ERROR_TYPE.FATAL_ERROR;
             OnError();
-            StopSynchronizers();
+            KillSynchronizers();
             Thread.Sleep(5000);
             InitializeSynchronizers();
         }

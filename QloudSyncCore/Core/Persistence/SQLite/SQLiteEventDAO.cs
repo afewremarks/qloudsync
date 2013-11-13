@@ -27,7 +27,6 @@ namespace GreenQloud.Persistence.SQLite
             if (e == null)
                 return;
 
-            try{
                 repositoryItemDAO.Create (e);
 
                 DateTime dateOfEvent =  e.InsertTime;
@@ -62,10 +61,6 @@ namespace GreenQloud.Persistence.SQLite
                     Logger.LogEvent("EVENT IGNORED", e);
                 }
 
-            }catch(Exception err){
-                Logger.LogInfo("ERROR", err);
-            }
-            
         }
 
         public override List<Event> All

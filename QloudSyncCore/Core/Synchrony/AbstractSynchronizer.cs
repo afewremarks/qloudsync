@@ -95,7 +95,12 @@ namespace GreenQloud.Synchrony
                 {
                     while (_stoped)
                     {
-                        Thread.Sleep(1000);
+                        Wait(1000);
+                        if (_killed)
+                        {
+                            _wasKilled = true;
+                            return;
+                        }
                     }
                     Run();
                 }
@@ -123,10 +128,23 @@ namespace GreenQloud.Synchrony
                 {
                     if (_killed)
                         canChange = true;
-                    Thread.Sleep(1000);
+                    Wait(1000);
                     elapsed += 1000;
                 }
                 canChange = false;
+            }
+        }
+
+        internal void Wait(int timeout)
+        {
+            int elapsed = 0;
+            bool leave = false;
+            while (!leave && (timeout == 0 || elapsed < timeout))
+            {
+                if (_killed)
+                    leave = true;
+                Thread.Sleep(1000);
+                elapsed += 1000;
             }
         }
     }

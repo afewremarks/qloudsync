@@ -36,7 +36,7 @@ namespace GreenQloud.Synchrony
             while (!_stoped)
             {
                 AddEvents();
-                Thread.Sleep(1000);
+                Wait(1000);
             }
         }
 

@@ -134,10 +134,10 @@ namespace GreenQloud.Synchrony
 
         public void InitializeSynchronizers ()
         {
-            recoverySynchronizer.Start ();
-            synchronizerResolver.Start (); 
+            recoverySynchronizer.Start (); 
             localSynchronizer.Start ();
             remoteSynchronizer.Start ();
+            synchronizerResolver.Start();
         }
 
         public void StopAll ()

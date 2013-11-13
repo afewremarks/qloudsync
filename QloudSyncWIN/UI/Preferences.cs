@@ -187,6 +187,7 @@ namespace GreenQloud.UI
         {
             int size = this.checkedListBox1.Items.Count;
             LocalRepository repo = repoDao.RootRepo();
+            Program.Controller.KillSynchronizers();
             for (int i = 0; i < size; i++) {
                 if (!this.checkedListBox1.GetItemChecked(i))
                 {
@@ -196,6 +197,7 @@ namespace GreenQloud.UI
                     repoIgnore.Remove(repo, this.checkedListBox1.Items[i].ToString());
                 }
             }
+            Program.Controller.InitializeSynchronizers();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -211,7 +213,7 @@ namespace GreenQloud.UI
                     }
                     catch (Exception ex){
                         Logger.LogInfo("ERROR", ex);
-                        Program.Controller.Alert("Cannot move StoraQloud folder while making changes on directory");
+                        Program.Controller.Alert("Cannot move StoraQloud");
                     }
                 }
             }  

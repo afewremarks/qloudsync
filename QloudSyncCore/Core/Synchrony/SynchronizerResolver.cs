@@ -88,7 +88,7 @@ namespace GreenQloud.Synchrony
             }
             SyncStatus = SyncStatus.IDLE;
             Done = true;
-            Thread.Sleep(1000);
+            Wait(1000);
         }
 
         private bool VerifyIgnoreRemote (Event remoteEvent)
@@ -233,7 +233,7 @@ namespace GreenQloud.Synchrony
                 }
 
                 if(currentException != null){
-                    Thread.Sleep(10000);
+                    Wait(10000);
                 }
 
             } while (currentException != null && e.TryQnt < 5 && !_stoped);

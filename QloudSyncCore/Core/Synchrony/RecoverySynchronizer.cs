@@ -84,7 +84,7 @@ using GreenQloud.Core;
             SolveFromPrefix(repo.RemoteFolder);
             int count = 0;
             do {
-                Thread.Sleep(5000);
+                Wait(5000);
                 lock (lokkThreads)
                 {
                     count = executingThreads.Count;
@@ -93,8 +93,10 @@ using GreenQloud.Core;
                
             if(!_stoped)
                 canChange = true;
-               
-            Thread.Sleep(10000);
+
+            //Only run one time...
+            Stop();
+            //Wait(60000);
         }
 
         void SolveItems (List<RepositoryItem> localItems, List<RepositoryItem> remoteItems, string prefix)
