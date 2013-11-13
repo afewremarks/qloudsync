@@ -116,7 +116,7 @@ namespace GreenQloud.UI
             ToolStripMenuItem preferences = new ToolStripMenuItem("Preferences", null, ShowPreferencesWindow);
             this.trayMenu.Items.Add(preferences);
             //TODO MOVE TO ABOUT
-            //this.trayMenu.Items.Add("Check for Updates", null, CheckForUpdates);
+            this.trayMenu.Items.Add("Check for Updates", null, CheckForUpdates);
             this.trayMenu.Items.Add("-", null);
             this.trayMenu.Items.Add("Quit", null, OnExit);
 
