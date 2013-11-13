@@ -113,7 +113,8 @@ namespace GreenQloud.UI
             //this.trayMenu.Items.Add("Network Status", null, OpenNetworkManager);
             this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
             this.trayMenu.Items.Add(pauseSync);
-            this.trayMenu.Items.Add("Preferences", null, ShowPreferencesWindow);
+            ToolStripMenuItem preferences = new ToolStripMenuItem("Preferences", null, ShowPreferencesWindow);
+            this.trayMenu.Items.Add(preferences);
             //TODO MOVE TO ABOUT
             //this.trayMenu.Items.Add("Check for Updates", null, CheckForUpdates);
             this.trayMenu.Items.Add("-", null);
@@ -131,6 +132,7 @@ namespace GreenQloud.UI
                     pauseSync.Visible = renderLoggedIn;
                     recentlyChangedSeparator.Visible = renderLoggedIn;
                     recentlyChangedFinalSeparator.Visible = renderLoggedIn;
+                    preferences.Visible = renderLoggedIn;
 
                     MethodInfo mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
                     mi.Invoke(this.trayIcon, null);
