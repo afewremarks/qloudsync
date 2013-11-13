@@ -56,11 +56,6 @@ namespace GreenQloud.Persistence.SQLite
                     e.Id = (int)database.ExecuteNonQuery(sql, true);
                     Logger.LogEvent("EVENT CREATED", e);
                 }
-                else
-                {
-                    Logger.LogEvent("EVENT IGNORED", e);
-                }
-
         }
 
         public override List<Event> All
