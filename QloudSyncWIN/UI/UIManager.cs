@@ -123,6 +123,15 @@ namespace GreenQloud.UI
             {
                 if (((MouseEventArgs)args).Button == System.Windows.Forms.MouseButtons.Left)
                 {
+                    bool renderLoggedIn = Credential.Username != "";
+
+                    sqFolder.Visible = renderLoggedIn;
+                    shareview.Visible = renderLoggedIn;
+                    recentlyChanged.Visible = renderLoggedIn;
+                    pauseSync.Visible = renderLoggedIn;
+                    recentlyChangedSeparator.Visible = renderLoggedIn;
+                    recentlyChangedFinalSeparator.Visible = renderLoggedIn;
+
                     MethodInfo mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
                     mi.Invoke(this.trayIcon, null);
                 }
