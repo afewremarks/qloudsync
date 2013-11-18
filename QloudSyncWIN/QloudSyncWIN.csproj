@@ -136,6 +136,12 @@
     <Compile Include="UI\BugReport.Designer.cs">
       <DependentUpon>BugReport.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Wait.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Wait.Designer.cs">
+      <DependentUpon>Wait.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Invoker.cs" />
     <Compile Include="UI\NetworkManager.cs">
       <SubType>Form</SubType>
@@ -194,6 +200,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\BugReport.resx">
       <DependentUpon>BugReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Wait.resx">
+      <DependentUpon>Wait.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\NetworkManager.resx">
       <DependentUpon>NetworkManager.cs</DependentUpon>

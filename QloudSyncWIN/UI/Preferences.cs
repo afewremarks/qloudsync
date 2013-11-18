@@ -185,6 +185,10 @@ namespace GreenQloud.UI
 
         private void button1_Click(object sender, EventArgs e)
         {
+            Wait wait = new Wait();
+            wait.Show();
+            wait.Focus();
+            wait.BringToFront();
             int size = this.checkedListBox1.Items.Count;
             LocalRepository repo = repoDao.RootRepo();
             Program.Controller.KillSynchronizers();
@@ -198,6 +202,9 @@ namespace GreenQloud.UI
                 }
             }
             Program.Controller.InitializeSynchronizers();
+            wait.Hide();
+            this.Focus();
+            this.BringToFront();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -209,7 +216,14 @@ namespace GreenQloud.UI
                 {
                     try
                     {
+                        Wait wait = new Wait();
+                        wait.Show();
+                        wait.Focus();
+                        wait.BringToFront();
                         Program.Controller.MoveSQFolder(pathTo);
+                        wait.Hide();
+                        this.Focus();
+                        this.BringToFront();
                     }
                     catch (Exception ex){
                         Logger.LogInfo("ERROR", ex);
