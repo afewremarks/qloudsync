@@ -2,7 +2,7 @@
     <shortName>QloudSync</shortName>
     <fullName>QloudSync</fullName>
     <version>3.1.3</version>
-    <licenseFile>E:/Users/Maia/Downloads/license.xml</licenseFile>
+    <licenseFile>E:\Users\Maia\Documents\GitHub\qloudsync\Installer\Windows\BitRock_License.txt</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
     <leftImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>
     <splashImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/about.png</splashImage>
@@ -131,13 +131,12 @@
     </postUninstallationActionList>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
-    <installationType>upgrade</installationType>
     <vendor>GreenQloud</vendor>
     <customLanguageFileList>
         <language>
             <code>en</code>
             <encoding>utf-8</encoding>
-            <file>E:\Users\Maia\Downloads\new_lang.lng</file>
+            <file>E:/Users/Maia/Downloads/new_lang.lng</file>
         </language>
     </customLanguageFileList>
     <finalPageActionList>

@@ -62,7 +62,9 @@ namespace GreenQloud {
 
             if (p.ExitCode == 0)
             {
-                MessageBox.Show("New version available!");
+                if (MessageBox.Show("New version available! Whould you like to update?", "Confirm", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+                    Process.Start(RuntimeSettings.AutoUpdaterPath);
+                }
             } else {
                 MessageBox.Show("QloudSync is up to date!");
             }}).Start();
