@@ -452,6 +452,7 @@ namespace GreenQloud
         public void UpdateConfigFile()
         {
             ConfigFile.GetInstance().UpdateConfigFile();
+            MailConfigFile.GetInstance().UpdateConfigFile();
         }
 
         public void CreateRepoFolder(LocalRepository repo)

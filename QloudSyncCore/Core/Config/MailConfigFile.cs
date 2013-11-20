@@ -6,21 +6,21 @@ using System.Collections;
 namespace GreenQloud
 {
 
-    public class ConfigFile : AbstractConfigFile<ConfigFile>
+    public class MailConfigFile : AbstractConfigFile<MailConfigFile>
     {
         protected string INIT_CONFIG_FOLDER;
         protected string INIT_FULLNAME;
 
-        public ConfigFile(){
+        public MailConfigFile(){
             INIT_CONFIG_FOLDER = AppDomain.CurrentDomain.BaseDirectory;
-            INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, ".." + Path.DirectorySeparatorChar.ToString() + "Resources" + Path.DirectorySeparatorChar.ToString() + "qloudsync.conf");
-            FULLNAME = Path.Combine(CONFIG_FOLDER, "qloudsync.conf");
+            INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, ".." + Path.DirectorySeparatorChar.ToString() + "Resources" + Path.DirectorySeparatorChar.ToString() + "qloudsync_mail.conf");
+            FULLNAME = Path.Combine(CONFIG_FOLDER, "qloudsync_mail.conf");
         }
 
         public override void UpdateConfigFile ()
         {
             if(!File.Exists(INIT_FULLNAME)){
-                INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, "qloudsync.conf");
+                INIT_FULLNAME = Path.Combine(INIT_CONFIG_FOLDER, "qloudsync_mail.conf");
             }
 
             try{

@@ -36,7 +36,7 @@ namespace GreenQloud.UI
         {
             try
             {
-                new SendMail().SendBugMessage(this.comboBox1.SelectedItem + "\n\n" + this.textBox1.Text);
+                new SendMail().SendBugMessage("<html><p>" + this.comboBox1.SelectedItem + "</p><p>" + this.textBox1.Text + "</p></html>");
                 this.Close();
             }
             catch (Exception ex) {
