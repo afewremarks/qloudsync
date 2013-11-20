@@ -52,7 +52,7 @@
             // 
             this.TxtUserName.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TxtUserName.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.TxtUserName.Font = new System.Drawing.Font("Myriad Web Pro", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtUserName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TxtUserName.ForeColor = System.Drawing.Color.DarkGray;
             this.TxtUserName.Location = new System.Drawing.Point(100, 314);
             this.TxtUserName.Name = "TxtUserName";
@@ -65,7 +65,7 @@
             // TxtPassword
             // 
             this.TxtPassword.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.TxtPassword.Font = new System.Drawing.Font("Myriad Web Pro", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TxtPassword.ForeColor = System.Drawing.Color.DarkGray;
             this.TxtPassword.Location = new System.Drawing.Point(100, 373);
             this.TxtPassword.Name = "TxtPassword";
@@ -82,7 +82,7 @@
             this.BtnContinue.FlatAppearance.BorderSize = 0;
             this.BtnContinue.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(242)))), ((int)(((byte)(80)))), ((int)(((byte)(34)))));
             this.BtnContinue.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BtnContinue.Font = new System.Drawing.Font("Myriad Web Pro", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnContinue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnContinue.ForeColor = System.Drawing.Color.White;
             this.BtnContinue.Location = new System.Drawing.Point(266, 485);
             this.BtnContinue.Name = "BtnContinue";
@@ -99,7 +99,7 @@
             this.BtnRegister.FlatAppearance.BorderSize = 0;
             this.BtnRegister.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(159)))), ((int)(((byte)(133)))));
             this.BtnRegister.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BtnRegister.Font = new System.Drawing.Font("Myriad Web Pro", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnRegister.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnRegister.ForeColor = System.Drawing.Color.White;
             this.BtnRegister.Location = new System.Drawing.Point(48, 485);
             this.BtnRegister.Name = "BtnRegister";
@@ -124,14 +124,14 @@
             // linkLabel1
             // 
             this.linkLabel1.ActiveLinkColor = System.Drawing.Color.White;
-            this.linkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
             this.linkLabel1.AutoSize = true;
             this.linkLabel1.BackColor = System.Drawing.Color.Transparent;
-            this.linkLabel1.Font = new System.Drawing.Font("Myriad Web Pro", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.linkLabel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.linkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
             this.linkLabel1.LinkColor = System.Drawing.Color.White;
             this.linkLabel1.Location = new System.Drawing.Point(150, 427);
             this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(159, 17);
+            this.linkLabel1.Size = new System.Drawing.Size(164, 18);
             this.linkLabel1.TabIndex = 13;
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "Forgot your Password?";
@@ -158,8 +158,6 @@
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(450, 575);
             this.Name = "Login";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "QloudSync by GreenQloud";

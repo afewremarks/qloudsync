@@ -360,5 +360,19 @@ namespace GreenQloud.UI
         {
             this.trayIcon.Icon = Icon.FromHandle(((Bitmap)Icons.ResourceManager.GetObject("process_pause_active")).GetHicon());
         }
+
+        private void InitializeComponent()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UIManager));
+            this.SuspendLayout();
+            // 
+            // UIManager
+            // 
+            this.ClientSize = new System.Drawing.Size(284, 262);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "UIManager";
+            this.ResumeLayout(false);
+
+        }
     }
 }

@@ -201,6 +201,9 @@
     <EmbeddedResource Include="UI\BugReport.resx">
       <DependentUpon>BugReport.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\UIManager.resx">
+      <DependentUpon>UIManager.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Wait.resx">
       <DependentUpon>Wait.cs</DependentUpon>
     </EmbeddedResource>
