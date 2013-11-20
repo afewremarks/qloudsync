@@ -141,12 +141,12 @@ namespace GreenQloud.UI
 
             this.trayMenu.Opening += (sender, args) => {
                 pauseSync.Text = PauseText();
-                LoadExtraItems(recentlyChangedSeparator, recentlyChangedFinalSeparator, savings);
+                LoadExtraItems(recentlyChangedSeparator, recentlyChangedFinalSeparator, savings, recentlyChanged);
             };
         }
 
         private string savingstext = "";
-        private void LoadExtraItems(ToolStripSeparator separator,  ToolStripSeparator finalSeparator, ToolStripMenuItem savings)
+        private void LoadExtraItems(ToolStripSeparator separator,  ToolStripSeparator finalSeparator, ToolStripMenuItem savings, ToolStripMenuItem recentlyChanged)
         {
 
             //First load the recently changes
@@ -163,6 +163,12 @@ namespace GreenQloud.UI
                 SQLiteEventDAO eventDao = new SQLiteEventDAO();
                 List<Event> events = eventDao.LastEvents;
                 
+                bool displayRecentlyChanges = events.Count != 0;
+                recentlyChanged.Visible = displayRecentlyChanges;
+                separator.Visible = displayRecentlyChanges;
+                finalSeparator.Visible = displayRecentlyChanges;
+                
+
                 foreach (Event e in events)
                 {
                     end = this.trayMenu.Items.IndexOf(finalSeparator);
