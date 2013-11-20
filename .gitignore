@@ -10,5 +10,6 @@ obj/
 *.am
 *.suo
 
+*/qloudsync_mail.conf
 QloudSync/test-results/
 QloudSyncMAC/test-results/QloudSyncMAC.csproj.test-cache
