@@ -57,17 +57,32 @@ namespace GreenQloud {
         public override void CheckForUpdates()
         {
             new Thread(delegate() {
-            Process p = Process.Start(RuntimeSettings.AutoUpdaterPath, "--mode unattended");
-            p.WaitForExit();
-
-            if (p.ExitCode == 0)
-            {
-                if (MessageBox.Show("New version available! Whould you like to update?", "Confirm", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                    Process.Start(RuntimeSettings.AutoUpdaterPath);
+                Process p = null;
+                try
+                {
+                    p = Process.Start(RuntimeSettings.AutoUpdaterPath, "--mode unattended");
+                    p.WaitForExit();
                 }
-            } else {
-                MessageBox.Show("QloudSync is up to date!");
-            }}).Start();
+                catch (Exception ex)
+                {
+                    Logger.LogInfo("ERROR", ex);
+                    Alert("Could not check for updates.");
+                }
+                if (p != null)
+                {
+                    if (p.ExitCode == 0)
+                    {
+                        if (MessageBox.Show("New version available! Whould you like to update?", "Confirm", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        {
+                            Process.Start(RuntimeSettings.AutoUpdaterPath);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("QloudSync is up to date!");
+                    }
+                }
+            }).Start();
         }
 
         public void SendBugMessage(string explanation)
