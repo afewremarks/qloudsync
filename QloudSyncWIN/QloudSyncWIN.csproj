@@ -226,12 +226,6 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="qloudsync_mail.conf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="qloudsync_mail.conf.template">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

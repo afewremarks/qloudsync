@@ -107,8 +107,8 @@ namespace GreenQloud.UI
             //place to load recently changes
             ToolStripSeparator recentlyChangedFinalSeparator = new ToolStripSeparator();
             this.trayMenu.Items.Add(recentlyChangedFinalSeparator);
-            
-            this.trayMenu.Items.Add("Help Center", null, OpenBugReport);
+
+            this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
             //ADD to preferences
             //this.trayMenu.Items.Add("Network Status", null, OpenNetworkManager);
             this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);

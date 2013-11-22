@@ -71,7 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Config\AbstractConfigFile.cs" />
-    <Compile Include="Core\Config\MailConfigFile.cs" />
     <Compile Include="Core\Controller\AbstractApplicationController.cs" />
     <Compile Include="Core\Exception\WarningException.cs" />
     <Compile Include="Core\IO\QloudSyncFileSystemWatcherWIN.cs" />
