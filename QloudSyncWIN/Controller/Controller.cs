@@ -2,9 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-
-using MonoMac.Foundation;
-using MonoMac.AppKit;
 using GreenQloud.Synchrony;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
@@ -83,18 +80,6 @@ namespace GreenQloud {
                     }
                 }
             }).Start();
-        }
-
-        public void SendBugMessage(string explanation)
-        {
-            try
-            {
-                new SendMail().SendBugMessage(explanation);
-            }
-            catch
-            {
-                Alert("Could not send the message, check your internet connection."); 
-            }
         }
 
         public override void Alert(string message) {

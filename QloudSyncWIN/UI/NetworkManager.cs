@@ -1,6 +1,5 @@
 ﻿using GreenQloud.Model;
 using GreenQloud.Repository;
-using LitS3;
 using QloudSyncCore.Core.Util;
 using System;
 using System.Collections.Generic;
@@ -113,9 +112,8 @@ namespace GreenQloud.UI
                         {
                             items.Add(e.Item);
                             remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
-                            GetObjectResponse meta = remoteRepositoryController.GetMetadata(e.Item.Key);
                             isUpload = false;
-                            progressBar1.Maximum = (int)meta.ContentLength;
+                            progressBar1.Maximum = (int)remoteRepositoryController.GetContentLength(e.Item.Key);
                             textBox1.AppendText(" -> Download: " + e.Item.Name + " ... ");
                         }
 

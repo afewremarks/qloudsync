@@ -77,18 +77,8 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LitS3, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\LitS3.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="MonoMac">
-      <HintPath>lib\MonoMac.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\DLLs\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -102,21 +92,14 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Web" />
-    <Reference Include="VistaDB.4, Version=4.1.0.0, Culture=neutral, PublicKeyToken=dfc935afe2125461, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\VistaDB.4.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppDelegate.cs" />
     <Compile Include="Backgrounds.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Backgrounds.resx</DependentUpon>
     </Compile>
     <Compile Include="Controller\Controller.cs" />
-    <Compile Include="FieldState.cs" />
     <Compile Include="Icons.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -245,12 +228,6 @@
     <None Include="Resources\Network.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="lib\LitS3.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\VistaDB.4.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\process-pause-active.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -343,15 +320,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib\MonoMac.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\Newtonsoft.Json.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\XamaMac.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="qloudsync-app2.ico" />
     <None Include="Resources\loginScreen.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -400,7 +368,9 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="lib\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\QloudSyncCore\QloudSyncCoreWIN.csproj">
       <Project>{2039e95a-5f46-43e1-ba58-b33c73972b0e}</Project>

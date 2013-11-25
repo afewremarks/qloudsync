@@ -2,7 +2,6 @@
 using GreenQloud.Persistence;
 using GreenQloud.Persistence.SQLite;
 using GreenQloud.Repository;
-using LitS3;
 using QloudSyncCore.Core.Util;
 using System;
 using System.Collections;
@@ -109,9 +108,8 @@ namespace GreenQloud.UI
                         {
                             items.Add(e.Item);
                             remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
-                            GetObjectResponse meta = remoteRepositoryController.GetMetadata(e.Item.Key);
                             isUpload = false;
-                            progressBar1.Maximum = (int)meta.ContentLength;
+                            progressBar1.Maximum = (int)remoteRepositoryController.GetContentLength(e.Item.Key);
                             textBox1.AppendText(" ↑ " + e.Item.Name + " ... ");
                         }
 

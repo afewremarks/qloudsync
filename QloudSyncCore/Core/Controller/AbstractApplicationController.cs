@@ -44,7 +44,6 @@ namespace GreenQloud
         Thread checkConnection;
         bool firstRun = RuntimeSettings.FirstRun;
         private bool disconected = false;
-        private bool loadedSynchronizers = false;
         private bool isPaused = false;
 
         public enum ERROR_TYPE
@@ -176,7 +175,6 @@ namespace GreenQloud
                         SynchronizerUnit.Add(repo, unit);
                     }
                     unit.InitializeSynchronizers();
-                    loadedSynchronizers = true;
                     Logger.LogInfo("INFO", "Synchronizers Ready!");
                     ErrorType = ERROR_TYPE.NULL;
                     OnIdle();

@@ -34,7 +34,7 @@ namespace GreenQloud.UI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            try
+            /*try
             {
                 new SendMail().SendBugMessage("<html><p>" + this.comboBox1.SelectedItem + "</p><p>" + this.textBox1.Text + "</p></html>");
                 this.Close();
@@ -42,7 +42,7 @@ namespace GreenQloud.UI
             catch (Exception ex) {
                 Logger.LogInfo("ERROR", ex);
                 Program.Controller.Alert("Could not send the message. Please check your internet status and try again later."); 
-            }
+            }*/
         }
     }
 }

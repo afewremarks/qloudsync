@@ -159,6 +159,11 @@ namespace GreenQloud.Repository
             return meta.ETag.Replace("\"", "");
         }
 
+        public long GetContentLength(string key)
+        {
+            return GetMetadata(key).ContentLength;
+        }
+
         public GetObjectResponse GetMetadata (string key, bool recoveryIfFolderBroken = false)
         {
             S3Service service = connection.Connect ();

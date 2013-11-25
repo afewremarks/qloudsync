@@ -40,22 +40,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="SendGridMail, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\SendGridMail.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Services.Client" />
-    <Reference Include="System.Runtime, Version=2.5.19.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\System.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks, Version=2.5.19.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\System.Threading.Tasks.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -106,7 +94,6 @@
     <Compile Include="Core\Util\Crypto.cs" />
     <Compile Include="Core\Util\Logger.cs" />
     <Compile Include="Core\Util\NetworkTraffic.cs" />
-    <Compile Include="Core\Util\SendMail.cs" />
     <Compile Include="Core\Util\Statistics.cs" />
     <Compile Include="Core\Util\Constant.cs" />
     <Compile Include="Core\Util\JSONHelper.cs" />
@@ -134,16 +121,21 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="Core\Config\.DS_Store" />
-    <None Include="lib\VistaDB.4.dll" />
-    <Content Include="lib\LitS3.dll" />
-    <Content Include="lib\MonoMac.dll" />
-    <Content Include="lib\SendGridMail.dll" />
-    <Content Include="lib\System.Runtime.dll" />
-    <Content Include="lib\System.Threading.Tasks.dll" />
+    <Resource Include="lib\VistaDB.4.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="lib\LitS3.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="lib\MonoMac.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="QloudSync.vdb4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="lib\Newtonsoft.Json.dll" />
+    <Resource Include="lib\Newtonsoft.Json.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
