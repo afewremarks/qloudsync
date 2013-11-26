@@ -24,12 +24,10 @@ namespace GreenQloud
 #endif
         public static void Main(string[] args)
         {
-            
-            Controller = new Controller();                
+            Controller = new Controller();
             UI = UIManager.GetInstance();
             GreenQloud.Core.Program.Run(Controller, UI);
             Application.Run(UI);
-
 #if !__MonoCS__
             // Suppress assertion messages in debug mode
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);

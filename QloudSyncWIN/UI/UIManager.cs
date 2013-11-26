@@ -27,11 +27,10 @@ namespace GreenQloud.UI
         public static UIManager GetInstance(){
             if(instance == null)
                 instance = new UIManager();
-
             return instance;
         }
 
-        private UIManager()
+        private UIManager() : base()
         {
             this.AddToSystemTray();
             this.LoginWindow = new Setup.Login(this);
@@ -267,7 +266,6 @@ namespace GreenQloud.UI
             {
                 preferences.ShowDialog();
             }
-
         }
 
         BugReport report = new BugReport();

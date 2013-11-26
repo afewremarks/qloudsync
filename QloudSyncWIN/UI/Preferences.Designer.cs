@@ -1,4 +1,5 @@
-﻿namespace GreenQloud.UI
+﻿using System.Windows.Forms;
+namespace GreenQloud.UI
 {
     partial class Preferences
     {
@@ -37,8 +38,6 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
-            this.lineShape1 = new Microsoft.VisualBasic.PowerPacks.LineShape();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label9 = new System.Windows.Forms.Label();
@@ -56,8 +55,6 @@
             this.currentBandwidthDownloadLabel = new System.Windows.Forms.Label();
             this.totalBandwidthConsumptionLabel = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.shapeContainer2 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
-            this.lineShape2 = new Microsoft.VisualBasic.PowerPacks.LineShape();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -98,7 +95,6 @@
             this.tabPage1.Controls.Add(this.button2);
             this.tabPage1.Controls.Add(this.button1);
             this.tabPage1.Controls.Add(this.label1);
-            this.tabPage1.Controls.Add(this.shapeContainer1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -163,25 +159,6 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Current Synced Folders:";
             // 
-            // shapeContainer1
-            // 
-            this.shapeContainer1.Location = new System.Drawing.Point(3, 3);
-            this.shapeContainer1.Margin = new System.Windows.Forms.Padding(0);
-            this.shapeContainer1.Name = "shapeContainer1";
-            this.shapeContainer1.Shapes.AddRange(new Microsoft.VisualBasic.PowerPacks.Shape[] {
-            this.lineShape1});
-            this.shapeContainer1.Size = new System.Drawing.Size(442, 233);
-            this.shapeContainer1.TabIndex = 7;
-            this.shapeContainer1.TabStop = false;
-            // 
-            // lineShape1
-            // 
-            this.lineShape1.Name = "lineShape1";
-            this.lineShape1.X1 = 334;
-            this.lineShape1.X2 = 434;
-            this.lineShape1.Y1 = 113;
-            this.lineShape1.Y2 = 113;
-            // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.groupBox2);
@@ -192,7 +169,6 @@
             this.tabPage2.Controls.Add(this.currentBandwidthDownloadLabel);
             this.tabPage2.Controls.Add(this.totalBandwidthConsumptionLabel);
             this.tabPage2.Controls.Add(this.progressBar1);
-            this.tabPage2.Controls.Add(this.shapeContainer2);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -355,25 +331,7 @@
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(245, 23);
             this.progressBar1.TabIndex = 0;
-            // 
-            // shapeContainer2
-            // 
-            this.shapeContainer2.Location = new System.Drawing.Point(3, 3);
-            this.shapeContainer2.Margin = new System.Windows.Forms.Padding(0);
-            this.shapeContainer2.Name = "shapeContainer2";
-            this.shapeContainer2.Shapes.AddRange(new Microsoft.VisualBasic.PowerPacks.Shape[] {
-            this.lineShape2});
-            this.shapeContainer2.Size = new System.Drawing.Size(442, 233);
-            this.shapeContainer2.TabIndex = 5;
-            this.shapeContainer2.TabStop = false;
-            // 
-            // lineShape2
-            // 
-            this.lineShape2.Name = "lineShape2";
-            this.lineShape2.X1 = 272;
-            this.lineShape2.X2 = 272;
-            this.lineShape2.Y1 = 4;
-            this.lineShape2.Y2 = 226;
+           
             // 
             // tabPage3
             // 
@@ -508,15 +466,11 @@
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
-        private Microsoft.VisualBasic.PowerPacks.ShapeContainer shapeContainer1;
-        private Microsoft.VisualBasic.PowerPacks.LineShape lineShape1;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label totalBandwidthConsumptionLabel;
         private System.Windows.Forms.Label currentBandwidthUploadLabel;
         private System.Windows.Forms.Label currentBandwidthDownloadLabel;
         private System.Windows.Forms.TextBox textBox1;
-        private Microsoft.VisualBasic.PowerPacks.ShapeContainer shapeContainer2;
-        private Microsoft.VisualBasic.PowerPacks.LineShape lineShape2;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton radioButton2;
