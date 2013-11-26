@@ -1,8 +1,8 @@
 <project>
     <shortName>QloudSync</shortName>
     <fullName>QloudSync</fullName>
-    <version>3.1.3</version>
-    <licenseFile>E:\Users\Maia\Documents\GitHub\qloudsync\Installer\Windows\BitRock_License.txt</licenseFile>
+    <version>3.1.4</version>
+    <licenseFile>E:/Users/Maia/Documents/GitHub/qloudsync/Installer/Windows/BitRock_License.txt</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
     <leftImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>
     <splashImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/about.png</splashImage>
@@ -25,7 +25,7 @@
                     <runInTerminal>0</runInTerminal>
                     <windowsExec>${installdir}/client/QloudSync.Windows.exe</windowsExec>
                     <windowsExecArgs></windowsExecArgs>
-                    <windowsIcon>E:\Users\Maia\Desktop\QloudSync Stuff\Images for QloudSync\qloudsync-ico.ico</windowsIcon>
+                    <windowsIcon>${installdir}/client/Resources/qloudsync-ico.ico</windowsIcon>
                     <windowsPath>${installdir}</windowsPath>
                 </shortcut>
             </desktopShortcutList>
@@ -89,7 +89,7 @@
                     <runInTerminal>0</runInTerminal>
                     <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
                     <windowsExecArgs></windowsExecArgs>
-                    <windowsIcon>${installdir}/QloudSync/Resources/qloudsync-ico.ico</windowsIcon>
+                    <windowsIcon>${installdir}/client/Resources/qloudsync-ico.ico</windowsIcon>
                     <windowsPath>${installdir}/</windowsPath>
                 </startMenuShortcut>
                 <startMenuShortcut>
@@ -99,16 +99,42 @@
                     <runInTerminal>0</runInTerminal>
                     <windowsExec>${installdir}/client/QloudSync.Windows.exe</windowsExec>
                     <windowsExecArgs>/systemstartup</windowsExecArgs>
-                    <windowsIcon>E:\Users\Maia\Desktop\QloudSync Stuff\Images for QloudSync\qloudsync-ico.ico</windowsIcon>
+                    <windowsIcon>${installdir}/client/Resources/qloudsync-ico.ico</windowsIcon>
                     <windowsPath>${installdir}/</windowsPath>
                 </startMenuShortcut>
             </startMenuShortcutList>
         </component>
+        <component>
+            <name>dotnet</name>
+            <description>ServiceEx</description>
+            <canBeEdited>0</canBeEdited>
+            <selected>1</selected>
+            <show>0</show>
+            <folderList>
+                <folder>
+                    <description>.NET installer</description>
+                    <destination>${installdir}</destination>
+                    <name>dotnet</name>
+                    <platforms>windows</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>E:/Users/Maia/Desktop/client/runtime/dotNetFx45_Full_setup.exe</origin>
+                        </distributionFile>
+                    </distributionFileList>
+                    <ruleList>
+	<!-- The .NET installer will be unpacked on demand
+            so we attach a rule that will be never passed to
+            prevent the automatic unpack process -->
+	<isTrue value="0"/>
+                    </ruleList>
+                </folder>
+            </folderList>
+        </component>
     </componentList>
-    <preInstallationActionList>
-        <autodetectDotNetFramework>
-            <explanation>This Application Requires .NET 4.0 or higher to be installed.</explanation>
-            <progressText>Loading...</progressText>
+    <readyToInstallActionList>
+	<!-- check .NET >= 4.0 is installed -->
+	<autodetectDotNetFramework>
+            <abortOnError>0</abortOnError>
             <validDotNetVersionList>
                 <validDotNetVersion>
                     <frameworkType>any</frameworkType>
@@ -117,7 +143,34 @@
                 </validDotNetVersion>
             </validDotNetVersionList>
         </autodetectDotNetFramework>
-    </preInstallationActionList>
+
+	<!-- install .NET if not found -->
+	<actionGroup>
+            <progressText>Installing .NET framework</progressText>
+            <actionList>
+                <unpackFile>
+                    <component>dotnet</component>
+                    <destination>${system_temp_directory}/dotNetFx45_Full_setup.exe</destination>
+                    <folder>dotnet</folder>
+                    <origin>dotNetFx45_Full_setup.exe</origin>
+                </unpackFile>
+                <runProgram>
+                    <program>${system_temp_directory}/dotNetFx45_Full_setup.exe</program>
+                    <programArguments>/q:a "/c:install.exe /qb"</programArguments>
+                </runProgram>
+
+	<!-- Delete the .NET installer -->
+	<deleteFile>
+                    <path>${system_temp_directory}/dotNetFx45_Full_setup.exe</path>
+                </deleteFile>
+            </actionList>
+            <ruleList>
+                <isFalse>
+                    <value>${dotnet_autodetected}</value>
+                </isFalse>
+            </ruleList>
+        </actionGroup>
+    </readyToInstallActionList>
     <postUninstallationActionList>
         <deleteFile>
             <path>${installdir}/</path>
@@ -129,6 +182,7 @@
             <path>${windows_folder_appdata}/Microsoft/Windows/Start/QloudSync.Windows.exe</path>
         </deleteFile>
     </postUninstallationActionList>
+    <enableDebugger>1</enableDebugger>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
     <vendor>GreenQloud</vendor>
@@ -163,7 +217,7 @@
         <runProgram>
             <abortOnError>0</abortOnError>
             <program>${installdir}/client/QloudSync.Windows.exe</program>
-            <programArguments></programArguments>
+            <programArguments>&amp;</programArguments>
             <progressText>Run QloudSync?</progressText>
             <showMessageOnError>0</showMessageOnError>
         </runProgram>

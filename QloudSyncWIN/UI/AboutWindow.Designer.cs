@@ -46,9 +46,9 @@
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Location = new System.Drawing.Point(295, 110);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(82, 11);
+            this.label1.Size = new System.Drawing.Size(96, 11);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Version 3.1";
+            this.label1.Text = "Version 3.1.4";
             // 
             // label3
             // 
