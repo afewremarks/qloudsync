@@ -67,13 +67,13 @@ namespace GreenQloud.Persistence.SQLite
         }
         public override List<Event> LastEvents{
             get{
-                string sql = string.Format("SELECT TOP {6} e.* FROM Event e INNER JOIN  RepositoryItem ie ON ie.RepositoryItemId = e.ItemId " +
+                string sql = string.Format("SELECT e.* FROM Event e INNER JOIN  RepositoryItem ie ON ie.RepositoryItemId = e.ItemId " +
                 "WHERE (" +
                     "ie.RepositoryItemId IN (SELECT r1.RepositoryItemId FROM RepositoryItem r1 WHERE r1.MOVED <> '{0}')" +
                     "OR ie.RepositoryItemId IN" +
                     "(SELECT r2.RepositoryItemId FROM RepositoryItem r2 INNER JOIN RepositoryItem r3 ON r2.ResultItemId = r3.RepositoryItemId WHERE r2.MOVED = '{1}' AND r3.MOVED <> '{2}')" +
                     ") AND e.SYNCHRONIZED = '{3}' AND ie.isfolder <> '{4}' AND e.RESPONSE = '{5}' " +
-                 "ORDER BY EventID DESC", bool.TrueString, bool.TrueString, bool.TrueString, bool.TrueString, bool.TrueString, RESPONSE.OK, 5);
+                 "ORDER BY EventID DESC LIMIT {6}", bool.TrueString, bool.TrueString, bool.TrueString, bool.TrueString, bool.TrueString, RESPONSE.OK, 5);
 
                 return Select (sql);
             }
@@ -198,9 +198,9 @@ namespace GreenQloud.Persistence.SQLite
         
         public override DateTime LastSyncTime{
             get{
-                List<Event> events = Select(string.Format("SELECT TOP 10 * FROM EVENT WHERE REPOSITORY = 'REMOTE' AND RepositoryId = '{0}' ORDER BY INSERTTIME DESC", repo.Id));
+                List<Event> events = Select(string.Format("SELECT * FROM EVENT WHERE REPOSITORY = 'REMOTE' AND RepositoryId = '{0}' ORDER BY INSERTTIME DESC LIMIT 10", repo.Id));
                 if (events.Count == 0)
-                    events = Select(string.Format("SELECT TOP 1 * FROM EVENT WHERE REPOSITORY = 'LOCAL' AND RepositoryId = '{0}' ORDER BY INSERTTIME DESC", repo.Id));
+                    events = Select(string.Format("SELECT * FROM EVENT WHERE REPOSITORY = 'LOCAL' AND RepositoryId = '{0}' ORDER BY INSERTTIME DESC LIMIT 1", repo.Id));
 
                 if (events.Count > 0)
                 {
