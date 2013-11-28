@@ -97,12 +97,19 @@ namespace GreenQloud.Persistence.SQLite
         {
             item.Moved = true;
             string sql;
-            if(item.IsFolder)
-                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryId = '{1}' AND RepositoryItemKey LIKE '{2}%' ", bool.TrueString, item.Repository.Id, item.Key);
+            if (item.IsFolder)
+            {
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryId = '{1}' AND RepositoryItemKey = '{2}' AND RepositoryItemId = '{2}%' ", bool.TrueString, item.Repository.Id, item.Key, item.Id);
+                database.ExecuteNonQuery(sql);
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryId = '{1}' AND RepositoryItemKey <> '{2}' AND RepositoryItemKey LIKE '{2}%' ", bool.TrueString, item.Repository.Id, item.Key);
+                database.ExecuteNonQuery(sql);
+            }
             else
+            {
                 sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryId = '{1}' AND RepositoryItemKey = '{2}' ", bool.TrueString, item.Repository.Id, item.Key);
-
-            database.ExecuteNonQuery (sql);
+                database.ExecuteNonQuery(sql);
+            }
+            
         }
 
         public override void ActualizeUpdatedAt (RepositoryItem item){

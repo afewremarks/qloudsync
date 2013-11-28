@@ -26,19 +26,10 @@ namespace GreenQloud.UI
         System.Windows.Forms.Timer bandwidthCalcTimer = new System.Windows.Forms.Timer();
         float lastAmountOfBytesReceived;
         float lastAmountOfBytesSent;
-        private static NetworkManager instance;
         List<RepositoryItem> items;
         RemoteRepositoryController remoteRepositoryController;
         private bool makeStep;
         private bool isUpload;
-
-        public static NetworkManager GetInstance()
-        {
-            if (instance == null)
-                instance = new NetworkManager();
-            return instance;
-        }
-
 
         public Preferences()
         {
@@ -87,30 +78,42 @@ namespace GreenQloud.UI
                         makeStep = true;
                         if (e.RepositoryType == RepositoryType.LOCAL)
                         {
-                            FileInfo fi = new FileInfo(e.Item.LocalAbsolutePath);
+                            try {
+                                FileInfo fi = new FileInfo(e.Item.LocalAbsolutePath);
 
-                            if (e.EventType == EventType.MOVE)
-                            {
-                                fi = new FileInfo(e.Item.ResultItem.LocalAbsolutePath);
-                                items.Add(e.Item.ResultItem);
+                                if (e.EventType == EventType.MOVE)
+                                {
+                                    fi = new FileInfo(e.Item.ResultItem.LocalAbsolutePath);
+                                    items.Add(e.Item.ResultItem);
+                                }
+                                else
+                                {
+                                    items.Add(e.Item);
+                                }
+
+                                progressBar1.Maximum = (int)fi.Length;
+
+                                isUpload = true;
+                                textBox1.AppendText(" ↓ " + e.Item.Name + " ... ");
                             }
-                            else
+                            catch
                             {
-                                items.Add(e.Item);
+                                Logger.LogInfo("ERROR", "Network manager could not load informations");
                             }
-
-                            progressBar1.Maximum = (int)fi.Length;
-
-                            isUpload = true;
-                            textBox1.AppendText(" ↑ " + e.Item.Name + " ... ");
                         }
                         else
                         {
-                            items.Add(e.Item);
-                            remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
-                            isUpload = false;
-                            progressBar1.Maximum = (int)remoteRepositoryController.GetContentLength(e.Item.Key);
-                            textBox1.AppendText(" ↑ " + e.Item.Name + " ... ");
+                            try{
+                                items.Add(e.Item);
+                                remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
+                                isUpload = false;
+                                progressBar1.Maximum = (int)remoteRepositoryController.GetContentLength(e.Item.Key);
+                                textBox1.AppendText(" ↑ " + e.Item.Name + " ... ");
+                            }
+                            catch
+                            {
+                                Logger.LogInfo("ERROR", "Network manager could not load informations");
+                            }
                         }
 
                     }

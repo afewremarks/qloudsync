@@ -186,9 +186,36 @@ namespace GreenQloud.Model
             }
         }
 
-        public string TrashRelativePath {
+        public string RemoteTrashPath {
             get {
-                return ToPathString(Path.Combine (Constant.TRASH, Key));
+                string keyReturn = ToPathString(Path.Combine (Constant.TRASH, Key));
+                keyReturn = keyReturn.Replace(Path.DirectorySeparatorChar.ToString(), "/");
+
+                RemoteRepositoryController remoteController = new RemoteRepositoryController(this.Repository);
+                int i = 0;
+                string modifiedKeyReturn = keyReturn;
+                while (remoteController.Exists(modifiedKeyReturn))
+                {
+                    i++;
+                    int folderDelimiter = keyReturn.LastIndexOf("/");
+                    int extensionDelimiter = Name.LastIndexOf(".");
+                    if (folderDelimiter == keyReturn.Count() - 1) {//if true, its a folder
+                        modifiedKeyReturn = keyReturn.Insert(folderDelimiter, " (" + i + ")");
+                    }
+                    else //its a file
+                    {
+                        if (extensionDelimiter != -1 && extensionDelimiter != 0)
+                        { //file have extension
+                            modifiedKeyReturn = keyReturn.Insert(keyReturn.LastIndexOf("."), " (" + i + ")");
+                        }
+                        else 
+                        {
+                            modifiedKeyReturn = keyReturn + " (" + i + ")";
+                        }
+                    }
+                } 
+
+                return modifiedKeyReturn;
             }
         }
 

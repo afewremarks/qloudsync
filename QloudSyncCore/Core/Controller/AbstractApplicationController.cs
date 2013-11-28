@@ -159,7 +159,7 @@ namespace GreenQloud
             }
         }
 
-        public void InitializeSynchronizers(LocalRepository repo)
+        public void InitializeSynchronizers(LocalRepository repo, bool recovery = false)
         {
             SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO();
             Thread startSync;
@@ -174,7 +174,7 @@ namespace GreenQloud
                         unit = new SynchronizerUnit(repo);
                         SynchronizerUnit.Add(repo, unit);
                     }
-                    unit.InitializeSynchronizers();
+                    unit.InitializeSynchronizers(recovery);
                     Logger.LogInfo("INFO", "Synchronizers Ready!");
                     ErrorType = ERROR_TYPE.NULL;
                     OnIdle();
@@ -428,7 +428,7 @@ namespace GreenQloud
             OnError();
             KillSynchronizers(repo);
             Thread.Sleep(5000);
-            InitializeSynchronizers(repo);
+            InitializeSynchronizers(repo, true);
         }
 
         public void HandleError()

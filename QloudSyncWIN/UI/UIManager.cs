@@ -250,15 +250,6 @@ namespace GreenQloud.UI
             Program.Controller.CheckForUpdates();
         }
 
-        NetworkManager manager = new NetworkManager();
-        public void OpenNetworkManager(Object sender, EventArgs e)
-        {
-            if (!manager.Visible) {
-            manager.ShowDialog();
-            }
-
-        }
-
         Preferences preferences = new Preferences();
         public void ShowPreferencesWindow(Object sender, EventArgs e)
         {

@@ -14,6 +14,7 @@ using GreenQloud.Util;
 using System.Net.Sockets;
 using LitS3;
 using GreenQloud.Core;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Synchrony
 {
@@ -132,8 +133,12 @@ namespace GreenQloud.Synchrony
             localSynchronizer = LocalEventsSynchronizer.NewInstance (this.repo, this);
         }
 
-        public void InitializeSynchronizers ()
+        public void InitializeSynchronizers (bool recovery = false)
         {
+            if (recovery) {
+                SQLiteEventDAO eventDao = new SQLiteEventDAO(this.repo);
+                eventDao.RemoveAllUnsynchronized();
+            }
             recoverySynchronizer.Start (); 
             localSynchronizer.Start ();
             remoteSynchronizer.Start ();

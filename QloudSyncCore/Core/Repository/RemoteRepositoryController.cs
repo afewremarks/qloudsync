@@ -37,14 +37,23 @@ namespace GreenQloud.Repository
 
         public bool Exists (RepositoryItem item)
         {
-            try{
-                S3Service service = connection.Connect ();
+            return Exists(item.Key);
+        }
 
-                var request = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, item.Key, true);
-                using (GetObjectResponse response = request.GetResponse()) { 
+        public bool Exists(string key)
+        {
+            try
+            {
+                S3Service service = connection.Connect();
+
+                var request = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, key, true);
+                using (GetObjectResponse response = request.GetResponse())
+                {
                     //todo...
                 }
-            } catch (WebException webx) {
+            }
+            catch (WebException webx)
+            {
                 if (((HttpWebResponse)webx.Response).StatusCode == HttpStatusCode.NotFound)
                     return false;
                 else

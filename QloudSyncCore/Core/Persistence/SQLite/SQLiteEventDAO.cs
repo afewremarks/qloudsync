@@ -27,8 +27,11 @@ namespace GreenQloud.Persistence.SQLite
         {
             if (e == null)
                 return;
-
                 repositoryItemDAO.Create (e);
+                if (e.EventType == EventType.DELETE || e.EventType == EventType.MOVE)
+                {
+                    repositoryItemDAO.MarkAsMoved(e.Item);
+                }
 
                 DateTime dateOfEvent =  e.InsertTime;
                 if(dateOfEvent==DateTime.MinValue){
@@ -158,7 +161,7 @@ namespace GreenQloud.Persistence.SQLite
         public override void IgnoreAllIfMoved (Event e){
             CombineMultipleMoves (e);
             e = FindById(e.Id);
-            List<Event> list = Select (string.Format("SELECT * FROM EVENT WHERE ItemId ='{0}' AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> '{3}' AND RepositoryId = '{4}'", e.Item.Id, EventType.MOVE, e.Id, bool.TrueString, repo.Id));
+            List<Event> list = Select(string.Format("SELECT * FROM EVENT WHERE ItemId ='{0}' AND TYPE = '{1}' AND EventID > '{2}'  AND SYNCHRONIZED <> '{3}' AND RepositoryId = '{4}' ORDER BY EventID ASC LIMIT 1", e.Item.Id, EventType.MOVE, e.Id, bool.TrueString, repo.Id));
             if(list.Count > 0) { 
                 if (e.EventType == EventType.CREATE || e.EventType == EventType.UPDATE) {
                     database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  SYNCHRONIZED = '{0}', RESPONSE = '{1}' WHERE EventID = '{2}'", bool.TrueString, RESPONSE.IGNORED.ToString(), list.First().Id));
