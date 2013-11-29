@@ -94,7 +94,7 @@ namespace GreenQloud.UI
                                 progressBar1.Maximum = (int)fi.Length;
 
                                 isUpload = true;
-                                textBox1.AppendText(" ↓ " + e.Item.Name + " ... ");
+                                textBox1.AppendText(" ↑ " + e.Item.Name + " ... ");
                             }
                             catch
                             {
@@ -108,7 +108,7 @@ namespace GreenQloud.UI
                                 remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
                                 isUpload = false;
                                 progressBar1.Maximum = (int)remoteRepositoryController.GetContentLength(e.Item.Key);
-                                textBox1.AppendText(" ↑ " + e.Item.Name + " ... ");
+                                textBox1.AppendText(" ↓ " + e.Item.Name + " ... ");
                             }
                             catch
                             {
