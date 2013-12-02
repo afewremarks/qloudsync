@@ -75,6 +75,16 @@ namespace GreenQloud.Synchrony
             }
             return false;
         }
+        
+        public static int GetTotalEventsToSync()
+        {
+            int eventsToSync = 0;
+            foreach (SynchronizerUnit unit in synchronizerUnits.Values)
+            {
+                eventsToSync += unit.synchronizerResolver.EventsToSync;
+            }
+            return eventsToSync;
+        }
 
         public static bool AnyUploading ()
         {
