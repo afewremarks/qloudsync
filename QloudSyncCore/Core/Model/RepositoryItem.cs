@@ -174,7 +174,7 @@ namespace GreenQloud.Model
         public string LocalFolderPath {
             get {
                 string path = "";
-                path = Path.Combine (Repository.Path, KeyRelative);
+                path = Path.Combine (Repository.Path, KeyRelative.Replace("/",Path.DirectorySeparatorChar.ToString()));
                 path = path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar.ToString())); 
                 return ToPathString (path);
             }
