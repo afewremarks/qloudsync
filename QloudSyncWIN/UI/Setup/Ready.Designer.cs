@@ -59,6 +59,7 @@
             this.BackgroundImage = global::GreenQloud.Properties.Resources.getStarted;
             this.ClientSize = new System.Drawing.Size(434, 537);
             this.Controls.Add(this.button1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(450, 575);

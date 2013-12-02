@@ -152,6 +152,7 @@
             this.Controls.Add(this.TxtPassword);
             this.Controls.Add(this.TxtUserName);
             this.Controls.Add(this.label2);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(450, 575);
