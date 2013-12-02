@@ -24,7 +24,6 @@ namespace GreenQloud.UI
         public AboutWindow About;
         private bool isLoged;
         private static UIManager instance;
-        string StateText = "";
         
         public static UIManager GetInstance(){
             if(instance == null)
@@ -63,50 +62,6 @@ namespace GreenQloud.UI
                     Application.DoEvents();
                 }
             });
-
-            Program.Controller.OnIdle += delegate
-            {
-                int itensToSync = SynchronizerUnit.GetTotalEventsToSync();
-                if (itensToSync > 0)
-                {
-                    StateText = itensToSync+" Events to sync";
-                }
-                else 
-                {
-                    StateText = "Up to date ";
-                }
-                Console.WriteLine(StateText);
-            };
-
-            Program.Controller.OnPaused += delegate
-            {
-                StateText = "Sync Paused ";
-                Console.WriteLine(StateText);
-            };
-
-            Program.Controller.OnSyncing += delegate
-            {
-                StateText = "Syncing changes…";
-                Console.WriteLine(StateText);
-            };
-
-            Program.Controller.OnError += delegate
-            {
-                switch (Program.Controller.ErrorType)
-                {
-                    case GreenQloud.AbstractApplicationController.ERROR_TYPE.DISCONNECTION:
-                        StateText = "Lost network connection";
-                        break;
-                    case GreenQloud.AbstractApplicationController.ERROR_TYPE.ACCESS_DENIED:
-                        StateText = "Access Denied. Login again!";
-                        break;
-                    default:
-                        StateText = "Failed to send some changes";
-                        break;
-                }
-                Console.WriteLine(StateText);
-
-            };	
 
             this.About = new AboutWindow();
             Program.Controller.ShowAboutWindowEvent += (() => this.About.ShowDialog());
@@ -196,16 +151,18 @@ namespace GreenQloud.UI
         private string savingstext = "";
         private void LoadExtraItems(ToolStripSeparator separator, ToolStripSeparator finalSeparator, ToolStripMenuItem savings, ToolStripMenuItem recentlyChanged, ToolStripMenuItem stateText)
         {
-            if (StateText.Count() == 0)
+            int itensToSync = SynchronizerUnit.GetTotalEventsToSync();
+            if (itensToSync > 0)
             {
-                stateText.Visible = false;
+                stateText.Text = itensToSync + " Events to sync";
+                stateText.Visible = true;
             }
             else
             {
+                stateText.Text = "Up to date ";
                 stateText.Visible = true;
-                stateText.Text = StateText;
             }
-
+           
             //First load the recently changes
             int begin = this.trayMenu.Items.IndexOf(separator);
             int end = this.trayMenu.Items.IndexOf(finalSeparator);
