@@ -237,11 +237,6 @@ using GreenQloud.Core;
             }
             return null;
         }
-
-        internal void Skip()
-        {
-            canChange = true;
-        }
     }
 }
 

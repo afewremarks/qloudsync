@@ -115,6 +115,14 @@ namespace GreenQloud.Synchrony
             }
         }
 
+        public void Skip()
+        {
+            _stoped = true;
+            _killed = true;
+            _wasKilled = true;
+            canChange = true;
+        }
+
         #region Abstract Methods
         public abstract void Run();
         #endregion
