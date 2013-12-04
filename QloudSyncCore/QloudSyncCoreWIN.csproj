@@ -32,10 +32,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LitS3, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\LitS3.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
@@ -118,6 +114,28 @@
     <Compile Include="Core\UI\ApplicationUI.cs" />
     <Compile Include="Core\Program.cs" />
     <Compile Include="Core\Model\SQTotalUsed.cs" />
+    <Compile Include="LitS3\AccessControl.cs" />
+    <Compile Include="LitS3\AddObject.cs" />
+    <Compile Include="LitS3\Bucket.cs" />
+    <Compile Include="LitS3\BucketAccess.cs" />
+    <Compile Include="LitS3\CopyObject.cs" />
+    <Compile Include="LitS3\CreateBucket.cs" />
+    <Compile Include="LitS3\DeleteBucket.cs" />
+    <Compile Include="LitS3\DeleteObject.cs" />
+    <Compile Include="LitS3\GetAllBuckets.cs" />
+    <Compile Include="LitS3\GetBucketLocation.cs" />
+    <Compile Include="LitS3\GetObject.cs" />
+    <Compile Include="LitS3\Identity.cs" />
+    <Compile Include="LitS3\ListEntries.cs" />
+    <Compile Include="LitS3\ListObjects.cs" />
+    <Compile Include="LitS3\ObjectTransfer.cs" />
+    <Compile Include="LitS3\S3Authorizer.cs" />
+    <Compile Include="LitS3\S3ErrorCode.cs" />
+    <Compile Include="LitS3\S3Exception.cs" />
+    <Compile Include="LitS3\S3Headers.cs" />
+    <Compile Include="LitS3\S3Request.cs" />
+    <Compile Include="LitS3\S3Response.cs" />
+    <Compile Include="LitS3\S3Service.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
