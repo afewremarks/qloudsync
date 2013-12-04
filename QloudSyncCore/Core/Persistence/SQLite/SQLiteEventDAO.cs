@@ -176,10 +176,20 @@ namespace GreenQloud.Persistence.SQLite
             database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  TRY_QNT = '{0}' WHERE EventID ='{1}'", e.TryQnt, e.Id));
         }
 
-        public override List<Event> EventsNotSynchronized {
+        public override List<Event> EventsToSync {
             get {
                 string sql = string.Format ("SELECT * FROM EVENT WHERE SYNCHRONIZED ='{0}' AND INSERTTIME < '{1}' AND RepositoryId = '{2}' ORDER BY EventID ASC", bool.FalseString, GlobalDateTime.Now.AddSeconds (-10).ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"), repo.Id);
                 List<Event> list = Select (sql);
+                return list;
+            }
+        }
+
+        public override List<Event> EventsNotSynchronized
+        {
+            get
+            {
+                string sql = string.Format("SELECT * FROM EVENT WHERE SYNCHRONIZED ='{0}' AND RepositoryId = '{1}' ORDER BY EventID ASC", bool.FalseString, repo.Id);
+                List<Event> list = Select(sql);
                 return list;
             }
         }
@@ -191,7 +201,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public override void RemoveAllUnsynchronized ()
         {
-            List<Event> list = EventsNotSynchronized;
+            List<Event> list = EventsToSync;
             foreach (Event e in list)
             {
                 UpdateToSynchronized (e, RESPONSE.IGNORED);

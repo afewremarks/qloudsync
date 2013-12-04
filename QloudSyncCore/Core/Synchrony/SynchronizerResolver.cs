@@ -80,11 +80,11 @@ namespace GreenQloud.Synchrony
 
         public void SolveAll ()
         {
-            eventsToSync = eventDAO.EventsNotSynchronized.Count;
+            eventsToSync = eventDAO.EventsToSync.Count;
             while (eventsToSync > 0 && !_stoped)
             {
                 Synchronize();
-                eventsToSync = eventDAO.EventsNotSynchronized.Count;
+                eventsToSync = eventDAO.EventsToSync.Count;
             }
             SyncStatus = SyncStatus.IDLE;
             Done = true;
@@ -162,7 +162,7 @@ namespace GreenQloud.Synchrony
 
         void Synchronize(){
             Exception currentException;
-            Event e = eventDAO.EventsNotSynchronized.FirstOrDefault();
+            Event e = eventDAO.EventsToSync.FirstOrDefault();
             do {
                 currentException = null;
                 if (e  != null){

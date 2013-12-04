@@ -10,7 +10,10 @@ namespace GreenQloud.Persistence
         public abstract List<Event> All{
             get;
         }
-        public abstract List<Event> EventsNotSynchronized{
+        public abstract List<Event> EventsToSync{
+            get;
+        }
+        public abstract List<Event> EventsNotSynchronized {
             get;
         }
         public abstract List<Event> LastEvents{

@@ -66,6 +66,18 @@ namespace GreenQloud.Synchrony
             synchronizerUnits.Add(repo, unit);
         }
 
+        public static bool AnyRecovering()
+        {
+            foreach (SynchronizerUnit unit in synchronizerUnits.Values)
+            {
+                if (!unit.recoverySynchronizer.IsStoped())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static bool AnyDownloading ()
         {
             foreach(SynchronizerUnit unit in synchronizerUnits.Values){
@@ -75,15 +87,26 @@ namespace GreenQloud.Synchrony
             }
             return false;
         }
+
+        public static int UnitCount()
+        {
+            return synchronizerUnits.Values.Count();
+        }
         
         public static int GetTotalEventsToSync()
         {
             int eventsToSync = 0;
             foreach (SynchronizerUnit unit in synchronizerUnits.Values)
             {
-                eventsToSync += unit.synchronizerResolver.EventsToSync;
+                eventsToSync += unit.EventsToSync();
             }
             return eventsToSync;
+        }
+
+        private int EventsToSync()
+        {
+            SQLiteEventDAO eventDAO = new SQLiteEventDAO(repo);
+            return eventDAO.EventsNotSynchronized.Count();
         }
 
         public static bool AnyUploading ()

@@ -151,18 +151,33 @@ namespace GreenQloud.UI
         private string savingstext = "";
         private void LoadExtraItems(ToolStripSeparator separator, ToolStripSeparator finalSeparator, ToolStripMenuItem savings, ToolStripMenuItem recentlyChanged, ToolStripMenuItem stateText)
         {
-            int itensToSync = SynchronizerUnit.GetTotalEventsToSync();
-            if (itensToSync > 0)
+            if (SynchronizerUnit.UnitCount() > 0)
             {
-                stateText.Text = itensToSync + " Events to sync";
+                int itensToSync = SynchronizerUnit.GetTotalEventsToSync();
+                if (itensToSync > 0)
+                {
+                    stateText.Text = itensToSync + " Event"+(itensToSync > 1 ? "s" : "")+" to sync";
+                    stateText.Visible = true;
+                }
+                else
+                {
+                    if (SynchronizerUnit.AnyRecovering())
+                    {
+                        stateText.Text = "Looking for changes...";
+                        stateText.Visible = true;
+                    }
+                    else
+                    {
+                        stateText.Text = "Up to date";
+                        stateText.Visible = true;
+                    }
+                }
+            }
+            else 
+            {
+                stateText.Text = "Loading Synchronizers...";
                 stateText.Visible = true;
             }
-            else
-            {
-                stateText.Text = "Up to date ";
-                stateText.Visible = true;
-            }
-           
             //First load the recently changes
             int begin = this.trayMenu.Items.IndexOf(separator);
             int end = this.trayMenu.Items.IndexOf(finalSeparator);
