@@ -128,7 +128,7 @@ namespace GreenQloud
             controller.MoveDir(repo.Path, pathTo);
             repo.Path = pathTo;
             repoDao.Update(repo);
-            InitializeSynchronizers();
+            InitializeSynchronizers(false);
             Program.Controller.Alert("SQFolder moved to "+ pathTo);
         }
 
@@ -159,7 +159,7 @@ namespace GreenQloud
             }
         }
 
-        public void InitializeSynchronizers(LocalRepository repo, bool recovery = false)
+        public void InitializeSynchronizers(LocalRepository repo, bool recovery)
         {
             SQLiteRepositoryDAO repoDAO = new SQLiteRepositoryDAO();
             Thread startSync;
@@ -235,14 +235,14 @@ namespace GreenQloud
             }
         }
 
-        public void InitializeSynchronizers()
+        public void InitializeSynchronizers(bool recovery)
         {
             SQLiteRepositoryDAO repoRaven = new SQLiteRepositoryDAO();
             List<LocalRepository> repos = repoRaven.AllActived;
             foreach (LocalRepository repo in repos)
             {
                 CreateRepoFolder(repo);
-                InitializeSynchronizers(repo);
+                InitializeSynchronizers(repo, recovery);
             }
         }
 
@@ -293,7 +293,7 @@ namespace GreenQloud
                 {
                     ShowSetupWindow(PageType.ConfigureFolders);
                 } else {
-                    InitializeSynchronizers();
+                    InitializeSynchronizers(false);
                 }
             }
             verifyConfigRequirements();
@@ -368,7 +368,7 @@ namespace GreenQloud
         {
             try
             {
-                InitializeSynchronizers();
+                InitializeSynchronizers(true);
             }
             catch (Exception e)
             {
@@ -437,7 +437,7 @@ namespace GreenQloud
             OnError();
             KillSynchronizers();
             Thread.Sleep(5000);
-            InitializeSynchronizers();
+            InitializeSynchronizers(true);
         }
 
         public void CreateConfigFolder()

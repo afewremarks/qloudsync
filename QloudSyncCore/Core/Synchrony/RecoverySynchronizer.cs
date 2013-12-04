@@ -102,6 +102,10 @@ using GreenQloud.Core;
             lastReleased = GlobalDateTime.Now;
 
             //Only run one time...
+           repo.Recovering = false;
+           SQLiteRepositoryDAO dao = new SQLiteRepositoryDAO();
+           dao.Update(repo);
+            
             Stop();
             //Wait(60000);
         }
@@ -232,6 +236,11 @@ using GreenQloud.Core;
                 }
             }
             return null;
+        }
+
+        internal void Skip()
+        {
+            canChange = true;
         }
     }
 }

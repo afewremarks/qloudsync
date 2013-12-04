@@ -169,10 +169,20 @@ namespace GreenQloud.Synchrony
         public void InitializeSynchronizers (bool recovery = false)
         {
             if (recovery) {
+                repo.Recovering = true;
+                SQLiteRepositoryDAO dao = new SQLiteRepositoryDAO();
+                dao.Update(repo);
+            }
+            if (recovery || repo.Recovering)
+            {
                 SQLiteEventDAO eventDao = new SQLiteEventDAO(this.repo);
                 eventDao.RemoveAllUnsynchronized();
+                recoverySynchronizer.Start();
             }
-            recoverySynchronizer.Start (); 
+            else
+            {
+                recoverySynchronizer.Skip();
+            }
             localSynchronizer.Start ();
             remoteSynchronizer.Start ();
             synchronizerResolver.Start();

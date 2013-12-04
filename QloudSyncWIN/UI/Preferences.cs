@@ -202,7 +202,7 @@ namespace GreenQloud.UI
                     repoIgnore.Remove(repo, this.checkedListBox1.Items[i].ToString());
                 }
             }
-            Program.Controller.InitializeSynchronizers();
+            Program.Controller.InitializeSynchronizers(true);
             wait.Hide();
             this.Focus();
             this.BringToFront();
