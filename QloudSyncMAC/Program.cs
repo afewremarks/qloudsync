@@ -4,6 +4,9 @@ using System.IO;
 using GreenQloud.Repository;
 using System.Linq;
 using Mono.Data.Sqlite;
+using MonoMac.Foundation;
+using MonoMac.AppKit;
+using MonoMac.ObjCRuntime;
 
 namespace GreenQloud {
 
@@ -19,9 +22,12 @@ namespace GreenQloud {
         #endif
         public static void Main (string [] args)
         {
+            NSApplication.CheckForIllegalCrossThreadCalls = false;
             Mono.Data.Sqlite.SqliteConnection.SetConfig (Mono.Data.Sqlite.SQLiteConfig.Serialized);
             Controller = new Controller ();
+            NSApplication.Init ();
             UI = new SparkleUI ();
+
             if (!program_mutex.WaitOne (0, false)) {
                 Console.WriteLine ("QloudSync is already running.");
                 Environment.Exit (-1);

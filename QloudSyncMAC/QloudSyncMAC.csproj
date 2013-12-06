@@ -9,7 +9,8 @@
     <ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
     <RootNamespace>QloudSync</RootNamespace>
-    <ReleaseVersion />
+    <ReleaseVersion>
+    </ReleaseVersion>
     <AssemblyName>QloudSync</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -22,7 +23,8 @@
     <IncludeMonoRuntime>true</IncludeMonoRuntime>
     <UseSGen>true</UseSGen>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <I18n />
+    <I18n>
+    </I18n>
     <EnableCodeSigning>false</EnableCodeSigning>
     <ConsolePause>false</ConsolePause>
     <CodeSigningKey>Mac Developer</CodeSigningKey>
@@ -41,7 +43,8 @@
     <IncludeMonoRuntime>true</IncludeMonoRuntime>
     <UseSGen>true</UseSGen>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <I18n />
+    <I18n>
+    </I18n>
     <EnableCodeSigning>false</EnableCodeSigning>
     <Externalconsole>true</Externalconsole>
     <CodeSigningKey>Mac Developer</CodeSigningKey>
@@ -96,7 +99,6 @@
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="lib\MonoMac.dll" />
-    <None Include="lib\XamaMac.dll" />
     <None Include="lib\LitS3.dll" />
     <None Include="lib\Newtonsoft.Json.dll" />
     <None Include="Pixmaps\file-default.png" />
@@ -105,7 +107,6 @@
     <InterfaceDefinition Include="MainMenu.xib" />
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="qloudsync.config" />
     <BundleResource Include="Pixmaps\about.png" />
     <BundleResource Include="Pixmaps\file_down.png" />
     <BundleResource Include="Pixmaps\file_up.png" />
@@ -143,6 +144,7 @@
     <BundleResource Include="Pixmaps\LoginButton220.png" />
     <BundleResource Include="Pixmaps\CreateButton159.png" />
     <BundleResource Include="Pixmaps\getstartedbutton.png" />
+    <BundleResource Include="qloudsync.conf" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\qloudsync-app.icns">

@@ -42,11 +42,10 @@ namespace GreenQloud {
 
         public SparkleUI ()
         {
-            using (var a = new NSAutoreleasePool ())
-            {
+            using (var a = new NSAutoreleasePool ()) {
                 NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("qloudsync-app.icns");
-                Setup      = new SparkleSetup ();
-                About      = new AboutWindow ();
+                Setup = new SparkleSetup ();
+                About = new AboutWindow ();
                 StatusIcon = new IconController ();
             }
         }

@@ -56,8 +56,6 @@ namespace GreenQloud {
 
         private List<NSMenuItem> recentChanges;
 
-
-        private NSMenuItem notify_item;
         private NSMenuItem recent_events_title;
         private NSMenuItem pause_sync;
         private NSMenuItem quit_item;
@@ -115,21 +113,6 @@ namespace GreenQloud {
         public string[] OverflowFolderErrors;
         private Thread co2Update;
         private bool isPaused = false;
-
-
-
-        
-        public int ProgressPercentage {
-            get {
-                return (int) Program.Controller.ProgressPercentage;
-            }
-        }
-        
-        public string ProgressSpeed {
-            get {
-                return Program.Controller.ProgressSpeed;
-            }
-        }
         
         public bool QuitItemEnabled {
             get {
@@ -213,8 +196,8 @@ namespace GreenQloud {
             Program.Controller.OnSyncing += delegate {
                 isPaused = false;
 
-                bool syncDown = Program.Controller.IsDownloading();
-                bool syncUp = Program.Controller.IsUploading();
+                bool syncDown = SynchronizerUnit.AnyDownloading(); 
+                bool syncUp = SynchronizerUnit.AnyUploading(); 
 
                 if(syncDown && syncUp){
                     CurrentState = IconState.Syncing;
@@ -231,10 +214,7 @@ namespace GreenQloud {
                     CurrentState = IconState.Idle;
                     StateText = "✓  Up to date ";
                 }
-                
-                if (ProgressPercentage > 0)
-                    StateText += " " + ProgressPercentage + "%  " + ProgressSpeed;
-                
+
                 UpdateIconEvent (CurrentState);
                 UpdateStatusItemEvent (StateText, this.syncing_working);
                 UpdateQuitItemEvent (QuitItemEnabled);
@@ -246,10 +226,10 @@ namespace GreenQloud {
                 CurrentState = IconState.Error;
                 switch(Program.Controller.ErrorType)
                 {
-                    case ERROR_TYPE.DISCONNECTION:
+                    case Controller.ERROR_TYPE.DISCONNECTION:
                     StateText = "✗   Lost network connection";
                     break;
-                    case ERROR_TYPE.ACCESS_DENIED:
+                    case Controller.ERROR_TYPE.ACCESS_DENIED:
                     StateText = "✗   Access Denied. Login again!";
                         this.preferences_item.Enabled = true;
                     break;
@@ -285,7 +265,7 @@ namespace GreenQloud {
                             break;
                         }
                         case IconState.Error: {
-                            if(Program.Controller.ErrorType == ERROR_TYPE.DISCONNECTION){
+                            if(Program.Controller.ErrorType == Controller.ERROR_TYPE.DISCONNECTION){
                                 this.status_item.Image          = this.disconnected_image;
                             } else {
                                 this.status_item.Image          = this.syncing_error_image;
@@ -344,7 +324,7 @@ namespace GreenQloud {
                 };
 
                 this.folder_item.Activated += delegate {
-                    SparkleShareClicked ();
+                    StorageFolderClicked ();
                 };
 
                 this.folder_item.Image = this.sparkleshare_image;
@@ -364,29 +344,6 @@ namespace GreenQloud {
                     Title   = "Recently Changed",
                     Enabled =  false
                 };       
-                recent_events_title.Activated += delegate {
-                    ChangeClicked ();
-                };
-
-                this.notify_item = new NSMenuItem () {
-                    Enabled = false// (Controller.Folders.Length > 0)
-                };
-
-                if (Preferences.NotificationsEnabled)
-                    this.notify_item.Title = "Turn Notifications Off";
-                else
-                    this.notify_item.Title = "Turn Notifications On";
-
-                this.notify_item.Activated += delegate {
-                    Program.Controller.ToggleNotifications ();
-
-                    InvokeOnMainThread (delegate {
-                        if (Preferences.NotificationsEnabled)
-                            this.notify_item.Title = "Turn Notifications Off";
-                        else
-                            this.notify_item.Title = "Turn Notifications On";
-                    });
-                };
 
                 this.about_item = new NSMenuItem () {
                     Title   = string.Format("About {0}", GlobalSettings.ApplicationName),
@@ -554,21 +511,15 @@ namespace GreenQloud {
 
         }
 
-        public void SparkleShareClicked ()
+        public void StorageFolderClicked ()
         {
-            Program.Controller.OpenSparkleShareFolder ();
+            Program.Controller.OpenStorageFolder();
         }
         
         public void RecentChangeItemClicked (object sender, EventArgs e)
         {
-            Program.Controller.OpenRepositoryitemFolder (((Event)sender).ItemLocalFolderPath);
+            Program.Controller.OpenFolder(((Event)sender).ItemLocalFolderPath);
         }
-        
-        public void AddHostedProjectClicked ()
-        {
-            new Thread (() => Program.Controller.ShowSetupWindow (PageType.Add)).Start ();
-        }
-        
         
         public void RecentEventsClicked ()
         {
@@ -579,11 +530,6 @@ namespace GreenQloud {
         public void AboutClicked ()
         {
             Program.Controller.ShowAboutWindow ();
-        }
-
-        public void ChangeClicked ()
-        {
-            Program.Controller.ShowTransferWindow ();
         }
 
         public String PauseText (){

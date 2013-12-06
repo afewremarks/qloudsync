@@ -1,13 +1,13 @@
-#if __MonoCS__
-#else
 using System;
 using System.Collections.Generic;
 using System.Data;
+#if __MonoCS__
+using Mono.Data.Sqlite;
+#else
 using System.Data.SqlClient;
-using System.Data.SQLite;
+#endif
 using System.IO;
 using System.Threading;
-
 
 namespace GreenQloud.Persistence.SQLite
 {
@@ -36,21 +36,17 @@ namespace GreenQloud.Persistence.SQLite
         {
             get
             {
-                return String.Format(@"Data Source='{0}';Version=3;", RuntimeSettings.DatabaseFile);
+                return String.Format(@"URI=file:{0};Version=3;", RuntimeSettings.DatabaseFile);
             }
         }
 
         public void CreateDataBase()
         {
-            using (SQLiteConnection cnn = new SQLiteConnection(ConnectionString))
-            {
-                cnn.Open();
-                ExecuteNonQuery("CREATE TABLE Repository (RepositoryID INTEGER PRIMARY KEY AUTOINCREMENT, Path ntext, RECOVERING ntext, RemoteFolder ntext, Active ntext)");
-                ExecuteNonQuery("CREATE TABLE RepositoryItem (RepositoryItemID INTEGER PRIMARY KEY AUTOINCREMENT, RepositoryItemKey ntext, RepositoryId ntext, IsFolder ntext, ResultItemId ntext, eTag ntext, eTagLocal ntext,  Moved ntext, UpdatedAt ntext)");
-                ExecuteNonQuery("CREATE TABLE EVENT (EventID INTEGER PRIMARY KEY AUTOINCREMENT, ItemId ntext, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext, USER ntext, APPLICATION ntext, APPLICATION_VERSION ntext, DEVICE_ID ntext, OS ntext, BUCKET ntext, TRY_QNT ntext, RESPONSE ntext, RepositoryId ntext)");
-                ExecuteNonQuery("CREATE TABLE TimeDiff (TimeDiffID INTEGER PRIMARY KEY AUTOINCREMENT, Diff ntext)");
-                ExecuteNonQuery("CREATE TABLE RepositoryIgnore (RepositoryIgnoreID INTEGER PRIMARY KEY AUTOINCREMENT, RepositoryId ntext, Path ntext)");
-            }
+            ExecuteNonQuery("CREATE TABLE Repository (RepositoryID INTEGER PRIMARY KEY AUTOINCREMENT, Path ntext, RECOVERING ntext, RemoteFolder ntext, Active ntext)");
+            ExecuteNonQuery("CREATE TABLE RepositoryItem (RepositoryItemID INTEGER PRIMARY KEY AUTOINCREMENT, RepositoryItemKey ntext, RepositoryId ntext, IsFolder ntext, ResultItemId ntext, eTag ntext, eTagLocal ntext,  Moved ntext, UpdatedAt ntext)");
+            ExecuteNonQuery("CREATE TABLE EVENT (EventID INTEGER PRIMARY KEY AUTOINCREMENT, ItemId ntext, TYPE ntext, REPOSITORY ntext, SYNCHRONIZED ntext, INSERTTIME ntext, USER ntext, APPLICATION ntext, APPLICATION_VERSION ntext, DEVICE_ID ntext, OS ntext, BUCKET ntext, TRY_QNT ntext, RESPONSE ntext, RepositoryId ntext)");
+            ExecuteNonQuery("CREATE TABLE TimeDiff (TimeDiffID INTEGER PRIMARY KEY AUTOINCREMENT, Diff ntext)");
+            ExecuteNonQuery("CREATE TABLE RepositoryIgnore (RepositoryIgnoreID INTEGER PRIMARY KEY AUTOINCREMENT, RepositoryId ntext, Path ntext)");
         }
 
         /// <summary>
@@ -60,17 +56,32 @@ namespace GreenQloud.Persistence.SQLite
         /// <returns>A DataTable containing the result set.</returns>
         public DataTable GetDataTable(string sql)
         {
+            #if __MonoCS__
+            using (SqliteConnection cnn = new SqliteConnection(ConnectionString))
+            #else
             using (SQLiteConnection cnn = new SQLiteConnection(ConnectionString))
+            #endif
             {
                 cnn.Open();
+                #if __MonoCS__
+                using (SqliteTransaction trans = cnn.BeginTransaction())
+                #else
                 using (SQLiteTransaction trans = cnn.BeginTransaction())
+                #endif
                 {
                     DataTable dt = new DataTable();
+                    #if __MonoCS__
+                    using (SqliteCommand mycommand = new SqliteCommand(sql, cnn))
+                    #else
                     using (SQLiteCommand mycommand = new SQLiteCommand(sql, cnn))
+                    #endif
                     {
+                        #if __MonoCS__
+                        using (SqliteDataReader reader = mycommand.ExecuteReader())
+                        #else
                         using (SQLiteDataReader reader = mycommand.ExecuteReader())
+                        #endif
                         {
-
                             // Add all the columns.
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
@@ -161,18 +172,30 @@ namespace GreenQloud.Persistence.SQLite
         }
         public int ExecuteNonQuery(string sql, bool returnId)
         {
+            #if __MonoCS__
+            using (SqliteConnection cnn = new SqliteConnection(ConnectionString))
+            #else
             using (SQLiteConnection cnn = new SQLiteConnection(ConnectionString))
+            #endif
             {
                 cnn.Open();
+                #if __MonoCS__
+                using (SqliteTransaction trans = cnn.BeginTransaction())
+                #else
                 using (SQLiteTransaction trans = cnn.BeginTransaction())
+                #endif
                 {
                     int result = 0;
+                    #if __MonoCS__
+                    using (SqliteCommand mycommand = new SqliteCommand(sql, cnn))
+                    #else
                     using (SQLiteCommand mycommand = new SQLiteCommand(sql, cnn))
+                    #endif
                     {
                         result = mycommand.ExecuteNonQuery();
                         if (returnId)
                         {
-                            string last_insert_rowid = @"select last_insert_rowid()";
+                            string last_insert_rowid = @"                            select last_insert_rowid()";
                             mycommand.CommandText = last_insert_rowid;
                             System.Object temp = mycommand.ExecuteScalar();
                             int id = int.Parse(temp.ToString());
@@ -193,13 +216,25 @@ namespace GreenQloud.Persistence.SQLite
         /// <returns>A string.</returns>
         public string ExecuteScalar(string sql)
         {
+            #if __MonoCS__
+            using (SqliteConnection cnn = new SqliteConnection(ConnectionString))
+            #else
             using (SQLiteConnection cnn = new SQLiteConnection(ConnectionString))
+            #endif
             {
                 cnn.Open();
+                #if __MonoCS__
+                using (SqliteTransaction trans = cnn.BeginTransaction())
+                #else
                 using (SQLiteTransaction trans = cnn.BeginTransaction())
+                #endif
                 {
                     object value;
+                    #if __MonoCS__
+                    using (SqliteCommand mycommand = new SqliteCommand(sql, cnn))
+                    #else
                     using (SQLiteCommand mycommand = new SQLiteCommand(sql, cnn))
+                    #endif
                     {
                         value = mycommand.ExecuteScalar();
                         if (value != null)
@@ -214,4 +249,3 @@ namespace GreenQloud.Persistence.SQLite
 
     }
 }
-#endif

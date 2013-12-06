@@ -55,7 +55,7 @@ namespace GreenQloud {
                 });
             };
 
-            SparkleSetupController.ChangePageEvent += delegate (PageType type, string [] warnings) {
+            SparkleSetupController.ChangePageEvent += delegate (Controller.PageType type, string [] warnings) {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
@@ -74,7 +74,7 @@ namespace GreenQloud {
         public static Action CalculatingDone = delegate {};
         public static Action SynchronizingDone = delegate {};
 
-        public void ShowPage (PageType type, string [] warnings)
+        public void ShowPage (Controller.PageType type, string [] warnings)
         {
             EventHandler closeAppDelegate = delegate {
                 Program.Controller.Quit();
@@ -83,7 +83,7 @@ namespace GreenQloud {
                 SparkleSetupController.FinishPageCompleted ();
             };
 
-            if (type == PageType.Login) {
+            if (type == Controller.PageType.Login) {
                 this.WillClose += closeAppDelegate;
 
                 background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "loginScreen.png");
@@ -158,7 +158,7 @@ namespace GreenQloud {
                 Buttons.Add (RegisterButton);
             }
 
-            if (type == PageType.ConfigureFolders) {
+            if (type == Controller.PageType.ConfigureFolders) {
                 this.WillClose -= closeAppDelegate;
                 this.WillClose += hiddeWindowDelegate;
                 //this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getStarted.png");
@@ -176,7 +176,7 @@ namespace GreenQloud {
                 NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
             }
 
-            if (type == PageType.Finished) {
+            if (type == Controller.PageType.Finished) {
                 this.WillClose -= closeAppDelegate;
                 this.WillClose += hiddeWindowDelegate;
                 this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getStarted.png");
@@ -195,7 +195,7 @@ namespace GreenQloud {
                 NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
             }
 
-            if (type == PageType.Tutorial) {
+            if (type == Controller.PageType.Tutorial) {
                 string slide_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath,
                     "Pixmaps", "tutorial-slide-" + SparkleSetupController.TutorialPageNumber + ".png");
 

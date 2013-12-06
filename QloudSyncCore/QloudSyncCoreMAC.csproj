@@ -9,7 +9,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>QloudSyncCore</RootNamespace>
     <AssemblyName>QloudSyncCore</AssemblyName>
-    <ReleaseVersion />
+    <ReleaseVersion>
+    </ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,7 +49,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Persistence\SQLite\SQLiteDataBaseWin.cs" />
     <Compile Include="Core\Exception\DisconnectionException.cs" />
     <Compile Include="Core\Exception\AccessDeniedException.cs" />
     <Compile Include="Core\Exception\PhysicalLocalRepositoryException.cs" />
@@ -64,7 +64,6 @@
     <Compile Include="Core\Persistence\RepositoryDAO.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryDAO.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteEventDAO.cs" />
-    <Compile Include="Core\Repository\Local\StorageQloud\StorageQloudPhysicalRepositoryController.cs" />
     <Compile Include="Core\Synchrony\RemoteEventsSynchronizer.cs" />
     <Compile Include="Core\Synchrony\AbstractSynchronizer.cs" />
     <Compile Include="Core\Synchrony\SynchronizerResolver.cs" />
@@ -80,7 +79,6 @@
     <Compile Include="Core\Repository\Connection\S3Connection.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryItemDAO.cs" />
     <Compile Include="Core\Repository\AbstractController.cs" />
-    <Compile Include="Core\Repository\Local\IPhysicalRepositoryController.cs" />
     <Compile Include="Core\Synchrony\RecoverySynchronizer.cs" />
     <Compile Include="Core\Synchrony\LocalEventsSynchronizer.cs" />
     <Compile Include="Core\Persistence\TimeDiffDAO.cs" />
@@ -97,46 +95,52 @@
     <Compile Include="Core\Model\SQTotalUsed.cs" />
     <Compile Include="Core\Persistence\SQLite\SQLiteDataBase.cs" />
     <Compile Include="Core\IO\QloudSyncFileSystemWatcherMAC.cs" />
-    <Compile Include="Core\LitS3\AccessControl.cs" />
-    <Compile Include="Core\LitS3\AddObject.cs" />
-    <Compile Include="Core\LitS3\AssemblyInfo.cs" />
-    <Compile Include="Core\LitS3\Bucket.cs" />
-    <Compile Include="Core\LitS3\BucketAccess.cs" />
-    <Compile Include="Core\LitS3\CopyObject.cs" />
-    <Compile Include="Core\LitS3\CreateBucket.cs" />
-    <Compile Include="Core\LitS3\DeleteBucket.cs" />
-    <Compile Include="Core\LitS3\DeleteObject.cs" />
-    <Compile Include="Core\LitS3\GetAllBuckets.cs" />
-    <Compile Include="Core\LitS3\GetBucketLocation.cs" />
-    <Compile Include="Core\LitS3\GetObject.cs" />
-    <Compile Include="Core\LitS3\Identity.cs" />
-    <Compile Include="Core\LitS3\ListEntries.cs" />
-    <Compile Include="Core\LitS3\ListObjects.cs" />
-    <Compile Include="Core\LitS3\ObjectTransfer.cs" />
-    <Compile Include="Core\LitS3\S3Authorizer.cs" />
-    <Compile Include="Core\LitS3\S3ErrorCode.cs" />
-    <Compile Include="Core\LitS3\S3Exception.cs" />
-    <Compile Include="Core\LitS3\S3Headers.cs" />
-    <Compile Include="Core\LitS3\S3Request.cs" />
-    <Compile Include="Core\LitS3\S3Response.cs" />
-    <Compile Include="Core\LitS3\S3Service.cs" />
-    <Compile Include="Core\Config\SelectedFoldersConfig.cs" />
     <Compile Include="Core\Config\AbstractConfigFile.cs" />
     <Compile Include="Core\Synchrony\SynchronizerUnit.cs" />
+    <Compile Include="LitS3\AccessControl.cs" />
+    <Compile Include="LitS3\AddObject.cs" />
+    <Compile Include="LitS3\Bucket.cs" />
+    <Compile Include="LitS3\BucketAccess.cs" />
+    <Compile Include="LitS3\CopyObject.cs" />
+    <Compile Include="LitS3\CreateBucket.cs" />
+    <Compile Include="LitS3\DeleteBucket.cs" />
+    <Compile Include="LitS3\DeleteObject.cs" />
+    <Compile Include="LitS3\GetAllBuckets.cs" />
+    <Compile Include="LitS3\GetBucketLocation.cs" />
+    <Compile Include="LitS3\GetObject.cs" />
+    <Compile Include="LitS3\Identity.cs" />
+    <Compile Include="LitS3\ListEntries.cs" />
+    <Compile Include="LitS3\ListObjects.cs" />
+    <Compile Include="LitS3\ObjectTransfer.cs" />
+    <Compile Include="LitS3\S3Authorizer.cs" />
+    <Compile Include="LitS3\S3ErrorCode.cs" />
+    <Compile Include="LitS3\S3Exception.cs" />
+    <Compile Include="LitS3\S3Headers.cs" />
+    <Compile Include="LitS3\S3Request.cs" />
+    <Compile Include="LitS3\S3Response.cs" />
+    <Compile Include="LitS3\S3Service.cs" />
+    <Compile Include="Core\Repository\IPhysicalRepositoryController.cs" />
+    <Compile Include="Core\Repository\PhysicalRepositoryController.cs" />
+    <Compile Include="Core\Persistence\RepositoryIgnoreDAO.cs" />
+    <Compile Include="Core\Persistence\SQLite\SQLiteRepositoryIgnoreDAO.cs" />
+    <Compile Include="Core\Model\RepositoryIgnore.cs" />
+    <Compile Include="Core\Model\TimeDiff.cs" />
+    <Compile Include="Core\Exception\WarningException.cs" />
+    <Compile Include="Core\Controller\AbstractApplicationController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
   <ItemGroup>
-    <None Include="Core\Config\.DS_Store" />
     <None Include="lib\LitS3.dll" />
     <None Include="lib\Newtonsoft.Json.dll" />
     <None Include="packages.config" />
     <None Include="lib\MonoMac.dll" />
+    <None Include="lib\XamaMac.dll" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Mono.Data.Sqlite" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Core\LitS3\" />
+    <Folder Include="LitS3\" />
   </ItemGroup>
 </Project>

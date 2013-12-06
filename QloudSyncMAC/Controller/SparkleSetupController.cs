@@ -11,22 +11,6 @@ using MonoMac.Foundation;
 
 namespace GreenQloud {
 
-    public enum PageType {
-
-        None,
-        Setup,
-        Add,
-        Invite,
-        Syncing,
-        Error,
-        Finished,
-        Tutorial,
-        CryptoSetup,
-        CryptoPassword,
-        Login,
-        ConfigureFolders
-    }
-
     public enum FieldState {
         Enabled,
         Disabled
@@ -39,7 +23,7 @@ namespace GreenQloud {
         public event Action HideWindowEvent = delegate { };
 
         public event ChangePageEventHandler ChangePageEvent = delegate { };
-        public delegate void ChangePageEventHandler (PageType page, string [] warnings = null);
+        public delegate void ChangePageEventHandler (Controller.PageType page, string [] warnings = null);
         
         public event UpdateProgressBarEventHandler UpdateProgressBarEvent = delegate { };
         public delegate void UpdateProgressBarEventHandler (double percentage);
@@ -80,7 +64,7 @@ namespace GreenQloud {
             }
         }
 
-        private PageType current_page;
+        private Controller.PageType current_page;
         private string saved_address     = "";
         private string saved_remote_path = "";
         private bool create_startup_item = true;
@@ -88,42 +72,42 @@ namespace GreenQloud {
 
         public SparkleSetupController ()
         {
-            ChangePageEvent += delegate (PageType page_type, string [] warnings) {
+            ChangePageEvent += delegate (Controller.PageType page_type, string [] warnings) {
                 this.current_page = page_type;
             };
 
             TutorialPageNumber = 0;
             SyncingFolder      = "";
 
-            Program.Controller.ShowSetupWindowEvent += delegate (PageType page_type) {
-                if (page_type == PageType.CryptoSetup || page_type == PageType.CryptoPassword) {
+            Program.Controller.ShowSetupWindowEvent += delegate (Controller.PageType page_type) {
+                if (page_type == Controller.PageType.CryptoSetup || page_type == Controller.PageType.CryptoPassword) {
                     ChangePageEvent (page_type, null);
                     return;
                 }
 
-                if (this.current_page == PageType.Syncing ||
-                    this.current_page == PageType.Finished ||
-                    this.current_page == PageType.CryptoSetup ||
-                    this.current_page == PageType.CryptoPassword) {
+                if (this.current_page == Controller.PageType.Syncing ||
+                    this.current_page == Controller.PageType.Finished ||
+                    this.current_page == Controller.PageType.CryptoSetup ||
+                    this.current_page == Controller.PageType.CryptoPassword) {
 
                     ShowWindowEvent ();
                     return;
                 }
 
-                if (page_type == PageType.Add) {
+                if (page_type == Controller.PageType.Add) {
                     if (WindowIsOpen) {
-                        if (this.current_page == PageType.Error ||
-                            this.current_page == PageType.Finished ||
-                            this.current_page == PageType.None) {
+                        if (this.current_page == Controller.PageType.Error ||
+                            this.current_page == Controller.PageType.Finished ||
+                            this.current_page == Controller.PageType.None) {
 
-                            ChangePageEvent (PageType.Add, null);
+                            ChangePageEvent (Controller.PageType.Add, null);
                         }
 
                         ShowWindowEvent ();
 
                     } else if (!RuntimeSettings.FirstRun && TutorialPageNumber == 0) {
                         WindowIsOpen = true;
-                        ChangePageEvent (PageType.Add, null);
+                        ChangePageEvent (Controller.PageType.Add, null);
                         ShowWindowEvent ();
                     }
 
@@ -174,7 +158,7 @@ namespace GreenQloud {
         public void TutorialSkipped ()
         {
             TutorialPageNumber = 4;
-            ChangePageEvent (PageType.Tutorial, null);
+            ChangePageEvent (Controller.PageType.Tutorial, null);
         }
 
 
@@ -197,7 +181,7 @@ namespace GreenQloud {
 
 
             } else {
-                ChangePageEvent (PageType.Tutorial, null);
+                ChangePageEvent (Controller.PageType.Tutorial, null);
             }
         }
 
@@ -228,17 +212,12 @@ namespace GreenQloud {
 
         public void LoginDone ()
         {
-            ChangePageEvent (PageType.ConfigureFolders, null);
+            ChangePageEvent (Controller.PageType.ConfigureFolders, null);
         }
         public void Finish ()
         {
             ProgressBarPercentage = 1.0;
-            ChangePageEvent (PageType.Finished, null);
-
-            Program.Controller.FolderFetched    += AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError += AddPageFetchErrorDelegate;
-            Program.Controller.FolderFetching   += SyncingPageFetchingDelegate;
-
+            ChangePageEvent (Controller.PageType.Finished, null);
 
             new Thread (() => {
                 Program.Controller.SyncStart ();
@@ -251,20 +230,12 @@ namespace GreenQloud {
 
         private void AddPageFetchedDelegate ()
         {
-            ChangePageEvent (PageType.Finished);
-
-            Program.Controller.FolderFetched    -= AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError -= AddPageFetchErrorDelegate;
-            Program.Controller.FolderFetching   -= SyncingPageFetchingDelegate;
+            ChangePageEvent (Controller.PageType.Finished);
         }
 
         private void AddPageFetchErrorDelegate (string [] errors)
         {
-            ChangePageEvent (PageType.Error, errors);
-
-            Program.Controller.FolderFetched    -= AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError -= AddPageFetchErrorDelegate;
-            Program.Controller.FolderFetching   -= SyncingPageFetchingDelegate;
+            ChangePageEvent (Controller.PageType.Error, errors);
         }
 
         private void SyncingPageFetchingDelegate (double percentage, double time)
@@ -276,7 +247,7 @@ namespace GreenQloud {
 
         public void ErrorPageCompleted ()
         {
-            ChangePageEvent (PageType.Add, null);
+            ChangePageEvent (Controller.PageType.Add, null);
         }
 
 
@@ -287,7 +258,7 @@ namespace GreenQloud {
         }
         public void GetStartedClicked ()
         {
-            Program.Controller.OpenSparkleShareFolder();
+            Program.Controller.OpenStorageFolder();
             Program.Controller.OpenStorageQloudWebSite ();
             FinishPageCompleted ();
         }
@@ -296,7 +267,7 @@ namespace GreenQloud {
         public void FinishPageCompleted ()
         {
             this.fetch_prior_history = false;
-            this.current_page = PageType.None;
+            this.current_page = Controller.PageType.None;
             HideWindowEvent ();
         }
 

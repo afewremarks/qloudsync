@@ -9,7 +9,7 @@ using System.Collections.Concurrent;
 using GreenQloud.Model;
 using GreenQloud.Persistence.SQLite;
 using System.Collections;
-using GreenQloud.Repository.Local;
+using GreenQloud.Repository;
 
 namespace GreenQloud
 {
@@ -28,7 +28,7 @@ namespace GreenQloud
             this.repo = repo;
             ignoreBag = new ArrayList();
             //Passar no construtor o param repo.....
-            physicalController = new StorageQloudPhysicalRepositoryController (repo);
+            physicalController = new PhysicalRepositoryController (repo);
             string watchedFolder = this.repo.Path;
             this.callback = this.Callback;
 
@@ -128,7 +128,7 @@ namespace GreenQloud
                             e.EventType = EventType.CREATE;
                             List<RepositoryItem> items =  new List<RepositoryItem>();
                             if(e.Item.IsFolder){
-                                items = physicalController.GetItems (new DirectoryInfo(e.Item.LocalAbsolutePath));
+                                items = physicalController.GetItems (e.Item.LocalAbsolutePath);
                             }
                             if (items.Count > 0) {
                                 foreach(RepositoryItem item in items){

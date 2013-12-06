@@ -16,17 +16,43 @@ using System.Collections;
  
 
 namespace GreenQloud {
+    public class Controller : AbstractApplicationController {
 
-    
-    public enum ERROR_TYPE{
-        NULL,
-        DISCONNECTION,
-        ACCESS_DENIED,
-        FATAL_ERROR
-    }
+        public override void Initialize ()
+        {
 
-    public class Controller : ApplicationController {
+        }
+        public override void CreateStartupItem ()
+        {
 
+        }
+        public override void CheckForUpdates()
+        {
+
+        }
+        public override void Alert(string message)
+        {
+
+        }
+
+
+
+        public override void Quit ()
+        {
+            Process.GetProcessesByName("QloudSync")[0].Kill();
+            Environment.Exit (0);
+        }
+        public override void OpenFolder (string path)
+        {
+            NSWorkspace.SharedWorkspace.OpenFile (path);
+        }
+        public override void OpenWebsite (string url)
+        {
+            NSWorkspace.SharedWorkspace.OpenUrl (new NSUrl (url));
+        }
+
+
+        /*
         public int Contador{
             set; get;
         }
@@ -481,5 +507,6 @@ namespace GreenQloud {
             set;
             get;
         }
+        */
    	}
 }
