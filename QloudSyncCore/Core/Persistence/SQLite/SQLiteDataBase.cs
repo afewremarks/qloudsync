@@ -5,6 +5,7 @@ using System.Data;
 using Mono.Data.Sqlite;
 #else
 using System.Data.SqlClient;
+using System.Data.SQLite;
 #endif
 using System.IO;
 using System.Threading;
