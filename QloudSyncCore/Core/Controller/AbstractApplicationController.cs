@@ -22,7 +22,7 @@ namespace GreenQloud
         public abstract void Quit();
         public abstract void OpenFolder(string path);
         public abstract void OpenWebsite(string url);
-        public abstract void CreateStartupItem();
+        public abstract void CreateMenuItem();
         public abstract void CheckForUpdates();
         public abstract void Alert(string message);
 
@@ -248,7 +248,7 @@ namespace GreenQloud
 
         public void UIHasLoaded()
         {
-            new Thread(() => CreateStartupItem()).Start();
+            new Thread(() => CreateMenuItem()).Start();
             checkConnection.Start();
 
             //TODO REFATORAR URGENTEs
