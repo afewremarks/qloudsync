@@ -22,7 +22,7 @@ namespace GreenQloud {
         {
 
         }
-        public override void CreateStartupItem ()
+        public override void CreateMenuItem ()
         {
 
         }
