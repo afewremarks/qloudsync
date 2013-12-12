@@ -40,7 +40,7 @@ namespace LitS3
         {
             this.CannedAcl = CannedAcl.Private;
             this.MetadataDirective = MetadataDirective.Automatic;
-            WebRequest.Headers[S3Headers.CopySource] = sourceBucketName + "/" + HttpUtility.UrlEncode(sourceObjectKey);
+            WebRequest.Headers[S3Headers.CopySource] = HttpUtility.UrlEncode(sourceBucketName + "/" + sourceObjectKey);
         }
 
         /// <summary>
