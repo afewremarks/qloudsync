@@ -132,7 +132,9 @@ namespace GreenQloud
                 if (args.FullPath != null)
                 {
                     string key = args.FullPath.Substring(repo.Path.Length);
-                    if (repositoryItemDAO.ExistsUnmoved(key, repo)) {
+                    key = key.Replace(Path.DirectorySeparatorChar.ToString(), "/");
+                    if (repositoryItemDAO.ExistsUnmoved(key, repo))
+                    {
                         isFolder = false;
                     }
                 }
