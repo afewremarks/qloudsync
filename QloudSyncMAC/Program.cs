@@ -24,8 +24,8 @@ namespace GreenQloud {
         {
             NSApplication.CheckForIllegalCrossThreadCalls = false;
             Mono.Data.Sqlite.SqliteConnection.SetConfig (Mono.Data.Sqlite.SQLiteConfig.Serialized);
-            Controller = new Controller ();
             NSApplication.Init ();
+            Controller = new Controller ();
             UI = new SparkleUI ();
 
             if (!program_mutex.WaitOne (0, false)) {

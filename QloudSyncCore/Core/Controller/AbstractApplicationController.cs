@@ -19,6 +19,7 @@ namespace GreenQloud
     {
 
         public abstract void Initialize();
+        public abstract void FirstRunAction();
         public abstract void Quit();
         public abstract void OpenFolder(string path);
         public abstract void OpenWebsite(string url);
@@ -82,7 +83,7 @@ namespace GreenQloud
                 foreach (string f in Directory.GetFiles(RuntimeSettings.ConfigPath))
                     File.Delete(f);
                 UpdateConfigFile();
-
+                FirstRunAction ();
             }
             ErrorType = ERROR_TYPE.NULL;
             checkConnection = new Thread(delegate()
