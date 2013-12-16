@@ -69,9 +69,7 @@ namespace GreenQloud.Persistence.SQLite
 
         public bool ExistsUnmoved (RepositoryItem item)
         {
-            string sql = string.Format("SELECT count(*) FROM REPOSITORYITEM WHERE RepositoryItemKey = '{0}' AND Moved <> '{1}'", item.Key, bool.TrueString);
-            int i = int.Parse(database.ExecuteScalar (sql));
-            return i > 0;
+            return ExistsUnmoved(item.Key, item.Repository);
         }
 
         public RepositoryItem GetFomDatabase (RepositoryItem item)
@@ -99,7 +97,7 @@ namespace GreenQloud.Persistence.SQLite
             string sql;
             if (item.IsFolder)
             {
-                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryId = '{1}' AND RepositoryItemKey = '{2}' AND RepositoryItemId = '{2}%' ", bool.TrueString, item.Repository.Id, item.Key, item.Id);
+                sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryId = '{1}' AND RepositoryItemKey = '{2}'", bool.TrueString, item.Repository.Id, item.Key, item.Id);
                 database.ExecuteNonQuery(sql);
                 sql = string.Format("UPDATE REPOSITORYITEM SET Moved = '{0}' WHERE RepositoryId = '{1}' AND RepositoryItemKey <> '{2}' AND RepositoryItemKey LIKE '{2}%' ", bool.TrueString, item.Repository.Id, item.Key);
                 database.ExecuteNonQuery(sql);

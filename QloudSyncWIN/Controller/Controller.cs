@@ -34,6 +34,11 @@ namespace GreenQloud {
             };
         }
 
+        public override void FirstRunAction()
+        {
+            
+        }
+
         public override void CreateMenuItem() {
             UIManager.GetInstance().BuildMenu();
         }
