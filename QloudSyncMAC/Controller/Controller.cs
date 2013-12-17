@@ -32,7 +32,10 @@ namespace GreenQloud {
         }
         public override void Alert(string message)
         {
-
+            NSAlert alert = new NSAlert(); 
+            alert.MessageText = message; 
+            alert.AddButton("Ok"); 
+            alert.RunModal ();
         }
 
         public override void FirstRunAction ()
