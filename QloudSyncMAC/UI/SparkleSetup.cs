@@ -12,6 +12,7 @@ using MonoMac.WebKit;
 using GreenQloud.Repository;
 using QloudSync.Repository;
 using System.Threading;
+using GreenQloud.Model;
 
 namespace GreenQloud {
 
@@ -28,6 +29,7 @@ namespace GreenQloud {
         private NSButton OpenFolderButton;
         private NSButton FinishButton;
         private NSButton ChangeSQFolder;
+        List<NSButton> remoteFoldersCheckboxes;
         private NSButton StopButton;
         private NSImage SlideImage;
         private NSImageView SlideImageView;
@@ -161,10 +163,10 @@ namespace GreenQloud {
 
             if (type == Controller.PageType.ConfigureFolders) {
                 this.WillClose += closeAppDelegate;
-                //this.WillClose += hiddeWindowDelegate;
                 this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "SelectSync1.png");
 
-                //CHANGE TO CHANGE SQFOLDER IMAGE
+                InitializeCheckboxesFolders ();
+
                 ChangeSQFolder = new NSButton () {
                     Frame = new RectangleF (49, 18, 137, 40),
                     Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "LoginButton220.png")),
@@ -176,7 +178,6 @@ namespace GreenQloud {
                     SparkleSetupController.ChangeSQFolder ();
                 };
 
-                //CHANGE TO CONTINUE IMAGE
                 FinishButton = new NSButton () {
                     Frame = new RectangleF (264, 18, 137, 40),
                     Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getstartedbutton.png")),
@@ -185,7 +186,7 @@ namespace GreenQloud {
                     Enabled  = true
                 };
                 FinishButton.Activated += delegate {
-                    SparkleSetupController.Finish ();
+                    SparkleSetupController.Finish (remoteFoldersCheckboxes);
                 };
                 Buttons.Add (ChangeSQFolder);
                 Buttons.Add (FinishButton);
@@ -333,6 +334,27 @@ namespace GreenQloud {
                         break;
                     }
                 }
+            }
+        }
+
+        void InitializeCheckboxesFolders ()
+        {
+            remoteFoldersCheckboxes = new List<NSButton> ();
+            List<RepositoryItem> remoteItems = new RemoteRepositoryController (null).RootFolders;
+
+            foreach (RepositoryItem item in remoteItems) 
+            {
+                NSButton chk = new NSButton () {
+                    Frame = new RectangleF (82,  Frame.Height - 100 - ((remoteFoldersCheckboxes.Count + 1) * 17), 300, 18),
+                    Title = item.Key
+                };
+                chk.SetButtonType(NSButtonType.Switch);
+                chk.State = NSCellStateValue.On;
+                remoteFoldersCheckboxes.Add (chk);
+            }
+            foreach (NSButton chk in remoteFoldersCheckboxes) 
+            {
+                ContentView.AddSubview (chk);
             }
         }
     }

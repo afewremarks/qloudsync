@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using GreenQloud.Synchrony;
 using MonoMac.Foundation;
+using MonoMac.AppKit;
 
  
 
@@ -220,11 +221,15 @@ namespace GreenQloud {
             throw new NotImplementedException ();
         }
 
-        public void Finish ()
+        public void Finish (List<NSButton> remoteFoldersCheckboxes)
         {
             ChangePageEvent (Controller.PageType.Finished, null);
             List<string> ignores = new List<string> ();
-            //foreach() iterate checkboxes and add to ignore
+            foreach (NSButton chk in remoteFoldersCheckboxes)
+            {
+                if (chk.State != NSCellStateValue.On)
+                    ignores.Add (chk.Title);
+            }
             Program.Controller.CreateDefaultRepo (RuntimeSettings.HomePath, ignores);
 
             new Thread (() => {
