@@ -214,15 +214,22 @@ namespace GreenQloud {
         {
             ChangePageEvent (Controller.PageType.ConfigureFolders, null);
         }
+
+        public void ChangeSQFolder ()
+        {
+            throw new NotImplementedException ();
+        }
+
         public void Finish ()
         {
-            ProgressBarPercentage = 1.0;
             ChangePageEvent (Controller.PageType.Finished, null);
+            List<string> ignores = new List<string> ();
+            //foreach() iterate checkboxes and add to ignore
+            Program.Controller.CreateDefaultRepo (RuntimeSettings.HomePath, ignores);
 
             new Thread (() => {
                 Program.Controller.SyncStart ();
             }).Start ();
-
         }
 
         // The following private methods are

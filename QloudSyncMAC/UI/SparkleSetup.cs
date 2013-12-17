@@ -27,6 +27,7 @@ namespace GreenQloud {
         private NSButton StartupCheckButton;
         private NSButton OpenFolderButton;
         private NSButton FinishButton;
+        private NSButton ChangeSQFolder;
         private NSButton StopButton;
         private NSImage SlideImage;
         private NSImageView SlideImageView;
@@ -159,20 +160,35 @@ namespace GreenQloud {
             }
 
             if (type == Controller.PageType.ConfigureFolders) {
-                this.WillClose -= closeAppDelegate;
-                this.WillClose += hiddeWindowDelegate;
-                //this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getStarted.png");
-                OpenFolderButton = new NSButton () {
-                    Frame = new RectangleF (157, 18, 137, 40),
+                this.WillClose += closeAppDelegate;
+                //this.WillClose += hiddeWindowDelegate;
+                this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "SelectSync1.png");
+
+                //CHANGE TO CHANGE SQFOLDER IMAGE
+                ChangeSQFolder = new NSButton () {
+                    Frame = new RectangleF (49, 18, 137, 40),
+                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "LoginButton220.png")),
+                    Transparent = false,
+                    Bordered = false,
+                    Enabled  = true
+                };
+                ChangeSQFolder.Activated += delegate {
+                    SparkleSetupController.ChangeSQFolder ();
+                };
+
+                //CHANGE TO CONTINUE IMAGE
+                FinishButton = new NSButton () {
+                    Frame = new RectangleF (264, 18, 137, 40),
                     Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getstartedbutton.png")),
                     Transparent = false,
                     Bordered = false,
                     Enabled  = true
                 };
-                OpenFolderButton.Activated += delegate {
+                FinishButton.Activated += delegate {
                     SparkleSetupController.Finish ();
                 };
-                Buttons.Add (OpenFolderButton);
+                Buttons.Add (ChangeSQFolder);
+                Buttons.Add (FinishButton);
                 NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
             }
 

@@ -145,6 +145,7 @@
     <BundleResource Include="Pixmaps\CreateButton159.png" />
     <BundleResource Include="Pixmaps\getstartedbutton.png" />
     <BundleResource Include="qloudsync.conf" />
+    <BundleResource Include="Pixmaps\SelectSync1.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\qloudsync-app.icns">
