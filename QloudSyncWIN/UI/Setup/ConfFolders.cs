@@ -69,20 +69,14 @@ namespace GreenQloud.UI.Setup
         private void button1_Click(object sender, EventArgs e)
         {
             this.Hide();
-            SQLiteRepositoryDAO repoDao = new SQLiteRepositoryDAO();
-            LocalRepository repo = new LocalRepository(this.label2.Text, "", true);
-            repoDao.Create(repo);
-            createIgnoredList(repo);
-            UIManager.GetInstance().ReadyToSync();
-        }
-
-        private void createIgnoredList(LocalRepository repo)
-        {
-            SQLiteRepositoryIgnoreDAO repoIgnoreDao = new SQLiteRepositoryIgnoreDAO();
+            
+            List<string> ignores = new List<string>();
             foreach (CheckBox check in remoteFoldersCheckboxes) {
                 if(!check.Checked)
-                    repoIgnoreDao.Create(repo, check.Text);
+                    ignores.Add(check.Text);
             }
+            Program.Controller.CreateDefaultRepo(this.label2.Text, ignores);
+            UIManager.GetInstance().ReadyToSync();
         }
 
         private void button2_Click(object sender, EventArgs e)

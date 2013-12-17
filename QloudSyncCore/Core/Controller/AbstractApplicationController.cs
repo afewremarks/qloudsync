@@ -133,6 +133,23 @@ namespace GreenQloud
             Program.Controller.Alert("SQFolder moved to "+ pathTo);
         }
 
+        public void CreateDefaultRepo(string sqFolder, List<string> ignoreKeys) 
+        {
+            SQLiteRepositoryDAO repoDao = new SQLiteRepositoryDAO();
+            LocalRepository repo = new LocalRepository(sqFolder, "", true);
+            repoDao.Create(repo);
+            CreateIgnoredList(ignoreKeys, repo);
+        }
+
+        private void CreateIgnoredList(List<string> ignoreKeys, LocalRepository repo)
+        {
+            SQLiteRepositoryIgnoreDAO repoIgnoreDao = new SQLiteRepositoryIgnoreDAO();
+            foreach (string ignore in ignoreKeys)
+            {
+                repoIgnoreDao.Create(repo, ignore);
+            }
+        }
+
         void CalcTimeDiff()
         {
             bool success = false;
