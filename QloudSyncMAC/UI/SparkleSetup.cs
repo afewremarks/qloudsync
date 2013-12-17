@@ -169,7 +169,7 @@ namespace GreenQloud {
 
                 ChangeSQFolder = new NSButton () {
                     Frame = new RectangleF (49, 18, 137, 40),
-                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "LoginButton220.png")),
+                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "Changeit220.png")),
                     Transparent = false,
                     Bordered = false,
                     Enabled  = true
@@ -180,7 +180,7 @@ namespace GreenQloud {
 
                 FinishButton = new NSButton () {
                     Frame = new RectangleF (264, 18, 137, 40),
-                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getstartedbutton.png")),
+                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "Continue159.png")),
                     Transparent = false,
                     Bordered = false,
                     Enabled  = true
