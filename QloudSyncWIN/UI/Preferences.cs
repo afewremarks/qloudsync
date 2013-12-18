@@ -143,7 +143,7 @@ namespace GreenQloud.UI
         private void LoadAccountInfo()
         {
             qloudversion.Text = string.Format("QloudSync Version: {0}", GlobalSettings.RunningVersion);
-            localpath.Text = string.Format("Local StorageQloud Folder Path: {0}", RuntimeSettings.HomePath);
+            localpath.Text = string.Format("Local StorageQloud Folder Path: {0}", RuntimeSettings.DefaultHomePath);
         }
 
 

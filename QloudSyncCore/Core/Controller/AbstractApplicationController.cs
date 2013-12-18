@@ -486,7 +486,7 @@ namespace GreenQloud
 
         public void OpenStorageFolder()
         {
-            string mainPath = new SQLiteRepositoryDAO().MainActive.Path;
+            string mainPath = RuntimeSettings.SelectedHomePath;
             OpenFolder(mainPath);
         }
 
