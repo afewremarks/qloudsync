@@ -33,6 +33,7 @@ namespace GreenQloud.UI.Setup
             this.button2 = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // button1
@@ -70,15 +71,34 @@ namespace GreenQloud.UI.Setup
             // 
             // label2
             // 
+            this.label2.AllowDrop = true;
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
+            this.label2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.label2.Location = new System.Drawing.Point(150, 394);
+            this.label2.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.label2.Location = new System.Drawing.Point(25, 416);
+            this.label2.MaximumSize = new System.Drawing.Size(450, 45);
+            this.label2.MinimumSize = new System.Drawing.Size(400, 45);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(157, 15);
+            this.label2.Size = new System.Drawing.Size(400, 45);
             this.label2.TabIndex = 16;
-            this.label2.Text = "Current StorageQloud Path:";
+            this.label2.Text = "fakePath";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.label1.Location = new System.Drawing.Point(150, 394);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(157, 15);
+            this.label1.TabIndex = 17;
+            this.label1.Text = "Current StorageQloud Path:";
             // 
             // ConfFolders
             // 
@@ -87,6 +107,7 @@ namespace GreenQloud.UI.Setup
             this.BackgroundImage = global::GreenQloud.Properties.Resources.SelectSync1;
             this.ClientSize = new System.Drawing.Size(450, 541);
             this.ControlBox = false;
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -108,5 +129,6 @@ namespace GreenQloud.UI.Setup
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private Label label1;
     }
 }
