@@ -90,5 +90,10 @@ namespace GreenQloud {
         public override void Alert(string message) {
             MessageBox.Show(message);
         }
+
+        public override bool Confirm(string message)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
