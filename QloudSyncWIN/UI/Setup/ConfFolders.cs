@@ -29,7 +29,7 @@ namespace GreenQloud.UI.Setup
             {
                 OnExit(sender, args);
             };
-            this.label2.Text = RuntimeSettings.HomePath;
+            this.label2.Text = RuntimeSettings.DefaultHomePath;
         }
 
         private void InitializeComponentCheckboxesFolders()

@@ -41,6 +41,7 @@ namespace GreenQloud {
         private NSTextField WarningTextField;
         private NSTextField WinningText;
         private NSTextField DisclaimText;
+        private NSTextField SQFolderText;
         private NSImage WarningImage;
         private NSImageView WarningImageView;
         private HyperLink hDescription;
@@ -167,6 +168,30 @@ namespace GreenQloud {
 
                 InitializeCheckboxesFolders ();
 
+                NSTextField SQFolderTextLabel = new NSTextField () {
+                    Alignment       = NSTextAlignment.Center,
+                    BackgroundColor = NSColor.Clear,
+                    Bordered        = false,
+                    Editable        = false,
+                    Frame           = new RectangleF (0, 75 , Frame.Width, 60),
+                    StringValue     = "Current StorageQloud Path:",
+                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                        "Lucida Grande", NSFontTraitMask.Unbold, 0, 9),
+                    TextColor = NSColor.White
+                };
+
+                SQFolderText = new NSTextField () {
+                    Alignment       = NSTextAlignment.Center,
+                    BackgroundColor = NSColor.Clear,
+                    Bordered        = false,
+                    Editable        = false,
+                    Frame           = new RectangleF (0, 60 , Frame.Width, 60),
+                    StringValue     = RuntimeSettings.DefaultHomePath,
+                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                        "Lucida Grande", NSFontTraitMask.Unbold, 0, 9),
+                    TextColor = NSColor.White
+                };
+
                 ChangeSQFolder = new NSButton () {
                     Frame = new RectangleF (49, 18, 137, 40),
                     Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "Changeit220.png")),
@@ -174,8 +199,9 @@ namespace GreenQloud {
                     Bordered = false,
                     Enabled  = true
                 };
+
                 ChangeSQFolder.Activated += delegate {
-                    SparkleSetupController.ChangeSQFolder ();
+                    SQFolderText.StringValue = SparkleSetupController.ChangeSQFolder ();
                 };
 
                 FinishButton = new NSButton () {
@@ -186,8 +212,11 @@ namespace GreenQloud {
                     Enabled  = true
                 };
                 FinishButton.Activated += delegate {
-                    SparkleSetupController.Finish (remoteFoldersCheckboxes);
+                    SparkleSetupController.Finish (SQFolderText.StringValue, remoteFoldersCheckboxes);
                 };
+
+                ContentView.AddSubview (SQFolderTextLabel);
+                ContentView.AddSubview (SQFolderText);
                 Buttons.Add (ChangeSQFolder);
                 Buttons.Add (FinishButton);
                 NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);

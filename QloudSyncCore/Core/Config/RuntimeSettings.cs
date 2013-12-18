@@ -1,3 +1,4 @@
+using GreenQloud.Persistence.SQLite;
 using System;
 //using System.Configuration;
 using System.IO;
@@ -47,7 +48,7 @@ namespace GreenQloud
         }
 
 
-        public static string HomePath{
+        public static string DefaultHomePath{
             get {
                 if (homePath == null)
                 {
@@ -59,6 +60,14 @@ namespace GreenQloud
                 if (!homePath.EndsWith (Path.DirectorySeparatorChar.ToString()))
                     homePath += Path.DirectorySeparatorChar;
                 return homePath;
+            }
+        }
+
+        public static string SelectedHomePath
+        {
+            get
+            {
+                return new SQLiteRepositoryDAO().MainActive.Path;
             }
         }
         

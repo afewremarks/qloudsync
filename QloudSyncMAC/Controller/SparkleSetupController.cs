@@ -216,12 +216,27 @@ namespace GreenQloud {
             ChangePageEvent (Controller.PageType.ConfigureFolders, null);
         }
 
-        public void ChangeSQFolder ()
+        public string ChangeSQFolder ()
         {
-            throw new NotImplementedException ();
+            string sqFolderPath = RuntimeSettings.DefaultHomePath;
+
+            var openPanel = new NSOpenPanel();
+            openPanel.ReleasedWhenClosed = true;
+            openPanel.Prompt = "Select folder";
+            openPanel.AllowsMultipleSelection = false;
+            openPanel.CanCreateDirectories = true;
+            openPanel.CanChooseFiles = false;
+            openPanel.CanChooseDirectories = true;
+            var result = openPanel.RunModal();
+            if (result == 1)
+            {
+                sqFolderPath = Path.Combine(openPanel.Url.Path, GlobalSettings.HomeFolderName) + Path.DirectorySeparatorChar;
+            }
+
+            return sqFolderPath;
         }
 
-        public void Finish (List<NSButton> remoteFoldersCheckboxes)
+        public void Finish (string selectedPath, List<NSButton> remoteFoldersCheckboxes)
         {
             ChangePageEvent (Controller.PageType.Finished, null);
             List<string> ignores = new List<string> ();
@@ -230,7 +245,7 @@ namespace GreenQloud {
                 if (chk.State != NSCellStateValue.On)
                     ignores.Add (chk.Title);
             }
-            Program.Controller.CreateDefaultRepo (RuntimeSettings.HomePath, ignores);
+            Program.Controller.CreateDefaultRepo (selectedPath, ignores);
 
             new Thread (() => {
                 Program.Controller.SyncStart ();
