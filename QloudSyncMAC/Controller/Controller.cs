@@ -38,6 +38,20 @@ namespace GreenQloud {
             alert.RunModal ();
         }
 
+        public override bool Confirm(string message)
+        {  
+            NSAlert alert = new NSAlert(); 
+            alert.MessageText = message; 
+            alert.AddButton("No");
+            alert.AddButton("Yes");
+            int ret = alert.RunModal ();
+            if (ret == 1001) {
+                return true;
+            }
+
+            return false;
+        }
+
         public override void FirstRunAction ()
         {
             CreateStartupItem ();

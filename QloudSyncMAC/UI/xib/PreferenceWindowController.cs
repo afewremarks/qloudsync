@@ -27,9 +27,14 @@ namespace QloudSync
             Initialize ();
 
             Program.Controller.ShowEventPreferenceWindow += delegate {
-                base.LoadWindow ();
-                //will render for generic 
-                base.ShowWindow (new NSObject ());
+                using (var a = new NSAutoreleasePool ())
+                {
+                    InvokeOnMainThread (delegate {
+                        base.LoadWindow ();
+                        //will render for generic 
+                        base.ShowWindow (new NSObject ());
+                    });
+                }
             };
         }
         // Shared initialization code
@@ -47,9 +52,37 @@ namespace QloudSync
         public override void AwakeFromNib ()
         {
             base.AwakeFromNib ();
+            //Selective Sync Tab
+            changeFoldersButton.Activated += delegate {
+
+            };
+
+            moveSQFolderButton.Activated += delegate {
+
+            };
+
+
+
+            //Network Status tab
+
+
+            //Account Tab
             pathLabel.StringValue = Environment.SystemDirectory;
-            usernameLabel.StringValue = Environment.UserName;
+            usernameLabel.StringValue = Credential.Username;
             versionLabel.StringValue = Environment.Version.ToString();
+
+            unlinkAccountButton.Activated += delegate {
+                try{
+                    if( Program.Controller.Confirm("Are you sure you want to continue? You are unlinking your account to" +
+                                                   "this computer.") ){
+                        Program.Controller.UnlinkAccount ();
+                    }
+                }catch (Exception ex){
+                    Logger.LogInfo("ERROR" , ex);
+                    Program.Controller.Alert("Cannot unlink accounts, please check your " +
+                        "internet connection and try again.");
+                }
+            };
         }
 
 

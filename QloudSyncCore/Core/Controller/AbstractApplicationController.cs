@@ -26,6 +26,7 @@ namespace GreenQloud
         public abstract void CreateMenuItem();
         public abstract void CheckForUpdates();
         public abstract void Alert(string message);
+        public abstract bool Confirm(string message);
 
         public event Action ShowAboutWindowEvent = delegate { };
         public event Action ShowEventLogWindowEvent = delegate { };

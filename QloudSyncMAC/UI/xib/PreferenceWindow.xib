@@ -66,7 +66,6 @@
 							<string key="NSFrame">{{13, 10}, {580, 338}}</string>
 							<reference key="NSSuperview" ref="312036702"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="574608550"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
@@ -378,14 +377,14 @@
 															<object class="NSView" id="977836256">
 																<reference key="NSNextResponder" ref="695104347"/>
 																<int key="NSvFlags">274</int>
-																<string key="NSFrameSize">{304, 112}</string>
+																<string key="NSFrameSize">{319, 127}</string>
 																<reference key="NSSuperview" ref="695104347"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="166777644"/>
 																<string key="NSReuseIdentifierKey">_NS:13</string>
 															</object>
 														</object>
-														<string key="NSFrame">{{1, 1}, {304, 112}}</string>
+														<string key="NSFrame">{{1, 1}, {319, 127}}</string>
 														<reference key="NSSuperview" ref="891720034"/>
 														<reference key="NSWindow"/>
 														<reference key="NSNextKeyView" ref="977836256"/>
@@ -397,7 +396,7 @@
 													<object class="NSScroller" id="166777644">
 														<reference key="NSNextResponder" ref="891720034"/>
 														<int key="NSvFlags">256</int>
-														<string key="NSFrame">{{305, 1}, {15, 112}}</string>
+														<string key="NSFrame">{{305, 1}, {15, 121}}</string>
 														<reference key="NSSuperview" ref="891720034"/>
 														<reference key="NSWindow"/>
 														<reference key="NSNextKeyView" ref="242482475"/>
@@ -410,7 +409,7 @@
 													<object class="NSScroller" id="242482475">
 														<reference key="NSNextResponder" ref="891720034"/>
 														<int key="NSvFlags">256</int>
-														<string key="NSFrame">{{1, 113}, {304, 15}}</string>
+														<string key="NSFrame">{{1, 113}, {313, 15}}</string>
 														<reference key="NSSuperview" ref="891720034"/>
 														<reference key="NSWindow"/>
 														<string key="NSReuseIdentifierKey">_NS:26</string>
