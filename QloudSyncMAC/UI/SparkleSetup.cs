@@ -186,7 +186,7 @@ namespace GreenQloud {
                     Bordered        = false,
                     Editable        = false,
                     Frame           = new RectangleF (0, 60 , Frame.Width, 60),
-                    StringValue     = RuntimeSettings.HomePath,
+                    StringValue     = RuntimeSettings.DefaultHomePath,
                     Font            = NSFontManager.SharedFontManager.FontWithFamily (
                         "Lucida Grande", NSFontTraitMask.Unbold, 0, 9),
                     TextColor = NSColor.White

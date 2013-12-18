@@ -218,7 +218,7 @@ namespace GreenQloud {
 
         public string ChangeSQFolder ()
         {
-            string sqFolderPath = RuntimeSettings.HomePath;
+            string sqFolderPath = RuntimeSettings.DefaultHomePath;
 
             var openPanel = new NSOpenPanel();
             openPanel.ReleasedWhenClosed = true;
