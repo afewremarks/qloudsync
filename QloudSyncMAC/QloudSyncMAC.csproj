@@ -40,7 +40,7 @@
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <IncludeMonoRuntime>true</IncludeMonoRuntime>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>true</UseSGen>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <I18n>
@@ -80,6 +80,7 @@
     <Folder Include="Controller\" />
     <Folder Include="UI\" />
     <Folder Include="Pixmaps\" />
+    <Folder Include="UI\xib\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller\Controller.cs" />
@@ -95,6 +96,11 @@
     </Compile>
     <Compile Include="UI\SparkleUI.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="UI\xib\PreferenceWindow.cs" />
+    <Compile Include="UI\xib\PreferenceWindowController.cs" />
+    <Compile Include="UI\xib\PreferenceWindow.designer.cs">
+      <DependentUpon>PreferenceWindow.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -105,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" />
+    <InterfaceDefinition Include="UI\xib\PreferenceWindow.xib" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Pixmaps\about.png" />

@@ -24,6 +24,7 @@ using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 //using MonoMac.Growl;
 using QloudSyncCore;
+using QloudSync;
 
 namespace GreenQloud {
 
@@ -33,6 +34,8 @@ namespace GreenQloud {
 
         public SparkleSetup Setup;
         public AboutWindow About;
+        public PreferenceWindowController PreferenceController;
+
         public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
 			"Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
 		
@@ -47,6 +50,7 @@ namespace GreenQloud {
                 Setup = new SparkleSetup ();
                 About = new AboutWindow ();
                 StatusIcon = new IconController ();
+                PreferenceController = new PreferenceWindowController ();
             }
         }
     

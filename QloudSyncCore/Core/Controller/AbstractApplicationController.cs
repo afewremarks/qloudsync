@@ -29,6 +29,7 @@ namespace GreenQloud
 
         public event Action ShowAboutWindowEvent = delegate { };
         public event Action ShowEventLogWindowEvent = delegate { };
+        public event Action ShowEventPreferenceWindow = delegate { };
         public event Action ShowTransferWindowEvent = delegate { };
         public event FolderFetchedEventHandler FolderFetched = delegate { };
         public delegate void FolderFetchedEventHandler();
@@ -409,6 +410,11 @@ namespace GreenQloud
         public void ShowEventLogWindow()
         {
             ShowEventLogWindowEvent();
+        }
+
+        public void ShowPreferenceWindow()
+        {
+            ShowEventPreferenceWindow ();
         }
 
         protected bool CheckConnection()

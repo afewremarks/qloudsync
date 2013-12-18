@@ -331,14 +331,14 @@ namespace GreenQloud {
                 this.folder_item.Image.Size = new SizeF (16, 16);
                 this.folder_item.Enabled = true;
 
-//                this.preferences_item = new NSMenuItem () {
-//                    Title   = "Preferences…",
-//                    Enabled = false
-//                };
+                this.preferences_item = new NSMenuItem () {
+                    Title   = "Preferences…",
+                    Enabled = true
+                };
 
-//                this.preferences_item.Activated += delegate {
-//                    AddHostedProjectClicked ();
-//                };
+                this.preferences_item.Activated += delegate {
+                    Program.Controller.ShowPreferenceWindow ();
+                };
 
                 this.recent_events_title = new NSMenuItem () {
                     Title   = "Recently Changed",
@@ -498,6 +498,7 @@ namespace GreenQloud {
                 //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
                 this.status_item.Menu = this.menu;
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
+                this.menu.AddItem (this.preferences_item);
                 this.menu.AddItem (this.pause_sync);
                 this.menu.AddItem (quit_item);
             }
