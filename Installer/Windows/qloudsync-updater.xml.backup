@@ -1,7 +1,7 @@
 <project>
     <shortName>QloudSync</shortName>
     <fullName>QloudSync</fullName>
-    <version>3.1.3</version>
+    <version>3.1.4</version>
     <licenseFile>E:/Users/Maia/Documents/GitHub/qloudsync/Installer/Windows/BitRock_License.txt</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
     <leftImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>
@@ -118,7 +118,7 @@
                     <platforms>windows</platforms>
                     <distributionFileList>
                         <distributionFile>
-                            <origin>E:\Users\Maia\Desktop\client\runtime\dotNetFx45_Full_setup.exe</origin>
+                            <origin>E:/Users/Maia/Desktop/client/runtime/dotNetFx45_Full_setup.exe</origin>
                         </distributionFile>
                     </distributionFileList>
                     <ruleList>
@@ -185,6 +185,7 @@
     <enableDebugger>1</enableDebugger>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
+    <startMenuGroupName>${product_shortname}</startMenuGroupName>
     <vendor>GreenQloud</vendor>
     <customLanguageFileList>
         <language>
