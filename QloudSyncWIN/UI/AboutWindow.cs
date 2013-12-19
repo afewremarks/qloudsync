@@ -28,14 +28,20 @@ namespace GreenQloud.UI
             Program.Controller.OpenWebsite(string.Format("https://github.com/greenqloud/qloudsync/tree/master/legal/Authors.txt"));
         }
 
-        BugReport report = new BugReport();
         private void linkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-          if (!report.Visible) 
-          {
-            report.ShowDialog();
-          }
+            Program.Controller.OpenWebsite("http://support.greenqloud.com");
         }
+
+
+         // BugReport report = new BugReport();
+         // private void linkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+         // {
+         // if (!report.Visible) 
+         // {
+         //   report.ShowDialog();
+         // }
+         // }
 
         private void linkLabel4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
