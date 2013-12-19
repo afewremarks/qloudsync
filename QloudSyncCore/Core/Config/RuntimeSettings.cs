@@ -67,7 +67,14 @@ namespace GreenQloud
         {
             get
             {
-                return new SQLiteRepositoryDAO().MainActive.Path;
+                try
+                {
+                    return new SQLiteRepositoryDAO().MainActive.Path;
+                }
+                catch 
+                {
+                    return DefaultHomePath;
+                }
             }
         }
         
