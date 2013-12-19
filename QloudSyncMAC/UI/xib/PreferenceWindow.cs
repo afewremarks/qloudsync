@@ -37,6 +37,18 @@ namespace QloudSync
 
             base.OrderFrontRegardless ();
         }
+
+        public override void PerformClose (NSObject sender)
+        {
+            base.OrderOut (this);
+
+            if (Program.UI != null)
+                Program.UI.UpdateDockIconVisibility ();
+
+            return;
+        }
+
+
     }
 }
 

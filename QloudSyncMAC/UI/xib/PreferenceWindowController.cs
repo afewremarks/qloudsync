@@ -9,6 +9,9 @@ using GreenQloud.Repository;
 using System.Drawing;
 using System.IO;
 using GreenQloud.Persistence.SQLite;
+using QloudSyncCore.Core.Util;
+using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace QloudSync
 {
@@ -17,6 +20,11 @@ namespace QloudSync
         List<NSButton> remoteFoldersCheckboxes;
         SQLiteRepositoryDAO repoDao;
         SQLiteRepositoryIgnoreDAO repoIgnore;
+        NetworkTraffic netTraffic;
+        Timer timer;
+
+        public event Action ShowWindowEvent = delegate { };
+        public event Action HideWindowEvent = delegate { };
 
         #region Constructors
         // Called when created from unmanaged code
@@ -35,16 +43,28 @@ namespace QloudSync
         {
             Initialize ();
 
-            Program.Controller.ShowEventPreferenceWindow += delegate {
+            HideWindowEvent += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
-                        Window.OrderFrontRegardless();
-                        base.LoadWindow ();
-                        //will render for generic 
-                        base.ShowWindow (this);
+                        base.Dispose();
+                        Window.PerformClose (Window);
                     });
                 }
+            };
+
+            ShowWindowEvent += delegate {
+                using (var a = new NSAutoreleasePool ())
+                {
+                    InvokeOnMainThread (delegate {
+                        base.LoadWindow();
+                        Window.OrderFrontRegardless ();
+                    });
+                }
+            };
+
+            Program.Controller.ShowEventPreferenceWindow += delegate {
+                ShowWindowEvent();
             };
         }
         // Shared initialization code
@@ -52,6 +72,11 @@ namespace QloudSync
         {
             repoDao = new SQLiteRepositoryDAO();
             repoIgnore = new SQLiteRepositoryIgnoreDAO();
+            netTraffic = new NetworkTraffic (Process.GetCurrentProcess().Id);
+            timer = new Timer ();
+            timer.Interval = 1000;
+            timer.Tick += new EventHandler (timer_Tick);
+            timer.Enabled = true;
         }
         #endregion
         //strongly typed window accessor
@@ -170,6 +195,31 @@ namespace QloudSync
             return sqFolderPath;
         }
 
+        public void WindowClosed ()
+        {
+            HideWindowEvent ();
+        }
+
+        public class Preferences : NSWindowDelegate {
+
+            public override bool WindowShouldClose (NSObject sender)
+            {
+                (sender as PreferenceWindowController).WindowClosed ();
+                return false;
+            }
+        }
+
+        void timer_Tick(Object sender, EventArgs args)
+        {
+            float currentAmmountOfBytesReceived = netTraffic.GetBytesReceived ();
+            using (NSAutoreleasePool pool = new NSAutoreleasePool()) {
+                totalBandwidthLabel.StringValue = (currentAmmountOfBytesReceived / 1024).ToString ("0.00");
+            }
+        }
+
+       
+
+    
 
     }
 }
