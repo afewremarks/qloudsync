@@ -500,6 +500,7 @@ namespace GreenQloud {
                
                 //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
                 this.status_item.Menu = this.menu;
+                this.menu.AddItem (help_item);
                 this.menu.AddItem (this.about_item);
                 this.menu.AddItem (quit_item);
             }
