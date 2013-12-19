@@ -92,7 +92,7 @@ namespace GreenQloud.UI
             this.trayMenu.Items.Add(savings);
             ToolStripMenuItem sqFolder = new ToolStripMenuItem("StorageQloud Folder", Icons.qloudsync_folder , OpenStorageQloudFolder);
             this.trayMenu.Items.Add(sqFolder);
-            ToolStripMenuItem shareview = new ToolStripMenuItem("Share/View Online...", Icons.process_syncing, OpenStorageQloudWebsite);
+            ToolStripMenuItem shareview = new ToolStripMenuItem("Share/View Online...", Icons.share, OpenStorageQloudWebsite);
             this.trayMenu.Items.Add(shareview);
             this.trayMenu.Items.Add("-", null);
 

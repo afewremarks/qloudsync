@@ -175,4 +175,15 @@
   <data name="qloudsync_ico" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\qloudsync-ico.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="share" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAADbSURBVDhPnZNbDcMwDEULoRAGoRAKYRAKoRDGpBAKoVIIBMIgFELmG8XdneUsUT+OlIdzHOcx
+        hBDusAkT2imlH7zgHg4hCasnRKa5ghUpKgTY7chCnWBOIZdUGIVV2AXIMM/xUZhqQit7lTEbZ0HMwkIV
+        MCiHF7WIWKQdK0OJHNxisyWzDGemZb4FyPkY+FJyqd6laDBYyli+wTLGqBDJ8mW0hBBhEY8xmAPXc2kJ
+        8Ty8nSlPbfcKH6ZfA0mPHmEPSIozFI8v9L7eP65nVRPexgrxD93ATuJXmIYPhoR9sOeXFesAAAAASUVO
+        RK5CYII=
+</value>
+  </data>
 </root>

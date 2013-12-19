@@ -238,6 +238,7 @@
     <None Include="Resources\qloudsync-ico.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="Resources\share.png" />
     <Content Include="Updater\autoupdate.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
