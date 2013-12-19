@@ -255,6 +255,11 @@ namespace GreenQloud.UI
             greenusername.Text = string.Format("GreenQloud Username: {0}", Credential.Username);
             
         }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Program.Controller.CheckForUpdates();
+        }
     }
 
     class Invoker
