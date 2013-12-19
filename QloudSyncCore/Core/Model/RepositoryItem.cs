@@ -93,7 +93,14 @@ namespace GreenQloud.Model
 
         public string Name{
             get {
-               return Key.Substring (Key.LastIndexOf("/")+1);
+                if (IsFolder)
+                {
+                    return Key.Substring(Key.Substring(0,Key.Length-2).LastIndexOf("/") + 1);
+                }
+                else 
+                {
+                    return Key.Substring(Key.LastIndexOf("/") + 1);
+                }
             }
         }
 

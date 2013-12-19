@@ -13,7 +13,6 @@ namespace GreenQloud.Repository
         void Download (RepositoryItem request, bool recursive);
         void Upload (RepositoryItem request);
         void Delete(RepositoryItem request);
-        void Copy (RepositoryItem item);
         bool Exists (RepositoryItem sqObject);
         GetObjectResponse GetMetadata (string key, bool recoveryFolder);
         long GetContentLength(string key);

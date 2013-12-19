@@ -197,12 +197,11 @@ namespace GreenQloud.Synchrony
                                 e.Item.BuildResultItem(e.Item.RemoteTrashPath);
                                 remoteRepository.Move (e.Item);
                                 break;
-                            case EventType.COPY:
-                                remoteRepository.Copy (e.Item);
-                                break;
                             case EventType.MOVE:
                                 remoteRepository.Move (e.Item);
                                 break;
+                            case EventType.COPY:
+                                throw new AbortedOperationException("Copy local not implemented");
                             }
                         } else {
                             SyncStatus = SyncStatus.DOWNLOADING;
