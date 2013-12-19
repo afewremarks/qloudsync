@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
+using GreenQloud;
 
 namespace QloudSync
 {
@@ -25,6 +26,17 @@ namespace QloudSync
         {
         }
         #endregion
+
+        public override void OrderFrontRegardless ()
+        {
+            NSApplication.SharedApplication.ActivateIgnoringOtherApps (true);
+            MakeKeyAndOrderFront (this);
+
+            if (Program.UI != null)
+                Program.UI.UpdateDockIconVisibility ();
+
+            base.OrderFrontRegardless ();
+        }
     }
 }
 

@@ -39,9 +39,10 @@ namespace QloudSync
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
+                        Window.OrderFrontRegardless();
                         base.LoadWindow ();
                         //will render for generic 
-                        base.ShowWindow (new NSObject ());
+                        base.ShowWindow (this);
                     });
                 }
             };
@@ -168,6 +169,8 @@ namespace QloudSync
 
             return sqFolderPath;
         }
+
+
     }
 }
 
