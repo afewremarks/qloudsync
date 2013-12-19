@@ -45,6 +45,8 @@ namespace GreenQloud {
         private NSImage WarningImage;
         private NSImageView WarningImageView;
         private HyperLink hDescription;
+        private bool currentWindowCloseApplication = false;
+
         public SparkleSetup () : base ()
         {
             SparkleSetupController.HideWindowEvent += delegate {
@@ -80,15 +82,17 @@ namespace GreenQloud {
 
         public void ShowPage (Controller.PageType type, string [] warnings)
         {
-            EventHandler closeAppDelegate = delegate {
-                Program.Controller.Quit();
+            EventHandler WillCloseDelegate = delegate {
+                if(currentWindowCloseApplication){
+                    Program.Controller.Quit();
+                } else {
+                    SparkleSetupController.FinishPageCompleted ();
+                }
             };
-            EventHandler hiddeWindowDelegate = delegate {
-                SparkleSetupController.FinishPageCompleted ();
-            };
+            this.WillClose += WillCloseDelegate; 
 
             if (type == Controller.PageType.Login) {
-                this.WillClose += closeAppDelegate;
+                currentWindowCloseApplication = true;
 
                 background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "loginScreen.png");
 
@@ -163,7 +167,8 @@ namespace GreenQloud {
             }
 
             if (type == Controller.PageType.ConfigureFolders) {
-                this.WillClose += closeAppDelegate;
+                currentWindowCloseApplication = true;
+
                 this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "SelectSync1.png");
 
                 InitializeCheckboxesFolders ();
@@ -223,8 +228,7 @@ namespace GreenQloud {
             }
 
             if (type == Controller.PageType.Finished) {
-                this.WillClose -= closeAppDelegate;
-                this.WillClose += hiddeWindowDelegate;
+                currentWindowCloseApplication = false;
                 this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "getStarted.png");
                 OpenFolderButton = new NSButton () {
                     Frame = new RectangleF (157, 18, 137, 40),
@@ -239,130 +243,6 @@ namespace GreenQloud {
                 };
                 Buttons.Add (OpenFolderButton);
                 NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
-            }
-
-            if (type == Controller.PageType.Tutorial) {
-                string slide_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath,
-                    "Pixmaps", "tutorial-slide-" + SparkleSetupController.TutorialPageNumber + ".png");
-
-                SlideImage = new NSImage (slide_image_path) {
-                    Size = new SizeF (350, 200)
-                };
-
-                SlideImageView = new NSImageView () {
-                    Image = SlideImage,
-                    Frame = new RectangleF (215, Frame.Height - 350, 350, 200)
-                };
-
-                ContentView.AddSubview (SlideImageView);
-
-
-                switch (SparkleSetupController.TutorialPageNumber) {
-
-                    case 1: {
-                        Header      = "What's happening next?";
-                    Description = string.Format("{0} creates a special folder on your computer ", GlobalSettings.ApplicationName) +
-                            "that will keep track of your projects.";
-
-
-                        SkipTutorialButton = new NSButton () {
-                            Title = "Skip Tutorial"
-                        };
-
-                        ContinueButton = new NSButton () {
-                            Title = "Continue"
-                        };
-
-
-                        SkipTutorialButton.Activated += delegate {
-                            SparkleSetupController.TutorialSkipped ();
-                        };
-
-                        ContinueButton.Activated += delegate {
-                            SparkleSetupController.TutorialPageCompleted ();
-                        };
-
-
-                        ContentView.AddSubview (SlideImageView);
-
-                        Buttons.Add (ContinueButton);
-                        Buttons.Add (SkipTutorialButton);
-
-                        break;
-                    }
-
-                    case 2: {
-                        Header      = "Sharing files with others";
-                        Description = "All files added to your project folders are synced automatically with " +
-                            "the host and your team members.";
-
-                        ContinueButton = new NSButton () {
-                            Title = "Continue"
-                        };
-
-                        ContinueButton.Activated += delegate {
-                            SparkleSetupController.TutorialPageCompleted ();
-                        };
-
-                        Buttons.Add (ContinueButton);
-
-                        break;
-                    }
-
-                    case 3: {
-                        Header      = "The status icon is here to help";
-                        Description = "It shows the syncing progress, provides easy access to " +
-                            "your projects and let's you view recent changes.";
-
-                        ContinueButton = new NSButton () {
-                            Title = "Continue"
-                        };
-
-                        ContinueButton.Activated += delegate {
-                            SparkleSetupController.TutorialPageCompleted ();
-                        };
-
-                        Buttons.Add (ContinueButton);
-
-                        break;
-                    }
-
-                    case 4: {
-                        Header      = "Adding projects to "+GlobalSettings.ApplicationName;
-                        Description = "You can do this through the status icon menu, or by clicking " +
-                            "magic buttons on webpages that look like this:";
-
-
-                        StartupCheckButton = new NSButton () {
-                            Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
-                            Title = string.Format("Add {0} to startup items",GlobalSettings.ApplicationName),
-                            State = NSCellStateValue.On
-                        };
-
-                        StartupCheckButton.SetButtonType (NSButtonType.Switch);
-
-                        FinishButton = new NSButton () {
-                            Title = "Finish"
-                        };
-
-                        SlideImage.Size = new SizeF (350, 64);
-
-
-                        StartupCheckButton.Activated += delegate {
-                            SparkleSetupController.StartupItemChanged (StartupCheckButton.State == NSCellStateValue.On);
-                        };
-
-                        FinishButton.Activated += delegate {
-                            SparkleSetupController.TutorialPageCompleted ();
-                        };
-
-
-                        ContentView.AddSubview (StartupCheckButton);
-                        Buttons.Add (FinishButton);
-
-                        break;
-                    }
-                }
             }
         }
 
