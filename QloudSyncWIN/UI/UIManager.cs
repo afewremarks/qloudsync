@@ -289,13 +289,15 @@ namespace GreenQloud.UI
             }
         }
 
-        BugReport report = new BugReport();
-        public void OpenBugReport(Object sender, EventArgs e)
-        {
-            if (!report.Visible) {
-            report.ShowDialog();
-            }
-        }
+        // Method for opening new window, old bug report
+
+        //BugReport report = new BugReport();
+        //public void OpenBugReport(Object sender, EventArgs e)
+        //{
+        //    if (!report.Visible) {
+        //    report.ShowDialog();
+        //    }
+        //}
 
         public void OpenStorageQloudRegistration(Object sender, EventArgs e)
         {
