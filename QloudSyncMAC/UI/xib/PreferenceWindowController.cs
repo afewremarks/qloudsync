@@ -38,7 +38,7 @@ namespace QloudSync
             Program.Controller.ShowEventPreferenceWindow += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    InvokeOnMainThread (delegate {
+                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                         Window.OrderFrontRegardless();
                         base.LoadWindow ();
                         //will render for generic 
