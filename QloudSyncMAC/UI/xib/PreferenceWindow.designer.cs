@@ -50,34 +50,9 @@ namespace QloudSync
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (foldersScrollView != null) {
-				foldersScrollView.Dispose ();
-				foldersScrollView = null;
-			}
-
 			if (changeFoldersButton != null) {
 				changeFoldersButton.Dispose ();
 				changeFoldersButton = null;
-			}
-
-			if (moveSQFolderButton != null) {
-				moveSQFolderButton.Dispose ();
-				moveSQFolderButton = null;
-			}
-
-			if (downloadLimiterMatrix != null) {
-				downloadLimiterMatrix.Dispose ();
-				downloadLimiterMatrix = null;
-			}
-
-			if (uploadLimiterMatrix != null) {
-				uploadLimiterMatrix.Dispose ();
-				uploadLimiterMatrix = null;
-			}
-
-			if (totalBandwidthLabel != null) {
-				totalBandwidthLabel.Dispose ();
-				totalBandwidthLabel = null;
 			}
 
 			if (downloadBandwidthLabel != null) {
@@ -85,9 +60,44 @@ namespace QloudSync
 				downloadBandwidthLabel = null;
 			}
 
+			if (downloadLimiterMatrix != null) {
+				downloadLimiterMatrix.Dispose ();
+				downloadLimiterMatrix = null;
+			}
+
+			if (foldersScrollView != null) {
+				foldersScrollView.Dispose ();
+				foldersScrollView = null;
+			}
+
+			if (moveSQFolderButton != null) {
+				moveSQFolderButton.Dispose ();
+				moveSQFolderButton = null;
+			}
+
+			if (pathLabel != null) {
+				pathLabel.Dispose ();
+				pathLabel = null;
+			}
+
+			if (totalBandwidthLabel != null) {
+				totalBandwidthLabel.Dispose ();
+				totalBandwidthLabel = null;
+			}
+
+			if (unlinkAccountButton != null) {
+				unlinkAccountButton.Dispose ();
+				unlinkAccountButton = null;
+			}
+
 			if (uploadBandwidthLabel != null) {
 				uploadBandwidthLabel.Dispose ();
 				uploadBandwidthLabel = null;
+			}
+
+			if (uploadLimiterMatrix != null) {
+				uploadLimiterMatrix.Dispose ();
+				uploadLimiterMatrix = null;
 			}
 
 			if (usernameLabel != null) {
@@ -98,16 +108,6 @@ namespace QloudSync
 			if (versionLabel != null) {
 				versionLabel.Dispose ();
 				versionLabel = null;
-			}
-
-			if (pathLabel != null) {
-				pathLabel.Dispose ();
-				pathLabel = null;
-			}
-
-			if (unlinkAccountButton != null) {
-				unlinkAccountButton.Dispose ();
-				unlinkAccountButton = null;
 			}
 		}
 	}
