@@ -65,6 +65,7 @@ namespace GreenQloud.UI
             this.qloudversion = new System.Windows.Forms.Label();
             this.greenusername = new System.Windows.Forms.Label();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.button4 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -344,6 +345,7 @@ namespace GreenQloud.UI
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.button4);
             this.groupBox3.Controls.Add(this.groupBox4);
             this.groupBox3.Controls.Add(this.button3);
             this.groupBox3.Controls.Add(this.localpath);
@@ -423,6 +425,16 @@ namespace GreenQloud.UI
             this.greenusername.TabIndex = 0;
             this.greenusername.Text = "GreenQloud Username:";
             // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(15, 202);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(125, 23);
+            this.button4.TabIndex = 7;
+            this.button4.Text = "Check for Updates";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
             // Preferences
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -492,6 +504,7 @@ namespace GreenQloud.UI
         private System.Windows.Forms.Label localpath;
         private System.Windows.Forms.Label qloudversion;
         private System.Windows.Forms.Label greenusername;
+        private Button button4;
 
     }
 }
