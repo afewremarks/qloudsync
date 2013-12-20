@@ -101,6 +101,11 @@
     <Compile Include="UI\xib\PreferenceWindow.designer.cs">
       <DependentUpon>PreferenceWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\xib\WaitWindow.cs" />
+    <Compile Include="UI\xib\WaitWindowController.cs" />
+    <Compile Include="UI\xib\WaitWindow.designer.cs">
+      <DependentUpon>WaitWindow.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -112,6 +117,7 @@
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" />
     <InterfaceDefinition Include="UI\xib\PreferenceWindow.xib" />
+    <InterfaceDefinition Include="UI\xib\WaitWindow.xib" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Pixmaps\about.png" />

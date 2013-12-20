@@ -28,10 +28,19 @@ namespace QloudSync
 		MonoMac.AppKit.NSTextField itemsLabel { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSTextField ItemsProcessedLabel { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSButton moveSQFolderButton { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSTextField pathLabel { get; set; }
+
+		[Outlet]
+		MonoMac.AppKit.NSScrollView processedItemsScrollView { get; set; }
+
+		[Outlet]
+		MonoMac.AppKit.NSView processedItemsView { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSProgressIndicator statusProgressIndicator { get; set; }
@@ -76,6 +85,11 @@ namespace QloudSync
 				foldersScrollView = null;
 			}
 
+			if (ItemsProcessedLabel != null) {
+				ItemsProcessedLabel.Dispose ();
+				ItemsProcessedLabel = null;
+			}
+
 			if (moveSQFolderButton != null) {
 				moveSQFolderButton.Dispose ();
 				moveSQFolderButton = null;
@@ -84,6 +98,16 @@ namespace QloudSync
 			if (pathLabel != null) {
 				pathLabel.Dispose ();
 				pathLabel = null;
+			}
+
+			if (processedItemsScrollView != null) {
+				processedItemsScrollView.Dispose ();
+				processedItemsScrollView = null;
+			}
+
+			if (processedItemsView != null) {
+				processedItemsView.Dispose ();
+				processedItemsView = null;
 			}
 
 			if (statusProgressIndicator != null) {

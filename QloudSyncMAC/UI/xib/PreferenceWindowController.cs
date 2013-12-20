@@ -109,6 +109,12 @@ namespace QloudSync
             changeFoldersButton.Activated += delegate {
 
                 int size = this.remoteFoldersCheckboxes.Count;
+                WaitWindowController wait = new WaitWindowController();
+                wait.LoadWindow();
+
+                wait.ShouldCloseDocument = false;
+                wait.ShowWindow(this);
+                    
                 LocalRepository repo = repoDao.RootRepo();
                 Program.Controller.KillSynchronizers();
                 for(int i = 0; i < size; i++)
@@ -124,17 +130,26 @@ namespace QloudSync
 
                 }
                 Program.Controller.InitializeSynchronizers(true);
+                wait.Close();
+
             };
 
             moveSQFolderButton.Activated += delegate {
                 string path = ChangeSQFolder();
+
                 if(path != RuntimeSettings.SelectedHomePath)
                 {
                     if(Program.Controller.Confirm("Are you sure of this? All your files will be moved"))
                     {
                         try
                         {
+                            WaitWindowController wait = new WaitWindowController();
+                            wait.LoadWindow();
+                            wait.ShouldCloseDocument = false;
+                            wait.ShowWindow(this);
                             Program.Controller.MoveSQFolder(path);
+                            wait.Close();
+
                         }
                         catch(Exception ex)
                         {
@@ -148,6 +163,8 @@ namespace QloudSync
 
 
             //Network Status tab
+            //Add Items View to be a SubView of ScrollView
+            processedItemsScrollView.AddSubview (processedItemsView);
 
 
             //Account Tab
@@ -243,6 +260,11 @@ namespace QloudSync
                                 }
                                 isUpload = true;
                                 statusProgressIndicator.MaxValue = (int)fi.Length;
+
+                                ItemsProcessedLabel.StringValue += " ↑ " + e.Item.Name + " ... " + Environment.NewLine;
+                              
+
+          
                             } catch(Exception ex){
                                 Logger.LogInfo ("ERROR", "NWManger " + ex.ToString());
                             }
@@ -252,6 +274,10 @@ namespace QloudSync
                                 items.Add(e.Item);
                                 remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
                                 statusProgressIndicator.MaxValue = (int)remoteRepositoryController.GetContentLength(e.Item.Key);
+
+                              
+                                ItemsProcessedLabel.StringValue += " ↓ " + e.Item.Name + " ... " + Environment.NewLine;
+                              
                             }catch(Exception ex){
                                 Logger.LogInfo ("ERROR", "NWManger " + ex.ToString());
                             }

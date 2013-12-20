@@ -35,14 +35,14 @@ namespace QloudSyncCore.Core.Util
                 {
                     #if __MonoCS__
                     bytesSentPerformanceCounter = new PerformanceCounter();
-                    bytesSentPerformanceCounter.CategoryName = ".NET CLR Networking 4.0.0.0";
-                    bytesSentPerformanceCounter.CounterName = "Bytes Sent";
+                    bytesSentPerformanceCounter.CategoryName = "Network Interface";
+                    bytesSentPerformanceCounter.CounterName = "Bytes Sent/sec";
                     bytesSentPerformanceCounter.InstanceName = instanceNames.First();
                     bytesSentPerformanceCounter.ReadOnly = true;
 
                     bytesReceivedPerformanceCounter = new PerformanceCounter();
-                    bytesReceivedPerformanceCounter.CategoryName = ".NET CLR Networking 4.0.0.0";
-                    bytesReceivedPerformanceCounter.CounterName = "Bytes Received";
+                    bytesReceivedPerformanceCounter.CategoryName = "Network Interface";
+                    bytesReceivedPerformanceCounter.CounterName = "Bytes Received/sec";
                     bytesReceivedPerformanceCounter.InstanceName = instanceNames.First();
                     bytesReceivedPerformanceCounter.ReadOnly = true;
                     #else
