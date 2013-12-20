@@ -1,4 +1,4 @@
-﻿using GreenQloud;
+using GreenQloud;
 using GreenQloud.Core;
 using GreenQloud.Model;
 using GreenQloud.Persistence.SQLite;

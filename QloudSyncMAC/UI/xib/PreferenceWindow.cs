@@ -27,27 +27,8 @@ namespace QloudSync
         }
         #endregion
 
-        public override void OrderFrontRegardless ()
-        {
-            NSApplication.SharedApplication.ActivateIgnoringOtherApps (true);
-            MakeKeyAndOrderFront (this);
 
-            if (Program.UI != null)
-                Program.UI.UpdateDockIconVisibility ();
-
-            base.OrderFrontRegardless ();
-        }
-
-        public override void PerformClose (NSObject sender)
-        {
-            base.OrderOut (this);
-
-            if (Program.UI != null)
-                Program.UI.UpdateDockIconVisibility ();
-
-            return;
-        }
-
+       
 
     }
 }

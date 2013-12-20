@@ -75,7 +75,7 @@ namespace GreenQloud.Persistence.SQLite
                     "ie.RepositoryItemId IN (SELECT r1.RepositoryItemId FROM RepositoryItem r1 WHERE r1.MOVED <> '{0}' GROUP BY r1.RepositoryItemKey )" +
                     "OR ie.RepositoryItemId IN" +
                     "(SELECT r2.RepositoryItemId FROM RepositoryItem r2 INNER JOIN RepositoryItem r3 ON r2.ResultItemId = r3.RepositoryItemId WHERE r2.MOVED = '{1}' AND r3.MOVED <> '{2}' GROUP BY r2.RepositoryItemKey)" +
-                    ") AND e.SYNCHRONIZED = '{3}' AND ie.isfolder <> '{4}' AND e.RESPONSE = '{5}' AND ie.MOVED <> '{2}' " +
+                    ") AND e.SYNCHRONIZED = '{3}' AND ie.isfolder <> '{4}' AND e.RESPONSE = '{5}'" +
                  "GROUP BY ie.RepositoryItemKey ORDER BY EventID DESC LIMIT {6} ", bool.TrueString, bool.TrueString, bool.TrueString, bool.TrueString, bool.TrueString, RESPONSE.OK, 5);
 
                 return Select (sql);

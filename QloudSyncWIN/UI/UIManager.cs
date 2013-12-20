@@ -111,17 +111,16 @@ namespace GreenQloud.UI
             ToolStripSeparator recentlyChangedFinalSeparator = new ToolStripSeparator();
             this.trayMenu.Items.Add(recentlyChangedFinalSeparator);
 
-            this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
+            //this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
             //ADD to preferences
             //this.trayMenu.Items.Add("Network Status", null, OpenNetworkManager);
-            this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
-            this.trayMenu.Items.Add(pauseSync);
             ToolStripMenuItem preferences = new ToolStripMenuItem("Preferences", null, ShowPreferencesWindow);
             this.trayMenu.Items.Add(preferences);
-            //TODO MOVE TO ABOUT
-            this.trayMenu.Items.Add("Check for Updates", null, CheckForUpdates);
+            this.trayMenu.Items.Add(pauseSync);
+
             this.trayMenu.Items.Add("-", null);
-            this.trayMenu.Items.Add("Quit", null, OnExit);
+            this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
+            this.trayMenu.Items.Add("Exit QloudSync", null, OnExit);
 
             this.trayIcon.MouseClick += (sender, args) =>
             {
@@ -289,13 +288,15 @@ namespace GreenQloud.UI
             }
         }
 
-        BugReport report = new BugReport();
-        public void OpenBugReport(Object sender, EventArgs e)
-        {
-            if (!report.Visible) {
-            report.ShowDialog();
-            }
-        }
+        // Method for opening new window, old bug report
+
+        //BugReport report = new BugReport();
+        //public void OpenBugReport(Object sender, EventArgs e)
+        //{
+        //    if (!report.Visible) {
+        //    report.ShowDialog();
+        //    }
+        //}
 
         public void OpenStorageQloudRegistration(Object sender, EventArgs e)
         {

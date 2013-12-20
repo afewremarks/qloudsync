@@ -49,7 +49,7 @@ namespace GreenQloud {
             HideWindowEvent += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    InvokeOnMainThread (delegate {
+                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                         PerformClose (this);
                     });
                 }
@@ -58,7 +58,7 @@ namespace GreenQloud {
             ShowWindowEvent += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    InvokeOnMainThread (delegate {
+                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                         OrderFrontRegardless ();
                     });
                 }

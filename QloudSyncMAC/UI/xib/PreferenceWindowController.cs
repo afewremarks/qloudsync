@@ -10,8 +10,8 @@ using System.Drawing;
 using System.IO;
 using GreenQloud.Persistence.SQLite;
 using QloudSyncCore.Core.Util;
-using System.Windows.Forms;
 using System.Diagnostics;
+using System.Timers;
 
 namespace QloudSync
 {
@@ -20,11 +20,14 @@ namespace QloudSync
         List<NSButton> remoteFoldersCheckboxes;
         SQLiteRepositoryDAO repoDao;
         SQLiteRepositoryIgnoreDAO repoIgnore;
+        RemoteRepositoryController remoteRepositoryController;
         NetworkTraffic netTraffic;
+        List<RepositoryItem> items;
         Timer timer;
-
-        public event Action ShowWindowEvent = delegate { };
-        public event Action HideWindowEvent = delegate { };
+        float lastAmountOfBytesReceived;
+        float lastAmountOfBytesSent;
+        bool makeStep;
+        bool isUpload;
 
         #region Constructors
         // Called when created from unmanaged code
@@ -43,40 +46,28 @@ namespace QloudSync
         {
             Initialize ();
 
-            HideWindowEvent += delegate {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    InvokeOnMainThread (delegate {
-                        base.Dispose();
-                        Window.PerformClose (Window);
-                    });
-                }
-            };
-
-            ShowWindowEvent += delegate {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    InvokeOnMainThread (delegate {
-                        base.LoadWindow();
-                        Window.OrderFrontRegardless ();
-                    });
-                }
-            };
-
             Program.Controller.ShowEventPreferenceWindow += delegate {
-                ShowWindowEvent();
+                using (var a = new NSAutoreleasePool ())
+                {
+
+                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
+                        base.LoadWindow ();
+                        //will render for generic 
+                        base.ShowWindow (this);
+                    });
+                }
             };
         }
         // Shared initialization code
         void Initialize ()
-        {
+        {   
+            items = new List<RepositoryItem>();
+            makeStep = false;
+            isUpload = false;
             repoDao = new SQLiteRepositoryDAO();
             repoIgnore = new SQLiteRepositoryIgnoreDAO();
             netTraffic = new NetworkTraffic (Process.GetCurrentProcess().Id);
-            timer = new Timer ();
-            timer.Interval = 1000;
-            timer.Tick += new EventHandler (timer_Tick);
-            timer.Enabled = true;
+
         }
         #endregion
         //strongly typed window accessor
@@ -90,8 +81,30 @@ namespace QloudSync
         {
             base.AwakeFromNib ();
             loadFolders ();
+            //Initial Timers
+            timer = new Timer (1000);
+            timer.Elapsed += delegate {
+                float currentAmountOfBytesReceived = netTraffic.GetBytesReceived ();
+                float currentAmountOfBytesSent = netTraffic.GetBytesSent ();
+                using (NSAutoreleasePool pool = new NSAutoreleasePool()) {
+                    totalBandwidthLabel.StringValue = string.Format("{0} Kb/s", (currentAmountOfBytesReceived / 1024).ToString ("0.00"));
+                    downloadBandwidthLabel.StringValue = string.Format("{0} Kb/s", ((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024).ToString("0.00"));
+                    uploadBandwidthLabel.StringValue = string.Format("{0} Kb/s" ,Math.Abs(((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024)).ToString("0.00"));
+                    lastAmountOfBytesReceived = currentAmountOfBytesReceived;
+                    lastAmountOfBytesSent = currentAmountOfBytesSent;
+                    OnItemEvent();
+                    UpdateProgressBar();
+                }
+            };
+            timer.Start ();
+
+            Window.WillClose += delegate {
+                timer.Stop();
+            };
+
             //Selective Sync Tab
             changeFoldersButton.Activated += delegate {
+
                 int size = this.remoteFoldersCheckboxes.Count;
                 LocalRepository repo = repoDao.RootRepo();
                 Program.Controller.KillSynchronizers();
@@ -195,25 +208,77 @@ namespace QloudSync
             return sqFolderPath;
         }
 
-        public void WindowClosed ()
+        public void OnItemEvent()
         {
-            HideWindowEvent ();
-        }
+            Event e = Program.Controller.GetCurrentEvent ();
+            ResetStatusBar ();
+            ResetItemList ();
+            if (e != null) {
 
-        public class Preferences : NSWindowDelegate {
+                EventType eventType = e.EventType;
 
-            public override bool WindowShouldClose (NSObject sender)
-            {
-                (sender as PreferenceWindowController).WindowClosed ();
-                return false;
+                if (e.Item != null && eventType != EventType.DELETE) {
+
+                    if(!items.Contains(e.Item)){
+
+                        itemsLabel.StringValue = "1";
+                        makeStep = true;
+
+                        if (e.RepositoryType == RepositoryType.LOCAL) {
+                            try {
+                                FileInfo fi = new FileInfo (e.Item.LocalAbsolutePath);
+                                if (e.EventType == EventType.MOVE) {
+                                    fi = new FileInfo (e.Item.ResultItem.LocalAbsolutePath);
+                                    items.Add (e.Item.ResultItem);
+                                } else {
+                                    items.Add (e.Item);
+                                }
+                                isUpload = true;
+                                statusProgressIndicator.MaxValue = (int)fi.Length;
+                            } catch(Exception ex){
+                                Logger.LogInfo ("ERROR", "NWManger " + ex.ToString());
+                            }
+                        } else {
+                            try{
+                                isUpload = false;
+                                items.Add(e.Item);
+                                remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
+                                statusProgressIndicator.MaxValue = (int)remoteRepositoryController.GetContentLength(e.Item.Key);
+                            }catch(Exception ex){
+                                Logger.LogInfo ("ERROR", "NWManger " + ex.ToString());
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        void timer_Tick(Object sender, EventArgs args)
+        private void ResetItemList()
         {
-            float currentAmmountOfBytesReceived = netTraffic.GetBytesReceived ();
-            using (NSAutoreleasePool pool = new NSAutoreleasePool()) {
-                totalBandwidthLabel.StringValue = (currentAmmountOfBytesReceived / 1024).ToString ("0.00");
+            if (items.Count == 50) {
+                items.Clear ();
+            }
+        }
+
+        private void ResetStatusBar()
+        {
+            if (statusProgressIndicator.DoubleValue == statusProgressIndicator.MaxValue) {
+                statusProgressIndicator.DoubleValue = 0;
+                makeStep = false;
+                itemsLabel.StringValue = "0";
+            }
+        }
+
+        private void UpdateProgressBar()
+        {
+            if (makeStep) {
+                int step = (int)(netTraffic.GetBytesReceived () - lastAmountOfBytesReceived);
+
+                if (isUpload) {
+                    step = (int)(netTraffic.GetBytesSent () - lastAmountOfBytesSent);
+                }
+
+                statusProgressIndicator.IncrementBy (step);
             }
         }
 

@@ -246,7 +246,7 @@ namespace GreenQloud {
             UpdateIconEvent += delegate (IconState state) {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    InvokeOnMainThread (delegate {
+                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                         switch (state) {
                         case IconState.Idle: {
                             this.status_item.Image          = this.syncing_idle_image;
@@ -282,7 +282,7 @@ namespace GreenQloud {
             UpdateStatusItemEvent += delegate (string state_text, NSImage image) {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    InvokeOnMainThread (delegate {
+                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                         StateText = state_text;
                     });
                 }
@@ -291,14 +291,14 @@ namespace GreenQloud {
             UpdateMenuEvent += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    InvokeOnMainThread (() => CreateMenu ());
+                    NSRunLoop.Main.BeginInvokeOnMainThread (() => CreateMenu ());
                 }
             };
 
             UpdateQuitItemEvent += delegate (bool quit_item_enabled) {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    InvokeOnMainThread (delegate {
+                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                         this.quit_item.Enabled = quit_item_enabled;
                     });
                 }
@@ -403,7 +403,7 @@ namespace GreenQloud {
                                 subscript.ToLowerInvariant ();
 
                                 using (var ns = new NSAutoreleasePool ()) {
-                                    InvokeOnMainThread (() => { 
+                                    NSRunLoop.Main.BeginInvokeOnMainThread (() => { 
                                         if (spent != null && saved != null) {
                                             co2_savings_item.Title = spent + " used | " + saved + " CO₂ saved";
                                             co2_savings_item.Hidden = false;
@@ -464,7 +464,7 @@ namespace GreenQloud {
 
                         EventHandler evt = new EventHandler(
                             delegate {
-                                InvokeOnMainThread (() => RecentChangeItemClicked(e, null));
+                                NSRunLoop.Main.BeginInvokeOnMainThread (() => RecentChangeItemClicked(e, null));
                             }
                         );
                         current.Activated += evt;
@@ -579,7 +579,7 @@ namespace GreenQloud {
     
         public override void MenuWillOpen (NSMenu menu)
         {
-            InvokeOnMainThread (() => {
+            NSRunLoop.Main.BeginInvokeOnMainThread (() => {
                 NSApplication.SharedApplication.DockTile.BadgeLabel = null;
             });
         }

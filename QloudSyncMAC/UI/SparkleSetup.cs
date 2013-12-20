@@ -50,13 +50,13 @@ namespace GreenQloud {
         public SparkleSetup () : base ()
         {
             SparkleSetupController.HideWindowEvent += delegate {
-                InvokeOnMainThread (delegate {
+                NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                     PerformClose (this);
                 });
             };
 
             SparkleSetupController.ShowWindowEvent += delegate {
-                InvokeOnMainThread (delegate {
+                NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                     OrderFrontRegardless ();
                 });
             };
@@ -64,7 +64,7 @@ namespace GreenQloud {
             SparkleSetupController.ChangePageEvent += delegate (Controller.PageType type, string [] warnings) {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    InvokeOnMainThread (delegate {
+                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                         Reset ();
                         ShowPage (type, warnings);
                         ShowAll ();
