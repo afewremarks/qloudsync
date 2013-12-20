@@ -90,10 +90,11 @@ namespace QloudSync
                     totalBandwidthLabel.StringValue = string.Format("{0} Kb/s", (currentAmountOfBytesReceived / 1024).ToString ("0.00"));
                     downloadBandwidthLabel.StringValue = string.Format("{0} Kb/s", ((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024).ToString("0.00"));
                     uploadBandwidthLabel.StringValue = string.Format("{0} Kb/s" ,Math.Abs(((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024)).ToString("0.00"));
-                    lastAmountOfBytesReceived = currentAmountOfBytesReceived;
-                    lastAmountOfBytesSent = currentAmountOfBytesSent;
                     OnItemEvent();
                     UpdateProgressBar();
+                    lastAmountOfBytesReceived = currentAmountOfBytesReceived;
+                    lastAmountOfBytesSent = currentAmountOfBytesSent;
+
                 }
             };
             timer.Start ();
