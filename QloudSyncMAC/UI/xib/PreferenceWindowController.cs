@@ -17,17 +17,18 @@ namespace QloudSync
 {
     public partial class PreferenceWindowController : MonoMac.AppKit.NSWindowController
     {
-        List<NSButton> remoteFoldersCheckboxes;
-        SQLiteRepositoryDAO repoDao;
-        SQLiteRepositoryIgnoreDAO repoIgnore;
-        RemoteRepositoryController remoteRepositoryController;
-        NetworkTraffic netTraffic;
-        List<RepositoryItem> items;
-        Timer timer;
-        float lastAmountOfBytesReceived;
-        float lastAmountOfBytesSent;
-        bool makeStep;
-        bool isUpload;
+        private List<NSButton> remoteFoldersCheckboxes;
+        private SQLiteRepositoryDAO repoDao;
+        private SQLiteRepositoryIgnoreDAO repoIgnore;
+        private RemoteRepositoryController remoteRepositoryController;
+        private NetworkTraffic netTraffic;
+        private List<RepositoryItem> items;
+        private List<RepositoryIgnore> ignoreFolders;
+        private Timer timer;
+        private float lastAmountOfBytesReceived;
+        private float lastAmountOfBytesSent;
+        private bool makeStep;
+        private bool isUpload;
 
         #region Constructors
         // Called when created from unmanaged code
@@ -79,6 +80,7 @@ namespace QloudSync
 
         public override void AwakeFromNib ()
         {
+
             base.AwakeFromNib ();
             loadFolders ();
             //Initial Timers
@@ -172,7 +174,7 @@ namespace QloudSync
         {
             remoteFoldersCheckboxes = new List<NSButton> ();
             List<RepositoryItem> remoteItems = new RemoteRepositoryController (null).RootFolders;
-
+            ignoreFolders = repoIgnore.All (repoDao.RootRepo ());
             foreach (RepositoryItem item in remoteItems) 
             {
                 NSButton chk = new NSButton () {
@@ -180,7 +182,12 @@ namespace QloudSync
                     Title = item.Key
                 };
                 chk.SetButtonType(NSButtonType.Switch);
-                chk.State = NSCellStateValue.On;
+
+                if(ignoreFolders.Any(i => i.Path.Equals(item.Key)))
+                    chk.State = NSCellStateValue.Off;
+                else
+                    chk.State = NSCellStateValue.On;
+
                 remoteFoldersCheckboxes.Add (chk);
             }
             foreach (NSButton chk in remoteFoldersCheckboxes) 
