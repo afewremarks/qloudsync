@@ -122,32 +122,12 @@ namespace GreenQloud.Repository
 
         private void MoveEntry(IEnumerable<ListEntry> entries, RepositoryItem father){
             foreach(ListEntry entry in entries ){
-                if(Key(entry) != string.Empty){
+                string key = Key(entry);
+                if(key != string.Empty && key != father.Key ){
                     RepositoryItem item = CreateObjectInstance (entry);
                     item.BuildResultItem (Path.Combine(father.ResultItem.Key, item.Name));
                     if(item.Key != father.Key){
                         Move (item);
-                    }
-                }
-            }
-        }
-
-        public void Copy (RepositoryItem item)
-        {
-            if(item.IsFolder){
-                GenericCopy (item.Key, item.ResultItem.Key);
-                CopyEntry(connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, item.Key), item);
-            }else{
-                GenericCopy (item.Key, item.ResultItem.Key);
-            }
-        }
-
-        private void CopyEntry(IEnumerable<ListEntry> entries, RepositoryItem father){
-            foreach(ListEntry entry in entries ){
-                if(Key(entry) != string.Empty){
-                    RepositoryItem item = CreateObjectInstance (entry);
-                    if(item.Key != father.Key){
-                        Copy (item);
                     }
                 }
             }

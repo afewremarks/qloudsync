@@ -92,7 +92,7 @@ namespace GreenQloud.UI
             this.trayMenu.Items.Add(savings);
             ToolStripMenuItem sqFolder = new ToolStripMenuItem("StorageQloud Folder", Icons.qloudsync_folder , OpenStorageQloudFolder);
             this.trayMenu.Items.Add(sqFolder);
-            ToolStripMenuItem shareview = new ToolStripMenuItem("Share/View Online...", Icons.process_syncing, OpenStorageQloudWebsite);
+            ToolStripMenuItem shareview = new ToolStripMenuItem("Share/View Online", Icons.share, OpenStorageQloudWebsite);
             this.trayMenu.Items.Add(shareview);
             this.trayMenu.Items.Add("-", null);
 
@@ -110,8 +110,6 @@ namespace GreenQloud.UI
             //place to load recently changes
             ToolStripSeparator recentlyChangedFinalSeparator = new ToolStripSeparator();
             this.trayMenu.Items.Add(recentlyChangedFinalSeparator);
-
-            //this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
             //ADD to preferences
             //this.trayMenu.Items.Add("Network Status", null, OpenNetworkManager);
             ToolStripMenuItem preferences = new ToolStripMenuItem("Preferences", null, ShowPreferencesWindow);
@@ -119,6 +117,7 @@ namespace GreenQloud.UI
             this.trayMenu.Items.Add(pauseSync);
 
             this.trayMenu.Items.Add("-", null);
+            this.trayMenu.Items.Add("Help Center", null, OpenStorageQloudHelpCenter);
             this.trayMenu.Items.Add("About QloudSync", null, ShowAboutWindow);
             this.trayMenu.Items.Add("Exit QloudSync", null, OnExit);
 

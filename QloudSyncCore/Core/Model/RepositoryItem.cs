@@ -93,7 +93,14 @@ namespace GreenQloud.Model
 
         public string Name{
             get {
-               return Key.Substring (Key.LastIndexOf("/")+1);
+                if (IsFolder)
+                {
+                    return Key.Substring(Key.Substring(0,Key.Length-2).LastIndexOf("/") + 1);
+                }
+                else 
+                {
+                    return Key.Substring(Key.LastIndexOf("/") + 1);
+                }
             }
         }
 
@@ -110,7 +117,7 @@ namespace GreenQloud.Model
                 string[] images =  new string[7] {"png" , "jpg", "gif", "jpeg", "tiff", "bmp", "JPG"};
                 string[] text =  new string[6] {"pdf", "doc", "docx", "odf", "txt", "xls"};
                 string[] video =  new string[7] {"mp4" , "m4v", "ogg", "webm", "mov","avi", "midi"};
-                string[] audio =  new string[3] {"mp3", "m4a", "wav"};
+                string[] audio =  new string[5] {"mp3", "m4a", "wav", "mid", "wma"};
 
                 if(images.Contains(extension))
                     return ItemType.IMAGE;

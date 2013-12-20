@@ -332,7 +332,7 @@ namespace GreenQloud {
                 this.folder_item.Enabled = true;
 
                 this.preferences_item = new NSMenuItem () {
-                    Title   = "Preferences…",
+                    Title   = "Preferences",
                     Enabled = true
                 };
 
@@ -351,7 +351,7 @@ namespace GreenQloud {
                 };
 
                 this.openweb_item = new NSMenuItem () {
-                    Title = "Share/View Online…",
+                    Title = "Share/View Online",
                     Enabled = true
                 };
 
@@ -429,6 +429,8 @@ namespace GreenQloud {
                 };
 
                
+                this.menu.AddItem (this.state_item);
+                this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (co2_savings_item);
                 this.menu.AddItem (this.folder_item);
                 this.menu.AddItem (this.openweb_item);  
@@ -490,16 +492,16 @@ namespace GreenQloud {
                 }
             
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.state_item);
+                this.menu.AddItem (this.preferences_item);
+                this.menu.AddItem (this.pause_sync);
 			    this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (help_item);
-                this.menu.AddItem (this.about_item);
+                //this.menu.AddItem (help_item);
+
                
                 //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
                 this.status_item.Menu = this.menu;
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.preferences_item);
-                this.menu.AddItem (this.pause_sync);
+                this.menu.AddItem (help_item);
+                this.menu.AddItem (this.about_item);
                 this.menu.AddItem (quit_item);
             }
         }
