@@ -175,31 +175,39 @@ namespace GreenQloud.Repository
             File.Copy(path, toPath);
             UnblockWatcher (toPath);
         }
-        public void CopyDir(DirectoryInfo dir, string to)
-        {
-            if(!Directory.Exists(to)){
-                BlockWatcher (to);
-                DirectoryInfo di = Directory.CreateDirectory (to);
-                UnblockWatcher (to);
-            }
-            dir.GetDirectories().ToList().ForEach(directory=>CopyDir(directory, to+"/"+directory.Name));
-
-            List<FileInfo> files = dir.GetFiles ("*", SearchOption.AllDirectories).ToList ();
-            foreach (FileInfo file in files) {
-                CopyFile(file.FullName, to+"/"+file.Name);
-            }
-        }
-
+        
         public void DeleteFile(string path)
         {
             BlockWatcher (path);
             File.Delete (path);
             UnblockWatcher (path);
         }
+
+        public void CopyDir(DirectoryInfo dir, string to)
+        {
+            if (!Directory.Exists(to))
+            {
+                BlockWatcher(to);
+                DirectoryInfo di = Directory.CreateDirectory(to);
+                UnblockWatcher(to);
+            }
+            dir.GetDirectories().ToList().ForEach(directory => CopyDir(directory, to + "/" + directory.Name));
+
+            List<FileInfo> files = dir.GetFiles("*", SearchOption.AllDirectories).ToList();
+            foreach (FileInfo file in files)
+            {
+                CopyFile(file.FullName, to + "/" + file.Name);
+            }
+        }
+
         public void DeleteDir(DirectoryInfo dir)
         {
             if (dir != null)
             {
+                string dirName = dir.FullName;
+                if (!dirName.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    dirName += Path.DirectorySeparatorChar;
+
                 dir.GetDirectories().ToList().ForEach(directory => DeleteDir(directory));
 
                 List<FileInfo> files = dir.GetFiles("*", SearchOption.AllDirectories).ToList();
@@ -208,9 +216,9 @@ namespace GreenQloud.Repository
                     DeleteFile(file.FullName);
                 }
 
-                BlockWatcher(dir.FullName);
-                Directory.Delete(dir.FullName);
-                UnblockWatcher(dir.FullName);
+                BlockWatcher(dirName);
+                Directory.Delete(dirName);
+                UnblockWatcher(dirName);
             }
         }
         #endregion
