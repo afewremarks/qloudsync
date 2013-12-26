@@ -429,72 +429,74 @@ namespace GreenQloud {
                 };
 
                
-                this.menu.AddItem (this.state_item);
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (co2_savings_item);
-                this.menu.AddItem (this.folder_item);
-                this.menu.AddItem (this.openweb_item);  
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.recent_events_title);
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
-
-
-                if (Program.Controller.DatabaseLoaded()) {
-                    SQLiteEventDAO eventDao = new SQLiteEventDAO ();
-                    List<Event> events = eventDao.LastEvents;
-                    string text = "";
-
-                    foreach (Event e in events) {
-
-                        NSMenuItem current = new NSMenuItem () {
-                            Title = e.ItemName,
-                            Enabled = true
-                        };
-
-
-                        current.Image = this.default_image;
-                        if (e.ItemType == ItemType.IMAGE)
-                            current.Image = this.pics_image;
-                        if (e.ItemType == ItemType.TEXT)
-                            current.Image = this.docs_image;
-                        if (e.ItemType == ItemType.VIDEO)
-                            current.Image = this.movies_image;
-                        if (e.ItemType == ItemType.AUDIO)
-                            current.Image = this.music_image;
-
-                        current.ToolTip = e.ToString ();
-
-                        EventHandler evt = new EventHandler(
-                            delegate {
-                                NSRunLoop.Main.BeginInvokeOnMainThread (() => RecentChangeItemClicked(e, null));
-                            }
-                        );
-                        current.Activated += evt;
-
-                        string title = "   "+e.ItemUpdatedAt;
-                        NSAttributedString att = new NSAttributedString (title, NSFontManager.SharedFontManager.FontWithFamily ("Helvetica", NSFontTraitMask.Narrow, 5, 11));
-                        NSMenuItem subtitle = new NSMenuItem () {
-                            Enabled = false
-                        };
-                        subtitle.IndentationLevel = 1;
-                        subtitle.AttributedTitle = att;
-
-                        this.recentChanges.Add (current);
-                        this.menu.AddItem (current);
-                        this.menu.AddItem (subtitle);
-                        text += e.ToString () + "\n\n";
-
-                    }
-                    this.recent_events_title.ToolTip = text;
-
+                bool renderLoggedIn = Credential.Username != "";
+                if (renderLoggedIn) {
+                    this.menu.AddItem (this.state_item);
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
+                    this.menu.AddItem (co2_savings_item);
+                    this.menu.AddItem (this.folder_item);
+                    this.menu.AddItem (this.openweb_item);  
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
+                    this.menu.AddItem (this.recent_events_title);
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 
 
+                    if (Program.Controller.DatabaseLoaded()) {
+                        SQLiteEventDAO eventDao = new SQLiteEventDAO ();
+                        List<Event> events = eventDao.LastEvents;
+                        string text = "";
+
+                        foreach (Event e in events) {
+
+                            NSMenuItem current = new NSMenuItem () {
+                                Title = e.ItemName,
+                                Enabled = true
+                            };
+
+
+                            current.Image = this.default_image;
+                            if (e.ItemType == ItemType.IMAGE)
+                                current.Image = this.pics_image;
+                            if (e.ItemType == ItemType.TEXT)
+                                current.Image = this.docs_image;
+                            if (e.ItemType == ItemType.VIDEO)
+                                current.Image = this.movies_image;
+                            if (e.ItemType == ItemType.AUDIO)
+                                current.Image = this.music_image;
+
+                            current.ToolTip = e.ToString ();
+
+                            EventHandler evt = new EventHandler(
+                                delegate {
+                                    NSRunLoop.Main.BeginInvokeOnMainThread (() => RecentChangeItemClicked(e, null));
+                                }
+                            );
+                            current.Activated += evt;
+
+                            string title = "   "+e.ItemUpdatedAt;
+                            NSAttributedString att = new NSAttributedString (title, NSFontManager.SharedFontManager.FontWithFamily ("Helvetica", NSFontTraitMask.Narrow, 5, 11));
+                            NSMenuItem subtitle = new NSMenuItem () {
+                                Enabled = false
+                            };
+                            subtitle.IndentationLevel = 1;
+                            subtitle.AttributedTitle = att;
+
+                            this.recentChanges.Add (current);
+                            this.menu.AddItem (current);
+                            this.menu.AddItem (subtitle);
+                            text += e.ToString () + "\n\n";
+
+                        }
+                        this.recent_events_title.ToolTip = text;
+
+                    
+
+                    }
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
+                    this.menu.AddItem (this.preferences_item);
+                    this.menu.AddItem (this.pause_sync);
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 }
-            
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.preferences_item);
-                this.menu.AddItem (this.pause_sync);
-			    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 //this.menu.AddItem (help_item);
 
                
