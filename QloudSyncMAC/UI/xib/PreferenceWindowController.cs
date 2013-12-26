@@ -9,7 +9,6 @@ using GreenQloud.Repository;
 using System.Drawing;
 using System.IO;
 using GreenQloud.Persistence.SQLite;
-using QloudSyncCore.Core.Util;
 using System.Diagnostics;
 using System.Timers;
 
@@ -21,7 +20,7 @@ namespace QloudSync
         private SQLiteRepositoryDAO repoDao;
         private SQLiteRepositoryIgnoreDAO repoIgnore;
         private RemoteRepositoryController remoteRepositoryController;
-        private NetworkTraffic netTraffic;
+        //private NetworkTraffic netTraffic;
         private List<RepositoryItem> items;
         private List<RepositoryIgnore> ignoreFolders;
         private Timer timer;
@@ -52,17 +51,13 @@ namespace QloudSync
             Program.Controller.ShowEventPreferenceWindow += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    try{
-                        NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
-                            base.LoadWindow ();
-                            loadFolders();
-                            //will render for generic 
-                            base.ShowWindow (this);
-                        });
+                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
+                        base.LoadWindow ();
+                        loadFolders();
+                        //will render for generic 
+                        base.ShowWindow (this);
+                    });
 
-                    }catch(Exception ex){
-                        Logger.LogInfo("ERROR", ex);
-                    }
                 }
             };
         }
@@ -75,7 +70,7 @@ namespace QloudSync
             isUpload = false;
             repoDao = new SQLiteRepositoryDAO();
             repoIgnore = new SQLiteRepositoryIgnoreDAO();
-            netTraffic = new NetworkTraffic (Process.GetCurrentProcess().Id);
+            //netTraffic = new NetworkTraffic (Process.GetCurrentProcess().Id);
 
         }
         #endregion
@@ -90,10 +85,9 @@ namespace QloudSync
         {
 
             base.AwakeFromNib ();
-            //loadFolders ();
             //Initial Timers
-            timer = new Timer (1000);
-            /*timer.Elapsed += delegate {
+            /*timer = new Timer (1000);
+            timer.Elapsed += delegate {
                 float currentAmountOfBytesReceived = netTraffic.GetBytesReceived ();
                 float currentAmountOfBytesSent = netTraffic.GetBytesSent ();
                 using (NSAutoreleasePool pool = new NSAutoreleasePool()) {
@@ -106,13 +100,13 @@ namespace QloudSync
                     lastAmountOfBytesSent = currentAmountOfBytesSent;
 
                 }
-            };*/
+            };
             timer.Start ();
 
             Window.WillClose += delegate {
                 timer.Stop();
             };
-
+            */
             //Selective Sync Tab
             changeFoldersButton.Activated += delegate {
 
@@ -197,18 +191,18 @@ namespace QloudSync
         //Helpers
         private void loadFolders()
         {
+            foreach (NSView view in foldersView.Subviews) {
+                view.RemoveFromSuperview ();
+            }
 
-            NSView buttonsView = new NSView ();
-            buttonsView.Frame = new RectangleF (0, -140, foldersScrollView.Window.Frame.Width, 
-                                                foldersScrollView.Window
-                                                .Frame.Height);
+           
             remoteFoldersCheckboxes = new List<NSButton> ();
             List<RepositoryItem> remoteItems = new RemoteRepositoryController (null).RootFolders;
             ignoreFolders = repoIgnore.All (repoDao.RootRepo ());
             foreach (RepositoryItem item in remoteItems) 
             {
                 NSButton chk = new NSButton () {
-                    Frame = new RectangleF (5,  -12 + ((remoteFoldersCheckboxes.Count + 1) * 17), 300, 18),
+                    Frame = new RectangleF (5, ((remoteFoldersCheckboxes.Count + 1) * 17), 300, 18),
                     Title = item.Key
                 };
                 chk.SetButtonType(NSButtonType.Switch);
@@ -220,12 +214,12 @@ namespace QloudSync
 
                 remoteFoldersCheckboxes.Add (chk);
             }
-            foreach (NSButton chk in remoteFoldersCheckboxes) 
-            {
-                buttonsView.AddSubview (chk);
-            }
 
-            foldersScrollView.AddSubview (buttonsView);
+            for (int i = 0; i < remoteFoldersCheckboxes.Count; i++) {
+                foldersView.AddSubview (remoteFoldersCheckboxes[i]);
+            }
+         
+
         }
 
         public string ChangeSQFolder ()
@@ -334,6 +328,7 @@ namespace QloudSync
 
         private void UpdateProgressBar()
         {
+            /*
             if (makeStep) {
                 int step = (int)(netTraffic.GetBytesReceived () - lastAmountOfBytesReceived);
 
@@ -343,6 +338,7 @@ namespace QloudSync
 
                 statusProgressIndicator.IncrementBy (step);
             }
+            */
         }
 
        

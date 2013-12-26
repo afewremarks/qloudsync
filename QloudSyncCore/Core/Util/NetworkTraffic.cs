@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace QloudSyncCore.Core.Util
+namespace GreenQloud
 {
     public class NetworkTraffic
     {

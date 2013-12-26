@@ -22,7 +22,7 @@ namespace QloudSync
 		MonoMac.AppKit.NSMatrix downloadLimiterMatrix { get; set; }
 
 		[Outlet]
-		MonoMac.AppKit.NSScrollView foldersScrollView { get; set; }
+		MonoMac.AppKit.NSView foldersView { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSTextField itemsLabel { get; set; }
@@ -80,9 +80,14 @@ namespace QloudSync
 				downloadLimiterMatrix = null;
 			}
 
-			if (foldersScrollView != null) {
-				foldersScrollView.Dispose ();
-				foldersScrollView = null;
+			if (foldersView != null) {
+				foldersView.Dispose ();
+				foldersView = null;
+			}
+
+			if (itemsLabel != null) {
+				itemsLabel.Dispose ();
+				itemsLabel = null;
 			}
 
 			if (ItemsProcessedLabel != null) {
@@ -143,11 +148,6 @@ namespace QloudSync
 			if (versionLabel != null) {
 				versionLabel.Dispose ();
 				versionLabel = null;
-			}
-
-			if (itemsLabel != null) {
-				itemsLabel.Dispose ();
-				itemsLabel = null;
 			}
 		}
 	}

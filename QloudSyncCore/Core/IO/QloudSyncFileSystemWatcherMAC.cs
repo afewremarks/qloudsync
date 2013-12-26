@@ -95,6 +95,9 @@ namespace GreenQloud
 
             for (int i = 0; i < numEvents; i++)
             {
+                if (paths [i] == repo.Path || paths [i] + Path.DirectorySeparatorChar.ToString () == repo.Path)
+                    return;
+
                 if(!paths[i].Substring(paths[i].LastIndexOf(Path.DirectorySeparatorChar)+1).StartsWith(".")){
 
                     string search = paths [i];
