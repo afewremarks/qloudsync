@@ -5,7 +5,6 @@ using GreenQloud.Repository;
 using System.Linq;
 using GreenQloud.UI;
 using System.Windows.Forms;
-using QloudSyncCore.Core.Util;
 using System.Diagnostics;
 
 namespace GreenQloud

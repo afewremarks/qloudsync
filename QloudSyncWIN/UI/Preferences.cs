@@ -2,7 +2,6 @@
 using GreenQloud.Persistence;
 using GreenQloud.Persistence.SQLite;
 using GreenQloud.Repository;
-using QloudSyncCore.Core.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;
