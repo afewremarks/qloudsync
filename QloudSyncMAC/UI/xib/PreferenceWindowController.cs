@@ -29,6 +29,8 @@ namespace QloudSync
         private float lastAmountOfBytesSent;
         private bool makeStep;
         private bool isUpload;
+        //Used to placeholder scroll
+        private int count;
 
         #region Constructors
         // Called when created from unmanaged code
@@ -50,18 +52,23 @@ namespace QloudSync
             Program.Controller.ShowEventPreferenceWindow += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
+                    try{
+                        NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
+                            base.LoadWindow ();
+                            //will render for generic 
+                            base.ShowWindow (this);
+                        });
 
-                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
-                        base.LoadWindow ();
-                        //will render for generic 
-                        base.ShowWindow (this);
-                    });
+                    }catch(Exception ex){
+                        Logger.LogInfo("ERROR", ex);
+                    }
                 }
             };
         }
         // Shared initialization code
         void Initialize ()
         {   
+            count = 0;
             items = new List<RepositoryItem>();
             makeStep = false;
             isUpload = false;
@@ -244,7 +251,21 @@ namespace QloudSync
 
                 if (e.Item != null && eventType != EventType.DELETE) {
 
+
+
                     if(!items.Contains(e.Item)){
+                        count++;
+
+
+
+                        if(!(items.Count == 0))
+                            ItemsProcessedLabel.StringValue += "done!" + Environment.NewLine;
+
+                        if (count == 4) {
+                            ItemsProcessedLabel.StringValue = "";
+                            count = 0;
+                        }
+                            
 
                         itemsLabel.StringValue = "1";
                         makeStep = true;
@@ -261,7 +282,7 @@ namespace QloudSync
                                 isUpload = true;
                                 statusProgressIndicator.MaxValue = (int)fi.Length;
 
-                                ItemsProcessedLabel.StringValue += " ↑ " + e.Item.Name + " ... " + Environment.NewLine;
+                                ItemsProcessedLabel.StringValue += " ↑ " + e.Item.Name + " ... ";
                               
 
           
@@ -276,7 +297,7 @@ namespace QloudSync
                                 statusProgressIndicator.MaxValue = (int)remoteRepositoryController.GetContentLength(e.Item.Key);
 
                               
-                                ItemsProcessedLabel.StringValue += " ↓ " + e.Item.Name + " ... " + Environment.NewLine;
+                                ItemsProcessedLabel.StringValue += " ↓ " + e.Item.Name + " ... ";
                               
                             }catch(Exception ex){
                                 Logger.LogInfo ("ERROR", "NWManger " + ex.ToString());
