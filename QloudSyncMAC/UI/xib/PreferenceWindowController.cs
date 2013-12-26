@@ -121,7 +121,7 @@ namespace QloudSync
                 Program.Controller.KillSynchronizers();
                 for(int i = 0; i < size; i++)
                 {
-                    if(this.remoteFoldersCheckboxes.ElementAt(i).State == NSCellStateValue.On)
+                    if(this.remoteFoldersCheckboxes.ElementAt(i).State == NSCellStateValue.Off)
                     {
                         repoIgnore.Create(repo, remoteFoldersCheckboxes.ElementAt(i).Title);
                     }
@@ -199,26 +199,23 @@ namespace QloudSync
             remoteFoldersCheckboxes = new List<NSButton> ();
             List<RepositoryItem> remoteItems = new RemoteRepositoryController (null).RootFolders;
             ignoreFolders = repoIgnore.All (repoDao.RootRepo ());
-            foreach (RepositoryItem item in remoteItems) 
-            {
+
+            for (int i = 0; i <remoteItems.Count; i++) {
                 NSButton chk = new NSButton () {
-                    Frame = new RectangleF (5, ((remoteFoldersCheckboxes.Count + 1) * 17), 300, 18),
-                    Title = item.Key
+                    Frame = new RectangleF (5,  foldersView.Window.Frame.Height - 120 - ((remoteFoldersCheckboxes.Count + 1) * 17), 300, 18),
+                    Title = remoteItems[i].Key,
+                    StringValue = remoteItems[i].Key
                 };
                 chk.SetButtonType(NSButtonType.Switch);
 
-                if(ignoreFolders.Any(i => i.Path.Equals(item.Key)))
+                if(ignoreFolders.Any(j => j.Path.Equals(remoteItems[i].Key)))
                     chk.State = NSCellStateValue.Off;
                 else
                     chk.State = NSCellStateValue.On;
 
                 remoteFoldersCheckboxes.Add (chk);
+                foldersView.AddSubview (chk);
             }
-
-            for (int i = 0; i < remoteFoldersCheckboxes.Count; i++) {
-                foldersView.AddSubview (remoteFoldersCheckboxes[i]);
-            }
-         
 
         }
 
