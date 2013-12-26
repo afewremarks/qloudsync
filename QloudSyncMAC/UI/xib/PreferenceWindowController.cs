@@ -9,7 +9,6 @@ using GreenQloud.Repository;
 using System.Drawing;
 using System.IO;
 using GreenQloud.Persistence.SQLite;
-using QloudSyncCore.Core.Util;
 using System.Diagnostics;
 using System.Timers;
 
@@ -21,7 +20,7 @@ namespace QloudSync
         private SQLiteRepositoryDAO repoDao;
         private SQLiteRepositoryIgnoreDAO repoIgnore;
         private RemoteRepositoryController remoteRepositoryController;
-        private NetworkTraffic netTraffic;
+        //private NetworkTraffic netTraffic;
         private List<RepositoryItem> items;
         private List<RepositoryIgnore> ignoreFolders;
         private Timer timer;
@@ -52,16 +51,11 @@ namespace QloudSync
             Program.Controller.ShowEventPreferenceWindow += delegate {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    try{
-                        NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
-                            base.LoadWindow ();
-                            //will render for generic 
-                            base.ShowWindow (this);
-                        });
-
-                    }catch(Exception ex){
-                        Logger.LogInfo("ERROR", ex);
-                    }
+                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
+                        base.LoadWindow ();
+                        //will render for generic 
+                        base.ShowWindow (this);
+                    });
                 }
             };
         }
@@ -74,7 +68,7 @@ namespace QloudSync
             isUpload = false;
             repoDao = new SQLiteRepositoryDAO();
             repoIgnore = new SQLiteRepositoryIgnoreDAO();
-            netTraffic = new NetworkTraffic (Process.GetCurrentProcess().Id);
+            //netTraffic = new NetworkTraffic (Process.GetCurrentProcess().Id);
 
         }
         #endregion
@@ -91,7 +85,7 @@ namespace QloudSync
             base.AwakeFromNib ();
             loadFolders ();
             //Initial Timers
-            timer = new Timer (1000);
+            /*timer = new Timer (1000);
             timer.Elapsed += delegate {
                 float currentAmountOfBytesReceived = netTraffic.GetBytesReceived ();
                 float currentAmountOfBytesSent = netTraffic.GetBytesSent ();
@@ -111,7 +105,7 @@ namespace QloudSync
             Window.WillClose += delegate {
                 timer.Stop();
             };
-
+            */
             //Selective Sync Tab
             changeFoldersButton.Activated += delegate {
 
@@ -326,6 +320,7 @@ namespace QloudSync
 
         private void UpdateProgressBar()
         {
+            /*
             if (makeStep) {
                 int step = (int)(netTraffic.GetBytesReceived () - lastAmountOfBytesReceived);
 
@@ -335,6 +330,7 @@ namespace QloudSync
 
                 statusProgressIndicator.IncrementBy (step);
             }
+            */
         }
 
        
