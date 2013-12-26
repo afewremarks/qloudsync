@@ -17,9 +17,8 @@ namespace GreenQloud
         public delegate void ChangedEventHandler(Event e);
         public event ChangedEventHandler Changed;
         private LocalRepository repo;
-        private SQLiteRepositoryItemDAO repositoryItemDAO = new SQLiteRepositoryItemDAO();
-
-        private FileSystemWatcher parentFolderWatcher = null, subfolderWatcher = null;
+        
+        private FileSystemWatcher parentFolderWatcher = null, subfolderWatcherFolder = null, subfolderWatcherFile = null;
         private System.Object lockThis = new System.Object(), processChangesLock = new System.Object();
         private Timer changeNotifier;
 
@@ -43,17 +42,28 @@ namespace GreenQloud
         {
             if (!String.IsNullOrEmpty(watchPath))
             {
-                subfolderWatcher = new FileSystemWatcher();
-                subfolderWatcher.Path = watchPath;
-                subfolderWatcher.IncludeSubdirectories = true;
-                subfolderWatcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.FileName |
-                NotifyFilters.DirectoryName;
+                subfolderWatcherFolder = new FileSystemWatcher();
+                subfolderWatcherFolder.Path = watchPath;
+                subfolderWatcherFolder.IncludeSubdirectories = true;
+                subfolderWatcherFolder.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.DirectoryName;
                 // Add event handlers.            
-                subfolderWatcher.Created += new FileSystemEventHandler(handleCreateEvent);
-                subfolderWatcher.Deleted += new FileSystemEventHandler(handleDeleteEvent);
-                subfolderWatcher.Renamed += new RenamedEventHandler(handleRenameEvent);
+                subfolderWatcherFolder.Created += new FileSystemEventHandler(handleCreateEvent);
+                subfolderWatcherFolder.Deleted += new FileSystemEventHandler(handleDeleteEvent);
+                subfolderWatcherFolder.Renamed += new RenamedEventHandler(handleRenameEvent);
                 //Begin watching
-                subfolderWatcher.EnableRaisingEvents = true;
+                subfolderWatcherFolder.EnableRaisingEvents = true;
+
+
+                subfolderWatcherFile = new FileSystemWatcher();
+                subfolderWatcherFile.Path = watchPath;
+                subfolderWatcherFile.IncludeSubdirectories = true;
+                subfolderWatcherFile.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.FileName;
+                // Add event handlers.            
+                subfolderWatcherFile.Created += new FileSystemEventHandler(handleCreateEvent);
+                subfolderWatcherFile.Deleted += new FileSystemEventHandler(handleDeleteEvent);
+                subfolderWatcherFile.Renamed += new RenamedEventHandler(handleRenameEvent);
+                //Begin watching
+                subfolderWatcherFile.EnableRaisingEvents = true;
 
                 parentFolderWatcher = new FileSystemWatcher();
                 parentFolderWatcher.Path = Path.GetDirectoryName(watchPath); ;
@@ -77,13 +87,16 @@ namespace GreenQloud
             try
             {
                 parentFolderWatcher.EnableRaisingEvents = false;
-                subfolderWatcher.EnableRaisingEvents = false;
+                subfolderWatcherFile.EnableRaisingEvents = false;
+                subfolderWatcherFolder.EnableRaisingEvents = false;
                 
                 parentFolderWatcher.Dispose();
-                subfolderWatcher.Dispose();
+                subfolderWatcherFile.Dispose();
+                subfolderWatcherFolder.Dispose();
                 
                 parentFolderWatcher = null;
-                subfolderWatcher = null;
+                subfolderWatcherFile = null;
+                subfolderWatcherFolder = null;
                 return true;
             }
             catch (Exception e)
@@ -129,14 +142,9 @@ namespace GreenQloud
                 //Detect if have a file with the name on database, if its true, so its a file.
                 //The need of this line is because the watcher cannot catch if the delete is a file or folder.
                 bool isFolder = true;
-                if (args.FullPath != null)
+                if (sender == subfolderWatcherFile)
                 {
-                    string key = args.FullPath.Substring(repo.Path.Length);
-                    key = key.Replace(Path.DirectorySeparatorChar.ToString(), "/");
-                    if (repositoryItemDAO.ExistsUnmoved(key, repo))
-                    {
-                        isFolder = false;
-                    }
+                    isFolder = false;
                 }
 
                 deleteList.Add(new FSOPDeleteVO(args.FullPath, isFolder));
