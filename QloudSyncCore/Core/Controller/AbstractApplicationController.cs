@@ -313,7 +313,7 @@ namespace GreenQloud
                 {
                     ShowSetupWindow(PageType.ConfigureFolders);
                 } else {
-                    InitializeSynchronizers(false);
+                    InitializeSynchronizers(true);
                 }
             }
             verifyConfigRequirements();
