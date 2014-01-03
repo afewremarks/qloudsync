@@ -510,10 +510,6 @@ namespace GreenQloud {
 
         public void PauseSync(){
             Program.Controller.PauseSync ();
-            using (var a = new NSAutoreleasePool ()) {
-                this.pause_sync.Title = PauseText ();
-            }
-
         }
 
         public void StorageFolderClicked ()
