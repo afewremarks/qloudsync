@@ -29,6 +29,7 @@ using GreenQloud.Persistence;
 using System.Collections.Generic;
 using GreenQloud.Persistence.SQLite;
 using System.Diagnostics;
+using QloudSync;
 
 
 namespace GreenQloud {
@@ -89,6 +90,7 @@ namespace GreenQloud {
         private NSImage music_image;
         private NSImage pics_image;
         private NSImage default_image;
+        private PreferenceWindowController PreferenceController;
 
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
         public delegate void UpdateIconEventHandler (IconState state);
@@ -337,7 +339,14 @@ namespace GreenQloud {
                 };
 
                 this.preferences_item.Activated += delegate {
-                    Program.Controller.ShowPreferenceWindow ();
+                    if(PreferenceController == null){
+                        PreferenceController = new PreferenceWindowController ();
+                        PreferenceController.Window.WillClose += delegate {
+                            PreferenceController = null;
+                        };
+                    } else {
+                        PreferenceController.Window.OrderFrontRegardless();
+                    }
                 };
 
                 this.recent_events_title = new NSMenuItem () {
@@ -556,6 +565,8 @@ namespace GreenQloud {
         }
 
     }
+
+   
     
     
     public class SparkleStatusIconMenuDelegate : NSMenuDelegate {

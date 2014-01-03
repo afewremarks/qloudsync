@@ -48,18 +48,17 @@ namespace QloudSync
         {
             Initialize ();
 
-            Program.Controller.ShowEventPreferenceWindow += delegate {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
-                        base.LoadWindow ();
-                        loadFolders();
-                        //will render for generic 
-                        Window.OpenWindow();
-                    });
+            using (var a = new NSAutoreleasePool ())
+            {
+                NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
+                    base.LoadWindow ();
+                    loadFolders();
+                    //will render for generic 
+                    Window.OpenWindow();
+                });
 
-                }
-            };
+            }
+
         }
         // Shared initialization code
         void Initialize ()
@@ -260,7 +259,7 @@ namespace QloudSync
 
                         if (e.RepositoryType == RepositoryType.LOCAL) {
                             try {
-                              
+
                                 if (e.EventType == EventType.MOVE) {
 
                                     items.Add (e.Item.ResultItem);
