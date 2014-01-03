@@ -221,13 +221,23 @@ namespace GreenQloud.Repository
         private void GenericDownload (string key, string localAbsolutePath)
         {
             BlockWatcher (localAbsolutePath);
-            connection.Connect().GetObject(RuntimeSettings.DefaultBucketName, key, localAbsolutePath);
+            S3Service service = connection.Connect ();
+            AddStatistics(key, new TransferStatistic(key, TransferType.DOWN));
+            service.GetObjectProgress += delegate(object sender, S3ProgressEventArgs e) {
+                UpdateStatistics(key, e);
+            };
+            service.GetObject(RuntimeSettings.DefaultBucketName, key, localAbsolutePath);
             UnblockWatcher (localAbsolutePath);
         }
 
         private void GenericUpload (string key, string filepath)
         {
-            connection.Connect().AddObject(filepath, RuntimeSettings.DefaultBucketName, key);
+            S3Service service = connection.Connect ();
+            AddStatistics(key, new TransferStatistic(key, TransferType.UP));
+            service.AddObjectProgress += delegate(object sender, S3ProgressEventArgs e) {
+                UpdateStatistics(key, e);
+            };
+            service.AddObject(filepath, RuntimeSettings.DefaultBucketName, key);
         }
 
         private void GenericCreateFolder (string key)
