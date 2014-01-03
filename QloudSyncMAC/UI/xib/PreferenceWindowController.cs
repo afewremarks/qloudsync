@@ -48,18 +48,17 @@ namespace QloudSync
         {
             Initialize ();
 
-            Program.Controller.ShowEventPreferenceWindow += delegate {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
-                        base.LoadWindow ();
-                        loadFolders();
-                        //will render for generic 
-                        base.ShowWindow (this);
-                    });
+            using (var a = new NSAutoreleasePool ())
+            {
+                NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
+                    base.LoadWindow ();
+                    loadFolders();
+                    //will render for generic 
+                    Window.OpenWindow();
+                });
 
-                }
-            };
+            }
+
         }
         // Shared initialization code
         void Initialize ()
@@ -86,27 +85,20 @@ namespace QloudSync
 
             base.AwakeFromNib ();
             //Initial Timers
-            /*timer = new Timer (1000);
+            timer = new Timer (1000);
             timer.Elapsed += delegate {
-                float currentAmountOfBytesReceived = netTraffic.GetBytesReceived ();
-                float currentAmountOfBytesSent = netTraffic.GetBytesSent ();
-                using (NSAutoreleasePool pool = new NSAutoreleasePool()) {
-                    totalBandwidthLabel.StringValue = string.Format("{0} Kb/s", (currentAmountOfBytesReceived / 1024).ToString ("0.00"));
-                    downloadBandwidthLabel.StringValue = string.Format("{0} Kb/s", ((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024).ToString("0.00"));
-                    uploadBandwidthLabel.StringValue = string.Format("{0} Kb/s" ,Math.Abs(((currentAmountOfBytesReceived - lastAmountOfBytesReceived) / 1024)).ToString("0.00"));
-                    OnItemEvent();
-                    UpdateProgressBar();
-                    lastAmountOfBytesReceived = currentAmountOfBytesReceived;
-                    lastAmountOfBytesSent = currentAmountOfBytesSent;
 
+                using (NSAutoreleasePool pool = new NSAutoreleasePool()) {
+                    OnItemEvent();
                 }
             };
             timer.Start ();
 
             Window.WillClose += delegate {
                 timer.Stop();
+                Window.WindowClosed();
             };
-            */
+
             //Selective Sync Tab
             changeFoldersButton.Activated += delegate {
 
@@ -164,9 +156,6 @@ namespace QloudSync
 
 
 
-            //Network Status tab
-            //Add Items View to be a SubView of ScrollView
-            processedItemsScrollView.AddSubview (processedItemsView);
 
 
             //Account Tab
@@ -202,7 +191,7 @@ namespace QloudSync
 
             for (int i = 0; i <remoteItems.Count; i++) {
                 NSButton chk = new NSButton () {
-                    Frame = new RectangleF (5,  foldersView.Window.Frame.Height - 120 - ((remoteFoldersCheckboxes.Count + 1) * 17), 300, 18),
+                    Frame = new RectangleF (5,  256 - ((remoteFoldersCheckboxes.Count + 1) * 17), 300, 18),
                     Title = remoteItems[i].Key,
                     StringValue = remoteItems[i].Key
                 };
@@ -242,7 +231,6 @@ namespace QloudSync
         public void OnItemEvent()
         {
             Event e = Program.Controller.GetCurrentEvent ();
-            ResetStatusBar ();
             ResetItemList ();
             if (e != null) {
 
@@ -258,10 +246,10 @@ namespace QloudSync
 
 
                         if(!(items.Count == 0))
-                            ItemsProcessedLabel.StringValue += "done!" + Environment.NewLine;
+                            itemsProcessedLabel.StringValue += "done!" + Environment.NewLine;
 
-                        if (count == 4) {
-                            ItemsProcessedLabel.StringValue = "";
+                        if (count == 6) {
+                            itemsProcessedLabel.StringValue = "";
                             count = 0;
                         }
                             
@@ -271,17 +259,17 @@ namespace QloudSync
 
                         if (e.RepositoryType == RepositoryType.LOCAL) {
                             try {
-                                FileInfo fi = new FileInfo (e.Item.LocalAbsolutePath);
+
                                 if (e.EventType == EventType.MOVE) {
-                                    fi = new FileInfo (e.Item.ResultItem.LocalAbsolutePath);
+
                                     items.Add (e.Item.ResultItem);
                                 } else {
                                     items.Add (e.Item);
                                 }
                                 isUpload = true;
-                                statusProgressIndicator.MaxValue = (int)fi.Length;
 
-                                ItemsProcessedLabel.StringValue += " ↑ " + e.Item.Name + " ... ";
+
+                                itemsProcessedLabel.StringValue += " ↑ " + e.Item.Name + " ... ";
                               
 
           
@@ -293,10 +281,10 @@ namespace QloudSync
                                 isUpload = false;
                                 items.Add(e.Item);
                                 remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
-                                statusProgressIndicator.MaxValue = (int)remoteRepositoryController.GetContentLength(e.Item.Key);
+
 
                               
-                                ItemsProcessedLabel.StringValue += " ↓ " + e.Item.Name + " ... ";
+                                itemsProcessedLabel.StringValue += " ↓ " + e.Item.Name + " ... ";
                               
                             }catch(Exception ex){
                                 Logger.LogInfo ("ERROR", "NWManger " + ex.ToString());
@@ -313,34 +301,6 @@ namespace QloudSync
                 items.Clear ();
             }
         }
-
-        private void ResetStatusBar()
-        {
-            if (statusProgressIndicator.DoubleValue == statusProgressIndicator.MaxValue) {
-                statusProgressIndicator.DoubleValue = 0;
-                makeStep = false;
-                itemsLabel.StringValue = "0";
-            }
-        }
-
-        private void UpdateProgressBar()
-        {
-            /*
-            if (makeStep) {
-                int step = (int)(netTraffic.GetBytesReceived () - lastAmountOfBytesReceived);
-
-                if (isUpload) {
-                    step = (int)(netTraffic.GetBytesSent () - lastAmountOfBytesSent);
-                }
-
-                statusProgressIndicator.IncrementBy (step);
-            }
-            */
-        }
-
-       
-
-    
 
     }
 }

@@ -50,7 +50,7 @@ namespace GreenQloud {
                 Setup = new SparkleSetup ();
                 About = new AboutWindow ();
                 StatusIcon = new IconController ();
-                PreferenceController = new PreferenceWindowController ();
+
             }
         }
     
