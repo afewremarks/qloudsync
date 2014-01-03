@@ -55,7 +55,7 @@ namespace QloudSync
                         base.LoadWindow ();
                         loadFolders();
                         //will render for generic 
-                        base.ShowWindow (this);
+                        Window.OpenWindow();
                     });
 
                 }
@@ -97,6 +97,7 @@ namespace QloudSync
 
             Window.WillClose += delegate {
                 timer.Stop();
+                Window.WindowClosed();
             };
 
             //Selective Sync Tab
