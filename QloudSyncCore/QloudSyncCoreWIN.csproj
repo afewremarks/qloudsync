@@ -84,13 +84,13 @@
     <Compile Include="Core\Persistence\SQLite\SQLiteTimeDiffDAO.cs" />
     <Compile Include="Core\Persistence\TimeDiffDAO.cs" />
     <Compile Include="Core\Repository\PhysicalRepositoryController.cs" />
+    <Compile Include="Core\Repository\TransferStatistic.cs" />
     <Compile Include="Core\Synchrony\RemoteEventsSynchronizer.cs" />
     <Compile Include="Core\Synchrony\AbstractSynchronizer.cs" />
     <Compile Include="Core\Synchrony\SynchronizerResolver.cs" />
     <Compile Include="Core\Synchrony\SynchronizerUnit.cs" />
     <Compile Include="Core\Util\Crypto.cs" />
     <Compile Include="Core\Util\Logger.cs" />
-    <Compile Include="Core\Util\NetworkTraffic.cs" />
     <Compile Include="Core\Util\Statistics.cs" />
     <Compile Include="Core\Util\Constant.cs" />
     <Compile Include="Core\Util\JSONHelper.cs" />

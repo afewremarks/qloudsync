@@ -39,24 +39,13 @@ namespace GreenQloud.UI
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label9 = new System.Windows.Forms.Label();
-            this.radioButton4 = new System.Windows.Forms.RadioButton();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label8 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.listBox2 = new System.Windows.Forms.ListBox();
+            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.numberofitems = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.currentBandwidthUploadLabel = new System.Windows.Forms.Label();
-            this.currentBandwidthDownloadLabel = new System.Windows.Forms.Label();
-            this.totalBandwidthConsumptionLabel = new System.Windows.Forms.Label();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.button4 = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
@@ -65,12 +54,10 @@ namespace GreenQloud.UI
             this.qloudversion = new System.Windows.Forms.Label();
             this.greenusername = new System.Windows.Forms.Label();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.button4 = new System.Windows.Forms.Button();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -162,14 +149,10 @@ namespace GreenQloud.UI
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.groupBox2);
-            this.tabPage2.Controls.Add(this.groupBox1);
+            this.tabPage2.Controls.Add(this.listBox2);
+            this.tabPage2.Controls.Add(this.listBox1);
+            this.tabPage2.Controls.Add(this.label4);
             this.tabPage2.Controls.Add(this.numberofitems);
-            this.tabPage2.Controls.Add(this.textBox1);
-            this.tabPage2.Controls.Add(this.currentBandwidthUploadLabel);
-            this.tabPage2.Controls.Add(this.currentBandwidthDownloadLabel);
-            this.tabPage2.Controls.Add(this.totalBandwidthConsumptionLabel);
-            this.tabPage2.Controls.Add(this.progressBar1);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -178,160 +161,40 @@ namespace GreenQloud.UI
             this.tabPage2.Text = "Network Status";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // groupBox2
+            // listBox2
             // 
-            this.groupBox2.Controls.Add(this.label9);
-            this.groupBox2.Controls.Add(this.radioButton4);
-            this.groupBox2.Controls.Add(this.textBox3);
-            this.groupBox2.Controls.Add(this.radioButton3);
-            this.groupBox2.Location = new System.Drawing.Point(285, 119);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(155, 111);
-            this.groupBox2.TabIndex = 8;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Upload Limiter:";
+            this.listBox2.FormattingEnabled = true;
+            this.listBox2.Location = new System.Drawing.Point(239, 21);
+            this.listBox2.Name = "listBox2";
+            this.listBox2.Size = new System.Drawing.Size(203, 212);
+            this.listBox2.TabIndex = 9;
             // 
-            // label9
+            // listBox1
             // 
-            this.label9.AutoSize = true;
-            this.label9.Enabled = false;
-            this.label9.Location = new System.Drawing.Point(124, 56);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(29, 13);
-            this.label9.TabIndex = 6;
-            this.label9.Text = "kb/s";
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.Location = new System.Drawing.Point(6, 21);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(203, 212);
+            this.listBox1.TabIndex = 8;
             // 
-            // radioButton4
+            // label4
             // 
-            this.radioButton4.AutoSize = true;
-            this.radioButton4.Checked = true;
-            this.radioButton4.Location = new System.Drawing.Point(6, 30);
-            this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(68, 17);
-            this.radioButton4.TabIndex = 5;
-            this.radioButton4.TabStop = true;
-            this.radioButton4.Text = "Unlimited";
-            this.radioButton4.UseVisualStyleBackColor = true;
-            // 
-            // textBox3
-            // 
-            this.textBox3.Location = new System.Drawing.Point(70, 53);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(48, 20);
-            this.textBox3.TabIndex = 4;
-            // 
-            // radioButton3
-            // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(6, 53);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(58, 17);
-            this.radioButton3.TabIndex = 3;
-            this.radioButton3.Text = "Limited";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.label8);
-            this.groupBox1.Controls.Add(this.textBox2);
-            this.groupBox1.Controls.Add(this.radioButton2);
-            this.groupBox1.Controls.Add(this.radioButton1);
-            this.groupBox1.Location = new System.Drawing.Point(285, 7);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(155, 100);
-            this.groupBox1.TabIndex = 7;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Download Limiter:";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Enabled = false;
-            this.label8.Location = new System.Drawing.Point(124, 55);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(29, 13);
-            this.label8.TabIndex = 3;
-            this.label8.Text = "kb/s";
-            // 
-            // textBox2
-            // 
-            this.textBox2.Location = new System.Drawing.Point(70, 50);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(48, 20);
-            this.textBox2.TabIndex = 2;
-            // 
-            // radioButton2
-            // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(6, 53);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(58, 17);
-            this.radioButton2.TabIndex = 1;
-            this.radioButton2.Text = "Limited";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            // 
-            // radioButton1
-            // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Checked = true;
-            this.radioButton1.Location = new System.Drawing.Point(6, 30);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(68, 17);
-            this.radioButton1.TabIndex = 0;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "Unlimited";
-            this.radioButton1.UseVisualStyleBackColor = true;
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(236, 3);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(86, 13);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "Processed Itens:";
+            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // numberofitems
             // 
             this.numberofitems.AutoSize = true;
-            this.numberofitems.Location = new System.Drawing.Point(18, 98);
+            this.numberofitems.Location = new System.Drawing.Point(3, 3);
             this.numberofitems.Name = "numberofitems";
             this.numberofitems.Size = new System.Drawing.Size(88, 13);
             this.numberofitems.TabIndex = 6;
-            this.numberofitems.Text = "Items Processed:";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(15, 119);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(245, 111);
-            this.textBox1.TabIndex = 4;
-            // 
-            // currentBandwidthUploadLabel
-            // 
-            this.currentBandwidthUploadLabel.AutoSize = true;
-            this.currentBandwidthUploadLabel.Location = new System.Drawing.Point(15, 41);
-            this.currentBandwidthUploadLabel.Name = "currentBandwidthUploadLabel";
-            this.currentBandwidthUploadLabel.Size = new System.Drawing.Size(134, 13);
-            this.currentBandwidthUploadLabel.TabIndex = 3;
-            this.currentBandwidthUploadLabel.Text = "Current Upload Bandwidth:";
-            // 
-            // currentBandwidthDownloadLabel
-            // 
-            this.currentBandwidthDownloadLabel.AutoSize = true;
-            this.currentBandwidthDownloadLabel.Location = new System.Drawing.Point(15, 24);
-            this.currentBandwidthDownloadLabel.Name = "currentBandwidthDownloadLabel";
-            this.currentBandwidthDownloadLabel.Size = new System.Drawing.Size(148, 13);
-            this.currentBandwidthDownloadLabel.TabIndex = 2;
-            this.currentBandwidthDownloadLabel.Text = "Current Download Bandwidth:";
-            // 
-            // totalBandwidthConsumptionLabel
-            // 
-            this.totalBandwidthConsumptionLabel.AutoSize = true;
-            this.totalBandwidthConsumptionLabel.Location = new System.Drawing.Point(12, 7);
-            this.totalBandwidthConsumptionLabel.Name = "totalBandwidthConsumptionLabel";
-            this.totalBandwidthConsumptionLabel.Size = new System.Drawing.Size(115, 13);
-            this.totalBandwidthConsumptionLabel.TabIndex = 1;
-            this.totalBandwidthConsumptionLabel.Text = "Total Bandwidth Used:";
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Location = new System.Drawing.Point(15, 68);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(245, 23);
-            this.progressBar1.TabIndex = 0;
+            this.numberofitems.Text = "Processing Itens:";
             // 
             // tabPage3
             // 
@@ -357,6 +220,16 @@ namespace GreenQloud.UI
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Account Information for current computer:";
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(15, 202);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(125, 23);
+            this.button4.TabIndex = 7;
+            this.button4.Text = "Check for Updates";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // groupBox4
             // 
@@ -425,15 +298,9 @@ namespace GreenQloud.UI
             this.greenusername.TabIndex = 0;
             this.greenusername.Text = "GreenQloud Username:";
             // 
-            // button4
+            // backgroundWorker1
             // 
-            this.button4.Location = new System.Drawing.Point(15, 202);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(125, 23);
-            this.button4.TabIndex = 7;
-            this.button4.Text = "Check for Updates";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
             // 
             // Preferences
             // 
@@ -455,10 +322,6 @@ namespace GreenQloud.UI
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -479,22 +342,6 @@ namespace GreenQloud.UI
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.Label totalBandwidthConsumptionLabel;
-        private System.Windows.Forms.Label currentBandwidthUploadLabel;
-        private System.Windows.Forms.Label currentBandwidthDownloadLabel;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton1;
-        private System.Windows.Forms.Label numberofitems;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.RadioButton radioButton4;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.GroupBox groupBox4;
@@ -505,6 +352,11 @@ namespace GreenQloud.UI
         private System.Windows.Forms.Label qloudversion;
         private System.Windows.Forms.Label greenusername;
         private Button button4;
+        private Label numberofitems;
+        private ListBox listBox2;
+        private ListBox listBox1;
+        private Label label4;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
 
     }
 }
