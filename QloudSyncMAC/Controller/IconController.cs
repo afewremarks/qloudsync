@@ -307,213 +307,213 @@ namespace GreenQloud {
             };
         }
 
-        private static object lockMenu = new object();
+
         public void CreateMenu ()
         {
-            lock (lockMenu) {
-                this.recentChanges.Clear ();
+            this.recentChanges.Clear ();
 
-                    this.menu = new NSMenu ();
-                    this.menu.AutoEnablesItems = false;
+            using (NSAutoreleasePool a = new NSAutoreleasePool ()) {
+                this.menu = new NSMenu ();
+                this.menu.AutoEnablesItems = false;
 
-                    this.state_item = new NSMenuItem () {
-                        Title = StateText,
-                        Enabled = true
-                    };
+                this.state_item = new NSMenuItem () {
+                    Title = StateText,
+                    Enabled = true
+                };
 
-                    this.folder_item = new NSMenuItem () {
-                        Title = GlobalSettings.HomeFolderName + " Folder"
-                    };
+                this.folder_item = new NSMenuItem () {
+                    Title = GlobalSettings.HomeFolderName+" Folder"
+                };
 
-                    this.folder_item.Activated += delegate {
-                        StorageFolderClicked ();
-                    };
+                this.folder_item.Activated += delegate {
+                    StorageFolderClicked ();
+                };
 
-                    this.folder_item.Image = this.sparkleshare_image;
-                    this.folder_item.Image.Size = new SizeF (16, 16);
-                    this.folder_item.Enabled = true;
+                this.folder_item.Image = this.sparkleshare_image;
+                this.folder_item.Image.Size = new SizeF (16, 16);
+                this.folder_item.Enabled = true;
 
-                    this.preferences_item = new NSMenuItem () {
-                        Title = "Preferences",
-                        Enabled = true
-                    };
+                this.preferences_item = new NSMenuItem () {
+                    Title   = "Preferences",
+                    Enabled = true
+                };
 
-                    this.preferences_item.Activated += delegate {
-                        if (PreferenceController == null) {
-                            PreferenceController = new PreferenceWindowController ();
-                            PreferenceController.Window.WillClose += delegate {
-                                PreferenceController = null;
-                            };
-                        } else {
-                            PreferenceController.Window.OrderFrontRegardless ();
-                        }
-                    };
-
-                    this.recent_events_title = new NSMenuItem () {
-                        Title = "Recently Changed",
-                        Enabled = false
-                    };       
-
-                    this.about_item = new NSMenuItem () {
-                        Title = string.Format ("About {0}", GlobalSettings.ApplicationName),
-                        Enabled = true
-                    };
-
-                    this.openweb_item = new NSMenuItem () {
-                        Title = "Share/View Online",
-                        Enabled = true
-                    };
-
-                    this.openweb_item.Image = this.share_image;
-                    this.openweb_item.Image.Size = new SizeF (16, 16);
-                    this.openweb_item.Enabled = true;
-
-                    this.openweb_item.Activated += delegate {                    
-                        Program.Controller.OpenStorageQloudWebSite ();
-                    };
-
-                    this.about_item.Activated += delegate {
-                        AboutClicked ();
-                    };
-
-                    this.pause_sync = new NSMenuItem () {
-                        Title = PauseText (),
-                        Enabled = true
-                    };
-
-                    this.pause_sync.Activated += delegate {
-                        PauseSync ();
-                    };
-
-                    this.quit_item = new NSMenuItem () {
-                        Title = "Quit",
-                        Enabled = QuitItemEnabled
-                    };
-
-                    this.quit_item.Activated += delegate {
-                        QuitClicked ();
-                    };
-
-
-
-                    co2_savings_item = new NSMenuItem () {
-                        Title = "",
-                        Enabled = true,
-                        Hidden = true
-                    };
-
-                    if (co2Update == null) {
-                        co2Update = new Thread (delegate() {
-                            while (true) {
-                                try {
-                                    string spent = Statistics.TotalUsedSpace.Spent;
-                                    string saved = Statistics.EarlyCO2Savings.Saved;
-                                    string subscript = "2";
-                                    subscript.ToLowerInvariant ();
-
-                                    using (var ns = new NSAutoreleasePool ()) {
-                                        NSRunLoop.Main.BeginInvokeOnMainThread (() => { 
-                                            if (spent != null && saved != null) {
-                                                co2_savings_item.Title = spent + " used | " + saved + " CO₂ saved";
-                                                co2_savings_item.Hidden = false;
-                                            }
-                                        });
-                                    }
-                                } catch (Exception e) {
-                                    Console.WriteLine (e.Message);
-                                    Logger.LogInfo ("INFO", "Cannot load CO₂ savings.");
-                                }
-                                Thread.Sleep (60000);
-                            }
-                        });
-                        co2Update.Start ();
+                this.preferences_item.Activated += delegate {
+                    if(PreferenceController == null){
+                        PreferenceController = new PreferenceWindowController ();
+                        PreferenceController.Window.WillClose += delegate {
+                            PreferenceController = null;
+                        };
+                    } else {
+                        PreferenceController.Window.OrderFrontRegardless();
                     }
+                };
 
-                    help_item = new NSMenuItem () {
-                        Title = "Help Center"
-                    };
+                this.recent_events_title = new NSMenuItem () {
+                    Title   = "Recently Changed",
+                    Enabled =  false
+                };       
 
-                    help_item.Activated += delegate {
-                        Program.Controller.OpenWebsite ("http://support.greenqloud.com");
-                    };
+                this.about_item = new NSMenuItem () {
+                    Title   = string.Format("About {0}", GlobalSettings.ApplicationName),
+                    Enabled = true
+                };
 
-                   
-                    bool renderLoggedIn = Credential.Username != "";
-                    if (renderLoggedIn) {
-                        this.menu.AddItem (this.state_item);
-                        this.menu.AddItem (NSMenuItem.SeparatorItem);
-                        this.menu.AddItem (co2_savings_item);
-                        this.menu.AddItem (this.folder_item);
-                        this.menu.AddItem (this.openweb_item);  
-                        this.menu.AddItem (NSMenuItem.SeparatorItem);
-                        this.menu.AddItem (this.recent_events_title);
-                        this.menu.AddItem (NSMenuItem.SeparatorItem);
+                this.openweb_item = new NSMenuItem () {
+                    Title = "Share/View Online",
+                    Enabled = true
+                };
+
+                this.openweb_item.Image = this.share_image;
+                this.openweb_item.Image.Size = new SizeF (16, 16);
+                this.openweb_item.Enabled = true;
+
+                this.openweb_item.Activated += delegate {                    
+                    Program.Controller.OpenStorageQloudWebSite();
+                };
+
+                this.about_item.Activated += delegate {
+                    AboutClicked ();
+                };
+
+                this.pause_sync = new NSMenuItem() {
+                    Title = PauseText(),
+                    Enabled = true
+                };
+
+                this.pause_sync.Activated += delegate {
+                    PauseSync();
+                };
+
+                this.quit_item = new NSMenuItem () {
+                    Title   = "Quit",
+                    Enabled = QuitItemEnabled
+                };
+
+                this.quit_item.Activated += delegate {
+                    QuitClicked ();
+                };
+
+
+
+                co2_savings_item = new NSMenuItem () {
+                    Title = "",
+                    Enabled = true,
+                    Hidden = true
+                };
+
+                if (co2Update == null) {
+                    co2Update = new Thread (delegate() {
+                        while (true) {
+                            try {
+                                string spent = Statistics.TotalUsedSpace.Spent;
+                                string saved = Statistics.EarlyCO2Savings.Saved;
+                                string subscript = "2";
+                                subscript.ToLowerInvariant ();
+
+                                using (var ns = new NSAutoreleasePool ()) {
+                                    NSRunLoop.Main.BeginInvokeOnMainThread (() => { 
+                                        if (spent != null && saved != null) {
+                                            co2_savings_item.Title = spent + " used | " + saved + " CO₂ saved";
+                                            co2_savings_item.Hidden = false;
+                                        }
+                                    });
+                                }
+                            } catch (Exception e) {
+                                Console.WriteLine (e.Message);
+                                Logger.LogInfo ("INFO", "Cannot load CO₂ savings.");
+                            }
+                            Thread.Sleep (60000);
+                        }
+                    });
+                    co2Update.Start ();
+                }
+
+                help_item = new NSMenuItem () {
+                    Title = "Help Center"
+                };
+
+                help_item.Activated += delegate {
+                    Program.Controller.OpenWebsite ("http://support.greenqloud.com");
+                };
+
+               
+                bool renderLoggedIn = Credential.Username != "";
+                if (renderLoggedIn) {
+                    this.menu.AddItem (this.state_item);
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
+                    this.menu.AddItem (co2_savings_item);
+                    this.menu.AddItem (this.folder_item);
+                    this.menu.AddItem (this.openweb_item);  
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
+                    this.menu.AddItem (this.recent_events_title);
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
+                
+
+                    if (Program.Controller.DatabaseLoaded()) {
+                        SQLiteEventDAO eventDao = new SQLiteEventDAO ();
+                        List<Event> events = eventDao.LastEvents;
+                        string text = "";
+
+                        foreach (Event e in events) {
+
+                            NSMenuItem current = new NSMenuItem () {
+                                Title = e.ItemName,
+                                Enabled = true
+                            };
+
+
+                            current.Image = this.default_image;
+                            if (e.ItemType == ItemType.IMAGE)
+                                current.Image = this.pics_image;
+                            if (e.ItemType == ItemType.TEXT)
+                                current.Image = this.docs_image;
+                            if (e.ItemType == ItemType.VIDEO)
+                                current.Image = this.movies_image;
+                            if (e.ItemType == ItemType.AUDIO)
+                                current.Image = this.music_image;
+
+                            current.ToolTip = e.ToString ();
+
+                            EventHandler evt = new EventHandler(
+                                delegate {
+                                    NSRunLoop.Main.BeginInvokeOnMainThread (() => RecentChangeItemClicked(e, null));
+                                }
+                            );
+                            current.Activated += evt;
+
+                            string title = "   "+e.ItemUpdatedAt;
+                            NSAttributedString att = new NSAttributedString (title, NSFontManager.SharedFontManager.FontWithFamily ("Helvetica", NSFontTraitMask.Narrow, 5, 11));
+                            NSMenuItem subtitle = new NSMenuItem () {
+                                Enabled = false
+                            };
+                            subtitle.IndentationLevel = 1;
+                            subtitle.AttributedTitle = att;
+
+                            this.recentChanges.Add (current);
+                            this.menu.AddItem (current);
+                            this.menu.AddItem (subtitle);
+                            text += e.ToString () + "\n\n";
+
+                        }
+                        this.recent_events_title.ToolTip = text;
+
                     
 
-                        if (Program.Controller.DatabaseLoaded ()) {
-                            SQLiteEventDAO eventDao = new SQLiteEventDAO ();
-                            List<Event> events = eventDao.LastEvents;
-                            string text = "";
-
-                            foreach (Event e in events) {
-
-                                NSMenuItem current = new NSMenuItem () {
-                                    Title = e.ItemName,
-                                    Enabled = true
-                                };
-
-
-                                current.Image = this.default_image;
-                                if (e.ItemType == ItemType.IMAGE)
-                                    current.Image = this.pics_image;
-                                if (e.ItemType == ItemType.TEXT)
-                                    current.Image = this.docs_image;
-                                if (e.ItemType == ItemType.VIDEO)
-                                    current.Image = this.movies_image;
-                                if (e.ItemType == ItemType.AUDIO)
-                                    current.Image = this.music_image;
-
-                                current.ToolTip = e.ToString ();
-
-                                EventHandler evt = new EventHandler (
-                                                       delegate {
-                                        NSRunLoop.Main.BeginInvokeOnMainThread (() => RecentChangeItemClicked (e, null));
-                                    }
-                                                   );
-                                current.Activated += evt;
-
-                                string title = "   " + e.ItemUpdatedAt;
-                                NSAttributedString att = new NSAttributedString (title, NSFontManager.SharedFontManager.FontWithFamily ("Helvetica", NSFontTraitMask.Narrow, 5, 11));
-                                NSMenuItem subtitle = new NSMenuItem () {
-                                    Enabled = false
-                                };
-                                subtitle.IndentationLevel = 1;
-                                subtitle.AttributedTitle = att;
-
-                                this.recentChanges.Add (current);
-                                this.menu.AddItem (current);
-                                this.menu.AddItem (subtitle);
-                                text += e.ToString () + "\n\n";
-
-                            }
-                            this.recent_events_title.ToolTip = text;
-
-                        
-
-                        }
-                        this.menu.AddItem (NSMenuItem.SeparatorItem);
-                        this.menu.AddItem (this.preferences_item);
-                        this.menu.AddItem (this.pause_sync);
-                        this.menu.AddItem (NSMenuItem.SeparatorItem);
                     }
-                    //this.menu.AddItem (help_item);
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
+                    this.menu.AddItem (this.preferences_item);
+                    this.menu.AddItem (this.pause_sync);
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
+                }
+                //this.menu.AddItem (help_item);
 
-                   
-                    //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
-                    this.status_item.Menu = this.menu;
-                    this.menu.AddItem (help_item);
-                    this.menu.AddItem (this.about_item);
-                    this.menu.AddItem (quit_item);
+               
+                //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
+                this.status_item.Menu = this.menu;
+                this.menu.AddItem (help_item);
+                this.menu.AddItem (this.about_item);
+                this.menu.AddItem (quit_item);
             }
         }
 
