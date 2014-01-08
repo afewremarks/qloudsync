@@ -40,7 +40,7 @@
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <IncludeMonoRuntime>true</IncludeMonoRuntime>
     <UseSGen>true</UseSGen>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <I18n>
