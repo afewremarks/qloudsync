@@ -127,7 +127,6 @@
     <Compile Include="Core\Model\TimeDiff.cs" />
     <Compile Include="Core\Exception\WarningException.cs" />
     <Compile Include="Core\Controller\AbstractApplicationController.cs" />
-    <Compile Include="Core\Util\NetworkTraffic.cs" />
     <Compile Include="Core\Repository\TransferStatistic.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
