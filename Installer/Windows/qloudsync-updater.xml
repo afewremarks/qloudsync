@@ -1,7 +1,7 @@
 <project>
     <shortName>QloudSync</shortName>
     <fullName>QloudSync</fullName>
-    <version>3.1.4</version>
+    <version>0.3.2</version>
     <licenseFile>E:/Users/Maia/Documents/GitHub/qloudsync/Installer/Windows/BitRock_License.txt</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
     <leftImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>

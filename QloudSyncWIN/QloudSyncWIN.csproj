@@ -220,6 +220,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Content Include="Resources\process-syncing-idle-active.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\SelectSync.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -299,7 +302,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\process-syncing-idle-active.png">
+    <Content Include="Resources\process-syncing-idle-synced.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
