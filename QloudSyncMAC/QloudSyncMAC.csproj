@@ -161,6 +161,7 @@
     <BundleResource Include="Pixmaps\SelectSync1.png" />
     <BundleResource Include="Pixmaps\Changeit220.png" />
     <BundleResource Include="Pixmaps\Continue159.png" />
+    <BundleResource Include="Pixmaps\process-paused.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pixmaps\qloudsync-app.icns">

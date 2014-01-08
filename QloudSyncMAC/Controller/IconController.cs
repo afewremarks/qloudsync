@@ -40,7 +40,8 @@ namespace GreenQloud {
         SyncingUp,
         SyncingDown,
         Syncing,
-        Error
+        Error,
+        Paused
     }
 
     public class IconController : NSObject {
@@ -84,6 +85,7 @@ namespace GreenQloud {
         private NSImage up_to_date;
         private NSImage work_in_progress;
         private NSImage error_in_sync;
+        private NSImage sync_pause_active;
 
         private NSImage docs_image;
         private NSImage movies_image;
@@ -94,19 +96,17 @@ namespace GreenQloud {
 
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
         public delegate void UpdateIconEventHandler (IconState state);
-        
-        public event UpdateMenuEventHandler UpdateMenuEvent = delegate { };
-        public delegate void UpdateMenuEventHandler (IconState state);
-        
+
         public event UpdateStatusItemEventHandler UpdateStatusItemEvent = delegate { };
-        public delegate void UpdateStatusItemEventHandler (string state_text, NSImage image);
-        
+
+        public delegate void UpdateStatusItemEventHandler (string state_text,NSImage image);
+
         public event UpdateQuitItemEventHandler UpdateQuitItemEvent = delegate { };
+
         public delegate void UpdateQuitItemEventHandler (bool quit_item_enabled);
 
         public IconState CurrentState = IconState.Working;
         public string StateText = string.Format ("Welcome to {0}!", GlobalSettings.ApplicationName);
-
         public readonly int MenuOverflowThreshold = 9;
         public readonly int MinSubmenuOverflowCount = 3;
         public string[] Folders;
@@ -115,7 +115,7 @@ namespace GreenQloud {
         public string[] OverflowFolderErrors;
         private Thread co2Update;
         private bool isPaused = false;
-        
+
         public bool QuitItemEnabled {
             get {
                 return (CurrentState == IconState.Idle || CurrentState == IconState.Error);
@@ -131,33 +131,33 @@ namespace GreenQloud {
         public IconController () : base ()
         {
             recentChanges = new List<NSMenuItem> ();
-            using (var a = new NSAutoreleasePool ())
-            {
+            using (var a = new NSAutoreleasePool ()) {
                 this.status_item = NSStatusBar.SystemStatusBar.CreateStatusItem (28);
                 this.status_item.HighlightMode = true;
 
 
-                this.syncing_working  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-working.png"));
-                this.syncing_idle_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-idle.png"));
-                this.syncing_up_image    = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-up.png"));
-                this.syncing_down_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-down.png"));
-                this.syncing_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing.png"));
+                this.syncing_working = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-working.png"));
+                this.syncing_idle_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-idle.png"));
+                this.syncing_up_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-up.png"));
+                this.syncing_down_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-down.png"));
+                this.syncing_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing.png"));
                 this.syncing_error_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.png"));
                 this.disconnected_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-active_new.png"));
 
-                this.syncing_idle_image_active  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-idle-active.png"));
-                this.syncing_up_image_active    = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-up-active.png"));
-                this.syncing_down_image_active  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-down-active.png"));
-                this.syncing_image_active  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-active.png"));
+                this.syncing_idle_image_active = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-idle-active.png"));
+                this.syncing_up_image_active = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-up-active.png"));
+                this.syncing_down_image_active = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-down-active.png"));
+                this.syncing_image_active = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-active.png"));
                 this.syncing_error_image_active = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error-active.png"));
-
-                this.status_item.Image      = this.syncing_working;
+                this.sync_pause_active = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-paused.png"));
+    
+                this.status_item.Image = this.syncing_working;
                 this.status_item.Image.Size = new SizeF (16, 16);
 
                 //this.status_item.AlternateImage      = this.syncing_idle_image_active;
                 //this.status_item.AlternateImage.Size = new SizeF (16, 16);
-                this.folder_image       = NSImage.ImageNamed ("NSFolder");
-                this.caution_image      = NSImage.ImageNamed ("NSCaution");
+                this.folder_image = NSImage.ImageNamed ("NSFolder");
+                this.caution_image = NSImage.ImageNamed ("NSCaution");
                 this.sparkleshare_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "qloudsync-folder.icns"));
 
                 this.share_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "share.png"));
@@ -169,111 +169,123 @@ namespace GreenQloud {
                 this.music_image.Size = new SizeF (16, 16);
                 this.pics_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "folder-pics.png"));
                 this.pics_image.Size = new SizeF (16, 16);
-                this.default_image  = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "file-3.png"));
+                this.default_image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "file-3.png"));
                 this.default_image.Size = new SizeF (16, 16);
 
                 CreateMenu ();
             }
 
+
             Program.Controller.OnIdle += delegate {
-                CurrentState = IconState.Idle;
-                StateText = "✓  Up to date ";
-                UpdateQuitItemEvent (QuitItemEnabled);
-                UpdateStatusItemEvent (StateText, this.up_to_date);
-                UpdateIconEvent (CurrentState);
-                UpdateMenuEvent (CurrentState);
+                    CurrentState = IconState.Idle;
+                    StateText = "✓  Up to date ";
+                    UpdateQuitItemEvent (QuitItemEnabled);
+                    UpdateStatusItemEvent (StateText, this.up_to_date);
+                    UpdateIconEvent (CurrentState);
+                    CreateMenu();
             };
 
             Program.Controller.OnPaused += delegate {
-                CurrentState = IconState.Error;
-                StateText = "Sync Paused ";
-                UpdateQuitItemEvent (QuitItemEnabled);
-                UpdateStatusItemEvent (StateText, this.up_to_date);
-                UpdateIconEvent (CurrentState);
-                UpdateMenuEvent (CurrentState);
-                this.status_item.Image = this.disconnected_image;
-                isPaused = true;
-           }; 
+                    CurrentState = IconState.Paused;
+                    StateText = "Sync Paused ";
+                    isPaused = true;
+                    UpdateQuitItemEvent (QuitItemEnabled);
+                    UpdateStatusItemEvent (StateText, this.up_to_date);
+                    UpdateIconEvent (CurrentState);
+                    CreateMenu();
+            }; 
 
             Program.Controller.OnSyncing += delegate {
-                isPaused = false;
+           
+                    isPaused = false;
 
-                bool syncDown = SynchronizerUnit.AnyDownloading(); 
-                bool syncUp = SynchronizerUnit.AnyUploading(); 
+                    bool syncDown = SynchronizerUnit.AnyDownloading (); 
+                    bool syncUp = SynchronizerUnit.AnyUploading (); 
 
-                if(syncDown && syncUp){
-                    CurrentState = IconState.Syncing;
-                    StateText    = "⟳ Syncing changes…";
-                    
-                } else if (syncUp) {
-                    CurrentState = IconState.SyncingUp;
-                    StateText    = "⟳ Sending changes…";
-                    
-                } else if (syncDown){
-                    CurrentState = IconState.SyncingDown;
-                    StateText    = "⟳ Receiving changes…";
-                } else {
-                    CurrentState = IconState.Idle;
-                    StateText = "✓  Up to date ";
-                }
+                    if (syncDown && syncUp) {
+                        CurrentState = IconState.Syncing;
+                        StateText = "⟳ Syncing changes…";
+                        
+                    } else if (syncUp) {
+                        CurrentState = IconState.SyncingUp;
+                        StateText = "⟳ Sending changes…";
+                        
+                    } else if (syncDown) {
+                        CurrentState = IconState.SyncingDown;
+                        StateText = "⟳ Receiving changes…";
+                    } else {
+                        CurrentState = IconState.Idle;
+                        StateText = "✓  Up to date ";
+                    }
 
-                UpdateIconEvent (CurrentState);
-                UpdateStatusItemEvent (StateText, this.syncing_working);
-                UpdateQuitItemEvent (QuitItemEnabled);
-                UpdateMenuEvent (CurrentState);
+                    UpdateIconEvent (CurrentState);
+                    UpdateStatusItemEvent (StateText, this.syncing_working);
+                    UpdateQuitItemEvent (QuitItemEnabled);
+                    CreateMenu();
+
             };
             
             Program.Controller.OnError += delegate {
-                isPaused = false;
-                CurrentState = IconState.Error;
-                switch(Program.Controller.ErrorType)
-                {
+             
+                    isPaused = false;
+                    CurrentState = IconState.Error;
+                    switch (Program.Controller.ErrorType) {
                     case Controller.ERROR_TYPE.DISCONNECTION:
-                    StateText = "✗   Lost network connection";
-                    break;
+                        StateText = "✗   Lost network connection";
+                        break;
                     case Controller.ERROR_TYPE.ACCESS_DENIED:
-                    StateText = "✗   Access Denied. Login again!";
+                        StateText = "✗   Access Denied. Login again!";
                         this.preferences_item.Enabled = true;
-                    break;
+                        break;
                     default:
-                    StateText = "✗   Failed to send some changes";
-                    break;
-                }
-                UpdateQuitItemEvent (QuitItemEnabled);
-                UpdateStatusItemEvent (StateText, this.error_in_sync);
-                UpdateIconEvent (CurrentState);
-                UpdateMenuEvent (CurrentState);
+                        StateText = "✗   Failed to send some changes";
+                        break;
+                    }
+                    UpdateQuitItemEvent (QuitItemEnabled);
+                    UpdateStatusItemEvent (StateText, this.error_in_sync);
+                    UpdateIconEvent (CurrentState);
+                    CreateMenu();
+                
             };			
 
             UpdateIconEvent += delegate (IconState state) {
-                using (var a = new NSAutoreleasePool ())
-                {
+                using (var a = new NSAutoreleasePool ()) {
                     NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                         switch (state) {
-                        case IconState.Idle: {
-                            this.status_item.Image          = this.syncing_idle_image;
-                            break;
-                        }
-                        case IconState.SyncingUp: {
-                            this.status_item.Image          = this.syncing_up_image;
-                            break;
-                        }
-                        case IconState.SyncingDown: {
-                            this.status_item.Image          = this.syncing_down_image;
-                            break;
-                        }
-                        case IconState.Syncing: {
-                            this.status_item.Image          = this.syncing_image;
-                            break;
-                        }
-                        case IconState.Error: {
-                            if(Program.Controller.ErrorType == Controller.ERROR_TYPE.DISCONNECTION){
-                                this.status_item.Image          = this.disconnected_image;
-                            } else {
-                                this.status_item.Image          = this.syncing_error_image;
+                        case IconState.Idle:
+                            {
+                                this.status_item.Image = this.syncing_idle_image;
+                                break;
                             }
-                            break;
-                        }
+                        case IconState.SyncingUp:
+                            {
+                                this.status_item.Image = this.syncing_up_image;
+                                break;
+                            }
+                        case IconState.SyncingDown:
+                            {
+                                this.status_item.Image = this.syncing_down_image;
+                                break;
+                            }
+                        case IconState.Syncing:
+                            {
+                                this.status_item.Image = this.syncing_image;
+                                break;
+                            }
+                        case IconState.Error:
+                            {
+                                if (Program.Controller.ErrorType == Controller.ERROR_TYPE.DISCONNECTION) {
+                                    this.status_item.Image = this.disconnected_image;
+                                } else {
+                                    this.status_item.Image = this.syncing_error_image;
+                                }
+                                break;
+                            }
+                        case IconState.Paused:
+                            {
+                                this.status_item.Image = this.sync_pause_active;
+                                break;
+                            }
                         }
 
                         this.status_item.Image.Size = new SizeF (16, 16);
@@ -282,24 +294,15 @@ namespace GreenQloud {
             };
 
             UpdateStatusItemEvent += delegate (string state_text, NSImage image) {
-                using (var a = new NSAutoreleasePool ())
-                {
+                using (var a = new NSAutoreleasePool ()) {
                     NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                         StateText = state_text;
                     });
                 }
             };
 
-            UpdateMenuEvent += delegate {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    NSRunLoop.Main.BeginInvokeOnMainThread (() => CreateMenu ());
-                }
-            };
-
             UpdateQuitItemEvent += delegate (bool quit_item_enabled) {
-                using (var a = new NSAutoreleasePool ())
-                {
+                using (var a = new NSAutoreleasePool ()) {
                     NSRunLoop.Main.BeginInvokeOnMainThread (delegate {
                         this.quit_item.Enabled = quit_item_enabled;
                     });
@@ -307,213 +310,215 @@ namespace GreenQloud {
             };
         }
 
-
+        private Object menuLock = new object ();
         public void CreateMenu ()
         {
-            this.recentChanges.Clear ();
+            lock (menuLock) {
+                this.recentChanges.Clear ();
 
-            using (NSAutoreleasePool a = new NSAutoreleasePool ()) {
-                this.menu = new NSMenu ();
-                this.menu.AutoEnablesItems = false;
+                using (NSAutoreleasePool a = new NSAutoreleasePool ()) {
+                    this.menu = new NSMenu ();
+                    this.menu.AutoEnablesItems = false;
 
-                this.state_item = new NSMenuItem () {
-                    Title = StateText,
-                    Enabled = true
-                };
+                    this.state_item = new NSMenuItem () {
+                        Title = StateText,
+                        Enabled = true
+                    };
 
-                this.folder_item = new NSMenuItem () {
-                    Title = GlobalSettings.HomeFolderName+" Folder"
-                };
+                    this.folder_item = new NSMenuItem () {
+                        Title = GlobalSettings.HomeFolderName+" Folder"
+                    };
 
-                this.folder_item.Activated += delegate {
-                    StorageFolderClicked ();
-                };
+                    this.folder_item.Activated += delegate {
+                        StorageFolderClicked ();
+                    };
 
-                this.folder_item.Image = this.sparkleshare_image;
-                this.folder_item.Image.Size = new SizeF (16, 16);
-                this.folder_item.Enabled = true;
+                    this.folder_item.Image = this.sparkleshare_image;
+                    this.folder_item.Image.Size = new SizeF (16, 16);
+                    this.folder_item.Enabled = true;
 
-                this.preferences_item = new NSMenuItem () {
-                    Title   = "Preferences",
-                    Enabled = true
-                };
+                    this.preferences_item = new NSMenuItem () {
+                        Title   = "Preferences",
+                        Enabled = true
+                    };
 
-                this.preferences_item.Activated += delegate {
-                    if(PreferenceController == null){
-                        PreferenceController = new PreferenceWindowController ();
-                        PreferenceController.Window.WillClose += delegate {
-                            PreferenceController = null;
-                        };
-                    } else {
-                        PreferenceController.Window.OrderFrontRegardless();
-                    }
-                };
-
-                this.recent_events_title = new NSMenuItem () {
-                    Title   = "Recently Changed",
-                    Enabled =  false
-                };       
-
-                this.about_item = new NSMenuItem () {
-                    Title   = string.Format("About {0}", GlobalSettings.ApplicationName),
-                    Enabled = true
-                };
-
-                this.openweb_item = new NSMenuItem () {
-                    Title = "Share/View Online",
-                    Enabled = true
-                };
-
-                this.openweb_item.Image = this.share_image;
-                this.openweb_item.Image.Size = new SizeF (16, 16);
-                this.openweb_item.Enabled = true;
-
-                this.openweb_item.Activated += delegate {                    
-                    Program.Controller.OpenStorageQloudWebSite();
-                };
-
-                this.about_item.Activated += delegate {
-                    AboutClicked ();
-                };
-
-                this.pause_sync = new NSMenuItem() {
-                    Title = PauseText(),
-                    Enabled = true
-                };
-
-                this.pause_sync.Activated += delegate {
-                    PauseSync();
-                };
-
-                this.quit_item = new NSMenuItem () {
-                    Title   = "Quit",
-                    Enabled = QuitItemEnabled
-                };
-
-                this.quit_item.Activated += delegate {
-                    QuitClicked ();
-                };
-
-
-
-                co2_savings_item = new NSMenuItem () {
-                    Title = "",
-                    Enabled = true,
-                    Hidden = true
-                };
-
-                if (co2Update == null) {
-                    co2Update = new Thread (delegate() {
-                        while (true) {
-                            try {
-                                string spent = Statistics.TotalUsedSpace.Spent;
-                                string saved = Statistics.EarlyCO2Savings.Saved;
-                                string subscript = "2";
-                                subscript.ToLowerInvariant ();
-
-                                using (var ns = new NSAutoreleasePool ()) {
-                                    NSRunLoop.Main.BeginInvokeOnMainThread (() => { 
-                                        if (spent != null && saved != null) {
-                                            co2_savings_item.Title = spent + " used | " + saved + " CO₂ saved";
-                                            co2_savings_item.Hidden = false;
-                                        }
-                                    });
-                                }
-                            } catch (Exception e) {
-                                Console.WriteLine (e.Message);
-                                Logger.LogInfo ("INFO", "Cannot load CO₂ savings.");
-                            }
-                            Thread.Sleep (60000);
+                    this.preferences_item.Activated += delegate {
+                        if (PreferenceController == null) {
+                            PreferenceController = new PreferenceWindowController ();
+                            PreferenceController.Window.WillClose += delegate {
+                                PreferenceController = null;
+                            };
+                        } else {
+                            PreferenceController.Window.OrderFrontRegardless ();
                         }
-                    });
-                    co2Update.Start ();
-                }
+                    };
 
-                help_item = new NSMenuItem () {
-                    Title = "Help Center"
-                };
+                    this.recent_events_title = new NSMenuItem () {
+                        Title   = "Recently Changed",
+                        Enabled =  false
+                    };       
 
-                help_item.Activated += delegate {
-                    Program.Controller.OpenWebsite ("http://support.greenqloud.com");
-                };
+                    this.about_item = new NSMenuItem () {
+                        Title   = string.Format("About {0}", GlobalSettings.ApplicationName),
+                        Enabled = true
+                    };
+
+                    this.openweb_item = new NSMenuItem () {
+                        Title = "Share/View Online",
+                        Enabled = true
+                    };
+
+                    this.openweb_item.Image = this.share_image;
+                    this.openweb_item.Image.Size = new SizeF (16, 16);
+                    this.openweb_item.Enabled = true;
+
+                    this.openweb_item.Activated += delegate {                    
+                        Program.Controller.OpenStorageQloudWebSite ();
+                    };
+
+                    this.about_item.Activated += delegate {
+                        AboutClicked ();
+                    };
+
+                    this.pause_sync = new NSMenuItem () {
+                        Title = PauseText(),
+                        Enabled = true
+                    };
+
+                    this.pause_sync.Activated += delegate {
+                        PauseSync ();
+                    };
+
+                    this.quit_item = new NSMenuItem () {
+                        Title   = "Quit",
+                        Enabled = QuitItemEnabled
+                    };
+
+                    this.quit_item.Activated += delegate {
+                        QuitClicked ();
+                    };
+
+
+
+                    co2_savings_item = new NSMenuItem () {
+                        Title = "",
+                        Enabled = true,
+                        Hidden = true
+                    };
+
+                    if (co2Update == null) {
+                        co2Update = new Thread (delegate() {
+                            while (true) {
+                                try {
+                                    string spent = Statistics.TotalUsedSpace.Spent;
+                                    string saved = Statistics.EarlyCO2Savings.Saved;
+                                    string subscript = "2";
+                                    subscript.ToLowerInvariant ();
+
+                                    using (var ns = new NSAutoreleasePool ()) {
+                                        NSRunLoop.Main.BeginInvokeOnMainThread (() => { 
+                                            if (spent != null && saved != null) {
+                                                co2_savings_item.Title = spent + " used | " + saved + " CO₂ saved";
+                                                co2_savings_item.Hidden = false;
+                                            }
+                                        });
+                                    }
+                                } catch (Exception e) {
+                                    Console.WriteLine (e.Message);
+                                    Logger.LogInfo ("INFO", "Cannot load CO₂ savings.");
+                                }
+                                Thread.Sleep (60000);
+                            }
+                        });
+                        co2Update.Start ();
+                    }
+
+                    help_item = new NSMenuItem () {
+                        Title = "Help Center"
+                    };
+
+                    help_item.Activated += delegate {
+                        Program.Controller.OpenWebsite ("http://support.greenqloud.com");
+                    };
 
                
-                bool renderLoggedIn = Credential.Username != "";
-                if (renderLoggedIn) {
-                    this.menu.AddItem (this.state_item);
-                    this.menu.AddItem (NSMenuItem.SeparatorItem);
-                    this.menu.AddItem (co2_savings_item);
-                    this.menu.AddItem (this.folder_item);
-                    this.menu.AddItem (this.openweb_item);  
-                    this.menu.AddItem (NSMenuItem.SeparatorItem);
-                    this.menu.AddItem (this.recent_events_title);
-                    this.menu.AddItem (NSMenuItem.SeparatorItem);
+                    bool renderLoggedIn = Credential.Username != "";
+                    if (renderLoggedIn) {
+                        this.menu.AddItem (this.state_item);
+                        this.menu.AddItem (NSMenuItem.SeparatorItem);
+                        this.menu.AddItem (co2_savings_item);
+                        this.menu.AddItem (this.folder_item);
+                        this.menu.AddItem (this.openweb_item);  
+                        this.menu.AddItem (NSMenuItem.SeparatorItem);
+                        this.menu.AddItem (this.recent_events_title);
+                        this.menu.AddItem (NSMenuItem.SeparatorItem);
                 
 
-                    if (Program.Controller.DatabaseLoaded()) {
-                        SQLiteEventDAO eventDao = new SQLiteEventDAO ();
-                        List<Event> events = eventDao.LastEvents;
-                        string text = "";
+                        if (Program.Controller.DatabaseLoaded ()) {
+                            SQLiteEventDAO eventDao = new SQLiteEventDAO ();
+                            List<Event> events = eventDao.LastEvents;
+                            string text = "";
 
-                        foreach (Event e in events) {
+                            foreach (Event e in events) {
 
-                            NSMenuItem current = new NSMenuItem () {
-                                Title = e.ItemName,
-                                Enabled = true
-                            };
+                                NSMenuItem current = new NSMenuItem () {
+                                    Title = e.ItemName,
+                                    Enabled = true
+                                };
 
 
-                            current.Image = this.default_image;
-                            if (e.ItemType == ItemType.IMAGE)
-                                current.Image = this.pics_image;
-                            if (e.ItemType == ItemType.TEXT)
-                                current.Image = this.docs_image;
-                            if (e.ItemType == ItemType.VIDEO)
-                                current.Image = this.movies_image;
-                            if (e.ItemType == ItemType.AUDIO)
-                                current.Image = this.music_image;
+                                current.Image = this.default_image;
+                                if (e.ItemType == ItemType.IMAGE)
+                                    current.Image = this.pics_image;
+                                if (e.ItemType == ItemType.TEXT)
+                                    current.Image = this.docs_image;
+                                if (e.ItemType == ItemType.VIDEO)
+                                    current.Image = this.movies_image;
+                                if (e.ItemType == ItemType.AUDIO)
+                                    current.Image = this.music_image;
 
-                            current.ToolTip = e.ToString ();
+                                current.ToolTip = e.ToString ();
 
-                            EventHandler evt = new EventHandler(
-                                delegate {
-                                    NSRunLoop.Main.BeginInvokeOnMainThread (() => RecentChangeItemClicked(e, null));
+                                EventHandler evt = new EventHandler (
+                                    delegate {
+                                    NSRunLoop.Main.BeginInvokeOnMainThread (() => RecentChangeItemClicked (e, null));
                                 }
-                            );
-                            current.Activated += evt;
+                                );
+                                current.Activated += evt;
 
-                            string title = "   "+e.ItemUpdatedAt;
-                            NSAttributedString att = new NSAttributedString (title, NSFontManager.SharedFontManager.FontWithFamily ("Helvetica", NSFontTraitMask.Narrow, 5, 11));
-                            NSMenuItem subtitle = new NSMenuItem () {
-                                Enabled = false
-                            };
-                            subtitle.IndentationLevel = 1;
-                            subtitle.AttributedTitle = att;
+                                string title = "   " + e.ItemUpdatedAt;
+                                NSAttributedString att = new NSAttributedString (title, NSFontManager.SharedFontManager.FontWithFamily ("Helvetica", NSFontTraitMask.Narrow, 5, 11));
+                                NSMenuItem subtitle = new NSMenuItem () {
+                                    Enabled = false
+                                };
+                                subtitle.IndentationLevel = 1;
+                                subtitle.AttributedTitle = att;
 
-                            this.recentChanges.Add (current);
-                            this.menu.AddItem (current);
-                            this.menu.AddItem (subtitle);
-                            text += e.ToString () + "\n\n";
+                                this.recentChanges.Add (current);
+                                this.menu.AddItem (current);
+                                this.menu.AddItem (subtitle);
+                                text += e.ToString () + "\n\n";
 
-                        }
-                        this.recent_events_title.ToolTip = text;
+                            }
+                            this.recent_events_title.ToolTip = text;
 
                     
 
+                        }
+                        this.menu.AddItem (NSMenuItem.SeparatorItem);
+                        this.menu.AddItem (this.preferences_item);
+                        this.menu.AddItem (this.pause_sync);
+                        this.menu.AddItem (NSMenuItem.SeparatorItem);
                     }
-                    this.menu.AddItem (NSMenuItem.SeparatorItem);
-                    this.menu.AddItem (this.preferences_item);
-                    this.menu.AddItem (this.pause_sync);
-                    this.menu.AddItem (NSMenuItem.SeparatorItem);
-                }
-                //this.menu.AddItem (help_item);
+                    //this.menu.AddItem (help_item);
 
                
-                //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
-                this.status_item.Menu = this.menu;
-                this.menu.AddItem (help_item);
-                this.menu.AddItem (this.about_item);
-                this.menu.AddItem (quit_item);
+                    //this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
+                    this.status_item.Menu = this.menu;
+                    this.menu.AddItem (help_item);
+                    this.menu.AddItem (this.about_item);
+                    this.menu.AddItem (quit_item);
+                }
             }
         }
 

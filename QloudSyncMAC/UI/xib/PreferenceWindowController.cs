@@ -19,15 +19,10 @@ namespace QloudSync
         private List<NSButton> remoteFoldersCheckboxes;
         private SQLiteRepositoryDAO repoDao;
         private SQLiteRepositoryIgnoreDAO repoIgnore;
-        private RemoteRepositoryController remoteRepositoryController;
-        //private NetworkTraffic netTraffic;
         private List<RepositoryItem> items;
         private List<RepositoryIgnore> ignoreFolders;
         private Timer timer;
-        private float lastAmountOfBytesReceived;
-        private float lastAmountOfBytesSent;
-        private bool makeStep;
-        private bool isUpload;
+       
         //Used to placeholder scroll
         private int count;
 
@@ -65,8 +60,6 @@ namespace QloudSync
         {   
             count = 0;
             items = new List<RepositoryItem>();
-            makeStep = false;
-            isUpload = false;
             repoDao = new SQLiteRepositoryDAO();
             repoIgnore = new SQLiteRepositoryIgnoreDAO();
             //netTraffic = new NetworkTraffic (Process.GetCurrentProcess().Id);
@@ -233,18 +226,10 @@ namespace QloudSync
             Event e = Program.Controller.GetCurrentEvent ();
             ResetItemList ();
             if (e != null) {
-
                 EventType eventType = e.EventType;
-
                 if (e.Item != null && eventType != EventType.DELETE) {
-
-
-
                     if(!items.Contains(e.Item)){
                         count++;
-
-
-
                         if(!(items.Count == 0))
                             itemsProcessedLabel.StringValue += "done!" + Environment.NewLine;
 
@@ -252,40 +237,22 @@ namespace QloudSync
                             itemsProcessedLabel.StringValue = "";
                             count = 0;
                         }
-                            
-
                         itemsLabel.StringValue = "1";
-                        makeStep = true;
-
                         if (e.RepositoryType == RepositoryType.LOCAL) {
                             try {
-
                                 if (e.EventType == EventType.MOVE) {
-
                                     items.Add (e.Item.ResultItem);
                                 } else {
                                     items.Add (e.Item);
                                 }
-                                isUpload = true;
-
-
                                 itemsProcessedLabel.StringValue += " ↑ " + e.Item.Name + " ... ";
-                              
-
-          
                             } catch(Exception ex){
                                 Logger.LogInfo ("ERROR", "NWManger " + ex.ToString());
                             }
                         } else {
                             try{
-                                isUpload = false;
                                 items.Add(e.Item);
-                                remoteRepositoryController = new RemoteRepositoryController(e.Item.Repository);
-
-
-                              
                                 itemsProcessedLabel.StringValue += " ↓ " + e.Item.Name + " ... ";
-                              
                             }catch(Exception ex){
                                 Logger.LogInfo ("ERROR", "NWManger " + ex.ToString());
                             }
