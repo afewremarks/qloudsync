@@ -38,7 +38,7 @@ namespace GreenQloud.Repository
 
         public override string ToString()
         {
-            return "(" + ProgressPercentage + "%) " + Key;  
+            return "(" + ProgressPercentage + "% "+ TransferType +") " + Key;  
         }
     }
 }

@@ -29,8 +29,8 @@
     <ProductName>QloudSync for Windows</ProductName>
     <PublisherName>GreenQloud</PublisherName>
     <AutorunEnabled>true</AutorunEnabled>
-    <ApplicationRevision>3</ApplicationRevision>
-    <ApplicationVersion>3.1.0.3</ApplicationVersion>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>0.3.2.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -220,25 +220,27 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Resources\SelectSync.png">
+    <Content Include="Resources\SelectSync.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SelectSync1.png">
+    </Content>
+    <Content Include="Resources\SelectSync1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\Network.png">
+    </Content>
+    <Content Include="Resources\Network.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
     <Content Include="Resources\process-pause-active.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\process-paused.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Resources\qloudsync-ico.ico">
+    <Content Include="Resources\qloudsync-ico.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <Content Include="Resources\share.png" />
+    </Content>
+    <Content Include="Resources\share.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Updater\autoupdate.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -258,74 +260,74 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="qloudsync.conf">
+    <Content Include="qloudsync.conf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="QloudSyncWIN_TemporaryKey.pfx" />
-    <None Include="Resources\process-syncing.png">
+    <Content Include="Resources\process-syncing.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\process-syncing-active.png">
+    <Content Include="Resources\process-syncing-active.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\process-syncing-down.png">
+    <Content Include="Resources\process-syncing-down.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\process-syncing-down-active.png">
+    <Content Include="Resources\process-syncing-down-active.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\process-syncing-error.png">
+    <Content Include="Resources\process-syncing-error.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\process-syncing-error-active.png">
+    <Content Include="Resources\process-syncing-error-active.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\process-syncing-idle.png">
+    <Content Include="Resources\process-syncing-idle.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\process-syncing-idle-active.png">
+    <Content Include="Resources\process-syncing-idle-active.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\process-syncing-up.png">
+    <Content Include="Resources\process-syncing-up.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\process-syncing-up-active.png">
+    <Content Include="Resources\process-syncing-up-active.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\about.png">
+    <Content Include="Resources\about.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\side-splash.png">
+    <Content Include="Resources\side-splash.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="qloudsync-app2.ico" />
-    <None Include="Resources\loginScreen.png">
+    <Content Include="Resources\loginScreen.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
     <Content Include="Resources\file-3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
