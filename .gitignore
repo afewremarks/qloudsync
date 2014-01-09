@@ -9,6 +9,6 @@ obj/
 *.psd
 *.am
 *.suo
-
+TestResults/
 QloudSync/test-results/
 QloudSyncMAC/test-results/QloudSyncMAC.csproj.test-cache
