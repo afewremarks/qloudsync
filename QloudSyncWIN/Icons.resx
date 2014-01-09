@@ -179,11 +179,14 @@
   <data name="share" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAADbSURBVDhPnZNbDcMwDEULoRAGoRAKYRAKoRDGpBAKoVIIBMIgFELmG8XdneUsUT+OlIdzHOcx
-        hBDusAkT2imlH7zgHg4hCasnRKa5ghUpKgTY7chCnWBOIZdUGIVV2AXIMM/xUZhqQit7lTEbZ0HMwkIV
-        MCiHF7WIWKQdK0OJHNxisyWzDGemZb4FyPkY+FJyqd6laDBYyli+wTLGqBDJ8mW0hBBhEY8xmAPXc2kJ
-        8Ty8nSlPbfcKH6ZfA0mPHmEPSIozFI8v9L7eP65nVRPexgrxD93ATuJXmIYPhoR9sOeXFesAAAAASUVO
-        RK5CYII=
+        YQUAAADmSURBVDhPnZNhEcMwCIUroRImYRImYRIiYRLmpBImoXcxEAmTMAkZLwc9ykHa5gd/Et7Hg5Ap
+        5zwNxEKaO3S11l2MwKBZKSrFywOi0iOIqKAAAYXbWcAQ4NDGT1riccxwQ/Fhd7jXmoJ8QD2ghb0p2QIi
+        E0kDvfbQjieOzkoPiBavwBbbsnaImUmbX55fWxMO/SjIS96jaGBid+0FnT0VIIq1xzgCAgRRb21wv63L
+        ERDr4TmTAk8p5i22DF67uXXc2VmvZ1o+8yVRFDMknj/D6PtF59taRcArO7fLtUD8w2EYaYsG/gGGhH2w
+        5f3fCQAAAABJRU5ErkJggg==
 </value>
+  </data>
+  <data name="process_syncing_idle_synced" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\process-syncing-idle-synced.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
