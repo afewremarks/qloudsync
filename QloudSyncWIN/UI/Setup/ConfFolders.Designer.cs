@@ -71,7 +71,6 @@ namespace GreenQloud.UI.Setup
             // 
             // label2
             // 
-            this.label2.AllowDrop = true;
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
