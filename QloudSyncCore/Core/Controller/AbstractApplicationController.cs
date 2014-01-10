@@ -22,6 +22,7 @@ namespace GreenQloud
         public abstract void FirstRunAction();
         public abstract void Quit();
         public abstract void OpenFolder(string path);
+        public abstract void SetIcon(string folderPath);
         public abstract void OpenWebsite(string url);
         public abstract void CreateMenuItem();
         public abstract void CheckForUpdates();
@@ -482,6 +483,7 @@ namespace GreenQloud
             if (!Directory.Exists(repo.Path))
             {
                 Directory.CreateDirectory(repo.Path);
+                SetIcon (repo.Path);
             }
         }
 
