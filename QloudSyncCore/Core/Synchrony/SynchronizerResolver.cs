@@ -108,50 +108,16 @@ namespace GreenQloud.Synchrony
                 }
             }
 
-
-            /*if (!remoteEvent.HaveResultItem)
-            {
-                if (!remoteEvent.Item.IsFolder)
-                {
-                    if (remoteRepository.Exists(remoteEvent.Item) && meta.ContentLength == 0)
-                        return true;
-                }
-            } else {
-                if (!remoteEvent.Item.ResultItem.IsFolder)
-                {
-                    if (remoteRepository.Exists(remoteEvent.Item.ResultItem) && meta.ContentLength == 0)
-                        return true;
-                }
-            }
-             */
             return false;
         }
         private bool VerifyIgnoreLocal (Event localEvent)
         {
-            /*if (!localEvent.HaveResultItem)
-            {
-                if (!localEvent.Item.IsFolder)
-                {
-                    FileInfo fi = new FileInfo(localEvent.Item.LocalAbsolutePath.Replace(@"\\", @"\"));
-                    if (fi.Exists && fi.Length == 0)
-                        return true;
-                }
-            }
-            else 
-            {
-                if (!localEvent.Item.ResultItem.IsFolder)
-                {
-                    FileInfo fi = new FileInfo(localEvent.Item.ResultItem.LocalAbsolutePath.Replace(@"\\", @"\"));
-                    if (fi.Exists && fi.Length == 0)
-                        return true;
-                }
-            }*/
             return false;
         }
         private bool VerifyIgnore (Event e)
         {
-            //if (e.Item.Name.StartsWith ("."))
-            //    return true;
+            if (e.Item.Name.Equals (".DS_Store"))
+                return true;
             if(e.RepositoryType == RepositoryType.REMOTE)
                return VerifyIgnoreRemote (e);
             if(e.RepositoryType == RepositoryType.LOCAL)
