@@ -322,6 +322,7 @@ namespace GreenQloud.Repository
         {
             lock (statisticsLock)
             {
+                statistics.Remove (key);
                 statistics.Add(key, statistic);
             }
         }
