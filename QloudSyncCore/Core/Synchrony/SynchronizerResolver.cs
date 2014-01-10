@@ -116,7 +116,8 @@ namespace GreenQloud.Synchrony
         }
         private bool VerifyIgnore (Event e)
         {
-            if (e.Item.Name.Equals (".DS_Store"))
+            Console.WriteLine (e.Item.Name);
+            if (e.Item.Name.Equals (".DS_Store") || e.Item.Name.Equals ("Icon\r") || e.Item.Name.Equals ("Icon"))
                 return true;
             if(e.RepositoryType == RepositoryType.REMOTE)
                return VerifyIgnoreRemote (e);
