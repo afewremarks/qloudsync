@@ -32,6 +32,7 @@ namespace GreenQloud.Synchrony
                             canChange = true;
                         }
                     };
+                    watcher.Start();
                 });
                 watcherThread.Start ();
             }
