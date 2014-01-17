@@ -73,7 +73,7 @@ namespace GreenQloud.Synchrony
         }
 
         public override void Run(){
-            while (!_stoped){
+            while (!Stoped){
                 SolveAll();
             }
         }
@@ -81,7 +81,7 @@ namespace GreenQloud.Synchrony
         public void SolveAll ()
         {
             eventsToSync = eventDAO.EventsToSync.Count;
-            while (eventsToSync > 0 && !_stoped)
+            while (eventsToSync > 0 && !Stoped)
             {
                 Synchronize();
                 eventsToSync = eventDAO.EventsToSync.Count;
@@ -225,7 +225,7 @@ namespace GreenQloud.Synchrony
                     Wait(10000);
                 }
 
-            } while (currentException != null && e.TryQnt < 5 && !_stoped);
+            } while (currentException != null && e.TryQnt < 5 && !Stoped);
 
             if (currentException != null) {
                 eventDAO.UpdateToSynchronized(e, RESPONSE.FAILURE);

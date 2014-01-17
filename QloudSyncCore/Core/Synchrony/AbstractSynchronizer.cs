@@ -21,9 +21,9 @@ namespace GreenQloud.Synchrony
         protected LocalRepository repo;
         protected SynchronizerUnit unit;
         private Thread _thread;
-        protected volatile bool _stoped;
+        private volatile bool _stoped;
         protected volatile bool _killed, _wasKilled;
-        protected Object lockk = new object();
+        private Object lockk = new object();
 
         public AbstractSynchronizer(LocalRepository repo, SynchronizerUnit unit) 
         {
@@ -31,6 +31,14 @@ namespace GreenQloud.Synchrony
             this.unit = unit;
             _stoped = true;
             _thread = new Thread(new ThreadStart(this.GenericRun)); 
+        }
+
+        public bool Stoped {
+            get { 
+                lock (lockk) {
+                    return _stoped;
+                }
+            }
         }
 
         public static T NewInstance(LocalRepository repo, SynchronizerUnit unit){

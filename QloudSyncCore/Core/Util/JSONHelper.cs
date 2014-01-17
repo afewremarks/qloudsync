@@ -41,6 +41,7 @@ namespace GreenQloud
         public static JArray GetInfoArray (string url)
         {
             System.Net.WebRequest myReq = System.Net.WebRequest.Create (url);
+            myReq.Timeout = 5000;
             string receiveContent = string.Empty;
             using (System.Net.WebResponse wr = myReq.GetResponse ()) {
                 Stream receiveStream = wr.GetResponseStream ();

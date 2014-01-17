@@ -35,7 +35,8 @@ using GreenQloud.Core;
         }
 
         public override void Run() {
-            while (!_stoped)
+            lastReleased = GlobalDateTime.Now;
+            while (!Stoped)
             {
                 CheckRemoteFolder();
                 Synchronize();
@@ -60,7 +61,7 @@ using GreenQloud.Core;
         }
 
         private void SolveFromPrefix(string prefix) {
-            if (!_stoped)
+            if (!Stoped)
             {
                 Thread t = new Thread(delegate()
                 {
@@ -94,9 +95,9 @@ using GreenQloud.Core;
                 {
                     count = executingThreads.Count;
                 }
-            } while (!_stoped &&  count > 0) ;
+            } while (!Stoped &&  count > 0) ;
                
-            if(!_stoped)
+            if(!Stoped)
                 canChange = true;
 
             lastReleased = GlobalDateTime.Now;
@@ -154,7 +155,7 @@ using GreenQloud.Core;
 
         private bool RequestForChange()
         {
-            if (!_stoped)
+            if (!Stoped)
             {
                 //Ask local if can make the change
                 if (!unit.LocalEventsSynchronizer.IsStoped())

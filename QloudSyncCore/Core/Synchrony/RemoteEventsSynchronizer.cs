@@ -29,15 +29,11 @@ namespace GreenQloud.Synchrony
         }
 
         public override void Run(){
-            Stop();
-            this.unit.RecoverySynchronizer.WaitForChanges(0);
-            Start();
-
-            while (!_stoped)
-            {
+            while (!Stoped)
+           {
                 AddEvents();
                 Wait(1000);
-            }
+           }
         }
 
         public void AddEvents ()
