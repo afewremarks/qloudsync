@@ -39,7 +39,6 @@ namespace GreenQloud
 
             CFRelease (paths);
             CFRelease (path);
-            Start ();
         }
 
         public delegate void ChangedEventHandler (Event e);
