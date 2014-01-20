@@ -167,64 +167,80 @@ namespace GreenQloud {
             }
 
             if (type == Controller.PageType.ConfigureFolders) {
-                currentWindowCloseApplication = true;
+                try {
+                    currentWindowCloseApplication = true;
 
-                this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "SelectSync1.png");
+                    this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "SelectSync1.png");
 
-                InitializeCheckboxesFolders ();
+                    InitializeCheckboxesFolders ();
 
-                NSTextField SQFolderTextLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Center,
-                    BackgroundColor = NSColor.Clear,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (0, 75 , Frame.Width, 60),
-                    StringValue     = "Current StorageQloud Path:",
-                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
-                        "Lucida Grande", NSFontTraitMask.Unbold, 0, 9),
-                    TextColor = NSColor.White
-                };
+                    NSTextField SQFolderTextLabel = new NSTextField () {
+                        Alignment       = NSTextAlignment.Center,
+                        BackgroundColor = NSColor.Clear,
+                        Bordered        = false,
+                        Editable        = false,
+                        Frame           = new RectangleF (0, 75 , Frame.Width, 60),
+                        StringValue     = "Current StorageQloud Path:",
+                        Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                            "Lucida Grande", NSFontTraitMask.Unbold, 0, 9),
+                        TextColor = NSColor.White
+                    };
 
-                SQFolderText = new NSTextField () {
-                    Alignment       = NSTextAlignment.Center,
-                    BackgroundColor = NSColor.Clear,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (0, 60 , Frame.Width, 60),
-                    StringValue     = RuntimeSettings.DefaultHomePath,
-                    Font            = NSFontManager.SharedFontManager.FontWithFamily (
-                        "Lucida Grande", NSFontTraitMask.Unbold, 0, 9),
-                    TextColor = NSColor.White
-                };
+                    SQFolderText = new NSTextField () {
+                        Alignment       = NSTextAlignment.Center,
+                        BackgroundColor = NSColor.Clear,
+                        Bordered        = false,
+                        Editable        = false,
+                        Frame           = new RectangleF (0, 60 , Frame.Width, 60),
+                        StringValue     = RuntimeSettings.DefaultHomePath,
+                        Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                            "Lucida Grande", NSFontTraitMask.Unbold, 0, 9),
+                        TextColor = NSColor.White
+                    };
 
-                ChangeSQFolder = new NSButton () {
-                    Frame = new RectangleF (49, 18, 137, 40),
-                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "Changeit220.png")),
-                    Transparent = false,
-                    Bordered = false,
-                    Enabled  = true
-                };
+                    ChangeSQFolder = new NSButton () {
+                        Frame = new RectangleF (49, 18, 137, 40),
+                        Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "Changeit220.png")),
+                        Transparent = false,
+                        Bordered = false,
+                        Enabled  = true
+                    };
 
-                ChangeSQFolder.Activated += delegate {
-                    SQFolderText.StringValue = SparkleSetupController.ChangeSQFolder ();
-                };
+                    ChangeSQFolder.Activated += delegate {
+                        SQFolderText.StringValue = SparkleSetupController.ChangeSQFolder ();
+                    };
 
-                FinishButton = new NSButton () {
-                    Frame = new RectangleF (264, 18, 137, 40),
-                    Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "Continue159.png")),
-                    Transparent = false,
-                    Bordered = false,
-                    Enabled  = true
-                };
-                FinishButton.Activated += delegate {
-                    SparkleSetupController.Finish (SQFolderText.StringValue, remoteFoldersCheckboxes);
-                };
+                    FinishButton = new NSButton () {
+                        Frame = new RectangleF (264, 18, 137, 40),
+                        Image = new NSImage(Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "Continue159.png")),
+                        Transparent = false,
+                        Bordered = false,
+                        Enabled  = true
+                    };
+                    FinishButton.Activated += delegate {
+                        SparkleSetupController.Finish (SQFolderText.StringValue, remoteFoldersCheckboxes);
+                    };
 
-                ContentView.AddSubview (SQFolderTextLabel);
-                ContentView.AddSubview (SQFolderText);
-                Buttons.Add (ChangeSQFolder);
-                Buttons.Add (FinishButton);
-                NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
+                    ContentView.AddSubview (SQFolderTextLabel);
+                    ContentView.AddSubview (SQFolderText);
+                    Buttons.Add (ChangeSQFolder);
+                    Buttons.Add (FinishButton);
+                    NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
+                } catch {
+                    ShowPage (AbstractApplicationController.PageType.Login, null);
+                    NSTextField MessageLabel = new NSTextField () {
+                        Alignment       = NSTextAlignment.Left,
+                        BackgroundColor = NSColor.Clear,
+                        Bordered        = false,
+                        Editable        = false,
+                        Frame           = new RectangleF (88, 55 , Frame.Width, 60),
+                        StringValue     = "An unexpected error occurred, please try again later.\n",
+                        Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                            "Lucida Grande", NSFontTraitMask.Bold, 0, 10),
+                        TextColor = NSColor.Red
+                    };
+                    ContentView.AddSubview (MessageLabel);
+                }
             }
 
             if (type == Controller.PageType.Finished) {

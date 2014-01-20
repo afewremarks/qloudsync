@@ -203,13 +203,11 @@ namespace GreenQloud.Synchrony
 
                         Logger.LogEvent ("DONE Event Synchronizing", e);
                     } catch (WebException webx) {
-                        if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
-                            throw webx;
-                        } else {
-                            currentException = webx;
-                        }
+                        Logger.LogInfo("FAILURE", webx);
+                        currentException = webx;
                     } catch (SocketException sock) {
-                        throw sock;
+                        Logger.LogInfo("FAILURE", sock);
+                        currentException = sock;
                     } catch (Exception ex) {
                         Logger.LogInfo("FAILURE", ex);
                         currentException = ex;
