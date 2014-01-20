@@ -73,7 +73,7 @@ namespace GreenQloud.Synchrony
         }
 
         public override void Run(){
-            while (!_stoped){
+            while (!Stoped){
                 SolveAll();
             }
         }
@@ -81,7 +81,7 @@ namespace GreenQloud.Synchrony
         public void SolveAll ()
         {
             eventsToSync = eventDAO.EventsToSync.Count;
-            while (eventsToSync > 0 && !_stoped)
+            while (eventsToSync > 0 && !Stoped)
             {
                 Synchronize();
                 eventsToSync = eventDAO.EventsToSync.Count;
@@ -203,13 +203,11 @@ namespace GreenQloud.Synchrony
 
                         Logger.LogEvent ("DONE Event Synchronizing", e);
                     } catch (WebException webx) {
-                        if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
-                            throw webx;
-                        } else {
-                            currentException = webx;
-                        }
+                        Logger.LogInfo("FAILURE", webx);
+                        currentException = webx;
                     } catch (SocketException sock) {
-                        throw sock;
+                        Logger.LogInfo("FAILURE", sock);
+                        currentException = sock;
                     } catch (Exception ex) {
                         Logger.LogInfo("FAILURE", ex);
                         currentException = ex;
@@ -225,7 +223,7 @@ namespace GreenQloud.Synchrony
                     Wait(10000);
                 }
 
-            } while (currentException != null && e.TryQnt < 5 && !_stoped);
+            } while (currentException != null && e.TryQnt < 5 && !Stoped);
 
             if (currentException != null) {
                 eventDAO.UpdateToSynchronized(e, RESPONSE.FAILURE);

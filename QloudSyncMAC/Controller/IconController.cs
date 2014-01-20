@@ -427,7 +427,7 @@ namespace GreenQloud {
                                     Console.WriteLine (e.Message);
                                     Logger.LogInfo ("INFO", "Cannot load CO₂ savings.");
                                 }
-                                Thread.Sleep (60000);
+                                Thread.Sleep (600000);
                             }
                         });
                         co2Update.Start ();

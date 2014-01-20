@@ -215,7 +215,7 @@ namespace GreenQloud.Persistence.SQLite
                 if (events.Count == 0)
                     events = Select(string.Format("SELECT * FROM EVENT WHERE REPOSITORY = 'LOCAL' AND RepositoryId = '{0}' ORDER BY INSERTTIME DESC LIMIT 1", repo.Id));
 
-                if (events.Count > 0)
+                if (events.Count > 0 && events[0].InsertTime.CompareTo(SynchronizerUnit.GetByRepo(repo).RecoverySynchronizer.LastReleased) > 0)
                 {
                     return  events[0].InsertTime;
                 }

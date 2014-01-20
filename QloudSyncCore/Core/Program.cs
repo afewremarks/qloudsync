@@ -78,6 +78,7 @@ namespace GreenQloud.Core {
                 } catch {
                 
                 }
+                Logger.LogInfo ("ERROR", "An unexpected error occourred. Check the log file.");
                 Program.Controller.HandleError();
             }
         }
@@ -86,7 +87,7 @@ namespace GreenQloud.Core {
             // Returns a System.Diagnostics.Process pointing to
             // a pre-existing process with the same name as the
             // current one, if any; or null if the current process
-            // is unique.
+        // is unique.,
         {
             Process curr = Process.GetCurrentProcess();
             Process[] procs = Process.GetProcessesByName(curr.ProcessName);
