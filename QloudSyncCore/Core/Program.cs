@@ -52,21 +52,25 @@ namespace GreenQloud.Core {
             {
                 if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
                     Logger.LogInfo ("LOST CONNECTION", webx);
-                    Program.Controller.HandleDisconnection ();
+                    //Logger.LogInfo ("LOST CONNECTION", "Calling HandleDisconnection");
+                    //Program.Controller.HandleDisconnection ();
                 } else {
                     Logger.LogInfo ("SYNCHRONIZER ERROR", webx);
+                    Logger.LogInfo ("SYNCHRONIZER ERROR", "Calling HandleError");
                     Program.Controller.HandleError ();
                 }
             }
             catch (SocketException sock) 
             {
                 Logger.LogInfo ("LOST CONNECTION", sock);
-                Program.Controller.HandleDisconnection ();
+                //Logger.LogInfo ("LOST CONNECTION", "Calling HandleDisconnection");
+                //Program.Controller.HandleDisconnection ();
             }
             catch (AbortedOperationException aex)
             {
                 Logger.LogInfo("Init", "Operation aborted. Sesnding a QloudSync Kill.");
                 Logger.LogInfo("ABORTED", aex); 
+                Logger.LogInfo ("ABORTED", "Calling Kill");
                 PriorProcess().Kill();
             } catch (WarningException warningException){
                 Program.Controller.Alert(warningException.Message);
@@ -79,6 +83,7 @@ namespace GreenQloud.Core {
                 
                 }
                 Logger.LogInfo ("ERROR", "An unexpected error occourred. Check the log file.");
+                Logger.LogInfo ("ERROR", "Calling HandleError");
                 Program.Controller.HandleError();
             }
         }

@@ -11,6 +11,7 @@ using System.IO;
 using GreenQloud.Persistence.SQLite;
 using System.Diagnostics;
 using System.Timers;
+using GreenQloud.Synchrony;
 
 namespace QloudSync
 {
@@ -19,7 +20,6 @@ namespace QloudSync
         private List<NSButton> remoteFoldersCheckboxes;
         private SQLiteRepositoryDAO repoDao;
         private SQLiteRepositoryIgnoreDAO repoIgnore;
-        private List<RepositoryItem> items;
         private List<RepositoryIgnore> ignoreFolders;
         private Timer timer;
        
@@ -59,7 +59,6 @@ namespace QloudSync
         void Initialize ()
         {   
             count = 0;
-            items = new List<RepositoryItem>();
             repoDao = new SQLiteRepositoryDAO();
             repoIgnore = new SQLiteRepositoryIgnoreDAO();
             //netTraffic = new NetworkTraffic (Process.GetCurrentProcess().Id);
@@ -77,10 +76,10 @@ namespace QloudSync
         {
 
             base.AwakeFromNib ();
-            //Initial Timers
-            timer = new Timer (1000);
+            //Network Tab
+            EventsNumberLabel.StringValue = "Looking for changes...";
+            timer = new Timer (5000);
             timer.Elapsed += delegate {
-
                 using (NSAutoreleasePool pool = new NSAutoreleasePool()) {
                     OnItemEvent();
                 }
@@ -223,49 +222,31 @@ namespace QloudSync
 
         public void OnItemEvent()
         {
-            Event e = Program.Controller.GetCurrentEvent ();
-            ResetItemList ();
-            if (e != null) {
-                EventType eventType = e.EventType;
-                if (e.Item != null && eventType != EventType.DELETE) {
-                    if(!items.Contains(e.Item)){
-                        count++;
-                        if(!(items.Count == 0))
-                            itemsProcessedLabel.StringValue += "done!" + Environment.NewLine;
-
-                        if (count == 6) {
-                            itemsProcessedLabel.StringValue = "";
-                            count = 0;
-                        }
-                        itemsLabel.StringValue = "1";
-                        if (e.RepositoryType == RepositoryType.LOCAL) {
-                            try {
-                                if (e.EventType == EventType.MOVE) {
-                                    items.Add (e.Item.ResultItem);
-                                } else {
-                                    items.Add (e.Item);
-                                }
-                                itemsProcessedLabel.StringValue += " ↑ " + e.Item.Name + " ... ";
-                            } catch(Exception ex){
-                                Logger.LogInfo ("ERROR", "NWManger " + ex.ToString());
-                            }
-                        } else {
-                            try{
-                                items.Add(e.Item);
-                                itemsProcessedLabel.StringValue += " ↓ " + e.Item.Name + " ... ";
-                            }catch(Exception ex){
-                                Logger.LogInfo ("ERROR", "NWManger " + ex.ToString());
-                            }
-                        }
+            if (SynchronizerUnit.UnitCount () > 0) {
+                int itensToSync = SynchronizerUnit.GetTotalEventsToSync ();
+                if (itensToSync > 0) {
+                    EventsNumberLabel.StringValue = itensToSync + " Event" + (itensToSync > 1 ? "s" : "") + " to sync";
+                } else {
+                    if (SynchronizerUnit.AnyRecovering ()) {
+                        EventsNumberLabel.StringValue = "Looking for changes...";
+                    } else {
+                        EventsNumberLabel.StringValue = "Up to date";
                     }
                 }
             }
-        }
 
-        private void ResetItemList()
-        {
-            if (items.Count == 50) {
-                items.Clear ();
+            itemsProcessedLabel.StringValue = "";
+            List<TransferStatistic> unifinishedStatistics = RemoteRepositoryController.UnfinishedStatistics;
+            unifinishedStatistics.Reverse ();
+            foreach(TransferStatistic s in unifinishedStatistics){
+                itemsProcessedLabel.StringValue += s.ToString() + "\n";
+            }
+
+            ItemsProcessedLabel2.StringValue = "";
+            List<TransferStatistic> finishedStatistics = RemoteRepositoryController.FinishedStatistics;
+            finishedStatistics.Reverse ();
+            foreach(TransferStatistic s in finishedStatistics){
+                ItemsProcessedLabel2.StringValue += s.ToString() + "\n";
             }
         }
 

@@ -8,6 +8,14 @@ namespace GreenQloud.Repository
     }
     public class TransferStatistic
     {
+        public TransferStatistic() {
+            CreatedAt = DateTime.Now;
+        }
+
+        public DateTime CreatedAt {
+            get; set;
+        }
+
         public string Key {
             get; set;
         }

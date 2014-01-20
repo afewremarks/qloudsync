@@ -371,7 +371,7 @@ namespace GreenQloud.Repository
         {
             get
             {
-                return finishedStatistics;
+                return finishedStatistics.OrderByDescending(x => x.CreatedAt).ToList();
             }
         }
 

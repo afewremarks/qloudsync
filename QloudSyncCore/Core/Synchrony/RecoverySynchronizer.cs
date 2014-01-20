@@ -8,6 +8,8 @@ using GreenQloud.Model;
 using GreenQloud.Persistence.SQLite;
 using System.IO;
 using GreenQloud.Core;
+using System.Net;
+using System.Net.Sockets;
 
  namespace GreenQloud.Synchrony
 {
@@ -36,26 +38,23 @@ using GreenQloud.Core;
 
         public override void Run() {
             lastReleased = GlobalDateTime.Now;
-            while (!Stoped)
-            {
-                CheckRemoteFolder();
-                Synchronize();
-            }
+            CheckRemoteFolder();
+            Synchronize();
         }
 
         void CheckRemoteFolder ()
         {
-            if (repo.RemoteFolder.Length > 0)
-            {
-                Event e = new Event(repo);
-                RepositoryItem item1 = RepositoryItem.CreateInstance(repo, repo.RemoteFolder);
-                e.Item = item1;
-                e.RepositoryType = RepositoryType.LOCAL;
-                e.EventType = EventType.CREATE;
-                eventDAO.Create(e);
-                if (remoteRepository.Exists(item1))
-                {
-                    eventDAO.UpdateToSynchronized(e, RESPONSE.IGNORED);
+            if (!Stoped) {
+                if (repo.RemoteFolder.Length > 0) {
+                    Event e = new Event (repo);
+                    RepositoryItem item1 = RepositoryItem.CreateInstance (repo, repo.RemoteFolder);
+                    e.Item = item1;
+                    e.RepositoryType = RepositoryType.LOCAL;
+                    e.EventType = EventType.CREATE;
+                    eventDAO.Create (e);
+                    if (remoteRepository.Exists (item1)) {
+                        eventDAO.UpdateToSynchronized (e, RESPONSE.IGNORED);
+                    }
                 }
             }
         }
@@ -65,13 +64,34 @@ using GreenQloud.Core;
             {
                 Thread t = new Thread(delegate()
                 {
-                    try
-                    {
-                        List<RepositoryItem> localItems = localRepository.GetItems(Path.Combine(repo.Path, prefix));
-                        List<RepositoryItem> remoteItems = remoteRepository.GetItems(prefix);
-                        SolveItems(localItems, remoteItems, prefix);
-                    } catch (Exception e){
-                        Program.GeneralUnhandledExceptionHandler(this, new UnhandledExceptionEventArgs(e, false)); 
+                    Exception currentException;
+                    int tryQnt = 0;
+                    do {
+                        currentException = null;
+                        try
+                        {
+                            List<RepositoryItem> localItems = localRepository.GetItems(Path.Combine(repo.Path, prefix));
+                            List<RepositoryItem> remoteItems = remoteRepository.GetItems(prefix);
+                            SolveItems(localItems, remoteItems, prefix);
+                        } catch (WebException webx) {
+                            Logger.LogInfo("FAILURE", webx);
+                            currentException = webx;
+                        } catch (SocketException sock) {
+                            Logger.LogInfo("FAILURE", sock);
+                            currentException = sock;
+                        } catch (Exception ex) {
+                            Logger.LogInfo("FAILURE", ex);
+                            currentException = ex;
+                        }
+
+                        if(currentException != null){
+                            Wait(10000);
+                        }
+                        tryQnt++;
+                    } while (currentException != null && tryQnt < 5);
+                    
+                    if (currentException != null) {
+                            Program.GeneralUnhandledExceptionHandler(this, new UnhandledExceptionEventArgs(currentException, false)); 
                     }
                 });
                 lock (lokkThreads)
@@ -95,9 +115,9 @@ using GreenQloud.Core;
                 {
                     count = executingThreads.Count;
                 }
-            } while (!Stoped &&  count > 0) ;
+            } while (!Killed && !Stoped &&  count > 0) ;
                
-            if(!Stoped)
+            if(!Killed && !Stoped)
                 canChange = true;
 
             lastReleased = GlobalDateTime.Now;
@@ -106,9 +126,31 @@ using GreenQloud.Core;
            repo.Recovering = false;
            SQLiteRepositoryDAO dao = new SQLiteRepositoryDAO();
            dao.Update(repo);
-            
-            Stop();
+           
+            if(!interrupted)
+                Kill();
             //Wait(60000);
+        }
+
+        private bool interrupted = false;
+        public override void Kill()
+        {
+            if (canChange == false)
+                interrupted = true;
+            base.Kill ();
+        }
+
+        public override void Stop()
+        {
+            if (canChange == false)
+                interrupted = true;
+            base.Stop ();
+        }
+
+        public override void Start()
+        {
+            interrupted = false;
+            base.Start ();
         }
 
         void SolveItems (List<RepositoryItem> localItems, List<RepositoryItem> remoteItems, string prefix)

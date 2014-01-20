@@ -47,7 +47,7 @@ namespace GreenQloud.Synchrony
             return instance;
         }
 
-        public void Start() {
+        public virtual void Start() {
             lock (lockk) {
                 if (!_killed)
                 {
@@ -72,7 +72,7 @@ namespace GreenQloud.Synchrony
         public void Join() { _thread.Join(); }
         public bool IsAlive { get { return _thread != null && _thread.IsAlive; } }
         public bool Killed { get { return _wasKilled; } }
-        public void Stop () { 
+        public virtual void Stop () { 
             lock (lockk) {
                 if (!_stoped) {
                     _stoped = true;
@@ -80,7 +80,7 @@ namespace GreenQloud.Synchrony
             }
         }
 
-        public void Kill()
+        public virtual void Kill()
         {
             Stop();
             lock (lockk)
@@ -116,9 +116,9 @@ namespace GreenQloud.Synchrony
             }
             catch (Exception e)
             {
-                _stoped = true;
-                _killed = true;
-                _wasKilled = true;
+                //_stoped = true;
+                //_killed = true;
+                //_wasKilled = true;
                 Program.GeneralUnhandledExceptionHandler(this, new UnhandledExceptionEventArgs(e, false));
             }
         }
