@@ -34,6 +34,11 @@ namespace GreenQloud {
             };
         }
 
+        public override void SetIcon(string folderPath)
+        {
+            Console.WriteLine(folderPath);
+        }
+
         public override void FirstRunAction()
         {
             

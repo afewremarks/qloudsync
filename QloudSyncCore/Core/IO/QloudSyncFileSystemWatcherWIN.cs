@@ -34,7 +34,6 @@ namespace GreenQloud
             this.repo = repo;
             this.watchPath = this.repo.Path;
             this.ignoreBag = new ArrayList();
-            Start();
         }
 
 
