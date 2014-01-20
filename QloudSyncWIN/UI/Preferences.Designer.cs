@@ -182,9 +182,9 @@ namespace GreenQloud.UI
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(236, 3);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(86, 13);
+            this.label4.Size = new System.Drawing.Size(88, 13);
             this.label4.TabIndex = 7;
-            this.label4.Text = "Processed Itens:";
+            this.label4.Text = "Processed Items:";
             this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // numberofitems
@@ -192,9 +192,9 @@ namespace GreenQloud.UI
             this.numberofitems.AutoSize = true;
             this.numberofitems.Location = new System.Drawing.Point(3, 3);
             this.numberofitems.Name = "numberofitems";
-            this.numberofitems.Size = new System.Drawing.Size(88, 13);
+            this.numberofitems.Size = new System.Drawing.Size(90, 13);
             this.numberofitems.TabIndex = 6;
-            this.numberofitems.Text = "Processing Itens:";
+            this.numberofitems.Text = "Processing Items:";
             // 
             // tabPage3
             // 
