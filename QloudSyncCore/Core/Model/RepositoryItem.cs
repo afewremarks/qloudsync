@@ -242,6 +242,17 @@ namespace GreenQloud.Model
             return path;
         }
 
+        public override bool Equals(object i){
+            RepositoryItem item = i as RepositoryItem;
+            if (item == null)
+                return false;
+
+            if (this.Id.Equals (item.Id) && this.Key.Equals (item.Key))
+                return true;
+
+            return false;
+        }
+
     }
 }
 

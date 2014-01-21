@@ -5,6 +5,7 @@ using GreenQloud.Model;
 using System.Linq;
 using GreenQloud.Synchrony;
 using System.Threading;
+using GreenQloud.Persistence.SQLite;
 
 namespace GreenQloud.Repository
 {
@@ -30,7 +31,24 @@ namespace GreenQloud.Repository
             return list;
         } 
 
-
+        public List<GreenQloud.Model.RepositoryItem> RootFolders {
+            get {
+                DirectoryInfo dir = new DirectoryInfo(repo.Path);
+                List<RepositoryItem> list = new List<RepositoryItem>();
+                if(repo != null) {
+                    if(dir.Exists) {
+                        foreach (DirectoryInfo dirInfo in dir.GetDirectories ("*", System.IO.SearchOption.TopDirectoryOnly).ToList ()){
+                            string key = dirInfo.FullName.Substring(repo.Path.Length);
+                            if (!key.EndsWith (Path.DirectorySeparatorChar.ToString()))
+                                key += Path.DirectorySeparatorChar;
+                            RepositoryItem localFile = RepositoryItem.CreateInstance (repo, key);
+                            list.Add (localFile);
+                        }
+                    }
+                }
+                return list;
+            }
+        }
 
 
 

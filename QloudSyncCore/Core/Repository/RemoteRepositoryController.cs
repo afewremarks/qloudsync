@@ -33,6 +33,7 @@ namespace GreenQloud.Repository
         public List<GreenQloud.Model.RepositoryItem> GetItems(string prefix) {
             return GetInstancesOfItems(GetS3Objects(prefix).Where(i =>!Key(i).StartsWith(".trash")).ToList());
         }
+
         public List<GreenQloud.Model.RepositoryItem> RootFolders {
             get {
                 return GetInstancesOfItems(GetRootFoldersS3Objects().Where(i => !Key(i).StartsWith(".trash")).ToList());

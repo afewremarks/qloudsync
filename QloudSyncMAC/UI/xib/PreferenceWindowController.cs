@@ -179,9 +179,17 @@ namespace QloudSync
            
             remoteFoldersCheckboxes = new List<NSButton> ();
             List<RepositoryItem> remoteItems = new RemoteRepositoryController (null).RootFolders;
+            List<RepositoryItem> localItems = new PhysicalRepositoryController (repoDao.MainActive).RootFolders;
+            List<RepositoryItem> totalItems = remoteItems;
+            for (int i = 0; i < localItems.Count; i++) {
+                if (!remoteItems.Contains (localItems [i])) {
+                    totalItems.Add (localItems [i]);
+                }
+            }
+
             ignoreFolders = repoIgnore.All (repoDao.RootRepo ());
 
-            for (int i = 0; i <remoteItems.Count; i++) {
+            for (int i = 0; i <totalItems.Count; i++) {
                 NSButton chk = new NSButton () {
                     Frame = new RectangleF (5,  256 - ((remoteFoldersCheckboxes.Count + 1) * 17), 300, 18),
                     Title = remoteItems[i].Key,
@@ -189,7 +197,7 @@ namespace QloudSync
                 };
                 chk.SetButtonType(NSButtonType.Switch);
 
-                if(ignoreFolders.Any(j => j.Path.Equals(remoteItems[i].Key)))
+                if(ignoreFolders.Any(j => j.Path.Equals(totalItems[i].Key)))
                     chk.State = NSCellStateValue.Off;
                 else
                     chk.State = NSCellStateValue.On;

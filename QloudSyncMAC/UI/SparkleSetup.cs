@@ -172,8 +172,6 @@ namespace GreenQloud {
 
                     this.background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "SelectSync1.png");
 
-                    InitializeCheckboxesFolders ();
-
                     NSTextField SQFolderTextLabel = new NSTextField () {
                         Alignment       = NSTextAlignment.Center,
                         BackgroundColor = NSColor.Clear,
@@ -186,17 +184,19 @@ namespace GreenQloud {
                         TextColor = NSColor.White
                     };
 
-                    SQFolderText = new NSTextField () {
-                        Alignment       = NSTextAlignment.Center,
-                        BackgroundColor = NSColor.Clear,
-                        Bordered        = false,
-                        Editable        = false,
-                        Frame           = new RectangleF (0, 60 , Frame.Width, 60),
-                        StringValue     = RuntimeSettings.DefaultHomePath,
-                        Font            = NSFontManager.SharedFontManager.FontWithFamily (
-                            "Lucida Grande", NSFontTraitMask.Unbold, 0, 9),
-                        TextColor = NSColor.White
-                    };
+                    if(SQFolderText == null) {
+                        SQFolderText = new NSTextField () {
+                            Alignment       = NSTextAlignment.Center,
+                            BackgroundColor = NSColor.Clear,
+                            Bordered        = false,
+                            Editable        = false,
+                            Frame           = new RectangleF (0, 60 , Frame.Width, 60),
+                            StringValue     = RuntimeSettings.DefaultHomePath,
+                            Font            = NSFontManager.SharedFontManager.FontWithFamily (
+                                "Lucida Grande", NSFontTraitMask.Unbold, 0, 9),
+                            TextColor = NSColor.White
+                        };
+                    }
 
                     ChangeSQFolder = new NSButton () {
                         Frame = new RectangleF (49, 18, 137, 40),
@@ -208,6 +208,9 @@ namespace GreenQloud {
 
                     ChangeSQFolder.Activated += delegate {
                         SQFolderText.StringValue = SparkleSetupController.ChangeSQFolder ();
+                        Reset ();
+                        ShowPage(AbstractApplicationController.PageType.ConfigureFolders, null);
+                        ShowAll();
                     };
 
                     FinishButton = new NSButton () {
@@ -221,13 +224,18 @@ namespace GreenQloud {
                         SparkleSetupController.Finish (SQFolderText.StringValue, remoteFoldersCheckboxes);
                     };
 
+
+                    InitializeCheckboxesFolders ();
                     ContentView.AddSubview (SQFolderTextLabel);
                     ContentView.AddSubview (SQFolderText);
                     Buttons.Add (ChangeSQFolder);
                     Buttons.Add (FinishButton);
                     NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
-                } catch {
-                    ShowPage (AbstractApplicationController.PageType.Login, null);
+                } catch (Exception e) {
+                    Logger.LogInfo ("ERROR", e);
+                    Reset ();
+                    ShowPage(AbstractApplicationController.PageType.Login, null);
+                    ShowAll ();
                     NSTextField MessageLabel = new NSTextField () {
                         Alignment       = NSTextAlignment.Left,
                         BackgroundColor = NSColor.Clear,
@@ -266,6 +274,7 @@ namespace GreenQloud {
         {
             remoteFoldersCheckboxes = new List<NSButton> ();
             List<RepositoryItem> remoteItems = new RemoteRepositoryController (null).RootFolders;
+            List<RepositoryItem> localItems = new PhysicalRepositoryController (new LocalRepository(this.SQFolderText.StringValue, "", true, true)).RootFolders;
 
             foreach (RepositoryItem item in remoteItems) 
             {
@@ -277,6 +286,20 @@ namespace GreenQloud {
                 chk.State = NSCellStateValue.On;
                 remoteFoldersCheckboxes.Add (chk);
             }
+
+            foreach (RepositoryItem item in localItems) 
+            {
+                if (!remoteItems.Contains (item)) {
+                    NSButton chk = new NSButton () {
+                        Frame = new RectangleF (82, Frame.Height - 100 - ((remoteFoldersCheckboxes.Count + 1) * 17), 300, 18),
+                        Title = item.Key
+                    };
+                    chk.SetButtonType (NSButtonType.Switch);
+                    chk.State = NSCellStateValue.On;
+                    remoteFoldersCheckboxes.Add (chk);
+                }
+            }
+
             foreach (NSButton chk in remoteFoldersCheckboxes) 
             {
                 ContentView.AddSubview (chk);
