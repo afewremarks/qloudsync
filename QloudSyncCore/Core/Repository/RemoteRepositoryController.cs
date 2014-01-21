@@ -96,7 +96,7 @@ namespace GreenQloud.Repository
         {
             if(item.IsFolder){
                 GenericCreateFolder (item.Key);
-                UploadEntry(connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, item.Key), item);
+                //UploadEntry(connection.Connect ().ListObjects (RuntimeSettings.DefaultBucketName, item.Key), item);
             }else{
                 GenericUpload (item.Key,  item.LocalAbsolutePath);
             }

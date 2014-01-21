@@ -24,23 +24,36 @@ namespace GreenQloud.UI.Setup
         public ConfFolders()
         {
             InitializeComponent();
+            this.label2.Text = RuntimeSettings.DefaultHomePath;
+            remoteFoldersCheckboxes = new List<System.Windows.Forms.CheckBox>();
             InitializeComponentCheckboxesFolders();
             this.FormClosed += (sender, args) =>
             {
                 OnExit(sender, args);
             };
-            this.label2.Text = RuntimeSettings.DefaultHomePath;
         }
 
         private void InitializeComponentCheckboxesFolders()
         {
+            foreach (System.Windows.Forms.CheckBox check in remoteFoldersCheckboxes) {
+                this.Controls.Remove(check);
+            }
+            remoteFoldersCheckboxes.Clear();
             // 
             // CheckBoxes
             // 
-            remoteFoldersCheckboxes = new List<System.Windows.Forms.CheckBox>();
             List<RepositoryItem> remoteItems = new RemoteRepositoryController(null).RootFolders;
+            List<RepositoryItem> localItems = new PhysicalRepositoryController(new LocalRepository(label2.Text, "", true, true)).RootFolders;
+            List<RepositoryItem> totalItems = new List<RepositoryItem>();
 
-            foreach (RepositoryItem item in remoteItems)
+            totalItems = remoteItems;
+            foreach (RepositoryItem i in localItems) {
+                if (!remoteItems.Contains(i)) {
+                    totalItems.Add(i);
+                }
+            }
+
+            foreach (RepositoryItem item in totalItems)
             {
                 System.Windows.Forms.CheckBox checkBox1 = new System.Windows.Forms.CheckBox();
                 checkBox1.BackColor = System.Drawing.Color.Transparent;
@@ -84,6 +97,8 @@ namespace GreenQloud.UI.Setup
             if ((new Invoker(folderBrowserDialog1).Invoke()) == DialogResult.OK)
             {
                 this.label2.Text = Path.Combine(folderBrowserDialog1.SelectedPath, GlobalSettings.HomeFolderName) + Path.DirectorySeparatorChar;
+                InitializeComponentCheckboxesFolders();
+                this.Refresh();
             }  
         }
 

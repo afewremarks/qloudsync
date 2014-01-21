@@ -43,11 +43,34 @@ namespace GreenQloud.UI
             base.OnLoad(e);
             this.checkedListBox1.Items.Clear();
             remoteFoldersCheckboxes = new List<System.Windows.Forms.CheckBox>();
-            List<RepositoryItem> remoteItems = new RemoteRepositoryController(null).RootFolders;
-            ignoreFolders = repoIgnore.All(repoDao.RootRepo());
-            foreach (RepositoryItem item in remoteItems)
+            loadSelectiveSyncCheckboxes();
+        }
+
+        private void loadSelectiveSyncCheckboxes()
+        {
+            foreach (System.Windows.Forms.CheckBox check in remoteFoldersCheckboxes)
             {
-                this.checkedListBox1.Items.Add(item.Key, !ignoreFolders.Any( i => i.Path.Equals(item.Key)));
+                this.Controls.Remove(check);
+            }
+            remoteFoldersCheckboxes.Clear();
+
+            List<RepositoryItem> remoteItems = new RemoteRepositoryController(null).RootFolders;
+            List<RepositoryItem> localItems = new PhysicalRepositoryController(repoDao.MainActive).RootFolders;
+            List<RepositoryItem> totalItems = new List<RepositoryItem>();
+
+            totalItems = remoteItems;
+            foreach (RepositoryItem i in localItems)
+            {
+                if (!remoteItems.Contains(i))
+                {
+                    totalItems.Add(i);
+                }
+            }
+            
+            ignoreFolders = repoIgnore.All(repoDao.RootRepo());
+            foreach (RepositoryItem item in totalItems)
+            {
+                this.checkedListBox1.Items.Add(item.Key, !ignoreFolders.Any(i => i.Path.Equals(item.Key)));
             }
             backgroundWorker1.RunWorkerAsync();
         }
