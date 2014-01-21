@@ -116,9 +116,8 @@ namespace GreenQloud.Synchrony
             }
             catch (Exception e)
             {
-                //_stoped = true;
-                //_killed = true;
-                //_wasKilled = true;
+                Kill ();
+                _wasKilled = true;
                 Program.GeneralUnhandledExceptionHandler(this, new UnhandledExceptionEventArgs(e, false));
             }
         }
