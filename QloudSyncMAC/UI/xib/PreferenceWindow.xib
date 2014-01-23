@@ -63,7 +63,6 @@
 							<string key="NSFrame">{{13, 10}, {580, 338}}</string>
 							<reference key="NSSuperview" ref="312036702"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="574608550"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
@@ -166,7 +165,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{398, 14}, {138, 32}}</string>
 												<reference key="NSSuperview" ref="859370158"/>
-												<reference key="NSNextKeyView"/>
 												<string key="NSReuseIdentifierKey">_NS:9</string>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="809848651">
@@ -303,7 +301,7 @@
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">0</int>
-													<string key="NSContents">Processing Itens:</string>
+													<string key="NSContents">Processing Items:</string>
 													<object class="NSFont" key="NSSupport" id="26">
 														<string key="NSName">LucidaGrande</string>
 														<double key="NSSize">11</double>
@@ -337,7 +335,6 @@
 																<string key="NSFrame">{{5, 9}, {248, 223}}</string>
 																<reference key="NSSuperview" ref="519824840"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView"/>
 																<string key="NSReuseIdentifierKey">_NS:1535</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="835406449">
@@ -368,7 +365,7 @@
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">0</int>
-													<string key="NSContents">Processed Itens:</string>
+													<string key="NSContents">Processed Items:</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSBackgroundColor" ref="737835787"/>
 													<object class="NSColor" key="NSTextColor">
@@ -654,7 +651,6 @@
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{398, 6}, {136, 32}}</string>
 																<reference key="NSSuperview" ref="82747736"/>
-																<reference key="NSNextKeyView"/>
 																<string key="NSReuseIdentifierKey">_NS:9</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="171746375">
