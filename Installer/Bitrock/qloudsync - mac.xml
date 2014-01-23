@@ -2,10 +2,10 @@
     <shortName>QloudSync</shortName>
     <fullName>QloudSync</fullName>
     <version>0.4.1</version>
-    <licenseFile>E:/Users/Maia/Documents/GitHub/qloudsync/Installer/Windows/BitRock_License.txt</licenseFile>
+    <licenseFile>/Users/carlosmaia/workspace/qloudsync/Installer/Bitrock/BitRock_License.txt</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
-    <leftImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>
-    <splashImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/about.png</splashImage>
+    <leftImage>/Users/carlosmaia/workspace/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>
+    <splashImage>/Users/carlosmaia/workspace/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/about.png</splashImage>
     <componentList>
         <component>
             <name>default</name>
@@ -55,7 +55,8 @@
                     <platforms>osx</platforms>
                     <distributionFileList>
                         <distributionDirectory>
-                            <origin>E:/Users/Maia/Desktop/client/MAC APP/QloudSync.app</origin>
+                            <allowWildcards>1</allowWildcards>
+                            <origin>/Users/carlosmaia/workspace/qloudsync/QloudSyncMAC/bin/Release</origin>
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
@@ -105,9 +106,18 @@
         <language>
             <code>en</code>
             <encoding>utf-8</encoding>
-            <file>E:/Users/Maia/Downloads/new_lang.lng</file>
+            <file>/Users/carlosmaia/workspace/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/new_lang.lng</file>
         </language>
     </customLanguageFileList>
+    <finalPageActionList>
+        <runProgram>
+            <abortOnError>0</abortOnError>
+            <program>${installdir}/Release/QloudSync.app/Contents/MacOS/QloudSync</program>
+            <programArguments>&amp;</programArguments>
+            <progressText>Run QloudSync?</progressText>
+            <showMessageOnError>0</showMessageOnError>
+        </runProgram>
+    </finalPageActionList>
     <parameterList>
         <directoryParameter>
             <name>installdir</name>
