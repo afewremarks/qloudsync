@@ -114,7 +114,7 @@
             <abortOnError>0</abortOnError>
             <program>${installdir}/Release/QloudSync.app/Contents/MacOS/QloudSync</program>
             <programArguments>&amp;</programArguments>
-            <progressText>Run QloudSync? (${installdir}/Release/QloudSync.app)</progressText>
+            <progressText>Run QloudSync?</progressText>
             <showMessageOnError>0</showMessageOnError>
         </runProgram>
     </finalPageActionList>
