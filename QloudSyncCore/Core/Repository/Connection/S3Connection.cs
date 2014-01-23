@@ -27,25 +27,40 @@ namespace QloudSync.Repository
 
                 uri = new Uri(GlobalSettings.AuthenticationURL + "?" + queryString.ToString());
                 myReq = WebRequest.Create(uri);
+                using (WebResponse wr = myReq.GetResponse ()){
+                    Stream receiveStream = wr.GetResponseStream ();
+                    StreamReader reader = new StreamReader (receiveStream, Encoding.UTF8);
+                    string receiveContent = reader.ReadToEnd ();
+                    Newtonsoft.Json.Linq.JObject o = Newtonsoft.Json.Linq.JObject.Parse(receiveContent);               
+                    Credential.SecretKey = (string)o["api_private_key"];
+                    Credential.PublicKey = (string)o["api_public_key"];
+                }
             }
             else 
             {
+
                 uri = new Uri(GlobalSettings.AuthenticationURL);
                 myReq = WebRequest.Create(uri);
-                string usernamePassword = username + ":" + password;
-                CredentialCache mycache = new CredentialCache();
-                mycache.Add(uri, "Basic", new NetworkCredential(username, password));
-                myReq.Credentials = mycache;
-                myReq.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(new ASCIIEncoding().GetBytes(usernamePassword)));
+                myReq.ContentType = "application/json";
+                myReq.Method = "POST";
+                string json = "";
+                using (var streamWriter = new StreamWriter(myReq.GetRequestStream()))
+                {
+                    json = "{\"username\":\""+username+"\",\"password\":\""+password+"\"}";
+                    streamWriter.Write(json);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+                using (WebResponse wr = myReq.GetResponse ()){
+                    Stream receiveStream = wr.GetResponseStream ();
+                    StreamReader reader = new StreamReader (receiveStream, Encoding.UTF8);
+                    string receiveContent = reader.ReadToEnd ();
+                    Newtonsoft.Json.Linq.JObject o = Newtonsoft.Json.Linq.JObject.Parse(receiveContent);               
+                    Credential.SecretKey = (string)o["secretKey"];
+                    Credential.PublicKey = (string)o["apiKey"];
+                }
             }
-            using (WebResponse wr = myReq.GetResponse ()){
-                Stream receiveStream = wr.GetResponseStream ();
-                StreamReader reader = new StreamReader (receiveStream, Encoding.UTF8);
-                string receiveContent = reader.ReadToEnd ();
-                Newtonsoft.Json.Linq.JObject o = Newtonsoft.Json.Linq.JObject.Parse(receiveContent);               
-                Credential.SecretKey = (string)o["api_private_key"];
-                Credential.PublicKey = (string)o["api_public_key"];
-            }
+
             Logger.LogInfo ("Authetication", "Keys loaded");
         } 
 

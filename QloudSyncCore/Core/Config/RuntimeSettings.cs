@@ -115,7 +115,7 @@ namespace GreenQloud
         public static string DefaultBucketName {
             get{
                 if (defaultBucketName == null)
-                    defaultBucketName = Credential.Username.Replace("@","-")+GlobalSettings.SuffixNameBucket;
+                    defaultBucketName = Credential.Username.ToLower().Replace("@","-")+GlobalSettings.SuffixNameBucket;
                 return defaultBucketName;
             }
         }

@@ -13,7 +13,7 @@ using System.IO;
         public static string Username {
             set {
                 if(value != null)
-                    xml.Username = value.ToLower();
+                    xml.Username = value;
             }
             get {
                 return xml.Username;
