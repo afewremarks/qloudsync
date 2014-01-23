@@ -1,0 +1,136 @@
+<project>
+    <shortName>QloudSync</shortName>
+    <fullName>QloudSync</fullName>
+    <version>0.4.1</version>
+    <licenseFile>E:/Users/Maia/Documents/GitHub/qloudsync/Installer/Windows/BitRock_License.txt</licenseFile>
+    <wrapLicenseFileText>0</wrapLicenseFileText>
+    <leftImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>
+    <splashImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/about.png</splashImage>
+    <componentList>
+        <component>
+            <name>default</name>
+            <description>Default Component</description>
+            <canBeEdited>1</canBeEdited>
+            <selected>1</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfiles</name>
+                    <platforms>all</platforms>
+                    <shortcutList>
+                        <shortcut>
+                            <comment>Uninstall</comment>
+                            <exec>${installdir}/${uninstallerName}</exec>
+                            <icon></icon>
+                            <name>Uninstall ${product_fullname}</name>
+                            <path>${installdir}</path>
+                            <platforms>all</platforms>
+                            <runAsAdmin>0</runAsAdmin>
+                            <runInTerminal>0</runInTerminal>
+                            <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
+                            <windowsExecArgs></windowsExecArgs>
+                            <windowsIcon>${installdir}/QloudSync/Resources/qloudsync-ico.ico</windowsIcon>
+                            <windowsPath>${installdir}</windowsPath>
+                        </shortcut>
+                    </shortcutList>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfileslinux</name>
+                    <platforms>linux</platforms>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfileswindows</name>
+                    <platforms>windows</platforms>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfilesosx</name>
+                    <platforms>osx</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>E:/Users/Maia/Desktop/client/MAC APP/QloudSync.app</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+        </component>
+        <component>
+            <name>dotnet</name>
+            <description>ServiceEx</description>
+            <canBeEdited>0</canBeEdited>
+            <selected>1</selected>
+            <show>0</show>
+            <folderList>
+                <folder>
+                    <description>.NET installer</description>
+                    <destination>${installdir}</destination>
+                    <name>dotnet</name>
+                    <platforms>windows</platforms>
+                    <ruleList>
+	<!-- The .NET installer will be unpacked on demand
+            so we attach a rule that will be never passed to
+            prevent the automatic unpack process -->
+	<isTrue value="0"/>
+                    </ruleList>
+                </folder>
+            </folderList>
+        </component>
+    </componentList>
+    <preInstallationActionList>
+        <deleteFile>
+            <path>${user_home_directory}/.config/QloudSync</path>
+        </deleteFile>
+    </preInstallationActionList>
+    <postUninstallationActionList>
+        <deleteFile>
+            <path>${installdir}/</path>
+        </deleteFile>
+        <deleteFile>
+            <path>${user_home_directory}/.config/QloudSync</path>
+        </deleteFile>
+    </postUninstallationActionList>
+    <enableDebugger>1</enableDebugger>
+    <enableRollback>1</enableRollback>
+    <enableTimestamp>1</enableTimestamp>
+    <startMenuGroupName>${product_shortname}</startMenuGroupName>
+    <vendor>GreenQloud</vendor>
+    <customLanguageFileList>
+        <language>
+            <code>en</code>
+            <encoding>utf-8</encoding>
+            <file>E:/Users/Maia/Downloads/new_lang.lng</file>
+        </language>
+    </customLanguageFileList>
+    <parameterList>
+        <directoryParameter>
+            <name>installdir</name>
+            <description>Installer.Parameter.installdir.description</description>
+            <explanation>Installer.Parameter.installdir.explanation</explanation>
+            <value></value>
+            <default>${platform_install_prefix}/${product_shortname}</default>
+            <allowEmptyValue>0</allowEmptyValue>
+            <cliOptionName>prefix</cliOptionName>
+            <mustBeWritable>1</mustBeWritable>
+            <mustExist>0</mustExist>
+            <width>40</width>
+        </directoryParameter>
+    </parameterList>
+    <platformOptionsList>
+        <platformOptions>
+            <wrapLicenseFileText>0</wrapLicenseFileText>
+            <platform>windows</platform>
+        </platformOptions>
+        <platformOptions>
+            <fullName>QloudSync Linux</fullName>
+            <platform>linux</platform>
+        </platformOptions>
+    </platformOptionsList>
+</project>
+

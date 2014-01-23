@@ -1,7 +1,7 @@
 <project>
     <shortName>QloudSync</shortName>
     <fullName>QloudSync</fullName>
-    <version>0.3.2</version>
+    <version>0.4.1</version>
     <licenseFile>E:/Users/Maia/Documents/GitHub/qloudsync/Installer/Windows/BitRock_License.txt</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
     <leftImage>E:/Users/Maia/Desktop/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>
@@ -79,6 +79,11 @@
                     <destination>${installdir}</destination>
                     <name>programfilesosx</name>
                     <platforms>osx</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>E:/Users/Maia/Desktop/client/MAC APP/QloudSync.app</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
                 </folder>
             </folderList>
             <startMenuShortcutList>
@@ -245,6 +250,9 @@
         <platformOptions>
             <fullName>QloudSync Linux</fullName>
             <platform>linux</platform>
+        </platformOptions>
+        <platformOptions>
+            <platform>osx</platform>
         </platformOptions>
     </platformOptionsList>
 </project>
