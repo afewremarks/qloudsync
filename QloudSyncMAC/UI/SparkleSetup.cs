@@ -221,7 +221,21 @@ namespace GreenQloud {
                         Enabled  = true
                     };
                     FinishButton.Activated += delegate {
-                        SparkleSetupController.Finish (SQFolderText.StringValue, remoteFoldersCheckboxes);
+                        DirectoryInfo dir = new DirectoryInfo(SQFolderText.StringValue);
+                        bool proceed = true;
+                        if(dir.Exists && (dir.GetDirectories().Length > 0 || dir.GetFiles().Length > 0) ){
+                            if(!Program.Controller.Confirm("This folder is not empty, do you wanna proceed? QloudSync will merge all files with your account.") ){
+                                proceed = false;
+                            }
+                        }
+                        if(proceed){
+                            SparkleSetupController.Finish (SQFolderText.StringValue, remoteFoldersCheckboxes);
+                        } else {
+                            Reset ();
+                            ShowPage(AbstractApplicationController.PageType.ConfigureFolders, null);
+                            ShowAll();
+                        }
+
                     };
 
 

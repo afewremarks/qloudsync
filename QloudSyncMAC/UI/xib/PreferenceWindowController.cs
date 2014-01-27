@@ -157,7 +157,7 @@ namespace QloudSync
 
             unlinkAccountButton.Activated += delegate {
                 try{
-                    if( Program.Controller.Confirm("Are you sure you want to continue? You are unlinking your account to" +
+                    if( Program.Controller.Confirm("Are you sure you want to continue? You are unlinking your account to " +
                                                    "this computer.") ){
                         Program.Controller.UnlinkAccount ();
                     }

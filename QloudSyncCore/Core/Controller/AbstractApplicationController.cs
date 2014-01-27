@@ -118,7 +118,7 @@ namespace GreenQloud
         {
             KillSynchronizers();
             PhysicalRepositoryController controller = new PhysicalRepositoryController(null);
-            controller.DeleteFile(RuntimeSettings.CredentialPath);
+            controller.DeleteDir(new DirectoryInfo(RuntimeSettings.ConfigPath));
             Alert("Your account are now unlinked, you can run QloudSync again to login with your accout or a new one.");
             Quit();
         }
