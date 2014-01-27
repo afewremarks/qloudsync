@@ -1,7 +1,7 @@
 <project>
     <shortName>QloudSync</shortName>
     <fullName>QloudSync</fullName>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
     <wrapLicenseFileText>0</wrapLicenseFileText>
     <leftImage>/Users/carlosmaia/workspace/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>
     <splashImage>/Users/carlosmaia/workspace/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/about.png</splashImage>
