@@ -24,6 +24,10 @@ namespace GreenQloud {
             }
             line += timestamp + " | " + type + " | " + message;
 
+            #if DEBUG
+                Console.WriteLine(line);
+            #endif
+
             lock (debug_lock) {
                 Directory.CreateDirectory(RuntimeSettings.ConfigPath);
                 if (log_size >= 50000) {
