@@ -103,7 +103,7 @@ namespace GreenQloud.Synchrony
                     meta = remoteRepository.GetMetadata (remoteEvent.Item.Key, true);
                 }
                 if(meta == null){
-                    Logger.LogInfo("ERROR", "File " + (remoteEvent.HaveResultItem ? remoteEvent.Item.ResultItem.Key : remoteEvent.Item.Key) + " ignored. Metadata not found!");
+                    Logger.LogInfo("ERROR ON VERIFY IGNORE REMOTE", "File " + (remoteEvent.HaveResultItem ? remoteEvent.Item.ResultItem.Key : remoteEvent.Item.Key) + " ignored. Metadata not found!");
                     return true;
                 }
             }
@@ -116,7 +116,6 @@ namespace GreenQloud.Synchrony
         }
         private bool VerifyIgnore (Event e)
         {
-            Console.WriteLine (e.Item.Name);
             if (e.Item.Name.Equals (".DS_Store") || e.Item.Name.Equals ("Icon\r") || e.Item.Name.Equals ("Icon"))
                 return true;
             if(e.RepositoryType == RepositoryType.REMOTE)
@@ -137,18 +136,18 @@ namespace GreenQloud.Synchrony
                         PerformIgnores (e);
                         if (VerifyIgnore (e)) {
                             eventDAO.UpdateToSynchronized (e, RESPONSE.IGNORED);
-                            Logger.LogInfo ("EVENT IGNORE", "Ignore event on " + e.Item.LocalAbsolutePath);
+                            Logger.LogInfo ("INFO EVENT IGNORE", "Ignore event on " + e.Item.LocalAbsolutePath);
                             return;
                         }
 
                         //refresh event
                         e = eventDAO.FindById(e.Id);
                         if(e.Synchronized){
-                            Logger.LogInfo ("INFO", "Event " + e.Id + " already synchronized with response " + e.Response);
+                            Logger.LogInfo ("INFO EVENT ALREADY SYNCED", "Event " + e.Id + " already synchronized with response " + e.Response);
                             return;
                         }
                        
-                        Logger.LogEvent ("Event Synchronizing (try "+(e.TryQnt+1)+")", e );
+                        Logger.LogEvent ("ERROR ON SYNC TRY (try "+(e.TryQnt+1)+")", e );
                         Program.Controller.HandleItemEvent(e);
                         if (e.RepositoryType == RepositoryType.LOCAL) {
                             SyncStatus = SyncStatus.UPLOADING;
@@ -201,15 +200,15 @@ namespace GreenQloud.Synchrony
                         SyncStatus = SyncStatus.IDLE;
                         Program.Controller.HandleSyncStatusChanged ();
 
-                        Logger.LogEvent ("DONE Event Synchronizing", e);
+                        Logger.LogEvent ("INFO EVENT SYNCHRONIZING DONE", e);
                     } catch (WebException webx) {
-                        Logger.LogInfo("FAILURE", webx);
+                        Logger.LogInfo("ERROR CONNECTION FAILURE ON SYNCHRONIZING", webx);
                         currentException = webx;
                     } catch (SocketException sock) {
-                        Logger.LogInfo("FAILURE", sock);
+                        Logger.LogInfo("ERROR CONNECTION FAILURE ON SYNCHRONIZING", sock);
                         currentException = sock;
                     } catch (Exception ex) {
-                        Logger.LogInfo("FAILURE", ex);
+                        Logger.LogInfo("ERROR CONNECTION FAILURE ON SYNCHRONIZING", ex);
                         currentException = ex;
                     }
 

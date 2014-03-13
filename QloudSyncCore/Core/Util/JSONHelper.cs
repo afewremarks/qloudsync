@@ -33,7 +33,7 @@ namespace GreenQloud
                 
                 return Newtonsoft.Json.Linq.JObject.Parse(receiveContent);
             } catch (Exception e){
-                Console.WriteLine(e.StackTrace);
+                Logger.LogInfo ("ERROR READING JSON", e);
                 return new JObject();
             }
         }

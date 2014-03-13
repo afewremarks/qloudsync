@@ -109,7 +109,7 @@ namespace GreenQloud
                             }
                         }
                         Thread.Sleep (5000);
-                    } catch { Logger.LogInfo("ERROR", "Failed to check connection"); };
+                        } catch (Exception e) { Logger.LogInfo("ERROR ON CHECK CONNECTION", e); };
                 }
             });
         }
@@ -168,12 +168,12 @@ namespace GreenQloud
                     SQLiteTimeDiffDAO dao = new SQLiteTimeDiffDAO();
                     if (dao.Count == 0)
                     {
-                        Logger.LogInfo("ERROR", "Failed to load server time... attempt to try again.");
+                        Logger.LogInfo("ERROR ON CALC TIME DIFF", "Failed to load server time, record not found on database... attempt to try again.");
                         Thread.Sleep(2000);
                     }
                     else
                     {
-                        Logger.LogInfo("WARNING", "Failed to load server time... using previous information.");
+                        Logger.LogInfo("WARNING ON CALC TIME DIFF", "Failed to load server time... using previous information.");
                         success = true;
                     }
                 }
@@ -188,7 +188,7 @@ namespace GreenQloud
             {
                 try
                 {
-                    Logger.LogInfo("INFO", "Initializing Synchronizers!");
+                    Logger.LogInfo("INFO INITIALIZE SYNC", "Initializing Synchronizers!");
                     SynchronizerUnit unit = SynchronizerUnit.GetByRepo(repo);
                     if (unit == null)
                     {
@@ -196,13 +196,13 @@ namespace GreenQloud
                         SynchronizerUnit.Add(repo, unit);
                     }
                     unit.InitializeSynchronizers(recovery);
-                    Logger.LogInfo("INFO", "Synchronizers Ready!");
+                    Logger.LogInfo("INFO INITIALIZE SYNC", "Synchronizers Ready!");
                     ErrorType = ERROR_TYPE.NULL;
                     OnIdle();
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    Logger.LogInfo("ERROR ON INITIALIZATION SYNC", e);
                 }
             });
             startSync.Start();
@@ -234,11 +234,11 @@ namespace GreenQloud
             if (unit != null)
             {
                 unit.StopAll();
-                Logger.LogInfo("INFO", "Synchronizers Stoped!");
+                Logger.LogInfo("INFO STOP SYNCHRONIZERS", "Synchronizers Stoped!");
             }
             else
             {
-                Logger.LogInfo("INFO", "Cannot stop synchronizers! [repository not found]");
+                Logger.LogInfo("ERROR STOP SYNCHRONIZERS", "Cannot stop synchronizers! [repository not found]");
             }
         }
 
@@ -248,11 +248,11 @@ namespace GreenQloud
             if (unit != null)
             {
                 unit.KillAll();
-                Logger.LogInfo("INFO", "Synchronizers Killed nicely!");
+                Logger.LogInfo("INFO KILL SYNCHRONIZERS", "Synchronizers Killed nicely!");
             }
             else
             {
-                Logger.LogInfo("INFO", "Cannot stop synchronizers! [repository not found]");
+                Logger.LogInfo("ERROR KILL SYNCHRONIZERS", "Cannot stop synchronizers! [repository not found]");
             }
         }
 
@@ -331,7 +331,7 @@ namespace GreenQloud
                 string id = Crypto.Getbase64(ConfigFile.GetInstance().Read("ApplicationName") + Credential.Username + GlobalDateTime.NowUniversalString);
                 ConfigFile.GetInstance().Write("InstanceID", id);
                 ConfigFile.GetInstance().Read("InstanceID");
-                Logger.LogInfo("INFO", "Generated InstanceID: " + id);
+                Logger.LogInfo("INFO CONFIG REQUIREMENTS", "Generated InstanceID: " + id);
             }
         }
 
@@ -381,7 +381,7 @@ namespace GreenQloud
 
         public void FinishFetcher()
         {
-            Logger.LogInfo("Controller", "First load sucessfully");
+            Logger.LogInfo("INFO FIRST LOAD", "First load sucessfully");
             FolderFetched();
         }
         
@@ -393,7 +393,7 @@ namespace GreenQloud
             }
             catch (Exception e)
             {
-                Logger.LogInfo("Initial Sync Error", e.Message + "\n " + e.StackTrace);
+                Logger.LogInfo("ERROR INITIAL SYNC", e.Message + "\n " + e.StackTrace);
             }
         }
 

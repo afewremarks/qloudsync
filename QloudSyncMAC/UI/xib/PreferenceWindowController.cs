@@ -139,7 +139,7 @@ namespace QloudSync
                         }
                         catch(Exception ex)
                         {
-                            Logger.LogInfo("ERROR", ex);
+                            Logger.LogInfo("ERROR ON MOVE STORAGEQLOUD FOLDER", ex);
                             Program.Controller.Alert("Cannot move StorageQloud Folder");
                         }
                     }
@@ -162,7 +162,7 @@ namespace QloudSync
                         Program.Controller.UnlinkAccount ();
                     }
                 }catch (Exception ex){
-                    Logger.LogInfo("ERROR" , ex);
+                    Logger.LogInfo("ERROR ON UNLINK ACCOUNT" , ex);
                     Program.Controller.Alert("Cannot unlink accounts, please check your " +
                         "internet connection and try again.");
                 }

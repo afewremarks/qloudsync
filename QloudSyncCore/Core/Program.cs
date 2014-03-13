@@ -51,39 +51,35 @@ namespace GreenQloud.Core {
             catch (WebException webx) 
             {
                 if (webx.Status == WebExceptionStatus.NameResolutionFailure || webx.Status == WebExceptionStatus.Timeout || webx.Status == WebExceptionStatus.ConnectFailure) {
-                    Logger.LogInfo ("LOST CONNECTION", webx);
-                    //Logger.LogInfo ("LOST CONNECTION", "Calling HandleDisconnection");
-                    //Program.Controller.HandleDisconnection ();
+                    Logger.LogInfo ("ERROR LOST CONNECTION", webx);
                 } else {
-                    Logger.LogInfo ("SYNCHRONIZER ERROR", webx);
-                    Logger.LogInfo ("SYNCHRONIZER ERROR", "Calling HandleError");
+                    Logger.LogInfo ("ERROR UNEXPECTED ON SYNCHRONIZER", webx);
+                    Logger.LogInfo ("ERROR UNEXPECTED ON SYNCHRONIZER", "Calling HandleError");
                     Program.Controller.HandleError ();
                 }
             }
             catch (SocketException sock) 
             {
-                Logger.LogInfo ("LOST CONNECTION", sock);
-                //Logger.LogInfo ("LOST CONNECTION", "Calling HandleDisconnection");
-                //Program.Controller.HandleDisconnection ();
+                Logger.LogInfo ("ERROR LOST CONNECTION", sock);
             }
             catch (AbortedOperationException aex)
             {
-                Logger.LogInfo("Init", "Operation aborted. Sesnding a QloudSync Kill.");
-                Logger.LogInfo("ABORTED", aex); 
-                Logger.LogInfo ("ABORTED", "Calling Kill");
+                Logger.LogInfo("INFO INIT", "Operation aborted. Sesnding a QloudSync Kill.");
+                Logger.LogInfo("INFO ABORTED", aex); 
+                Logger.LogInfo ("INFO ABORTED", "Calling Kill");
                 PriorProcess().Kill();
             } catch (WarningException warningException){
                 Program.Controller.Alert(warningException.Message);
             } catch (Exception ex) {
-                Logger.LogInfo("Unexpected Exception", ex);
+                Logger.LogInfo("ERROR UNEXPECTED", ex);
                 try
                 {
                     //new SendMail().SendBugMessage(ex.Message);
                 } catch {
                 
                 }
-                Logger.LogInfo ("ERROR", "An unexpected error occourred. Check the log file.");
-                Logger.LogInfo ("ERROR", "Calling HandleError");
+                Logger.LogInfo ("ERROR UNEXPECTED", "An unexpected error occourred. Check the log file.");
+                Logger.LogInfo ("ERROR UNEXPECTED", "Calling HandleError");
                 Program.Controller.HandleError();
             }
         }

@@ -147,7 +147,7 @@ namespace GreenQloud.Repository
         {
             GetObjectResponse meta = GetMetadata (item.Key);
             if(meta == null){
-                Logger.LogInfo("ERROR", "ETAG from " + item.Key + " cannot be calculated. Metadata not found!");
+                Logger.LogInfo("ERROR ON READING METADATA", "ETAG from " + item.Key + " cannot be calculated. Metadata not found!");
                 return "";
             }
             return meta.ETag.Replace("\"", "");
@@ -174,18 +174,18 @@ namespace GreenQloud.Repository
                         if(recoveryIfFolderBroken){
                             if(key.EndsWith("/")){
                                 GenericCreateFolder(key);
-                                Logger.LogInfo("INFO", "METADATA FOR "+ key +" NOT FOUND, trying to recover it!");
+                                Logger.LogInfo("INFO METADATA NOT FOUND", "METADATA FOR "+ key +" NOT FOUND, trying to recover it!");
                                 GetObjectRequest request2 = new LitS3.GetObjectRequest(service, RuntimeSettings.DefaultBucketName, key, true);
                                 using (GetObjectResponse response2 = request2.GetResponse()){
-                                    Logger.LogInfo("INFO", "METADATA FOR "+ key +" RECOVERED, folder created!");
+                                    Logger.LogInfo("INFO METADATA RECOVERED", "METADATA FOR "+ key +" RECOVERED, folder created!");
                                     return response2;
                                 }
                             }
                         }
-                        Logger.LogInfo("INFO", "METADATA FOR "+ key +" CANNOT BE RECOVERED!");
+                        Logger.LogInfo("INFO METADATA NOT RECOVERED", "METADATA FOR "+ key +" CANNOT BE RECOVERED!");
                         return null;
-                    } catch {
-                        Logger.LogInfo("INFO", "METADATA FOR "+ key +" CANNOT BE RECOVERED!");
+                    } catch (Exception e){
+                        Logger.LogInfo("ERROR CANNOT RECOVERY METADATA", e);
                         return null;
                     }
                 } else {
@@ -376,26 +376,6 @@ namespace GreenQloud.Repository
             }
         }
 
-        public void PrettyPrintStatiscs()
-        {
-            Console.WriteLine("Unfinished");
-            foreach (TransferStatistic statistic in unfinishedStatistics)
-            {
-                Console.WriteLine(statistic.Key);
-                Console.WriteLine("Bytes Total: " + statistic.BytesTotal);
-                Console.WriteLine("Bytes Transferred: " + statistic.BytesTransferred);
-                Console.WriteLine("%: " + statistic.ProgressPercentage);
-            }
-
-            Console.WriteLine("Finished");
-            foreach (TransferStatistic statistic in finishedStatistics)
-            {
-                Console.WriteLine(statistic.Key);
-                Console.WriteLine("Bytes Total: " + statistic.BytesTotal);
-                Console.WriteLine("Bytes Transferred: " + statistic.BytesTransferred);
-                Console.WriteLine("%: " + statistic.ProgressPercentage);
-            }
-        }
     }
 }
 

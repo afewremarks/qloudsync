@@ -18,7 +18,7 @@ namespace GreenQloud
 
         public static void Init(){
             statistic_timer.Elapsed += (object sender, System.Timers.ElapsedEventArgs e) => {UpdateVariables();};
-            statistic_timer.Disposed += (object sender, EventArgs e) => Console.WriteLine("Dispose Statistics");
+            statistic_timer.Disposed += (object sender, EventArgs e) => Logger.LogInfo ("INFO STATISTICS","Dispose Statistics");
         }
 
         public static void Stop(){

@@ -10,23 +10,23 @@ namespace GreenQloud {
         private static Object debug_lock = new Object ();
         private static int log_size = 0;
 
-        public static void LogInfo (string type, string message)
+        public static void LogInfo (string type, string message, bool useData = true)
         {
-            string timestamp;
-            try {
-                timestamp = GlobalDateTime.Now.ToString ("HH:mm:ss");
-            } catch {
-                timestamp = "[CANNOT GET DATE FROM SERVER!]";
+            string timestamp = "";
+            string line = "";
+            if (useData) {
+                try {
+                    timestamp = GlobalDateTime.Now.ToString ("HH:mm:ss");
+                } catch (Exception e) {
+                    timestamp = "[CANNOT GET DATE FROM SERVER!]";
+                    line += timestamp + " | " + "ERROR" + " | " + e.Message + Environment.NewLine;
+                }
             }
-            string line      = timestamp + " | " + type + " | " + message;
+            line += timestamp + " | " + type + " | " + message;
 
-#if DEBUG
-                Console.WriteLine (line);
-#endif
             lock (debug_lock) {
-                // Don't let the log get bigger than 1000 lines
                 Directory.CreateDirectory(RuntimeSettings.ConfigPath);
-                if (log_size >= 1000) {
+                if (log_size >= 50000) {
                     File.WriteAllText (RuntimeSettings.LogFilePath, line + Environment.NewLine);
                     log_size = 0;
 

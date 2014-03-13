@@ -154,7 +154,7 @@ namespace GreenQloud.Persistence.SQLite
                     } while (list2 != null && list2.Count > 0);
                 }
             } catch (Exception ex) {
-                Logger.LogInfo("ERROR", ex.Message);
+                Logger.LogInfo("ERROR ON COMBINING MOVE EVENTS", ex.Message);
             }
         }
 

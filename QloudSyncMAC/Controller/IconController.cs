@@ -424,8 +424,7 @@ namespace GreenQloud {
                                         });
                                     }
                                 } catch (Exception e) {
-                                    Console.WriteLine (e.Message);
-                                    Logger.LogInfo ("INFO", "Cannot load CO₂ savings.");
+                                    Logger.LogInfo("ERROR ON LOAD CO₂ SAVINGS", e);
                                 }
                                 Thread.Sleep (600000);
                             }

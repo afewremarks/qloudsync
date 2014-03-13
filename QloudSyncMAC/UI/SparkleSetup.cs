@@ -96,8 +96,6 @@ namespace GreenQloud {
 
                 background_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "loginScreen.png");
 
-                Console.WriteLine (background_image_path);
-
                 FullNameTextField = new NSTextField () {
                     Frame       = new RectangleF (90, Frame.Height - 337, 270, 25),
                     Delegate    = new SparkleTextFieldDelegate (),
@@ -246,7 +244,7 @@ namespace GreenQloud {
                     Buttons.Add (FinishButton);
                     NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
                 } catch (Exception e) {
-                    Logger.LogInfo ("ERROR", e);
+                    Logger.LogInfo ("ERROR ON LOADING CONFIG FOLDERS", e);
                     Reset ();
                     ShowPage(AbstractApplicationController.PageType.Login, null);
                     ShowAll ();

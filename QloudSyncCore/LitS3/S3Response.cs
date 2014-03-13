@@ -30,6 +30,7 @@ namespace LitS3
                 CheckResponse(value);
                 this.response = value;
                 ProcessResponse();
+                GreenQloud.Logger.LogInfo("INFO S3 RESPONSE", this.response.Headers.ToString());
             }
         }
 

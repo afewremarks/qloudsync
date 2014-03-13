@@ -6,7 +6,7 @@ namespace GreenQloud
     {
         public ConfigurationException (string Message) : base(Message)
         {
-            Logger.LogInfo ("ConfigurationException", this.Message);
+            Logger.LogInfo ("ERROR ON CONFIGURATION", this.Message);
         }
     }
 }

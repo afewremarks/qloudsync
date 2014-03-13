@@ -29,14 +29,13 @@ namespace GreenQloud {
             UI = new SparkleUI ();
 
             if (!program_mutex.WaitOne (0, false)) {
-                Console.WriteLine ("QloudSync is already running.");
+                Logger.LogInfo ("ERROR ON INIT", "QloudSync is already running.");
                 Environment.Exit (-1);
             }
             try {
                 GreenQloud.Core.Program.Run(Controller, UI);
             } catch (Exception e){
-                Logger.LogInfo ("Init", e);
-                Console.WriteLine (e.StackTrace);
+                Logger.LogInfo ("ERROR ON INIT", e);
                 Environment.Exit (-1);
             }
             #if !__MonoCS__

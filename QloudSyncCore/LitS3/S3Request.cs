@@ -24,6 +24,7 @@ namespace LitS3
             this.Service = service;
             this.bucketName = bucketName;
             this.WebRequest = CreateWebRequest(method, objectKey, queryString);
+            GreenQloud.Logger.LogInfo("INFO S3 REQUEST", this.WebRequest.RequestUri.AbsoluteUri);
         }
 
         HttpWebRequest CreateWebRequest(string method, string objectKey, string queryString)

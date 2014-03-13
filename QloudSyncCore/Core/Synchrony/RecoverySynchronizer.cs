@@ -74,13 +74,13 @@ using System.Net.Sockets;
                             List<RepositoryItem> remoteItems = remoteRepository.GetItems(prefix);
                             SolveItems(localItems, remoteItems, prefix);
                         } catch (WebException webx) {
-                            Logger.LogInfo("FAILURE", webx);
+                            Logger.LogInfo("ERROR CONNECTION FAILURE ON SOLVE_FROM_PREFIX", webx);
                             currentException = webx;
                         } catch (SocketException sock) {
-                            Logger.LogInfo("FAILURE", sock);
+                            Logger.LogInfo("ERROR CONNECTION FAILURE ON SOLVE_FROM_PREFIX", sock);
                             currentException = sock;
                         } catch (Exception ex) {
-                            Logger.LogInfo("FAILURE", ex);
+                            Logger.LogInfo("ERROR CONNECTION FAILURE ON SOLVE_FROM_PREFIX", ex);
                             currentException = ex;
                         }
 
@@ -238,7 +238,7 @@ using System.Net.Sockets;
                         e.RepositoryType = RepositoryType.LOCAL;
                         e.EventType = EventType.UPDATE;
                     } else {
-                        Logger.LogInfo ("WARNING", "Recovery Synchronizer found both update local and remote on " + item.Key + " and cannot merge this."); //TODO MAKE A MANUAL MERGE DECISION
+                        Logger.LogInfo ("ERROR ON SOLVE FROM REMOTE", "Recovery Synchronizer found both update local and remote on " + item.Key + " and cannot merge this."); //TODO MAKE A MANUAL MERGE DECISION
                         return null;
                     }
                     return e;

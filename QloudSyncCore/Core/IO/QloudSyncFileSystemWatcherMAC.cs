@@ -109,11 +109,6 @@ namespace GreenQloud
                             ignore = true;
                     }
 
-
-                    #if DEBUG
-                    Console.WriteLine ("Flags on watcher: " + flags[i].ToString());
-                    #endif
-
                     if (!ignore) {
 
                         Event e = new Event (repo);

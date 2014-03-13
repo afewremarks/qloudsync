@@ -27,7 +27,7 @@ namespace GreenQloud
                 if (!File.Exists(FULLNAME)) 
                     File.Copy(INIT_FULLNAME, FULLNAME);
             }catch(Exception e){
-                    Logger.LogInfo("Update Config File Error", e);
+                Logger.LogInfo("ERROR ON UPDATE CONFIG FILE", e);
             }
         }
     }

@@ -15,7 +15,7 @@ namespace GreenQloud
 	class DisconnectionException : Exception
 	{
         public DisconnectionException (): base("Lost connection"){
-            Logger.LogInfo ("Error", this.Message);
+            Logger.LogInfo ("ERROR ON CONNECTION", this.Message);
         }
 	}
 

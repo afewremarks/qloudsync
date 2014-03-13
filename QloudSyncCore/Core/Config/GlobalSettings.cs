@@ -38,7 +38,7 @@ namespace GreenQloud
                     return int.Parse(ConfigFile.GetInstance().Read("IntervalBetweenChecksStatistics"));
                 }
                 catch{
-                    Logger.LogInfo ("GlobalSettings", "Invalid IntervalBetweenChecksStatistics value");
+                    Logger.LogInfo ("ERROR ON IntervalBetweenChecksStatistics VALUE", "Invalid IntervalBetweenChecksStatistics value");
                     return 3600000;
                 }
             }
@@ -116,7 +116,7 @@ namespace GreenQloud
                 return int.Parse(ConfigFile.GetInstance().Read ("UploadTimeout"));
                 }
                 catch{
-                    Logger.LogInfo ("GlobalSettings", "Invalid UploadTimeout value");
+                    Logger.LogInfo ("ERROR INVALID GlobalSettings", "Invalid UploadTimeout value");
                     return 3600000;
                 }
             }
@@ -129,7 +129,7 @@ namespace GreenQloud
                     return int.Parse(ConfigFile.GetInstance().Read ("IntervalBetweenChecksRemoteRepository"));
                 }
                 catch{
-                    Logger.LogInfo ("GlobalSettings", "Invalid IntervalBetweenChecksRemoteRepository value");
+                    Logger.LogInfo ("ERROR INVALID GlobalSettings", "Invalid IntervalBetweenChecksRemoteRepository value");
                     return 30000;
                 }
             }

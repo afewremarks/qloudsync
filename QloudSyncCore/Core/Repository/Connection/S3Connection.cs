@@ -61,7 +61,7 @@ namespace QloudSync.Repository
                 }
             }
 
-            Logger.LogInfo ("Authetication", "Keys loaded");
+            Logger.LogInfo ("INFO AUTH SUCCESS", "Keys loaded");
         } 
 
         public S3Service Connect ()

@@ -15,7 +15,7 @@ namespace GreenQloud
 	public class AccessDeniedException : Exception
 	{
         public AccessDeniedException () : base ("Access denied"){
-            Logger.LogInfo ("Error", this.Message);
+            Logger.LogInfo ("ERROR ON PERMITION", this.Message);
         }
 	}
 
