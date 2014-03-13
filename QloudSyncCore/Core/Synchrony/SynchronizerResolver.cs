@@ -147,7 +147,7 @@ namespace GreenQloud.Synchrony
                             return;
                         }
                        
-                        Logger.LogEvent ("ERROR ON SYNC TRY (try "+(e.TryQnt+1)+")", e );
+                        Logger.LogEvent ("INFO SYNC TRY (try "+(e.TryQnt+1)+")", e );
                         Program.Controller.HandleItemEvent(e);
                         if (e.RepositoryType == RepositoryType.LOCAL) {
                             SyncStatus = SyncStatus.UPLOADING;
