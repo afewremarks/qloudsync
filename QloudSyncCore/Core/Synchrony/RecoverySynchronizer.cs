@@ -80,7 +80,7 @@ using System.Net.Sockets;
                             Logger.LogInfo("ERROR CONNECTION FAILURE ON SOLVE_FROM_PREFIX", sock);
                             currentException = sock;
                         } catch (Exception ex) {
-                            Logger.LogInfo("ERROR CONNECTION FAILURE ON SOLVE_FROM_PREFIX", ex);
+                            Logger.LogInfo("ERROR FAILURE ON SOLVE_FROM_PREFIX", ex);
                             currentException = ex;
                         }
 

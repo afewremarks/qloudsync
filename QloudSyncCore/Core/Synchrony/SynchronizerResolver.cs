@@ -208,7 +208,7 @@ namespace GreenQloud.Synchrony
                         Logger.LogInfo("ERROR CONNECTION FAILURE ON SYNCHRONIZING", sock);
                         currentException = sock;
                     } catch (Exception ex) {
-                        Logger.LogInfo("ERROR CONNECTION FAILURE ON SYNCHRONIZING", ex);
+                        Logger.LogInfo("ERROR FAILURE ON SYNCHRONIZING", ex);
                         currentException = ex;
                     }
 
