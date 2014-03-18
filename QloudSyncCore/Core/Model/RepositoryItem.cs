@@ -233,6 +233,11 @@ namespace GreenQloud.Model
             }
         }
 
+        public void BuildResultConflictItem(){
+            resultItem = CreateInstance (this.Repository, this.Key + ".conflict." + GlobalDateTime.NowUniversalString, this.ETag, this.LocalETag);
+            ResultItemId = resultItem.Id;
+        }
+
         private string ToPathString (string path)
         {
             path = path.Replace("/", Path.DirectorySeparatorChar.ToString());

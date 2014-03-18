@@ -239,7 +239,11 @@ using System.Net.Sockets;
                         e.EventType = EventType.UPDATE;
                     } else {
                         Logger.LogInfo ("ERROR ON SOLVE FROM REMOTE", "Recovery Synchronizer found both update local and remote on " + item.Key + " and cannot merge this."); //TODO MAKE A MANUAL MERGE DECISION
-                        return null;
+                        item.BuildResultConflictItem ();
+                        localRepository.Move (item);
+                        e.Item = RepositoryItem.CreateInstance (repo, item.Key);
+                        e.RepositoryType = RepositoryType.REMOTE;
+                        e.EventType = EventType.CREATE;
                     }
                     return e;
                 }

@@ -193,7 +193,7 @@ namespace GreenQloud.Persistence.SQLite
                 return list;
             }
         }
-
+            
         public override void SetEventType (Event e)
         {
             database.ExecuteNonQuery (string.Format("UPDATE EVENT SET  TYPE = '{0}' WHERE EventID ='{1}'", e.EventType, e.Id));
