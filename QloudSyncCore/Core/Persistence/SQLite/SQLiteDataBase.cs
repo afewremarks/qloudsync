@@ -169,10 +169,12 @@ namespace GreenQloud.Persistence.SQLite
         /// <returns>An Integer containing the number of rows updated.</returns>
         public int ExecuteNonQuery(string sql)
         {
+            Logger.LogInfo ("SQL INFO ExecuteNonQuery", sql);
             return ExecuteNonQuery(sql, false);
         }
         public int ExecuteNonQuery(string sql, bool returnId)
         {
+            Logger.LogInfo ("SQL INFO ExecuteNonQuery", sql);
             #if __MonoCS__
             using (SqliteConnection cnn = new SqliteConnection(ConnectionString))
             #else
@@ -217,6 +219,7 @@ namespace GreenQloud.Persistence.SQLite
         /// <returns>A string.</returns>
         public string ExecuteScalar(string sql)
         {
+            Logger.LogInfo ("SQL INFO ExecuteScalar", sql);
             #if __MonoCS__
             using (SqliteConnection cnn = new SqliteConnection(ConnectionString))
             #else

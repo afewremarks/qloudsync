@@ -232,7 +232,7 @@ namespace GreenQloud.Persistence.SQLite
                 " LEFT JOIN RepositoryItem it on e.ItemId = it.RepositoryItemID" +
                 " LEFT JOIN RepositoryItem ri on it.ResultItemId = ri.RepositoryItemID" +
                 " WHERE SYNCHRONIZED <> '{0}' AND " +
-                " (it.RepositoryItemKey LIKE '{1}%' OR  it.RepositoryItemKey LIKE '%{1}' OR ri.RepositoryItemKey LIKE '{1}%' OR  ri.RepositoryItemKey LIKE '%{1}') AND e.RepositoryId = '{2}'", bool.TrueString, itemKey, repo.Id);
+                " (it.RepositoryItemKey LIKE '{1}%' OR  it.RepositoryItemKey LIKE '%{1}' OR ri.RepositoryItemKey LIKE '{1}%' OR  ri.RepositoryItemKey LIKE '%{1}') AND e.RepositoryId = '{2}'", bool.TrueString, itemKey.Replace("'","''"), repo.Id);
             
             System.Object temp = database.ExecuteScalar(sql);
             int count = int.Parse(temp.ToString());
