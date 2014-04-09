@@ -1,10 +1,11 @@
 <project>
     <shortName>QloudSync</shortName>
     <fullName>QloudSync</fullName>
-    <version>0.4.2</version>
+    <version>0.4.3</version>
+    <licenseFile>/Users/gustavo/Workspace/greenqloud/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/$RLWCE6O.txt</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
-    <leftImage>/Users/carlosmaia/workspace/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>
-    <splashImage>/Users/carlosmaia/workspace/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/about.png</splashImage>
+    <leftImage>/Users/gustavo/Workspace/greenqloud/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/side-splash.png</leftImage>
+    <splashImage>/Users/gustavo/Workspace/greenqloud/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/about.png</splashImage>
     <componentList>
         <component>
             <name>default</name>
@@ -55,7 +56,7 @@
                     <distributionFileList>
                         <distributionDirectory>
                             <allowWildcards>1</allowWildcards>
-                            <origin>/Users/carlosmaia/workspace/qloudsync/QloudSyncMAC/bin/Release</origin>
+                            <origin>/Users/gustavo/Workspace/greenqloud/qloudsync/QloudSyncMAC/bin/Debug</origin>
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
@@ -105,7 +106,7 @@
         <language>
             <code>en</code>
             <encoding>utf-8</encoding>
-            <file>/Users/carlosmaia/workspace/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/new_lang.lng</file>
+            <file>/Users/gustavo/workspace/greenqloud/qloudsync/Installer/QloudSync Stuff/Images for QloudSync/new_lang_MAC.lng</file>
         </language>
     </customLanguageFileList>
     <finalPageActionList>
